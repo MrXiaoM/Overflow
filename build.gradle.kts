@@ -14,7 +14,7 @@ version = "$miraiVersion.$overflowVersion"
 
 buildConfig {
     className("BuildConstants")
-    packageName("${group}.${rootProject.name}")
+    packageName("${project.group}.${rootProject.name}")
     useKotlinOutput()
 
     buildConfigField("String", "VERSION", "\"${project.version}\"")
@@ -38,9 +38,11 @@ dependencies {
 tasks {
     shadowJar {
         mapOf(
-            "io.netty" to "netty"
+            "io.netty" to "netty",
+            "org.intellij.lang.annotations" to "annotations.intellij",
+            "org.jetbrains.annotations" to "annotations.jetbrains"
         ).forEach {
-            relocate(it.key, "${group}.${rootProject.name}.libs.${it.value}")
+            relocate(it.key, "${project.group}.${rootProject.name}.libs.${it.value}")
         }
     }
     withType<KotlinCompile> {
