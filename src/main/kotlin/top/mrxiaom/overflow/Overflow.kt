@@ -8,7 +8,7 @@ import io.netty.channel.EventLoopGroup
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.IMirai
@@ -22,10 +22,12 @@ import net.mamoe.mirai.data.MemberInfo
 import net.mamoe.mirai.data.StrangerInfo
 import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.event.Event
+import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
+import net.mamoe.mirai.event.nextEvent
 import net.mamoe.mirai.internal.event.EventChannelToEventDispatcherAdapter
 import net.mamoe.mirai.internal.event.InternalEventMechanism
 import net.mamoe.mirai.message.action.Nudge
@@ -33,6 +35,9 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
+import top.mrxiaom.overflow.events.PacketReceiveEvent
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.jvm.jvmName
 
 fun setup() {
@@ -45,6 +50,8 @@ lateinit var instance: Overflow
 @OptIn(MiraiExperimentalApi::class)
 class Overflow : IMirai {
     val logger = MiraiLogger.Factory.create(this::class, "OverflowImpl")
+    val scope = CoroutineScope(EmptyCoroutineContext + CoroutineName("overflow"))
+    val serverFuture = java.util.concurrent.CompletableFuture<Boolean>()
     override val BotFactory: BotFactory
         get() = BotFactoryImpl
     override var FileCacheStrategy: FileCacheStrategy = net.mamoe.mirai.utils.FileCacheStrategy.PlatformDefault
@@ -58,6 +65,9 @@ class Overflow : IMirai {
         } catch (ignored: ClassNotFoundException) {
         }
         logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
+        GlobalEventChannel.registerListenerHost(PacketListener())
+        scope.launch { startServer() }
+        serverFuture.get()
     }
 
     fun startServer() {
@@ -81,14 +91,14 @@ class Overflow : IMirai {
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
 
             val future: ChannelFuture = boot.bind(port).sync()
-
+            logger.info("已在端口 $port 开启接口服务器")
+            logger.info("正在等待连接...")
+            serverFuture.complete(true)
             future.channel().closeFuture().sync()
         } finally {
             workerGroup.shutdownGracefully()
             bossGroup.shutdownGracefully()
         }
-        logger.info("已在端口 $port 开启接口服务器")
-        logger.info("正在等待连接...")
     }
 
     override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
@@ -128,6 +138,7 @@ class Overflow : IMirai {
         originalMessage: MessageChain
     ): OfflineMessageSource {
         TODO("Not yet implemented")
+
     }
 
     override fun createFileMessage(id: String, internalId: Int, name: String, size: Long): FileMessage {
