@@ -22,9 +22,12 @@ import net.mamoe.mirai.data.MemberInfo
 import net.mamoe.mirai.data.StrangerInfo
 import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.event.Event
+import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
+import net.mamoe.mirai.internal.event.EventChannelToEventDispatcherAdapter
+import net.mamoe.mirai.internal.event.InternalEventMechanism
 import net.mamoe.mirai.message.action.Nudge
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.FileCacheStrategy
@@ -47,40 +50,38 @@ class Overflow : IMirai {
 
     init {
         instance = this
+        logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
+    }
 
+    fun startServer() { 
         val port = System.getProperty("overflow.port", "11451")
             .toIntOrNull()?.run {
                 if (this in 1..65535) this else null
             } ?: error("-Doverflow.port 的值无效")
 
-        // 待测试，我不知道在初始化时 runBlocking 是否正确
-        runBlocking {
-            logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
+        val bossGroup: EventLoopGroup = NioEventLoopGroup()
+        val workerGroup: EventLoopGroup = NioEventLoopGroup()
+        try {
+            val boot = ServerBootstrap()
+            boot.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel::class.java)
+                .childHandler(object : ChannelInitializer<SocketChannel>() {
+                    override fun initChannel(ch: SocketChannel) {
+                        ch.pipeline().addLast(NetworkHandler())
+                    }
+                })
+                .option(ChannelOption.SO_BACKLOG, 128)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
 
-            val bossGroup: EventLoopGroup = NioEventLoopGroup()
-            val workerGroup: EventLoopGroup = NioEventLoopGroup()
-            try {
-                val boot = ServerBootstrap()
-                boot.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel::class.java)
-                    .childHandler(object : ChannelInitializer<SocketChannel>() {
-                        override fun initChannel(ch: SocketChannel) {
-                            ch.pipeline().addLast(NetworkHandler())
-                        }
-                    })
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
+            val future: ChannelFuture = boot.bind(port).sync()
 
-                val future: ChannelFuture = boot.bind(port).sync()
-
-                future.channel().closeFuture().sync()
-            } finally {
-                workerGroup.shutdownGracefully()
-                bossGroup.shutdownGracefully()
-            }
-            logger.info("已在端口 $port 开启接口服务器")
-            logger.info("正在等待连接...")
+            future.channel().closeFuture().sync()
+        } finally {
+            workerGroup.shutdownGracefully()
+            bossGroup.shutdownGracefully()
         }
+        logger.info("已在端口 $port 开启接口服务器")
+        logger.info("正在等待连接...")
     }
 
     override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
@@ -95,8 +96,17 @@ class Overflow : IMirai {
         TODO("Not yet implemented")
     }
 
+    @OptIn(InternalEventMechanism::class)
     override suspend fun broadcastEvent(event: Event) {
-        TODO("Not yet implemented")
+        if (event is BotEvent) {
+            val bot = event.bot
+            // TODO Bot has not implemented
+            //if (bot is AbstractBot) {
+            //    bot.components[EventDispatcher].broadcast(event)
+            //}
+        } else {
+            EventChannelToEventDispatcherAdapter.instance.broadcastEventImpl(event)
+        }
     }
 
     override fun constructMessageSource(
