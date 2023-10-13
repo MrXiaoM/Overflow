@@ -33,6 +33,9 @@ dependencies {
     netty("codec-http")
     netty("codec-socks")
     netty("transport")
+
+    testImplementation("net.mamoe:mirai-console:$miraiVersion")
+    testImplementation("net.mamoe:mirai-console-terminal:$miraiVersion")
 }
 
 tasks {

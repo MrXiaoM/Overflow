@@ -33,6 +33,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
+import kotlin.reflect.jvm.jvmName
 
 fun setup() {
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
@@ -50,10 +51,16 @@ class Overflow : IMirai {
 
     init {
         instance = this
+        // 暂定禁止 mirai-console 的终端用户须知，它可能已不适用于 Overflow
+        try {
+            Class.forName("net.mamoe.mirai.console.enduserreadme.EndUserReadme")
+            System.setProperty("mirai.console.skip-end-user-readme", "Overflow v${BuildConstants}")
+        } catch (ignored: ClassNotFoundException) {
+        }
         logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
     }
 
-    fun startServer() { 
+    fun startServer() {
         val port = System.getProperty("overflow.port", "11451")
             .toIntOrNull()?.run {
                 if (this in 1..65535) this else null
@@ -98,6 +105,7 @@ class Overflow : IMirai {
 
     @OptIn(InternalEventMechanism::class)
     override suspend fun broadcastEvent(event: Event) {
+        logger.info("fired event: " + event::class.jvmName)
         if (event is BotEvent) {
             val bot = event.bot
             // TODO Bot has not implemented
