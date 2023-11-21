@@ -3,6 +3,7 @@ import kotlin.collections.*
 
 plugins {
     kotlin("jvm") version "1.9.0"
+    kotlin("plugin.serialization") version "1.9.0"
     id("com.github.johnrengelman.shadow") version "7.0.0"
     id("com.github.gmazzo.buildconfig") version "3.1.0"
 }
@@ -20,9 +21,13 @@ buildConfig {
     buildConfigField("String", "VERSION", "\"${project.version}\"")
     buildConfigField("String", "MIRAI_VERSION", "\"$miraiVersion\"")
 }
+allprojects {
+    group = rootProject.group
+    version = rootProject.version
 
-repositories {
-    mavenCentral()
+    repositories {
+        mavenCentral()
+    }
 }
 
 dependencies {
@@ -34,11 +39,16 @@ dependencies {
     netty("codec-socks")
     netty("transport")
 
+    implementation(project(":onebot-client"))
+
     testImplementation("net.mamoe:mirai-console:$miraiVersion")
     testImplementation("net.mamoe:mirai-console-terminal:$miraiVersion")
 }
 
 tasks {
+    build {
+        dependsOn(shadowJar)
+    }
     shadowJar {
         mapOf(
             "io.netty" to "netty",
@@ -49,6 +59,6 @@ tasks {
         }
     }
     withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "17"
     }
 }
