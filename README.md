@@ -1,6 +1,12 @@
-# Overflow WIP
+<div align="center">
+  <h1>Overflow WIP</h1>
+  
+  欢迎回到 mirai
+  
+  Overflow 是 mirai-core-api 的实现，对接 OneBot 11 标准，实现 mirai 的无缝迁移。
+</div>
 
-mirai-core-api 的实现，对接 OneBot 标准，实现 mirai 的无缝迁移。
+## 以下使用方法均为 1.0 版本的设想，暂未实现，敬请期待
 
 # 快速开始-使用者
 
@@ -45,4 +51,5 @@ TODO
 
 # 鸣谢
 
-本项目使用了 [onebot-client](https://github.com/cnlimiter/onebot-client) 进行快速开发。感谢该项目为本项目的发起者节约了大量的阅读文档与设计接口时间。
+本项目使用了 [onebot-client](https://github.com/cnlimiter/onebot-client) 进行快速开发。  
+感谢该项目为本项目的发起者节约了大量的阅读文档与设计接口时间。
