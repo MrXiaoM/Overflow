@@ -8,6 +8,8 @@
 
 ## 以下使用方法均为 1.0 版本的设想，暂未实现，敬请期待
 
+正在进行快速开发阶段，项目结构、包名等可能随时改变，正式发布前**请勿**提交 Pull Requests。
+
 # 快速开始-使用者
 
 将 `mirai-core` 实现删除，替换为 `overflow` 即可。  
@@ -37,7 +39,7 @@
 ```json5
 "top.mrxiaom:overflow-core-all"
 ```
-即可。`overflow-core-all` 的版本号将于 mirai 的发行版保持同步。
+即可。`overflow-core-all` 的版本号将与 mirai 的发行版保持同步。
 
 # 快速开始-开发者
 
