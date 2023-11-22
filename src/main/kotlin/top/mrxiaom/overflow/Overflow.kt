@@ -1,13 +1,8 @@
 package top.mrxiaom.overflow
 
-import io.netty.bootstrap.ServerBootstrap
-import io.netty.channel.ChannelFuture
-import io.netty.channel.ChannelInitializer
-import io.netty.channel.ChannelOption
-import io.netty.channel.EventLoopGroup
-import io.netty.channel.nio.NioEventLoopGroup
-import io.netty.channel.socket.SocketChannel
-import io.netty.channel.socket.nio.NioServerSocketChannel
+import cn.evolvefield.onebot.client.config.BotConfig
+import cn.evolvefield.onebot.client.connection.ConnectFactory
+import cn.evolvefield.onebot.client.handler.EventBus
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.*
@@ -25,7 +20,6 @@ import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
 import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
-import net.mamoe.mirai.event.nextEvent
 import net.mamoe.mirai.internal.event.EventChannelToEventDispatcherAdapter
 import net.mamoe.mirai.internal.event.InternalEventMechanism
 import net.mamoe.mirai.message.action.Nudge
@@ -33,8 +27,11 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
+import top.mrxiaom.overflow.listener.FriendMessageListener
+import top.mrxiaom.overflow.listener.GroupMessageListener
 import top.mrxiaom.overflow.message.OnebotMessages
 import java.io.File
+import java.util.concurrent.LinkedBlockingQueue
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.jvm.jvmName
 
@@ -46,7 +43,10 @@ class Overflow : IMirai {
         get() = BotFactoryImpl
     override var FileCacheStrategy: FileCacheStrategy = net.mamoe.mirai.utils.FileCacheStrategy.PlatformDefault
 
-    val channel = GlobalEventChannel.parentScope(scope)
+    val config: Config by lazy {
+        val text = File("config.json")
+        Json.decodeFromString(Config.serializer(), text.readText())
+    }
 
     companion object {
         private lateinit var _instance: Overflow
@@ -54,7 +54,7 @@ class Overflow : IMirai {
         @JvmStatic
         fun setup() {
             @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-            net.mamoe.mirai._MiraiInstance.set(Overflow())
+            _MiraiInstance.set(Overflow())
         }
         @JvmStatic
         @get:JvmName("getInstance")
@@ -74,6 +74,16 @@ class Overflow : IMirai {
 
         OnebotMessages.registerSerializers()
 
+        val blockingQueue = LinkedBlockingQueue<String>() //使用队列传输数据
+
+        val service = ConnectFactory(
+            BotConfig(config.wsHost), blockingQueue
+        )
+        val bot = service.ws.createBot().also { BotFactoryImpl.internalBot = it }
+        val dispatchers = EventBus(blockingQueue)
+
+        dispatchers.addListener(FriendMessageListener(bot))
+        dispatchers.addListener(GroupMessageListener(bot))
     }
 
     override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
