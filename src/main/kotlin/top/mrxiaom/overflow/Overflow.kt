@@ -33,6 +33,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
+import top.mrxiaom.overflow.message.OnebotMessages
 import java.io.File
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.jvm.jvmName
@@ -71,6 +72,7 @@ class Overflow : IMirai {
         }
         logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
 
+        OnebotMessages.registerSerializers()
 
     }
 
