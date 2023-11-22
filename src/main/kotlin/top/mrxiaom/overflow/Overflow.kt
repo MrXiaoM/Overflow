@@ -197,7 +197,8 @@ class Overflow : IMirai {
     }
 
     override suspend fun queryImageUrl(bot: Bot, image: Image): String {
-        TODO("Not yet implemented")
+        // Onebot 没有 imageId 概念，Overflow 使用 imageId 字段来存储 Onebot 中的 file 链接
+        return image.imageId
     }
 
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
