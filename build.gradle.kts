@@ -9,13 +9,12 @@ plugins {
 }
 
 group = "top.mrxiaom"
-val miraiVersion = "2.16.0-RC"
-val overflowVersion = "0001"
-version = "$miraiVersion.$overflowVersion"
+val miraiVersion = "2.16.0"
+version = miraiVersion
 
 buildConfig {
     className("BuildConstants")
-    packageName("${project.group}.${rootProject.name}")
+    packageName("${project.group}.${rootProject.name.toLowerCase()}")
     useKotlinOutput()
 
     buildConfigField("String", "VERSION", "\"${project.version}\"")
@@ -39,7 +38,9 @@ dependencies {
     netty("codec-socks")
     netty("transport")
 
+    implementation(project(":onebot-sdk"))
     implementation(project(":onebot-client"))
+    implementation("org.java-websocket:Java-WebSocket:1.5.4")
 
     testImplementation("net.mamoe:mirai-console:$miraiVersion")
     testImplementation("net.mamoe:mirai-console-terminal:$miraiVersion")

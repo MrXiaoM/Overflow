@@ -9,10 +9,8 @@ import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import kotlinx.coroutines.*
-import net.mamoe.mirai.Bot
-import net.mamoe.mirai.BotFactory
-import net.mamoe.mirai.IMirai
-import net.mamoe.mirai.LowLevelApi
+import kotlinx.serialization.json.Json
+import net.mamoe.mirai.*
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Friend
 import net.mamoe.mirai.contact.OtherClientInfo
@@ -35,73 +33,49 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
-import top.mrxiaom.overflow.events.PacketReceiveEvent
-import kotlin.coroutines.CoroutineContext
+import java.io.File
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.jvm.jvmName
 
-fun setup() {
-    @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-    net.mamoe.mirai._MiraiInstance.set(Overflow())
-}
-
-lateinit var instance: Overflow
 
 @OptIn(MiraiExperimentalApi::class)
 class Overflow : IMirai {
-    val logger = MiraiLogger.Factory.create(this::class, "OverflowImpl")
     val scope = CoroutineScope(EmptyCoroutineContext + CoroutineName("overflow"))
-    val serverFuture = java.util.concurrent.CompletableFuture<Boolean>()
     override val BotFactory: BotFactory
         get() = BotFactoryImpl
     override var FileCacheStrategy: FileCacheStrategy = net.mamoe.mirai.utils.FileCacheStrategy.PlatformDefault
 
+    val channel = GlobalEventChannel.parentScope(scope)
+
+    companion object {
+        private lateinit var _instance: Overflow
+        val logger = MiraiLogger.Factory.create(Overflow::class, "溢出核心")
+        @JvmStatic
+        fun setup() {
+            @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+            net.mamoe.mirai._MiraiInstance.set(Overflow())
+        }
+        @JvmStatic
+        @get:JvmName("getInstance")
+        val instance: Overflow
+            get() = _instance
+    }
+
     init {
-        instance = this
+        _instance = this
         // 暂定禁止 mirai-console 的终端用户须知，它可能已不适用于 Overflow
         try {
             Class.forName("net.mamoe.mirai.console.enduserreadme.EndUserReadme")
-            System.setProperty("mirai.console.skip-end-user-readme", "Overflow v${BuildConstants}")
+            System.setProperty("mirai.console.skip-end-user-readme", "Overflow v${BuildConstants.VERSION}")
         } catch (ignored: ClassNotFoundException) {
         }
         logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
-        GlobalEventChannel.registerListenerHost(PacketListener())
-        scope.launch { startServer() }
-        serverFuture.get()
-    }
 
-    fun startServer() {
-        val port = System.getProperty("overflow.port", "11451")
-            .toIntOrNull()?.run {
-                if (this in 1..65535) this else null
-            } ?: error("-Doverflow.port 的值无效")
 
-        val bossGroup: EventLoopGroup = NioEventLoopGroup()
-        val workerGroup: EventLoopGroup = NioEventLoopGroup()
-        try {
-            val boot = ServerBootstrap()
-            boot.group(bossGroup, workerGroup)
-                .channel(NioServerSocketChannel::class.java)
-                .childHandler(object : ChannelInitializer<SocketChannel>() {
-                    override fun initChannel(ch: SocketChannel) {
-                        ch.pipeline().addLast(NetworkHandler())
-                    }
-                })
-                .option(ChannelOption.SO_BACKLOG, 128)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
-
-            val future: ChannelFuture = boot.bind(port).sync()
-            logger.info("已在端口 $port 开启接口服务器")
-            logger.info("正在等待连接...")
-            serverFuture.complete(true)
-            future.channel().closeFuture().sync()
-        } finally {
-            workerGroup.shutdownGracefully()
-            bossGroup.shutdownGracefully()
-        }
     }
 
     override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
+
         TODO("Not yet implemented")
     }
 

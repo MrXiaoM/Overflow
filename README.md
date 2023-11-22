@@ -1,13 +1,48 @@
 # Overflow WIP
 
-mirai-core-api 的实现，放出网络接口，用于对接其它协议库或实现。
+mirai-core-api 的实现，对接 OneBot 标准，实现 mirai 的无缝迁移。
 
-# 项目进度说明
+# 快速开始-使用者
 
-本人 kotlin 水平烂、有其它项目在身、有学业在身，该项目的开发优先级较低，看心情更新。
+将 `mirai-core` 实现删除，替换为 `overflow` 即可。  
+以下为使用 MCL 迁移到 overflow 的操作示例。
 
-当前所设计的网络包编写规则类似于 Minecraft，类命名规范暂定为：
-* 从 mirai 发送到目标协议的包，命名为 `S2C${packetName}Packet`。
-* 从目标协议发送到 mirai 的包，命名为 `C2S${packetName}Packet`。
+编辑 config.json
+```json5
+{
+  // ...
+  "packages": {
+    // ...
+    "net.mamoe:mirai-core-all": {
+      "channel": "maven-stable",
+      "version": "2.15.0",
+      "type": "libs",
+      "versionLocked": false
+    },
+    // ...
+  }
+}
+```
+将其中的
+```json5
+"net.mamoe:mirai-core-all"
+```
+改为
+```json5
+"top.mrxiaom:overflow-core-all"
+```
+即可。`overflow-core-all` 的版本号将于 mirai 的发行版保持同步。
 
-当 mirai 收到目标协议发送过来的包时，将会广播事件 `top.mrxiaom.overflow.events.PacketReceiveEvent`。
+# 快速开始-开发者
+
+## 使用 Mirai Console Gradle Plugin 开发
+
+TODO
+
+## 纯 mirai-core 开发
+
+将 `net.mamoe:mirai-core` 依赖替换为 `top.mrxiaom:overflow-core-all` 即可。
+
+# 鸣谢
+
+本项目使用了 [onebot-client](https://github.com/cnlimiter/onebot-client) 进行快速开发。感谢该项目为本项目的发起者节约了大量的阅读文档与设计接口时间。
