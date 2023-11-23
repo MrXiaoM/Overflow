@@ -56,7 +56,7 @@ public class ActionHandler {
         if (!channel.isOpen()) {
             return null;
         }
-        var reqJson = generateReqJson(action, params);
+        JsonObject reqJson = generateReqJson(action, params);
         ActionSendUtils actionSendUtils = new ActionSendUtils(channel, 3000L);
         apiCallbackMap.put(reqJson.get("echo").getAsString(), actionSendUtils);
         JsonsObject result;
@@ -81,7 +81,7 @@ public class ActionHandler {
      * @return 请求数据结构
      */
     private JsonObject generateReqJson(ActionPath action, JsonObject params) {
-        var json = new JsonObject();
+        JsonObject json = new JsonObject();
         json.addProperty("action", action.getPath());
         json.add("params", params);
         json.addProperty("echo", echo++);
