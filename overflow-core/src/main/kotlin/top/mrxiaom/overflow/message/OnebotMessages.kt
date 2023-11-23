@@ -2,6 +2,8 @@ package top.mrxiaom.overflow.message
 
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
+import net.mamoe.mirai.Bot
+import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
@@ -68,7 +70,7 @@ object OnebotMessages {
         })
     }
     @OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
-    fun deserializeFromOneBotJson(jsonString: String): MessageChain {
+    suspend fun deserializeFromOneBotJson(bot: Bot, jsonString: String): MessageChain {
         val json = Json.parseToJsonElement(jsonString).jsonArray
         return buildMessageChain {
             for (o in json) {
@@ -96,7 +98,9 @@ object OnebotMessages {
                     ))
                     //"music" -> add(MusicShare())
                     "forward" -> {
-                        //val id = data["id"]!!.jsonPrimitive.long
+                        val id = data["id"]!!.toString()
+                        val nodes = Mirai.downloadForwardMessage(bot, id)
+
                         TODO("解析转发消息")
                     }
                     "xml" -> add(SimpleServiceMessage(60, data["data"].toString()))

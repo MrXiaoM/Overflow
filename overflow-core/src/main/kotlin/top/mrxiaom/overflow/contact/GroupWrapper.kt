@@ -14,6 +14,7 @@ import cn.evole.onebot.sdk.response.group.GroupInfoResp;
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
 import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.contact.Group.Companion.setEssenceMessage
 import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.message.OnebotMessages
@@ -37,13 +38,24 @@ class GroupWrapper(
         get() = botWrapper
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${botWrapper.id})Group/$id")
     override val active: GroupActive
-        get() = TODO("Not yet implemented")
+        get() {
+            val resp = botWrapper.impl.getGroupHonorInfo(id, "all").data
+            TODO("Not yet implemented")
+        }
     override val announcements: Announcements
         get() = TODO("Not yet implemented")
     override val essences: Essences
-        get() = TODO("Not yet implemented")
+        get() {
+            for (resp in botWrapper.impl.getEssenceMsgList(id).data) {
+
+            }
+            TODO("Not yet implemented")
+        }
     override val files: RemoteFiles
-        get() = TODO("Not yet implemented")
+        get() {
+            val resp = botWrapper.impl.getGroupRootFiles(id).data
+            TODO("Not yet implemented")
+        }
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(
         "Please use files instead.",
@@ -84,7 +96,11 @@ class GroupWrapper(
     }
 
     override suspend fun quit(): Boolean {
-        throw NotImplementedError("Onebot 未提供退群接口")
+        if (botAsMember.isOwner()) {
+            throw IllegalStateException("机器人是群主，无法退群")
+        }
+        botWrapper.impl.setGroupLeave(id, false)
+        return true
     }
 
     override suspend fun sendMessage(message: Message): MessageReceipt<Group> {
@@ -95,7 +111,9 @@ class GroupWrapper(
     }
 
     override suspend fun setEssenceMessage(source: MessageSource): Boolean {
-        TODO("Not yet implemented")
+        // TODO 权限
+        botWrapper.impl.setEssenceMsg(source.ids[0])
+        return true
     }
 
     override suspend fun uploadAudio(resource: ExternalResource): OfflineAudio {

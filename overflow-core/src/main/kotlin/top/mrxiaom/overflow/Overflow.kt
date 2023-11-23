@@ -1,5 +1,6 @@
 package top.mrxiaom.overflow
 
+import cn.evole.onebot.sdk.action.ActionRaw
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import cn.evolvefield.onebot.client.handler.EventBus
@@ -27,6 +28,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
+import top.mrxiaom.overflow.contact.BotWrapper
 import top.mrxiaom.overflow.listener.FriendMessageListener
 import top.mrxiaom.overflow.listener.GroupMessageListener
 import top.mrxiaom.overflow.message.OnebotMessages
@@ -36,13 +38,23 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.jvm.jvmName
 
 
+val Bot.asOnebot: BotWrapper
+    get() = this as? BotWrapper ?: throw IllegalStateException("Bot 非 Overflow 实现")
+fun ActionRaw.check(failMsg: String): Boolean {
+    if (retCode != 0) {
+        Overflow.logger.warning("$failMsg, static=$status, retCode=$retCode, echo=$echo")
+    }
+    return retCode == 0
+}
 @OptIn(MiraiExperimentalApi::class)
 class Overflow : IMirai {
     val scope = CoroutineScope(EmptyCoroutineContext + CoroutineName("overflow"))
     override val BotFactory: BotFactory
         get() = BotFactoryImpl
     override var FileCacheStrategy: FileCacheStrategy = net.mamoe.mirai.utils.FileCacheStrategy.PlatformDefault
-
+    internal val newFriendRequestFlagMap = mutableMapOf<Long, String>()
+    internal val newMemberJoinRequestFlagMap = mutableMapOf<Long, String>()
+    internal val newInviteJoinGroupRequestFlagMap = mutableMapOf<Long, String>()
     val config: Config by lazy {
         val text = File("config.json")
         Json.decodeFromString(Config.serializer(), text.readText())
@@ -87,16 +99,33 @@ class Overflow : IMirai {
     }
 
     override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
-
-        TODO("Not yet implemented")
+        newInviteJoinGroupRequestFlagMap[event.eventId]?.also {
+            event.bot.asOnebot.impl.setGroupAddRequest(it, "invite", true, "")
+        }
     }
 
     override suspend fun acceptMemberJoinRequest(event: MemberJoinRequestEvent) {
-        TODO("Not yet implemented")
+        newMemberJoinRequestFlagMap[event.eventId]?.also {
+            event.bot.asOnebot.impl.setGroupAddRequest(it, "add", true, "")
+        }
     }
 
     override suspend fun acceptNewFriendRequest(event: NewFriendRequestEvent) {
-        TODO("Not yet implemented")
+        newFriendRequestFlagMap[event.eventId]?.also {
+            event.bot.asOnebot.impl.setFriendAddRequest(it, true, "")
+        }
+    }
+
+    override suspend fun rejectMemberJoinRequest(event: MemberJoinRequestEvent, blackList: Boolean, message: String) {
+        newMemberJoinRequestFlagMap[event.eventId]?.also {
+            event.bot.asOnebot.impl.setGroupAddRequest(it, "add", false, message)
+        }
+    }
+
+    override suspend fun rejectNewFriendRequest(event: NewFriendRequestEvent, blackList: Boolean) {
+        newFriendRequestFlagMap[event.eventId]?.also {
+            event.bot.asOnebot.impl.setFriendAddRequest(it, true, "")
+        }
     }
 
     @OptIn(InternalEventMechanism::class)
@@ -132,7 +161,7 @@ class Overflow : IMirai {
     }
 
     override fun createUnsupportedMessage(struct: ByteArray): UnsupportedMessage {
-        TODO("Not yet implemented")
+        return UnsupportedMessage(struct)
     }
 
     override suspend fun downloadForwardMessage(bot: Bot, resourceId: String): List<ForwardMessage.Node> {
@@ -213,7 +242,7 @@ class Overflow : IMirai {
         messageInternalIds: IntArray,
         time: Int
     ): Boolean {
-        TODO("Not yet implemented")
+        return bot.asOnebot.impl.deleteMsg(messageIds[0]).check("撤回好友消息") // 忽略多消息情况
     }
 
     @LowLevelApi
@@ -223,7 +252,7 @@ class Overflow : IMirai {
         messageIds: IntArray,
         messageInternalIds: IntArray
     ): Boolean {
-        TODO("Not yet implemented")
+        return bot.asOnebot.impl.deleteMsg(messageIds[0]).check("撤回群消息") // 忽略多消息情况
     }
 
     @LowLevelApi
@@ -235,24 +264,16 @@ class Overflow : IMirai {
         messageInternalIds: IntArray,
         time: Int
     ): Boolean {
-        TODO("Not yet implemented")
+        return bot.asOnebot.impl.deleteMsg(messageIds[0]).check("撤回讨论组消息") // 忽略多消息情况
     }
 
     override suspend fun recallMessage(bot: Bot, source: MessageSource) {
-        TODO("Not yet implemented")
+        bot.asOnebot.impl.deleteMsg(source.ids[0]).check("撤回消息") // 忽略多消息情况
     }
 
     @MiraiExperimentalApi
     override suspend fun refreshKeys(bot: Bot) {
         // TODO
-    }
-
-    override suspend fun rejectMemberJoinRequest(event: MemberJoinRequestEvent, blackList: Boolean, message: String) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun rejectNewFriendRequest(event: NewFriendRequestEvent, blackList: Boolean) {
-        TODO("Not yet implemented")
     }
 
     override suspend fun sendNudge(bot: Bot, nudge: Nudge, receiver: Contact): Boolean {
