@@ -16,9 +16,12 @@ import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)
 class BotWrapper private constructor(
-    val impl: Bot,
+    implBot: Bot,
     botConfiguration: BotConfiguration
 ) : net.mamoe.mirai.Bot {
+    private var implInternal = implBot
+    val impl: Bot
+        get() = implInternal
     private lateinit var loginInfo: LoginInfoResp
     private var friendsInternal: ContactList<FriendWrapper> = ContactList()
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
@@ -43,7 +46,7 @@ class BotWrapper private constructor(
     override val configuration: BotConfiguration = botConfiguration
     override val coroutineContext: CoroutineContext = CoroutineName("Bot/$id")
     override val eventChannel: EventChannel<BotEvent> = GlobalEventChannel
-        .parentScope(Overflow().scope)
+        .parentScope(Overflow.instance)
         .context(coroutineContext)
         .filterIsInstance()
 
@@ -78,11 +81,19 @@ class BotWrapper private constructor(
     }
 
     companion object {
-        suspend fun wrap(impl: Bot, botConfiguration: BotConfiguration): BotWrapper {
-            return BotWrapper(impl, botConfiguration).apply {
+        suspend fun wrap(impl: Bot, botConfiguration: BotConfiguration = BotConfiguration { fileBasedDeviceInfo("device.json") }): BotWrapper {
+            return (net.mamoe.mirai.Bot.getInstanceOrNull(impl.id) as? BotWrapper)?.apply {
+                implInternal = impl
+            } ?:
+            BotWrapper(impl, botConfiguration).apply {
                 updateLoginInfo()
                 updateContacts()
+                @Suppress("INVISIBLE_MEMBER")
+                net.mamoe.mirai.Bot._instances[id] = this
             }
+        }
+        suspend fun Bot.wrap(): BotWrapper {
+            return wrap(this)
         }
     }
 }

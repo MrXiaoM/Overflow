@@ -42,6 +42,9 @@ class Bot(
     val channel: WebSocket,
     val actionHandler: ActionHandler
 ) {
+    private var idInternal: Long = 0
+    val id: Long
+        get() = idInternal
     /**
      * 发送消息
      *
@@ -500,10 +503,10 @@ class Bot(
     suspend fun getLoginInfo(): ActionData<LoginInfoResp> {
         val action = ActionPathEnum.GET_LOGIN_INFO
         val result = actionHandler.action(channel, action, null)
-        return GsonUtil.fromJson(
+        return GsonUtil.fromJson<ActionData<LoginInfoResp>>(
             result.toString(),
             object : TypeToken<ActionData<LoginInfoResp>>() {}.type
-        )
+        ).also { idInternal = it.data.userId }
     }
 
     /**

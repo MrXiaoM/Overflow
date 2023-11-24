@@ -36,6 +36,7 @@ import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
 import top.mrxiaom.overflow.contact.BotWrapper
+import top.mrxiaom.overflow.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.listener.FriendMessageListener
 import top.mrxiaom.overflow.listener.GroupMessageListener
 import top.mrxiaom.overflow.message.OnebotMessages
@@ -99,7 +100,7 @@ class Overflow : IMirai, CoroutineScope {
             BotConfig(config.wsHost)
         )
         val ws = service.ws ?: throw IllegalStateException("未连接到 Onebot")
-        val bot = ws.createBot().also { BotFactoryImpl.internalBot = it }
+        val bot = runBlocking { ws.createBot().also { BotFactoryImpl.internalBot = it }.wrap() }
 
         val dispatchers = service.createEventBus(this)
 

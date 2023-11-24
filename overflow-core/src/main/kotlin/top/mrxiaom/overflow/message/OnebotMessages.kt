@@ -70,9 +70,11 @@ object OnebotMessages {
         })
     }
     @OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
-    suspend fun deserializeFromOneBotJson(bot: Bot, jsonString: String): MessageChain {
+    suspend fun deserializeFromOneBotJson(bot: Bot, jsonString: String, source: MessageSource?): MessageChain {
         val json = Json.parseToJsonElement(jsonString).jsonArray
         return buildMessageChain {
+            if (source != null) add(source)
+
             for (o in json) {
                 val obj = o.jsonObject
                 val data = obj["data"]?.jsonObject ?: buildJsonObject {  }
