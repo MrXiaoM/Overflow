@@ -28,8 +28,9 @@ dependencies {
     netty("codec-socks")
     netty("transport")
 
-    implementation(project(":onebot-sdk"))
-    implementation(project(":onebot-client"))
+    api(project(":onebot-sdk"))
+    api(project(":onebot-client"))
+    compileOnly("com.google.code.gson:gson:2.8.9")
     implementation("org.java-websocket:Java-WebSocket:1.5.4")
     implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
 

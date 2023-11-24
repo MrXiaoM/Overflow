@@ -177,8 +177,14 @@ class Overflow : IMirai, CoroutineScope {
         internalIds: IntArray,
         originalMessage: MessageChain
     ): OfflineMessageSource {
-        TODO("Not yet implemented")
-
+        return MessageSourceBuilder()
+            .sender(fromId)
+            .target(targetId)
+            .id(ids[0])
+            .time(time)
+            .internalId(internalIds[0])
+            .messages { addAll(originalMessage) }
+            .build(botId, kind)
     }
 
     override fun createFileMessage(id: String, internalId: Int, name: String, size: Long): FileMessage {
@@ -194,7 +200,7 @@ class Overflow : IMirai, CoroutineScope {
     }
 
     override suspend fun downloadLongMessage(bot: Bot, resourceId: String): MessageChain {
-        TODO("Not yet implemented")
+        throw NotImplementedError("Onebot 未提供长消息下载方法")
     }
 
     @LowLevelApi

@@ -937,16 +937,46 @@ class Bot(
     }
 
     /**
-     * 自定义请求
+     * 自定义请求 ActionData
      *
      * @param action 请求路径
      * @param params 请求参数
      * @return [ActionData]
      */
     @JvmBlockingBridge
-    suspend fun customRequest(action: ActionPath, params: JsonObject?): ActionData<*> {
+    suspend inline fun <reified T : Any> customRequestData(action: ActionPath, params: JsonObject?): ActionData<T> {
         val result = actionHandler.action(channel, action, params)
-        return GsonUtil.strToJavaBean(result.toString(), ActionData::class.java)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionData<T>>() {}.type
+        )
+    }
+    /**
+     * 自定义请求 ActionList
+     *
+     * @param action 请求路径
+     * @param params 请求参数
+     * @return [ActionList]
+     */
+    @JvmBlockingBridge
+    suspend inline fun <reified T : Any> customRequestList(action: ActionPath, params: JsonObject?): ActionList<T> {
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionList<T>>() {}.type
+        )
+    }
+    /**
+     * 自定义请求 ActionRaw
+     *
+     * @param action 请求路径
+     * @param params 请求参数
+     * @return [ActionRaw]
+     */
+    @JvmBlockingBridge
+    suspend fun customRequestRaw(action: ActionPath, params: JsonObject?): ActionRaw {
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
     /**
