@@ -13,6 +13,7 @@ import kotlinx.coroutines.internal.PrepareOp
 import kotlinx.coroutines.selects.SelectBuilder
 import kotlinx.coroutines.selects.SelectInstance
 import kotlinx.coroutines.selects.select
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.*
 import net.mamoe.mirai.contact.Contact
@@ -65,9 +66,15 @@ class Overflow : IMirai, CoroutineScope {
     internal val newFriendRequestFlagMap = mutableMapOf<Long, String>()
     internal val newMemberJoinRequestFlagMap = mutableMapOf<Long, String>()
     internal val newInviteJoinGroupRequestFlagMap = mutableMapOf<Long, String>()
+    private val prettyJson = Json { prettyPrint = true }
     val config: Config by lazy {
         val text = File(System.getProperty("overflow.config", "overflow.json"))
-        Json.decodeFromString(Config.serializer(), text.readText())
+        if (!text.exists()) {
+            Config().apply {
+                text.writeText(prettyJson.encodeToString(this))
+            }
+        }
+        else Json.decodeFromString(Config.serializer(), text.readText())
     }
 
     companion object {
