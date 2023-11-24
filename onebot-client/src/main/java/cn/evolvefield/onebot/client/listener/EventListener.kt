@@ -12,11 +12,11 @@ interface EventListener<T : Event> {
     /**
      * 监听到消息
      *
-     * @param t 消息实体
+     * @param e 消息实体
      */
-    fun onMessage(t: T)
+    suspend fun onMessage(e: T)
 }
 @Suppress("unchecked_cast")
-internal fun <T : Event> EventListener<T>.message(event: Event) {
+internal suspend fun <T : Event> EventListener<T>.message(event: Event) {
     onMessage(event as T)
 }

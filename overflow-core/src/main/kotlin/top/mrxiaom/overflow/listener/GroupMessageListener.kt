@@ -7,7 +7,7 @@ import cn.evolvefield.onebot.client.listener.EventListener
 internal class GroupMessageListener(
     val bot: Bot
 ) : EventListener<GroupMessageEvent> {
-    override fun onMessage(e: GroupMessageEvent) {
+    override suspend fun onMessage(e: GroupMessageEvent) {
         // TODO 构建 mirai 事件并广播
     }
 }

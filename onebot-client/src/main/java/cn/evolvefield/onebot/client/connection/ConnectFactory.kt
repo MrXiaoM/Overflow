@@ -2,6 +2,9 @@ package cn.evolvefield.onebot.client.connection
 
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.handler.ActionHandler
+import cn.evolvefield.onebot.client.handler.EventBus
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
 import java.net.URI
 import java.util.concurrent.BlockingQueue
 
@@ -14,9 +17,12 @@ import java.util.concurrent.BlockingQueue
 /**
  *
  * @param config 配置
- * @param queue 队列消息
+ * @param channel 队列消息
  */
-class ConnectFactory(private val config: BotConfig, private val queue: BlockingQueue<String>) {
+class ConnectFactory(
+    private val config: BotConfig,
+    private val channel: Channel<String> = Channel()
+) {
     private val actionHandler: ActionHandler = ActionHandler()
     var ws: WSClient? = kotlin.runCatching {
         createWebsocketClient()
@@ -49,12 +55,16 @@ class ConnectFactory(private val config: BotConfig, private val queue: BlockingQ
         }
         val url = builder.toString()
         try {
-            ws = WSClient(URI.create(url), queue, actionHandler)
+            ws = WSClient(URI.create(url), channel, actionHandler)
             ws.connect()
         } catch (e: Exception) {
             WSClient.log.error("▌ §c{}连接错误，请检查服务端是否开启 §a┈━═☆", url)
         }
         return ws
+    }
+
+    fun createEventBus(scope: CoroutineScope): EventBus {
+        return EventBus.create(scope, channel)
     }
 
     fun stop() {

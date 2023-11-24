@@ -6,6 +6,10 @@ import cn.evolvefield.onebot.client.listener.EnableEventListener
 import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.client.listener.message
 import cn.evolvefield.onebot.client.util.ListenerUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.selects.select
 import org.slf4j.LoggerFactory
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
@@ -17,21 +21,15 @@ import java.util.concurrent.ConcurrentHashMap
  * Description:
  */
 @Suppress("unused")
-open class EventBus(protected var queue: BlockingQueue<String>) : Runnable {
+class EventBus private constructor(protected var channel: Channel<String>) {
+
     //存储监听器对象
     protected var eventlistenerlist: MutableList<EventListener<out Event>> = ArrayList()
 
     //缓存类型与监听器的关系
     protected var cache: MutableMap<Class<out Event>, List<EventListener<out Event>>> = ConcurrentHashMap()
 
-    //线程池 用于并发执行队列中的任务
-    protected var service: Thread
     private var close = false
-
-    init {
-        service = Thread(this)
-        service.start()
-    }
 
     fun addListener(EventListener: EventListener<out Event>) {
         eventlistenerlist.add(EventListener)
@@ -41,28 +39,12 @@ open class EventBus(protected var queue: BlockingQueue<String>) : Runnable {
         close = true
         cache.clear()
         eventlistenerlist.clear()
-        service.interrupt()
-    }
-
-    override fun run() {
-        try {
-            while (!close) {
-                runTask()
-            }
-        } catch (e: Exception) {
-            log.error(e.message)
-        }
     }
 
     /**
      * 执行任务
      */
-    protected fun runTask() {
-        val message = task //获取消息
-        if (message == "null") {
-            log.debug("消息队列为空")
-            return
-        }
+    protected suspend fun onReceive(message: String) {
         val messageType = ListenerUtils.getMessageType(message) //获取消息对应的实体类型
         log.debug(String.format("接收到上报消息内容：%s", messageType))
         val bean = GsonUtil.strToJavaBean(message, messageType)!! //将消息反序列化为对象
@@ -73,21 +55,6 @@ open class EventBus(protected var queue: BlockingQueue<String>) : Runnable {
             eventListener.message(bean) //调用监听方法
         }
     }
-
-    protected val task: String
-        /**
-         * 从队列中获取任务
-         *
-         * @return
-         */
-        get() {
-            try {
-                return queue.take()
-            } catch (e: Exception) {
-                log.error(e.message)
-            }
-            return "null"
-        }
 
     /**
      * 获取能处理消息类型的处理器
@@ -129,5 +96,14 @@ open class EventBus(protected var queue: BlockingQueue<String>) : Runnable {
 
     companion object {
         private val log = LoggerFactory.getLogger(EventBus::class.java)
+        fun create(scope: CoroutineScope, channel: Channel<String>): EventBus {
+            return EventBus(channel).apply {
+                scope.launch {
+                    select {
+                        channel.onReceive { onReceive(it) }
+                    }
+                }
+            }
+        }
     }
 }

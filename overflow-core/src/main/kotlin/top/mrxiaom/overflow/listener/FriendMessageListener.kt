@@ -7,7 +7,7 @@ import cn.evolvefield.onebot.client.listener.EventListener
 internal class FriendMessageListener(
     val bot: Bot
 ) : EventListener<PrivateMessageEvent> {
-    override fun onMessage(e: PrivateMessageEvent) {
+    override suspend fun onMessage(e: PrivateMessageEvent) {
         // TODO 构建 mirai 事件并广播
     }
 }

@@ -10,12 +10,12 @@ import cn.evolvefield.onebot.client.handler.DefaultEventHandler
  * Version: 1.0
  */
 class PrivateMessageEventListener : DefaultEventHandler<PrivateMessageEvent>() {
-    override fun onMessage(t: PrivateMessageEvent) {
+    override suspend fun onMessage(e: PrivateMessageEvent) {
         //处理逻辑
-        val message = t.message
+        val message = e.message
         val split = message.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         val key = split[0]
         val handler = getHandler(key)
-        handler.handle(t)
+        handler.handle(e)
     }
 }

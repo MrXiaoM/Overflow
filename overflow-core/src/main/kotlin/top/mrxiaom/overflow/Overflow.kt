@@ -5,6 +5,14 @@ import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import cn.evolvefield.onebot.client.handler.EventBus
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.internal.AtomicDesc
+import kotlinx.coroutines.internal.PrepareOp
+import kotlinx.coroutines.selects.SelectBuilder
+import kotlinx.coroutines.selects.SelectInstance
+import kotlinx.coroutines.selects.select
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.*
 import net.mamoe.mirai.contact.Contact
@@ -17,14 +25,13 @@ import net.mamoe.mirai.data.StrangerInfo
 import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.GlobalEventChannel
-import net.mamoe.mirai.event.events.BotEvent
-import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
-import net.mamoe.mirai.event.events.MemberJoinRequestEvent
-import net.mamoe.mirai.event.events.NewFriendRequestEvent
+import net.mamoe.mirai.event.broadcast
+import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.internal.event.EventChannelToEventDispatcherAdapter
 import net.mamoe.mirai.internal.event.InternalEventMechanism
 import net.mamoe.mirai.message.action.Nudge
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.utils.ConcurrentLinkedQueue
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
@@ -34,6 +41,8 @@ import top.mrxiaom.overflow.listener.GroupMessageListener
 import top.mrxiaom.overflow.message.OnebotMessages
 import java.io.File
 import java.util.concurrent.LinkedBlockingQueue
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.jvm.jvmName
 
@@ -47,8 +56,8 @@ fun ActionRaw.check(failMsg: String): Boolean {
     return retCode == 0
 }
 @OptIn(MiraiExperimentalApi::class)
-class Overflow : IMirai {
-    val scope = CoroutineScope(EmptyCoroutineContext + CoroutineName("overflow"))
+class Overflow : IMirai, CoroutineScope {
+    override val coroutineContext: CoroutineContext = CoroutineName("overflow")
     override val BotFactory: BotFactory
         get() = BotFactoryImpl
     override var FileCacheStrategy: FileCacheStrategy = net.mamoe.mirai.utils.FileCacheStrategy.PlatformDefault
@@ -86,14 +95,13 @@ class Overflow : IMirai {
 
         OnebotMessages.registerSerializers()
 
-        val blockingQueue = LinkedBlockingQueue<String>() //使用队列传输数据
-
         val service = ConnectFactory(
-            BotConfig(config.wsHost), blockingQueue
+            BotConfig(config.wsHost)
         )
         val ws = service.ws ?: throw IllegalStateException("未连接到 Onebot")
         val bot = ws.createBot().also { BotFactoryImpl.internalBot = it }
-        val dispatchers = EventBus(blockingQueue)
+
+        val dispatchers = service.createEventBus(this)
 
         dispatchers.addListener(FriendMessageListener(bot))
         dispatchers.addListener(GroupMessageListener(bot))
@@ -317,4 +325,5 @@ class Overflow : IMirai {
     ) {
         TODO("Not yet implemented")
     }
+
 }

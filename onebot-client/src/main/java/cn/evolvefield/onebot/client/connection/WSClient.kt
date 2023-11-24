@@ -4,6 +4,7 @@ import cn.evole.onebot.sdk.util.json.JsonsObject
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import com.google.gson.JsonSyntaxException
+import kotlinx.coroutines.channels.Channel
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.LoggerFactory
@@ -16,7 +17,7 @@ import java.util.concurrent.BlockingQueue
  * Date: 2023/4/4 2:20
  * Description:
  */
-class WSClient(uri: URI?, private val queue: BlockingQueue<String>, private val actionHandler: ActionHandler) :
+class WSClient(uri: URI?, private val channel: Channel<String>, private val actionHandler: ActionHandler) :
     WebSocketClient(uri) {
     fun createBot(): Bot {
         return Bot(this, actionHandler)
@@ -35,7 +36,7 @@ class WSClient(uri: URI?, private val queue: BlockingQueue<String>, private val 
                     if (FAILED_STATUS == jsonObject.optString(RESULT_STATUS_KEY)) {
                         log.debug("请求失败: {}", jsonObject.optString("wording"))
                     } else actionHandler.onReceiveActionResp(jsonObject) //请求执行
-                } else if (!queue.offer(message)) { //事件监听
+                } else if (!channel.trySend(message).isSuccess) { //事件监听
                     log.error("监听错误: {}", message)
                 }
             }
