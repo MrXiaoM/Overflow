@@ -91,7 +91,8 @@ class Overflow : IMirai {
         val service = ConnectFactory(
             BotConfig(config.wsHost), blockingQueue
         )
-        val bot = service.ws.createBot().also { BotFactoryImpl.internalBot = it }
+        val ws = service.ws ?: throw IllegalStateException("未连接到 Onebot")
+        val bot = ws.createBot().also { BotFactoryImpl.internalBot = it }
         val dispatchers = EventBus(blockingQueue)
 
         dispatchers.addListener(FriendMessageListener(bot))

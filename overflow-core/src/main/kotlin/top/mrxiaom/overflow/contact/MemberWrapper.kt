@@ -2,6 +2,8 @@ package top.mrxiaom.overflow.contact
 
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.MemberPermission
@@ -14,6 +16,7 @@ import net.mamoe.mirai.message.data.Message
 import net.mamoe.mirai.message.data.PlainText
 import net.mamoe.mirai.message.data.ShortVideo
 import net.mamoe.mirai.utils.ExternalResource
+import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.data.WrappedVideo
 import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
@@ -27,7 +30,7 @@ class MemberWrapper(
 
     val data: GroupMemberInfoResp
         get() = impl
-    fun queryUpdate() {
+    suspend fun queryUpdate() {
         impl = botWrapper.impl.getGroupMemberInfo(impl.groupId, impl.userId, false).data
     }
 
@@ -46,7 +49,9 @@ class MemberWrapper(
     override var nameCard: String
         get() = impl.card
         set(value) {
-            botWrapper.impl.setGroupCard(impl.groupId, id, value)
+            Overflow.instance.scope.launch {
+                botWrapper.impl.setGroupCard(impl.groupId, id, value)
+            }
         }
     override val nick: String = impl.nickname
     override val permission: MemberPermission = when(impl.role) {
@@ -59,7 +64,9 @@ class MemberWrapper(
     override var specialTitle: String
         get() = impl.title
         set(value) {
-            botWrapper.impl.setGroupSpecialTitle(impl.groupId, id, value, -1)
+            Overflow.instance.scope.launch {
+                botWrapper.impl.setGroupSpecialTitle(impl.groupId, id, value, -1)
+            }
         }
     override suspend fun kick(message: String, block: Boolean) {
         botWrapper.impl.setGroupKick(impl.groupId, id, block)

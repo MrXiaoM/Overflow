@@ -5,6 +5,7 @@ plugins {
     kotlin("plugin.serialization")
     id("com.github.johnrengelman.shadow")
     id("com.github.gmazzo.buildconfig")
+    id("me.him188.kotlin-jvm-blocking-bridge")
 }
 
 val miraiVersion = rootProject.ext["miraiVersion"].toString()
@@ -30,6 +31,7 @@ dependencies {
     implementation(project(":onebot-sdk"))
     implementation(project(":onebot-client"))
     implementation("org.java-websocket:Java-WebSocket:1.5.4")
+    implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
 
     testImplementation("net.mamoe:mirai-console:$miraiVersion")
     testImplementation("net.mamoe:mirai-console-terminal:$miraiVersion")

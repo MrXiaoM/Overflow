@@ -1,5 +1,6 @@
 package top.mrxiaom.overflow
 
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.auth.BotAuthorization
@@ -18,12 +19,12 @@ object BotFactoryImpl : BotFactory {
     override fun newBot(qq: Long, authorization: BotAuthorization, configuration: BotConfiguration): Bot = end(qq, configuration)
 
     private fun end(qq: Long, configuration: BotConfiguration): Bot {
-        if (internalBot != null){
-            val data = internalBot!!.loginInfo.data
+        if (internalBot != null) runBlocking {
+            val data = internalBot!!.getLoginInfo().data
             if (data.userId == qq) {
-                return Bot.getInstanceOrNull(qq) ?: BotWrapper(internalBot!!, configuration)
-            }
-        }
+                Bot.getInstanceOrNull(qq) ?: BotWrapper.wrap(internalBot!!, configuration)
+            } else null
+        }?.also { return it }
         throw UnsupportedOperationException("溢出核心已委托远程实现接管了账户管理，mirai 框架端没有登录机器人的职责")
     }
 }

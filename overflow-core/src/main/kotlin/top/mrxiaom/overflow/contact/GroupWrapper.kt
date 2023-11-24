@@ -23,15 +23,19 @@ import top.mrxiaom.overflow.message.data.WrappedVideo
 import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
 import java.util.Base64
 
+@OptIn(MiraiInternalApi::class)
 class GroupWrapper(
     val botWrapper: BotWrapper,
     private var impl: GroupInfoResp
 ) : Group {
-
+    private var membersInternal: ContactList<MemberWrapper> = ContactList()
     val data: GroupInfoResp
         get() = impl
-    fun queryUpdate() {
+    suspend fun queryUpdate() {
         impl = botWrapper.impl.getGroupInfo(impl.groupId, false).data
+        membersInternal = ContactList(botWrapper.impl.getGroupMemberList(id).data.map {
+            MemberWrapper(botWrapper, this@GroupWrapper, it)
+        }.toMutableList())
     }
 
     override val bot: Bot
@@ -39,21 +43,21 @@ class GroupWrapper(
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${botWrapper.id})Group/$id")
     override val active: GroupActive
         get() {
-            val resp = botWrapper.impl.getGroupHonorInfo(id, "all").data
+            //val resp = botWrapper.impl.getGroupHonorInfo(id, "all").data
             TODO("Not yet implemented")
         }
     override val announcements: Announcements
         get() = TODO("Not yet implemented")
     override val essences: Essences
         get() {
-            for (resp in botWrapper.impl.getEssenceMsgList(id).data) {
-
-            }
+            //for (resp in botWrapper.impl.getEssenceMsgList(id).data) {
+            //
+            //}
             TODO("Not yet implemented")
         }
     override val files: RemoteFiles
         get() {
-            val resp = botWrapper.impl.getGroupRootFiles(id).data
+            //val resp = botWrapper.impl.getGroupRootFiles(id).data
             TODO("Not yet implemented")
         }
     @Suppress("DEPRECATION_ERROR")
@@ -71,13 +75,8 @@ class GroupWrapper(
     override var name: String
         get() = impl.groupName
         set(value) { impl.groupName = value }
-    @OptIn(MiraiInternalApi::class)
     override val members: ContactList<NormalMember>
-        get() {
-            return ContactList(botWrapper.impl.getGroupMemberList(id).data.map {
-                MemberWrapper(botWrapper, this@GroupWrapper, it)
-            }.toMutableList())
-        }
+        get() = membersInternal
     override val botAsMember: NormalMember
         get() = members.first { it.id == bot.id }
     override val owner: NormalMember

@@ -15,7 +15,7 @@ public class ClientsResp {
     private List<Clients> clients;
 
     @Data
-    private static class Clients {
+    public static class Clients {
 
         @SerializedName("app_id")
         private long appId;

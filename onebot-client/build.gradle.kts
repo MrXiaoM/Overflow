@@ -1,5 +1,6 @@
 plugins {
-    java
+    kotlin("jvm")
+    id("me.him188.kotlin-jvm-blocking-bridge")
 }
 
 java {
@@ -11,6 +12,8 @@ dependencies {
     compileOnly("com.google.code.gson:gson:2.8.9")
     compileOnly("org.jetbrains:annotations:20.1.0")
     compileOnly("org.slf4j:slf4j-api:2.0.1")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
+    implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
     implementation(project(":onebot-sdk"))
     implementation("org.java-websocket:Java-WebSocket:1.5.4")
 
