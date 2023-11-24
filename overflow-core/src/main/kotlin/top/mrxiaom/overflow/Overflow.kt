@@ -66,7 +66,7 @@ class Overflow : IMirai, CoroutineScope {
     internal val newMemberJoinRequestFlagMap = mutableMapOf<Long, String>()
     internal val newInviteJoinGroupRequestFlagMap = mutableMapOf<Long, String>()
     val config: Config by lazy {
-        val text = File("config.json")
+        val text = File(System.getProperty("overflow.config", "overflow.json"))
         Json.decodeFromString(Config.serializer(), text.readText())
     }
 
