@@ -28,6 +28,10 @@ public enum ActionPathEnum implements ActionPath {
      */
     GET_MSG("get_msg"),
     /**
+     * 获取转发消息内容
+     */
+    GET_FORWARD_MSG("get_forward_msg"),
+    /**
      * 群组踢人
      */
     SET_GROUP_KICK("set_group_kick"),

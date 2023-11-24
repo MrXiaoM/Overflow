@@ -70,7 +70,7 @@ object OnebotMessages {
         })
     }
     @OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
-    suspend fun deserializeFromOneBotJson(bot: Bot, jsonString: String, source: MessageSource?): MessageChain {
+    suspend fun deserializeFromOneBotJson(bot: Bot, jsonString: String, source: MessageSource? = null): MessageChain {
         val json = Json.parseToJsonElement(jsonString).jsonArray
         return buildMessageChain {
             if (source != null) add(source)
@@ -102,8 +102,8 @@ object OnebotMessages {
                     "forward" -> {
                         val id = data["id"]!!.toString()
                         val nodes = Mirai.downloadForwardMessage(bot, id)
-
-                        TODO("解析转发消息")
+                        val raw = RawForwardMessage(nodes)
+                        add(raw.render(ForwardMessage.DisplayStrategy))
                     }
                     "xml" -> add(SimpleServiceMessage(60, data["data"].toString()))
                     "json" -> add(LightApp(data["data"].toString()))

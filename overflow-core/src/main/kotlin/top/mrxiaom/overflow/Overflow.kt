@@ -3,16 +3,7 @@ package top.mrxiaom.overflow
 import cn.evole.onebot.sdk.action.ActionRaw
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
-import cn.evolvefield.onebot.client.handler.EventBus
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.internal.AtomicDesc
-import kotlinx.coroutines.internal.PrepareOp
-import kotlinx.coroutines.selects.SelectBuilder
-import kotlinx.coroutines.selects.SelectInstance
-import kotlinx.coroutines.selects.select
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.*
@@ -25,14 +16,11 @@ import net.mamoe.mirai.data.MemberInfo
 import net.mamoe.mirai.data.StrangerInfo
 import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.event.Event
-import net.mamoe.mirai.event.GlobalEventChannel
-import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.internal.event.EventChannelToEventDispatcherAdapter
 import net.mamoe.mirai.internal.event.InternalEventMechanism
 import net.mamoe.mirai.message.action.Nudge
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.ConcurrentLinkedQueue
 import net.mamoe.mirai.utils.FileCacheStrategy
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
@@ -42,10 +30,7 @@ import top.mrxiaom.overflow.listener.FriendMessageListener
 import top.mrxiaom.overflow.listener.GroupMessageListener
 import top.mrxiaom.overflow.message.OnebotMessages
 import java.io.File
-import java.util.concurrent.LinkedBlockingQueue
-import kotlin.coroutines.Continuation
 import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.jvm.jvmName
 
 
@@ -196,7 +181,10 @@ class Overflow : IMirai, CoroutineScope {
     }
 
     override suspend fun downloadForwardMessage(bot: Bot, resourceId: String): List<ForwardMessage.Node> {
-        TODO("Not yet implemented")
+        return bot.asOnebot.impl.getForwardMsg(resourceId).data.message.map {
+            val msg = OnebotMessages.deserializeFromOneBotJson(bot, it.content)
+            ForwardMessage.Node(it.userId.toLong(), 0, it.nickname, msg) // TODO: 时间
+        }
     }
 
     override suspend fun downloadLongMessage(bot: Bot, resourceId: String): MessageChain {

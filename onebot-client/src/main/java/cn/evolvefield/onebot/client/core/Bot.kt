@@ -982,6 +982,24 @@ class Bot(
     /**
      * 获取精华消息列表
      *
+     * @param resourceId 转发消息的ID
+     * @return [ActionList] of [ForwardMsgResp]
+     */
+    @JvmBlockingBridge
+    suspend fun getForwardMsg(resourceId: String): ActionData<ForwardMsgResp> {
+        val action = ActionPathEnum.GET_FORWARD_MSG
+        val params = JsonObject()
+        params.addProperty("id", resourceId)
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionData<ForwardMsgResp>>() {}.type
+        )
+    }
+
+    /**
+     * 获取精华消息列表
+     *
      * @param groupId 群号
      * @return [ActionList] of [EssenceMsgResp]
      */
