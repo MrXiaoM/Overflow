@@ -66,15 +66,23 @@ class Overflow : IMirai, CoroutineScope {
     internal val newFriendRequestFlagMap = mutableMapOf<Long, String>()
     internal val newMemberJoinRequestFlagMap = mutableMapOf<Long, String>()
     internal val newInviteJoinGroupRequestFlagMap = mutableMapOf<Long, String>()
-    private val prettyJson = Json { prettyPrint = true }
+    private val prettyJson = Json {
+        prettyPrint = true
+        ignoreUnknownKeys = true
+    }
     val config: Config by lazy {
         val text = File(System.getProperty("overflow.config", "overflow.json"))
-        if (!text.exists()) {
-            Config().apply {
-                text.writeText(prettyJson.encodeToString(this))
-            }
+        var config: Config? = null
+        if (text.exists()) try {
+            config = Json.decodeFromString(Config.serializer(), text.readText())
+        } catch (t: Throwable) {
+            val bak = File(text.parentFile, "${text.name}.old_${System.currentTimeMillis()}.bak")
+            text.copyTo(bak, true)
+            logger.warning("读取配置文件错误，已保存旧文件到 ${bak.name}", t)
         }
-        else Json.decodeFromString(Config.serializer(), text.readText())
+        (config ?: Config()).apply {
+            text.writeText(prettyJson.encodeToString(config))
+        }
     }
 
     companion object {
