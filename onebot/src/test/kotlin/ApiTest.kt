@@ -1,7 +1,6 @@
 import cn.evole.onebot.sdk.util.MsgUtils
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
-import java.util.concurrent.LinkedBlockingQueue
 
 /**
  * Description:

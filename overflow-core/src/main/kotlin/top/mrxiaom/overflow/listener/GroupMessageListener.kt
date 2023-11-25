@@ -1,17 +1,13 @@
 package top.mrxiaom.overflow.listener
 
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
-import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.getMemberOrFail
 import net.mamoe.mirai.event.broadcast
-import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.message.data.MessageSourceBuilder
 import net.mamoe.mirai.message.data.MessageSourceKind
 import top.mrxiaom.overflow.contact.BotWrapper
-import top.mrxiaom.overflow.contact.GroupWrapper
-import top.mrxiaom.overflow.contact.MemberWrapper
 import top.mrxiaom.overflow.message.OnebotMessages
 
 internal class GroupMessageListener(

@@ -6,7 +6,6 @@ import cn.evolvefield.onebot.client.handler.EventBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import java.net.URI
-import java.util.concurrent.BlockingQueue
 
 /**
  * Description:

@@ -9,7 +9,6 @@ import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.LoggerFactory
 import java.net.URI
-import java.util.concurrent.BlockingQueue
 
 /**
  * Project: onebot-client

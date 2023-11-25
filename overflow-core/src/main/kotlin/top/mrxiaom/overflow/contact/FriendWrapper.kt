@@ -1,7 +1,6 @@
 package top.mrxiaom.overflow.contact
 
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
-import cn.evole.onebot.sdk.response.group.GroupInfoResp
 import kotlinx.coroutines.CoroutineName
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Friend
@@ -42,7 +41,6 @@ class FriendWrapper(
     override suspend fun delete() {
         botWrapper.impl.deleteFriend(id)
     }
-
 
     @OptIn(MiraiInternalApi::class)
     override suspend fun sendMessage(message: Message): MessageReceipt<Friend> {

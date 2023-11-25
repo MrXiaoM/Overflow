@@ -2,7 +2,6 @@ import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
-import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.handler.Handler
 import cn.evolvefield.onebot.client.listener.SimpleEventListener
 import cn.evolvefield.onebot.client.listener.impl.GroupMessageEventListener
@@ -10,7 +9,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.concurrent.LinkedBlockingQueue
 import kotlin.coroutines.CoroutineContext
 
 /**

@@ -1,14 +1,9 @@
 package top.mrxiaom.overflow.contact
 
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
-import cn.evole.onebot.sdk.response.group.GroupInfoResp
 import kotlinx.coroutines.CoroutineName
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.contact.Friend
-import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.Stranger
-import net.mamoe.mirai.contact.friendgroup.FriendGroup
-import net.mamoe.mirai.contact.roaming.RoamingMessages
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
@@ -17,7 +12,6 @@ import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.message.data.WrappedAudio
 import top.mrxiaom.overflow.message.data.WrappedVideo
 import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
 import kotlin.coroutines.CoroutineContext
