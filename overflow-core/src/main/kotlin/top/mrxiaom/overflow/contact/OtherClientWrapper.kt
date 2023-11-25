@@ -24,30 +24,26 @@ import top.mrxiaom.overflow.message.data.WrappedVideo
 import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
 import java.util.Base64
 
+@OptIn(MiraiInternalApi::class)
 class OtherClientWrapper(
     val botWrapper: BotWrapper,
-    private var impl: ClientsResp.Clients
+    internal var impl: ClientsResp.Clients
 ) : OtherClient {
-
+    override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})OtherClient/${impl.deviceKind}")
     val data: ClientsResp.Clients
         get() = impl
-    suspend fun queryUpdate() {
-        //impl = botWrapper.impl.getOnlineClients(false).data.clients.filter {  }
-    }
 
     override val bot: Bot
-        get() = TODO("Not yet implemented")
-    override val coroutineContext: CoroutineContext
-        get() = TODO("Not yet implemented")
+        get() = botWrapper
     override val info: OtherClientInfo
-        get() = TODO("Not yet implemented")
+        get() = OtherClientInfo(impl.appId.toInt(), null, impl.deviceName, impl.deviceKind)
 
     override suspend fun uploadShortVideo(
         thumbnail: ExternalResource,
         video: ExternalResource,
         fileName: String?
     ): ShortVideo {
-        TODO("Not yet implemented")
+        return WrappedVideo(video.toBase64File())
     }
 
 }

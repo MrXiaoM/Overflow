@@ -36,9 +36,18 @@ class BotWrapper private constructor(
         groupsInternal = ContactList(impl.getGroupList().data.map {
             GroupWrapper(this, it)
         }.toMutableList())
-        otherClientsInternal = ContactList(impl.getOnlineClients(false).data.clients.map {
+    }
+    suspend fun updateOtherClients() {
+        val newList = impl.getOnlineClients(false).data.clients.map {
             OtherClientWrapper(this, it)
-        }.toMutableList())
+        }.toMutableList()
+        otherClientsInternal.delegate.removeIf { old ->
+            newList.none { old.impl.appId == it.impl.appId }
+        }
+        newList.removeIf {
+            otherClientsInternal.any { old -> old.impl.appId == it.impl.appId }
+        }
+        otherClientsInternal.delegate.addAll(newList)
     }
 
     override val id: Long = loginInfo.userId
@@ -88,6 +97,7 @@ class BotWrapper private constructor(
             BotWrapper(impl, botConfiguration).apply {
                 updateLoginInfo()
                 updateContacts()
+                updateOtherClients()
                 @Suppress("INVISIBLE_MEMBER")
                 net.mamoe.mirai.Bot._instances[id] = this
             }
