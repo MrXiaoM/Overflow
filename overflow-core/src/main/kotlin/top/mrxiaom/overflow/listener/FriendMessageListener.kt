@@ -23,6 +23,7 @@ internal class FriendMessageListener(
             "friend" -> {
                 val friend = e.privateSender.wrapAsFriend(bot)
                 var miraiMessage = OnebotMessages.deserializeFromOneBotJson(bot, e.message)
+                val messageString = miraiMessage.toString()
                 val messageSource = object : OnlineMessageSource.Incoming.FromFriend() {
                     override val bot: Bot = this@FriendMessageListener.bot
                     override val ids: IntArray = arrayOf(e.messageId).toIntArray()
@@ -39,7 +40,7 @@ internal class FriendMessageListener(
                 if (friend.id == bot.id) {
                     // TODO: 过滤自己发送的消息
                 } else {
-                    logger.info("${friend.remarkOrNick}(${friend.id}) -> $miraiMessage")
+                    logger.info("${friend.remarkOrNick}(${friend.id}) -> $messageString")
                     FriendMessageEvent(
                         friend, miraiMessage, e.time.toInt()
                     ).broadcast()

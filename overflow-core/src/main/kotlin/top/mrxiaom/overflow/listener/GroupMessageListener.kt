@@ -29,6 +29,7 @@ internal class GroupMessageListener(
                 val member = e.sender.wrapAsMember(group)
 
                 var miraiMessage = OnebotMessages.deserializeFromOneBotJson(bot, e.message)
+                val messageString = miraiMessage.toString()
                 val messageSource = object : OnlineMessageSource.Incoming.FromGroup() {
                     override val bot: Bot = this@GroupMessageListener.bot
                     override val ids: IntArray = arrayOf(e.messageId).toIntArray()
@@ -43,7 +44,7 @@ internal class GroupMessageListener(
                 if (member.id == bot.id) {
                     // TODO: 过滤自己发送的消息
                 } else {
-                    logger.info("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $miraiMessage")
+                    logger.info("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
                     net.mamoe.mirai.event.events.GroupMessageEvent(
                         e.sender.card, when (e.sender.role) {
                             "owner" -> MemberPermission.OWNER
