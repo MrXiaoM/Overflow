@@ -45,8 +45,8 @@ fun ActionRaw.check(failMsg: String): Boolean {
     }
     return retCode == 0
 }
-@OptIn(MiraiExperimentalApi::class)
-class Overflow : IMirai, CoroutineScope {
+@OptIn(MiraiExperimentalApi::class, LowLevelApi::class)
+class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
     override val coroutineContext: CoroutineContext = CoroutineName("overflow")
     override val BotFactory: BotFactory
         get() = BotFactoryImpl
@@ -104,26 +104,23 @@ class Overflow : IMirai, CoroutineScope {
         } catch (ignored: ClassNotFoundException) {
         }
         logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
-        launch {
-            OnebotMessages.registerSerializers()
-            logger.info("连接到 WebSocket: ${config.wsHost}")
-            val service = ConnectFactory.create(
-                BotConfig(config.wsHost)
-            )
-            val ws = service.createWebsocketClient()
-            if (ws == null) {
-                logger.error("未连接到 Onebot")
-                if (System.getProperty("overflow.not-exit").isNullOrBlank()) exitProcess(1)
-            } else {
-                val dispatchers = ws.createEventBus()
-                val bot = runBlocking { ws.createBot().also { BotFactoryImpl.internalBot = it }.wrap() }
+        logger.info("连接到 WebSocket: ${config.wsHost}")
+        val service = ConnectFactory.create(
+            BotConfig(config.wsHost)
+        )
+        val ws = runBlocking { service.createWebsocketClient() }
+        if (ws == null) {
+            logger.error("未连接到 Onebot")
+            if (System.getProperty("overflow.not-exit").isNullOrBlank()) exitProcess(1)
+        } else {
+            val dispatchers = ws.createEventBus()
+            val bot = runBlocking { ws.createBot().also { BotFactoryImpl.internalBot = it }.wrap() }
 
-                dispatchers.addListener(FriendMessageListener(bot))
-                dispatchers.addListener(GroupMessageListener(bot))
-                dispatchers.addListener(GroupNotifyListener(bot))
-                logger.info("注册事件")
-            }
+            dispatchers.addListener(FriendMessageListener(bot))
+            dispatchers.addListener(GroupMessageListener(bot))
+            dispatchers.addListener(GroupNotifyListener(bot))
         }
+        OnebotMessages.registerSerializers()
     }
 
 

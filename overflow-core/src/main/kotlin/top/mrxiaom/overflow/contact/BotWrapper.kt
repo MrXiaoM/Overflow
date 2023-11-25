@@ -2,7 +2,9 @@ package top.mrxiaom.overflow.contact
 
 import cn.evole.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.client.core.Bot
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.job
 import net.mamoe.mirai.LowLevelApi
 import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.contact.*
@@ -12,14 +14,12 @@ import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.internal.network.components.EventDispatcher
 import net.mamoe.mirai.internal.network.components.EventDispatcherImpl
-import net.mamoe.mirai.utils.BotConfiguration
-import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.MiraiLogger
-import net.mamoe.mirai.utils.cast
+import net.mamoe.mirai.utils.*
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.data.FriendInfoImpl
 import top.mrxiaom.overflow.data.StrangerInfoImpl
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(MiraiInternalApi::class, LowLevelApi::class)
 class BotWrapper private constructor(
@@ -61,7 +61,33 @@ class BotWrapper private constructor(
     override val id: Long = loginInfo.userId
     override val logger: MiraiLogger = MiraiLogger.Factory.create(this::class, "Bot/$id")
     override val configuration: BotConfiguration = botConfiguration
-    override val coroutineContext: CoroutineContext = CoroutineName("Bot/$id")
+    override val coroutineContext: CoroutineContext =
+        CoroutineName("Bot.$id")
+            .plus(logger.asCoroutineExceptionHandler())
+            .childScopeContext(configuration.parentCoroutineContext)
+            .apply {
+                job.invokeOnCompletion { throwable ->
+                    logger.info { "Bot cancelled" + throwable?.message?.let { ": $it" }.orEmpty() }
+
+                    kotlin.runCatching {
+                        val bot = bot
+                        if (bot is BotWrapper && bot.impl.channel.isOpen) {
+                            bot.impl.channel.close()
+                        }
+                    }.onFailure {
+                        if (it !is CancellationException) logger.error(it)
+                    }
+
+                    @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+                    net.mamoe.mirai.Bot._instances.remove(id)
+
+                    // help GC release instances
+                    groups.forEach { it.members.delegate.clear() }
+                    groups.delegate.clear() // job is cancelled, so child jobs are to be cancelled
+                    friends.delegate.clear()
+                    strangers.delegate.clear()
+                }
+            }
     override val eventChannel: EventChannel<BotEvent> = GlobalEventChannel
         .parentScope(Overflow.instance)
         .context(coroutineContext)
@@ -93,6 +119,7 @@ class BotWrapper private constructor(
         get() = throw NotImplementedError("Onebot 未提供陌生人列表接口")
 
     override fun close(cause: Throwable?) {
+        if (!impl.channel.isOpen || impl.channel.isClosing || impl.channel.isClosed) return
         if (cause != null) logger.warning(cause)
         impl.channel.close()
     }
@@ -123,4 +150,15 @@ class BotWrapper private constructor(
 @Suppress("INVISIBLE_MEMBER")
 fun MiraiLogger.subLogger(name: String): MiraiLogger {
     return net.mamoe.mirai.internal.utils.subLoggerImpl(this, name)
+}
+fun MiraiLogger.asCoroutineExceptionHandler(
+    priority: SimpleLogger.LogPriority = SimpleLogger.LogPriority.ERROR,
+): CoroutineExceptionHandler {
+    return CoroutineExceptionHandler { context, e ->
+        call(
+            priority,
+            context[CoroutineName]?.let { "Exception in coroutine '${it.name}'." } ?: "Exception in unnamed coroutine.",
+            e
+        )
+    }
 }
