@@ -8,11 +8,10 @@ import net.mamoe.mirai.contact.Friend
 import net.mamoe.mirai.contact.friendgroup.FriendGroup
 import net.mamoe.mirai.contact.roaming.RoamingMessages
 import net.mamoe.mirai.message.MessageReceipt
-import net.mamoe.mirai.message.data.Image
-import net.mamoe.mirai.message.data.Message
-import net.mamoe.mirai.message.data.OfflineAudio
-import net.mamoe.mirai.message.data.ShortVideo
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
+import net.mamoe.mirai.utils.MiraiInternalApi
+import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
@@ -44,6 +43,8 @@ class FriendWrapper(
         botWrapper.impl.deleteFriend(id)
     }
 
+
+    @OptIn(MiraiInternalApi::class)
     override suspend fun sendMessage(message: Message): MessageReceipt<Friend> {
         val forward = message.findForwardMessage()
         val messageId = if (forward != null) {
@@ -55,7 +56,17 @@ class FriendWrapper(
             val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
             response.data.messageId
         }
-        TODO("MessageReceipt")
+        @Suppress("DEPRECATION_ERROR")
+        return MessageReceipt(object : OnlineMessageSource.Outgoing.ToFriend(){
+            override val bot: Bot = this@FriendWrapper.bot
+            override val ids: IntArray = IntArray(messageId)
+            override val internalIds: IntArray = ids
+            override val isOriginalMessageInitialized: Boolean = true
+            override val originalMessage: MessageChain = message.toMessageChain()
+            override val sender: Bot = bot
+            override val target: Friend = this@FriendWrapper
+            override val time: Int = currentTimeSeconds().toInt()
+        }, this)
     }
 
     override suspend fun uploadAudio(resource: ExternalResource): OfflineAudio {

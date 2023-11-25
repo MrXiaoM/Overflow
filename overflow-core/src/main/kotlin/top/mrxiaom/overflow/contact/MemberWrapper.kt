@@ -6,16 +6,16 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Group
+import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.NormalMember
 import net.mamoe.mirai.contact.active.MemberActive
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.action.MemberNudge
-import net.mamoe.mirai.message.data.Image
-import net.mamoe.mirai.message.data.Message
-import net.mamoe.mirai.message.data.PlainText
-import net.mamoe.mirai.message.data.ShortVideo
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
+import net.mamoe.mirai.utils.MiraiInternalApi
+import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
@@ -89,6 +89,7 @@ class MemberWrapper(
         return sendMessage(PlainText(message))
     }
 
+    @OptIn(MiraiInternalApi::class)
     override suspend fun sendMessage(message: Message): MessageReceipt<NormalMember> {
         val forward = message.findForwardMessage()
         val messageId = if (forward != null) {
@@ -100,7 +101,17 @@ class MemberWrapper(
             val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
             response.data.messageId
         }
-        TODO("MessageReceipt")
+        @Suppress("DEPRECATION_ERROR")
+        return MessageReceipt(object : OnlineMessageSource.Outgoing.ToTemp(){
+            override val bot: Bot = this@MemberWrapper.bot
+            override val ids: IntArray = IntArray(messageId)
+            override val internalIds: IntArray = ids
+            override val isOriginalMessageInitialized: Boolean = true
+            override val originalMessage: MessageChain = message.toMessageChain()
+            override val sender: Bot = bot
+            override val target: Member = this@MemberWrapper
+            override val time: Int = currentTimeSeconds().toInt()
+        }, this)
     }
 
     override suspend fun unmute() {

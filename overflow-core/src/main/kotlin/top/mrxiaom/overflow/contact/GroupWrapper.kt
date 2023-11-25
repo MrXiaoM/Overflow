@@ -17,6 +17,7 @@ import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.contact.Group.Companion.setEssenceMessage
 import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.MiraiInternalApi
+import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.message.data.WrappedAudio
@@ -114,7 +115,17 @@ class GroupWrapper(
             val response = botWrapper.impl.sendGroupMsg(id, msg, false)
             response.data.messageId
         }
-        TODO("MessageReceipt")
+        @Suppress("DEPRECATION_ERROR")
+        return MessageReceipt(object : OnlineMessageSource.Outgoing.ToGroup(){
+            override val bot: Bot = this@GroupWrapper.bot
+            override val ids: IntArray = IntArray(messageId)
+            override val internalIds: IntArray = ids
+            override val isOriginalMessageInitialized: Boolean = true
+            override val originalMessage: MessageChain = message.toMessageChain()
+            override val sender: Bot = bot
+            override val target: Group = this@GroupWrapper
+            override val time: Int = currentTimeSeconds().toInt()
+        }, this)
     }
 
     override suspend fun setEssenceMessage(source: MessageSource): Boolean {
