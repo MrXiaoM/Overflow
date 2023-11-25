@@ -40,7 +40,7 @@ class FriendWrapper(
         get() = throw NotImplementedError("Onebot 未提供消息漫游接口")
 
     override suspend fun delete() {
-        Overflow.logger.warning("Onebot 未提供删除好友接口 ($id)")
+        botWrapper.impl.deleteFriend(id)
     }
 
     override suspend fun sendMessage(message: Message): MessageReceipt<Friend> {
