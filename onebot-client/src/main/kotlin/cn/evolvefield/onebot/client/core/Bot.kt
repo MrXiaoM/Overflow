@@ -272,7 +272,7 @@ class Bot(
     }
 
     /**
-     * 获取消息
+     * 获取历史消息
      *
      * @param messageType 消息类型
      * @param userId 私聊QQ
@@ -305,7 +305,7 @@ class Bot(
     }
 
     /**
-     * 获取消息
+     * 获取群聊历史消息
      *
      * @param groupId 群号
      * @param count 获取的消息数量（默认为20）
