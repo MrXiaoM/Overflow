@@ -230,7 +230,7 @@ public enum ActionPathEnum implements ActionPath {
     /**
      * 获取当前账号在线客户端列表
      */
-    GET_ONLINE_CLIENTS("get_online_clients"),
+    GET_ONLINE_CLIENTS("_get_online_clients"),
     /**
      * 图片 OCR
      */
