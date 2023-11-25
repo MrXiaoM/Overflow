@@ -10,6 +10,8 @@ import net.mamoe.mirai.contact.friendgroup.FriendGroups
 import net.mamoe.mirai.event.EventChannel
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotEvent
+import net.mamoe.mirai.internal.network.components.EventDispatcher
+import net.mamoe.mirai.internal.network.components.EventDispatcherImpl
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.MiraiLogger
@@ -63,6 +65,7 @@ class BotWrapper private constructor(
         .parentScope(Overflow.instance)
         .context(coroutineContext)
         .filterIsInstance()
+    val eventDispatcher: EventDispatcher = EventDispatcherImpl(coroutineContext, logger.subLogger(""))
 
     override val isOnline: Boolean
         get() = impl.channel.isOpen
@@ -114,4 +117,9 @@ class BotWrapper private constructor(
             return wrap(this)
         }
     }
+}
+
+@Suppress("INVISIBLE_MEMBER")
+fun MiraiLogger.subLogger(name: String): MiraiLogger {
+    return net.mamoe.mirai.internal.utils.subLoggerImpl(this, name)
 }

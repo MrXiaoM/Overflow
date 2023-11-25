@@ -1,6 +1,7 @@
 package top.mrxiaom.overflow.utils
 
 import net.mamoe.mirai.utils.ExternalResource
+import net.mamoe.mirai.utils.MiraiLogger
 import java.util.*
 
 object ResourceUtils {

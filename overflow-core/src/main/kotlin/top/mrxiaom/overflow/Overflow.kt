@@ -142,13 +142,11 @@ class Overflow : IMirai, CoroutineScope {
 
     @OptIn(InternalEventMechanism::class)
     override suspend fun broadcastEvent(event: Event) {
-        logger.info("fired event: " + event::class.jvmName)
         if (event is BotEvent) {
             val bot = event.bot
-            // TODO Bot has not implemented
-            //if (bot is AbstractBot) {
-            //    bot.components[EventDispatcher].broadcast(event)
-            //}
+            if (bot is BotWrapper) {
+                bot.eventDispatcher.broadcast(event)
+            }
         } else {
             EventChannelToEventDispatcherAdapter.instance.broadcastEventImpl(event)
         }
