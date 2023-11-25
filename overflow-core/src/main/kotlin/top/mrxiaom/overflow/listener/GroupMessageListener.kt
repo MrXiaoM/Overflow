@@ -8,6 +8,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
+import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiInternalApi
@@ -42,7 +43,7 @@ internal class GroupMessageListener(
                 if (member.id == bot.id) {
                     // TODO: 过滤自己发送的消息
                 } else {
-                    logger.info("Group(${e.groupId}) ${e.sender.userId} -> ${miraiMessage.contentToString()}")
+                    logger.info("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $miraiMessage")
                     net.mamoe.mirai.event.events.GroupMessageEvent(
                         e.sender.card, when (e.sender.role) {
                             "owner" -> MemberPermission.OWNER

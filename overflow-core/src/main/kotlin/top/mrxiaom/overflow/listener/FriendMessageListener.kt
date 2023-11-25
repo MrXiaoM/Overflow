@@ -4,8 +4,7 @@ import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.contact.ContactOrBot
-import net.mamoe.mirai.contact.Friend
+import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.message.data.MessageChain
@@ -36,10 +35,15 @@ internal class FriendMessageListener(
                     override val time: Int = e.time.toInt()
                 }
                 miraiMessage = messageSource.plus(miraiMessage)
-
-                FriendMessageEvent(
-                    friend, miraiMessage, e.time.toInt()
-                ).broadcast()
+                val logger = bot.configuration.botLoggerSupplier(bot)
+                if (friend.id == bot.id) {
+                    // TODO: 过滤自己发送的消息
+                } else {
+                    logger.info("${friend.remarkOrNick}(${friend.id}) -> $miraiMessage")
+                    FriendMessageEvent(
+                        friend, miraiMessage, e.time.toInt()
+                    ).broadcast()
+                }
             }
             "group" -> {
                 TODO("群临时会话")

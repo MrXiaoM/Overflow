@@ -8,6 +8,7 @@ import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
+import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.message.data.WrappedAudio
 import top.mrxiaom.overflow.message.data.WrappedFileMessage
 import top.mrxiaom.overflow.message.data.WrappedVideo
@@ -90,44 +91,49 @@ object OnebotMessages {
         }
         return nodes
     }
-    @OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
+    suspend fun deserializeFromOneBotJson(bot: Bot, json: com.google.gson.JsonArray, source: MessageSource? = null): MessageChain {
+        return deserializeFromOneBotJson(bot, Json.parseToJsonElement(json.toString()).jsonArray, source)
+    }
     suspend fun deserializeFromOneBotJson(bot: Bot, jsonString: String, source: MessageSource? = null): MessageChain {
-        val json = Json.parseToJsonElement(jsonString).jsonArray
+        return deserializeFromOneBotJson(bot, Json.parseToJsonElement(jsonString).jsonArray, source)
+    }
+    @OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
+    suspend fun deserializeFromOneBotJson(bot: Bot, json: JsonArray, source: MessageSource? = null): MessageChain {
         return buildMessageChain {
             if (source != null) add(source)
 
             for (o in json) {
                 val obj = o.jsonObject
                 val data = obj["data"]?.jsonObject ?: buildJsonObject {  }
-                when (obj["type"].toString()) {
-                    "text" -> add(data["text"].toString())
+                when (obj["type"]!!.string) {
+                    "text" -> add(data["text"]!!.string)
                     "face" -> add(Face(data["id"]!!.jsonPrimitive.int))
                     "image" -> {
-                        val image = imageFromFile(data["file"].toString())
-                        if (data["type"].toString() == "flash") {
+                        val image = imageFromFile((data["url"] ?: data["file"]).toString())
+                        if (data["type"]!!.string == "flash") {
                             add(image.flash())
                         } else {
                             add(image)
                         }
                     }
-                    "record" -> add(audioFromFile(data["file"].toString()))
-                    "video" -> add(videoFromFile(data["file"].toString()))
+                    "record" -> add(audioFromFile(data["file"]!!.string))
+                    "video" -> add(videoFromFile(data["file"]!!.string))
                     "at" -> add(At(data["qq"]!!.jsonPrimitive.long))
                     // TODO "rps" "dice" 无法通过 OneBot 获取其具体值，先搁置
                     "poke" -> add(PokeMessage(
-                        data["name"].toString(),
+                        data["name"]!!.string,
                         data["type"]!!.jsonPrimitive.int,
                         data["id"]!!.jsonPrimitive.int
                     ))
                     //"music" -> add(MusicShare())
                     "forward" -> {
-                        val id = data["id"]!!.toString()
+                        val id = data["id"]!!.string
                         val nodes = Mirai.downloadForwardMessage(bot, id)
                         val raw = RawForwardMessage(nodes)
                         add(raw.render(ForwardMessage.DisplayStrategy))
                     }
-                    "xml" -> add(SimpleServiceMessage(60, data["data"].toString()))
-                    "json" -> add(LightApp(data["data"].toString()))
+                    "xml" -> add(SimpleServiceMessage(60, data["data"]!!.string))
+                    "json" -> add(LightApp(data["data"]!!.string))
                 }
             }
         }
@@ -167,5 +173,6 @@ object OnebotMessages {
         get() = (this as? WrappedAudio)?.file ?: ""
     private val ShortVideo.onebotFile: String
         get() = (this as? WrappedVideo)?.file ?: ""
-
+    private val JsonElement.string
+        get() = jsonPrimitive.content
 }
