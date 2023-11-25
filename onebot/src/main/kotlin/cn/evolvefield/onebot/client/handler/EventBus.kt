@@ -6,16 +6,7 @@ import cn.evolvefield.onebot.client.listener.EnableEventListener
 import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.client.listener.message
 import cn.evolvefield.onebot.client.util.ListenerUtils
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consume
-import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.sync.Mutex
 import org.slf4j.LoggerFactory
-import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -24,24 +15,20 @@ import java.util.concurrent.ConcurrentHashMap
  * Date: 2023/3/19 15:45
  * Description:
  */
-val mutex = Mutex()
 @Suppress("unused")
 class EventBus {
 
     //存储监听器对象
-    protected var eventlistenerlist: MutableList<EventListener<out Event>> = ArrayList()
+    private val eventlistenerlist: MutableList<EventListener<out Event>> = ArrayList()
 
     //缓存类型与监听器的关系
-    protected var cache: MutableMap<Class<out Event>, List<EventListener<out Event>>> = ConcurrentHashMap()
+    private val cache: MutableMap<Class<out Event>, List<EventListener<out Event>>> = ConcurrentHashMap()
 
-    private var close = false
-
-    fun addListener(EventListener: EventListener<out Event>) {
-        eventlistenerlist.add(EventListener)
+    fun addListener(listener: EventListener<out Event>) {
+        eventlistenerlist.add(listener)
     }
 
     fun stop() {
-        close = true
         cache.clear()
         eventlistenerlist.clear()
     }
@@ -75,7 +62,7 @@ class EventBus {
      * @param messageType
      * @return
      */
-    protected fun getMethod(messageType: Class<out Event>): List<EventListener<out Event>> {
+    private fun getMethod(messageType: Class<out Event>): List<EventListener<out Event>> {
         val eventListeners: MutableList<EventListener<out Event>> = ArrayList()
         for (eventListener in eventlistenerlist) {
             try {

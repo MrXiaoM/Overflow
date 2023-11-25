@@ -2,6 +2,8 @@ package cn.evolvefield.onebot.client.connection
 
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.handler.ActionHandler
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import java.net.URI
 
@@ -24,7 +26,8 @@ class ConnectFactory private constructor(
      * 创建websocket客户端(支持cqhttp和mirai类型)
      * @return 连接示例
      */
-    fun createWebsocketClient(): WSClient? {
+    @JvmOverloads
+    fun createWebsocketClient(scope: CoroutineScope = CoroutineScope(CoroutineName("WSClient"))): WSClient? {
         val builder = StringBuilder()
         var ws: WSClient? = null
         if (config.miraiHttp) {
@@ -45,7 +48,7 @@ class ConnectFactory private constructor(
         }
         val url = builder.toString()
         try {
-            ws = WSClient.createAndConnect(URI.create(url), actionHandler)
+            ws = WSClient.createAndConnect(scope, URI.create(url), actionHandler)
         } catch (e: Exception) {
             WSClient.log.error("▌ §c{}连接错误，请检查服务端是否开启 §a┈━═☆", url)
         }

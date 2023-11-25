@@ -15,6 +15,7 @@ import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.internal.network.components.EventDispatcher
 import net.mamoe.mirai.internal.network.components.EventDispatcherImpl
 import net.mamoe.mirai.utils.*
+import org.java_websocket.framing.CloseFrame
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.data.FriendInfoImpl
 import top.mrxiaom.overflow.data.StrangerInfoImpl
@@ -72,7 +73,7 @@ class BotWrapper private constructor(
                     kotlin.runCatching {
                         val bot = bot
                         if (bot is BotWrapper && bot.impl.channel.isOpen) {
-                            bot.impl.channel.close()
+                            bot.close()
                         }
                     }.onFailure {
                         if (it !is CancellationException) logger.error(it)
@@ -88,10 +89,8 @@ class BotWrapper private constructor(
                     strangers.delegate.clear()
                 }
             }
-    override val eventChannel: EventChannel<BotEvent> = GlobalEventChannel
-        .parentScope(Overflow.instance)
-        .context(coroutineContext)
-        .filterIsInstance()
+    override val eventChannel: EventChannel<BotEvent> =
+        GlobalEventChannel.filterIsInstance<BotEvent>().filter { it.bot === this@BotWrapper }
     val eventDispatcher: EventDispatcher = EventDispatcherImpl(coroutineContext, logger.subLogger(""))
 
     override val isOnline: Boolean
@@ -121,7 +120,7 @@ class BotWrapper private constructor(
     override fun close(cause: Throwable?) {
         if (!impl.channel.isOpen || impl.channel.isClosing || impl.channel.isClosed) return
         if (cause != null) logger.warning(cause)
-        impl.channel.close()
+        impl.channel.close(CloseFrame.NORMAL, "主动关闭")
     }
 
     override suspend fun login() {

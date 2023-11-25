@@ -61,6 +61,6 @@ class ActionSendUtils(
 
     companion object {
         private val log = LoggerFactory.getLogger("ActionSender")
+        val mutex = Mutex()
     }
 }
-val mutex = Mutex()

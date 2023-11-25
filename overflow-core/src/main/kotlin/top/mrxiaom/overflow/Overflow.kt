@@ -121,7 +121,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         val service = ConnectFactory.create(
             BotConfig(config.wsHost)
         )
-        val ws = service.createWebsocketClient()
+        val ws = service.createWebsocketClient(this)
         if (ws == null) {
             logger.error("未连接到 Onebot")
             if (System.getProperty("overflow.not-exit").isNullOrBlank()) {
