@@ -7,10 +7,7 @@ import cn.evolvefield.onebot.client.connection.ConnectFactory
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.*
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.contact.Friend
-import net.mamoe.mirai.contact.OtherClientInfo
-import net.mamoe.mirai.contact.Stranger
+import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.data.FriendInfo
 import net.mamoe.mirai.data.MemberInfo
 import net.mamoe.mirai.data.StrangerInfo
@@ -303,7 +300,13 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
     }
 
     override suspend fun sendNudge(bot: Bot, nudge: Nudge, receiver: Contact): Boolean {
-        TODO("Not yet implemented")
+        val msg = "[{\"type\":\"touch\",\"data\":{\"id\":${nudge.target.id}}}]"
+        if (receiver is Group) {
+            bot.asOnebot.impl.sendGroupMsg(receiver.id, msg, false)
+        } else {
+            bot.asOnebot.impl.sendPrivateMsg(receiver.id, msg, false)
+        }
+        return true
     }
 
     @LowLevelApi
