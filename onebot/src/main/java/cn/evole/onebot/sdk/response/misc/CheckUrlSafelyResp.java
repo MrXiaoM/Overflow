@@ -12,6 +12,6 @@ import lombok.Data;
 public class CheckUrlSafelyResp {
 
     @SerializedName("level")
-    private int level;
+    public int level;
 
 }

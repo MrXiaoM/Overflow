@@ -19,13 +19,13 @@ import lombok.NoArgsConstructor;
 public class GroupPokeNoticeEvent extends NoticeEvent {
 
     @SerializedName("sub_type")
-    private String subType;
+    public String subType;
 
     @SerializedName("target_id")
-    private long targetId;
+    public long targetId;
 
     @SerializedName("group_id")
-    private long groupId;
+    public long groupId;
 
 
 }

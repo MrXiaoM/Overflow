@@ -19,19 +19,19 @@ import lombok.experimental.SuperBuilder;
 public class GroupMessageEvent extends MessageEvent {
 
     @SerializedName( "message_id")
-    private int messageId;
+    public int messageId;
 
     @SerializedName( "sub_type")
-    private String subType;
+    public String subType;
 
     @SerializedName( "group_id")
-    private long groupId;
+    public long groupId;
 
     @SerializedName( "anonymous")
-    private Anonymous anonymous;
+    public Anonymous anonymous;
 
     @SerializedName( "sender")
-    private GroupSender sender;
+    public GroupSender sender;
 
     /**
      * sender信息
@@ -40,31 +40,31 @@ public class GroupMessageEvent extends MessageEvent {
     public static class GroupSender {
 
         @SerializedName( "user_id")
-        private String userId;
+        public String userId;
 
         @SerializedName( "nickname")
-        private String nickname;
+        public String nickname;
 
         @SerializedName( "card")
-        private String card;
+        public String card;
 
         @SerializedName( "sex")
-        private String sex;
+        public String sex;
 
         @SerializedName( "age")
-        private int age;
+        public int age;
 
         @SerializedName( "area")
-        private String area;
+        public String area;
 
         @SerializedName( "level")
-        private String level;
+        public String level;
 
         @SerializedName( "role")
-        private String role;
+        public String role;
 
         @SerializedName( "title")
-        private String title;
+        public String title;
 
     }
 

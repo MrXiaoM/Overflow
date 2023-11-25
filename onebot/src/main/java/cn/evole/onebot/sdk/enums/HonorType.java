@@ -15,7 +15,7 @@ public enum HonorType {
     ALL("all"),//所有
     ;
 
-    private String value;
+    public String value;
 
     HonorType(String value) {
         this.value = value;

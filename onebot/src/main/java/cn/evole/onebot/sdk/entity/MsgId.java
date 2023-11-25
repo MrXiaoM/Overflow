@@ -16,5 +16,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class MsgId {
     @SerializedName( "message_id")
-    private int messageId;
+    public int messageId;
 }

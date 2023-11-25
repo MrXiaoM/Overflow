@@ -15,25 +15,25 @@ import java.util.List;
 public class GroupHonorInfoResp {
 
     @SerializedName("group_id")
-    private long groupId;
+    public long groupId;
 
     @SerializedName("current_talkative")
     private CurrentTalkative currentTalkative;
 
     @SerializedName("talkative_list")
-    private List<OtherHonor> talkativeList;
+    public List<OtherHonor> talkativeList;
 
     @SerializedName("performer_list")
-    private List<OtherHonor> performerList;
+    public List<OtherHonor> performerList;
 
     @SerializedName("legend_list")
-    private List<OtherHonor> legendList;
+    public List<OtherHonor> legendList;
 
     @SerializedName("strong_newbie_list")
-    private List<OtherHonor> strongNewbieList;
+    public List<OtherHonor> strongNewbieList;
 
     @SerializedName("emotion_list")
-    private List<OtherHonor> emotionList;
+    public List<OtherHonor> emotionList;
 
     /**
      * 活跃天数
@@ -43,16 +43,16 @@ public class GroupHonorInfoResp {
     public static class CurrentTalkative {
 
         @SerializedName("user_id")
-        private long userId;
+        public long userId;
 
         @SerializedName("nickname")
-        private String nickname;
+        public String nickname;
 
         @SerializedName("avatar")
-        private String avatar;
+        public String avatar;
 
         @SerializedName("day_count")
-        private int dayCount;
+        public int dayCount;
 
 
     }
@@ -65,16 +65,16 @@ public class GroupHonorInfoResp {
     public static class OtherHonor {
 
         @SerializedName("user_id")
-        private long userId;
+        public long userId;
 
         @SerializedName("nickname")
-        private String nickname;
+        public String nickname;
 
         @SerializedName("avatar")
-        private String avatar;
+        public String avatar;
 
         @SerializedName("description")
-        private String description;
+        public String description;
 
 
     }

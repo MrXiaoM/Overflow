@@ -24,24 +24,24 @@ public class MessageReactionsUpdatedNoticeEvent extends NoticeEvent {
      * 频道ID
      */
     @SerializedName("guild_id")
-    private String guildId;
+    public String guildId;
 
     /**
      * 子频道ID
      */
     @SerializedName("channel_id")
-    private String channelId;
+    public String channelId;
 
     /**
      * 消息ID
      */
     @SerializedName("message_id")
-    private String messageId;
+    public String messageId;
 
     /**
      * 当前消息被贴表情列表
      */
-    private List<ReactionInfo> currentReactions;
+    public List<ReactionInfo> currentReactions;
 
     @Data
     private static class ReactionInfo {
@@ -50,37 +50,37 @@ public class MessageReactionsUpdatedNoticeEvent extends NoticeEvent {
          * 表情ID
          */
         @SerializedName("emoji_id")
-        private String emojiId;
+        public String emojiId;
 
         /**
          * 表情对应数值ID
          */
         @SerializedName("emoji_index")
-        private int emojiIndex;
+        public int emojiIndex;
 
         /**
          * 表情类型
          */
         @SerializedName("emoji_type")
-        private int emojiType;
+        public int emojiType;
 
         /**
          * 表情名字
          */
         @SerializedName("emoji_name")
-        private String emojiName;
+        public String emojiName;
 
         /**
          * 当前表情被贴数量
          */
         @SerializedName("count")
-        private int count;
+        public int count;
 
         /**
          * BOT是否点击
          */
         @SerializedName("clicked")
-        private boolean clicked;
+        public boolean clicked;
 
     }
 

@@ -14,7 +14,7 @@ public class ForwardMsgResp {
      * 消息节点列表
      */
     @SerializedName("message")
-    private List<Node> message;
+    public List<Node> message;
     /**
      * 消息节点
      */
@@ -22,15 +22,15 @@ public class ForwardMsgResp {
     public static class Node {
 
         @SerializedName("user_id")
-        private String userId;
+        public String userId;
 
         @SerializedName("nickname")
-        private String nickname;
+        public String nickname;
 
         /**
          * 消息内容
          */
         @SerializedName("content")
-        private String content;
+        public String content;
     }
 }

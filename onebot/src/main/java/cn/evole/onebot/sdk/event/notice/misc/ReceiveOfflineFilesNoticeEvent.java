@@ -30,13 +30,13 @@ public class ReceiveOfflineFilesNoticeEvent extends NoticeEvent {
     public static class File {
 
         @SerializedName("name")
-        private String name;
+        public String name;
 
         @SerializedName("size")
-        private long size;
+        public long size;
 
         @SerializedName("url")
-        private String url;
+        public String url;
 
     }
 

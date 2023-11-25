@@ -21,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 public class GroupUploadNoticeEvent extends NoticeEvent {
 
     @SerializedName( "group_id")
-    private long groupId;
+    public long groupId;
 
     @SerializedName( "file")
     private File file;
@@ -33,16 +33,16 @@ public class GroupUploadNoticeEvent extends NoticeEvent {
     public static class File {
 
         @SerializedName( "id")
-        private String id;
+        public String id;
 
         @SerializedName( "name")
-        private String name;
+        public String name;
 
         @SerializedName( "size")
-        private long size;
+        public long size;
 
         @SerializedName( "busid")
-        private long busid;
+        public long busid;
 
     }
 

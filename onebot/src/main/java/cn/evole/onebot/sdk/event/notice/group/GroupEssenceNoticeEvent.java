@@ -21,11 +21,11 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class GroupEssenceNoticeEvent extends NoticeEvent {
     @SerializedName( "sub_type")
-    private String  subType;//add,delete	添加为add,移出为delete
+    public String  subType;//add,delete	添加为add,移出为delete
     @SerializedName( "sender_id")
-    private Long  senderId	;//消息发送者ID
+    public Long  senderId	;//消息发送者ID
     @SerializedName( "operator_id")
-    private Long operatorId;//操作者ID
+    public Long operatorId;//操作者ID
     @SerializedName( "message_id")
-    private Long messageId	;//消息ID
+    public Long messageId	;//消息ID
 }

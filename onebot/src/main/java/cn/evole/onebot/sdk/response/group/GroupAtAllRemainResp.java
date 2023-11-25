@@ -15,18 +15,18 @@ public class GroupAtAllRemainResp {
      * 是否可以 @全体成员
      */
     @SerializedName("can_at_all")
-    private boolean canAtAll;
+    public boolean canAtAll;
 
     /**
      * 群内所有管理当天剩余 @全体成员 次数
      */
     @SerializedName("remain_at_all_count_for_group")
-    private int remainAtAllCountForGroup;
+    public int remainAtAllCountForGroup;
 
     /**
      * Bot 当天剩余 @全体成员 次数
      */
     @SerializedName("remain_at_all_count_for_uin")
-    private int remainAtAllCountForUin;
+    public int remainAtAllCountForUin;
 
 }

@@ -10,12 +10,12 @@ import lombok.Data;
 public class GuildServiceProfileResp {
 
     @SerializedName("nickname")
-    private String nickname;
+    public String nickname;
 
     @SerializedName("tiny_id")
-    private String tinyId;
+    public String tinyId;
 
     @SerializedName("avatar_url")
-    private String avatarUrl;
+    public String avatarUrl;
 
 }

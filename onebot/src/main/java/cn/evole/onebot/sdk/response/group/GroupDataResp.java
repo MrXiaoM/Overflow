@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class GroupDataResp {
     @SerializedName("group_id")
-    private long groupId;
+    public long groupId;
 
     @SerializedName("group_name")
-    private String groupName;
+    public String groupName;
 }

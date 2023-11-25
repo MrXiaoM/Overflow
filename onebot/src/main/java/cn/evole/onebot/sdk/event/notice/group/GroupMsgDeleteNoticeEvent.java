@@ -21,12 +21,12 @@ import lombok.experimental.SuperBuilder;
 public class GroupMsgDeleteNoticeEvent extends NoticeEvent {
 
     @SerializedName( "group_id")
-    private long groupId;
+    public long groupId;
 
     @SerializedName( "operator_id")
-    private long operatorId;
+    public long operatorId;
 
     @SerializedName( "message_id")
-    private long msgId;
+    public long msgId;
 
 }

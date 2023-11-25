@@ -15,12 +15,12 @@ import java.util.LinkedList;
 public class ActionList<T>{
 
     @SerializedName("status")
-    private String status;
+    public String status;
 
     @SerializedName("retcode")
-    private int retCode;
+    public int retCode;
 
     @SerializedName("data")
-    private LinkedList<T> data;
+    public LinkedList<T> data;
 
 }

@@ -10,24 +10,24 @@ import lombok.Data;
 public class EssenceMsgResp {
 
     @SerializedName("sender_id")
-    private long senderId;
+    public long senderId;
 
     @SerializedName("sender_nick")
-    private String senderNick;
+    public String senderNick;
 
     @SerializedName("sender_time")
-    private long senderTime;
+    public long senderTime;
 
     @SerializedName("operator_id")
-    private long operatorId;
+    public long operatorId;
 
     @SerializedName("operator_nick")
-    private String operatorNick;
+    public String operatorNick;
 
     @SerializedName("operator_time")
-    private String operatorTime;
+    public String operatorTime;
 
     @SerializedName("message_id")
-    private int messageId;
+    public int messageId;
 
 }

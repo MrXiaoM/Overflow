@@ -15,37 +15,37 @@ public class GetMsgResp {
      * 消息id
      */
     @SerializedName("message_id")
-    private int messageId;
+    public int messageId;
 
     /**
      * 消息真实id
      */
     @SerializedName("real_id")
-    private int realId;
+    public int realId;
 
     /**
      * 发送者
      */
     @SerializedName("sender")
-    private Sender sender;
+    public Sender sender;
 
     /**
      * 发送时间
      */
     @SerializedName("time")
-    private int time;
+    public int time;
 
     /**
      * 消息内容
      */
     @SerializedName("message")
-    private String message;
+    public String message;
 
     /**
      * 原始消息内容
      */
     @SerializedName("raw_message")
-    private String rawMessage;
+    public String rawMessage;
 
     /**
      * sender信息
@@ -54,31 +54,31 @@ public class GetMsgResp {
     public static class Sender {
 
         @SerializedName("user_id")
-        private String userId;
+        public String userId;
 
         @SerializedName("nickname")
-        private String nickname;
+        public String nickname;
 
         @SerializedName("card")
-        private String card;
+        public String card;
 
         @SerializedName("sex")
-        private String sex;
+        public String sex;
 
         @SerializedName("age")
-        private int age;
+        public int age;
 
         @SerializedName("area")
-        private String area;
+        public String area;
 
         @SerializedName("level")
-        private String level;
+        public String level;
 
         @SerializedName("role")
-        private String role;
+        public String role;
 
         @SerializedName("title")
-        private String title;
+        public String title;
 
     }
 

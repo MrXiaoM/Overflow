@@ -12,28 +12,28 @@ import java.util.List;
 public class GuildMemberProfileResp {
 
     @SerializedName("tiny_id")
-    private String tinyId;
+    public String tinyId;
 
     @SerializedName("nickname")
-    private String nickname;
+    public String nickname;
 
     @SerializedName("avatar_url")
-    private String avatarUrl;
+    public String avatarUrl;
 
     @SerializedName("join_time")
-    private String joinTime;
+    public String joinTime;
 
     @SerializedName("roles")
-    private List<RoleInfo> roles;
+    public List<RoleInfo> roles;
 
     @Data
     public static class RoleInfo {
 
         @SerializedName("role_id")
-        private String roleId;
+        public String roleId;
 
         @SerializedName("role_name")
-        private String roleName;
+        public String roleName;
 
     }
 

@@ -20,22 +20,22 @@ import lombok.experimental.SuperBuilder;
 public class GuildMessageEvent extends MessageEvent {
 
     @SerializedName( "message_id")
-    private String messageId;
+    public String messageId;
 
     @SerializedName( "sub_type")
-    private String subType;
+    public String subType;
 
     @SerializedName( "guild_id")
-    private String guildId;
+    public String guildId;
 
     @SerializedName( "channel_id")
-    private String channelId;
+    public String channelId;
 
     @SerializedName( "self_tiny_id")
-    private String selfTinyId;
+    public String selfTinyId;
 
     @SerializedName( "sender")
-    private Sender sender;
+    public Sender sender;
 
     /**
      * Sender Info
@@ -44,13 +44,13 @@ public class GuildMessageEvent extends MessageEvent {
     public static class Sender {
 
         @SerializedName( "user_id")
-        private long userId;
+        public long userId;
 
         @SerializedName( "tiny_id")
-        private String tinyId;
+        public String tinyId;
 
         @SerializedName( "nickname")
-        private String nickname;
+        public String nickname;
 
     }
 

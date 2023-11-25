@@ -9,27 +9,27 @@ import lombok.Data;
 public class GetGuildMsgResp {
 
     @SerializedName("guild_id")
-    private String guildId;
+    public String guildId;
 
     @SerializedName("channel_id")
-    private String channelId;
+    public String channelId;
 
     @SerializedName("message")
-    private String message;
+    public String message;
 
     @SerializedName("message_id")
-    private String messageId;
+    public String messageId;
 
     @SerializedName("message_seq")
-    private int messageSeq;
+    public int messageSeq;
 
     @SerializedName("message_source")
-    private String messageSource;
+    public String messageSource;
 
     @SerializedName("sender")
     private GuildMessageEvent.Sender sender;
 
     @SerializedName("time")
-    private long time;
+    public long time;
 
 }

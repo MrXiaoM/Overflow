@@ -18,18 +18,18 @@ import lombok.NoArgsConstructor;
 public class GroupInfoResp extends GroupDataResp{
 
     @SerializedName("group_memo")
-    private String groupMemo;
+    public String groupMemo;
 
     @SerializedName("group_create_time")
-    private int groupCreateTime;
+    public int groupCreateTime;
 
     @SerializedName("group_level")
-    private int groupLevel;
+    public int groupLevel;
 
     @SerializedName("member_count")
-    private Integer memberCount;
+    public Integer memberCount;
 
     @SerializedName("max_member_count")
-    private Integer maxMemberCount;
+    public Integer maxMemberCount;
 
 }

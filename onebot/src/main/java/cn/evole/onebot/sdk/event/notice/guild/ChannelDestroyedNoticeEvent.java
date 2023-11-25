@@ -23,19 +23,19 @@ public class ChannelDestroyedNoticeEvent extends NoticeEvent {
      * 频道ID
      */
     @SerializedName("guild_id")
-    private String guildId;
+    public String guildId;
 
     /**
      * 子频道ID
      */
     @SerializedName("channel_id")
-    private String channelId;
+    public String channelId;
 
     /**
      * 操作者ID
      */
     @SerializedName("operator_id")
-    private String operatorId;
+    public String operatorId;
 
     /**
      * 频道信息

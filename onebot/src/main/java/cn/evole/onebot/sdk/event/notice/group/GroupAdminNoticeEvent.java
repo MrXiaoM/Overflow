@@ -25,13 +25,13 @@ public class GroupAdminNoticeEvent extends NoticeEvent {
      * 事件子类型, 分别表示设置和取消管理
      */
     @SerializedName( "sub_type")
-    private String subType;
+    public String subType;
 
     /**
      * 群号
      */
     @SerializedName( "group_id")
-    private long groupId;
+    public long groupId;
 
     /**
      * 管理员 QQ 号

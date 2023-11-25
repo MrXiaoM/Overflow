@@ -20,10 +20,10 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class HeartbeatMetaEvent extends MetaEvent {
     @SerializedName("status")
-    private Object status;
+    public Object status;
 
     @SerializedName("interval")
-    private long interval;
+    public long interval;
 
 
     public HeartbeatMetaEvent(long selfId, long time, Object status, long interval){

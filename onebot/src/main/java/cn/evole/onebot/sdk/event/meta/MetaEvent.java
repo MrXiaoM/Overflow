@@ -21,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class MetaEvent extends Event {
     @SerializedName("meta_event_type")
-    private String metaEventType;
+    public String metaEventType;
 
     @Override
     public void setPostType(String postType) {

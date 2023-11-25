@@ -12,6 +12,6 @@ import lombok.Data;
 @Data
 public class GuildMsgId {
     @SerializedName( "message_id")
-    private String messageId;
+    public String messageId;
 
 }

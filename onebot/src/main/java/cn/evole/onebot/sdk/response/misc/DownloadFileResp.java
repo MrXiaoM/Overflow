@@ -12,6 +12,6 @@ import lombok.Data;
 public class DownloadFileResp {
 
     @SerializedName("file")
-    private String file;
+    public String file;
 
 }

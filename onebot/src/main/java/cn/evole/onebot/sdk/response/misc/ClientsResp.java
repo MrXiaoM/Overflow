@@ -12,19 +12,19 @@ import java.util.List;
 public class ClientsResp {
 
     @SerializedName("clients")
-    private List<Clients> clients;
+    public List<Clients> clients;
 
     @Data
     public static class Clients {
 
         @SerializedName("app_id")
-        private long appId;
+        public long appId;
 
         @SerializedName("device_name")
-        private String deviceName;
+        public String deviceName;
 
         @SerializedName("device_kind")
-        private String deviceKind;
+        public String deviceKind;
 
     }
 

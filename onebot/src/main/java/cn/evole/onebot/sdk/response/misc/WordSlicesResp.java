@@ -12,6 +12,6 @@ import java.util.List;
 public class WordSlicesResp {
 
     @SerializedName("slices")
-    private List<String> slices;
+    public List<String> slices;
 
 }

@@ -22,20 +22,20 @@ import java.util.List;
 public class MessageEvent extends Event {
 
     @SerializedName( "message_type")
-    private String messageType;
+    public String messageType;
 
     @SerializedName( "user_id")
-    private long userId;
+    public long userId;
 
     @SerializedName( "message")
-    private String message;
+    public String message;
 
     @SerializedName( "raw_message")
-    private String rawMessage;
+    public String rawMessage;
 
     @SerializedName( "font")
-    private int font;
+    public int font;
 
-    private List<MsgChainBean> arrayMsg;
+    public List<MsgChainBean> arrayMsg;
 
 }

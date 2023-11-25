@@ -14,56 +14,56 @@ public class GetHistoryMsgResp {
      * 发送时间
      */
     @SerializedName("time")
-    private int time;
+    public int time;
 
     /**
      * 消息类型
      */
     @SerializedName("message_type")
-    private int messageType;
+    public int messageType;
 
     /**
      * 消息id
      */
     @SerializedName("message_id")
-    private int messageId;
+    public int messageId;
 
     /**
      * 消息真实id
      */
     @SerializedName("real_id")
-    private int realId;
+    public int realId;
 
     /**
      * 发送者
      */
     @SerializedName("sender")
-    private Sender sender;
+    public Sender sender;
 
 
     /**
      * 消息内容
      */
     @SerializedName("message")
-    private String message;
+    public String message;
 
     /**
      * 群号
      */
     @SerializedName("group_id")
-    private long groupId;
+    public long groupId;
 
     /**
      * 消息目标(私聊)
      */
     @SerializedName("target_id")
-    private long targetId;
+    public long targetId;
 
     /**
      * 消息接收者，群聊是群号，私聊时是目标QQ
      */
     @SerializedName("peer_id")
-    private long peerId;
+    public long peerId;
 
     /**
      * sender信息
@@ -72,19 +72,19 @@ public class GetHistoryMsgResp {
     public static class Sender {
 
         @SerializedName("user_id")
-        private long userId;
+        public long userId;
 
         @SerializedName("nickname")
-        private String nickname;
+        public String nickname;
 
         @SerializedName("sex")
-        private String sex;
+        public String sex;
 
         @SerializedName("age")
-        private int age;
+        public int age;
 
         @SerializedName("uid")
-        private String uid;
+        public String uid;
     }
 
 }

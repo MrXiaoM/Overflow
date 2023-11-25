@@ -21,15 +21,15 @@ import lombok.experimental.SuperBuilder;
 public class RequestEvent extends Event {
 
     @SerializedName( "request_type")
-    private String requestType;
+    public String requestType;
 
     @SerializedName( "user_id")
-    private long userId;
+    public long userId;
 
     @SerializedName( "comment")
-    private String comment;
+    public String comment;
 
     @SerializedName( "flag")
-    private String flag;
+    public String flag;
 
 }

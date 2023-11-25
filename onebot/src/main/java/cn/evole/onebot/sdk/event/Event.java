@@ -18,12 +18,12 @@ import lombok.experimental.SuperBuilder;
 public class Event {
 
     @SerializedName("post_type")
-    private String postType;
+    public String postType;
 
     @SerializedName( "time")
-    private long time;
+    public long time;
 
     @SerializedName( "self_id")
-    private long selfId;
+    public long selfId;
 
 }

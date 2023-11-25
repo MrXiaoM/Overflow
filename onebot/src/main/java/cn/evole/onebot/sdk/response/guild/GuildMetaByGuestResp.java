@@ -10,30 +10,30 @@ import lombok.Data;
 public class GuildMetaByGuestResp {
 
     @SerializedName("guild_id")
-    private String guildId;
+    public String guildId;
 
     @SerializedName("guild_name")
-    private String guildName;
+    public String guildName;
 
     @SerializedName("guild_profile")
-    private String guildProfile;
+    public String guildProfile;
 
     @SerializedName("create_time")
-    private long createTime;
+    public long createTime;
 
     @SerializedName("max_member_count")
-    private long maxMemberCount;
+    public long maxMemberCount;
 
     @SerializedName("max_robot_count")
-    private long maxRobotCount;
+    public long maxRobotCount;
 
     @SerializedName("max_admin_count")
-    private long maxAdminCount;
+    public long maxAdminCount;
 
     @SerializedName("member_count")
-    private long memberCount;
+    public long memberCount;
 
     @SerializedName("owner_id")
-    private String ownerId;
+    public String ownerId;
 
 }

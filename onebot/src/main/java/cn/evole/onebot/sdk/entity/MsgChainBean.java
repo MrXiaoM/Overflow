@@ -12,7 +12,7 @@ import java.util.Map;
  */
 @Data
 public class MsgChainBean {
-    private String type;
+    public String type;
 
-    private Map<String, String> data;
+    public Map<String, String> data;
 }

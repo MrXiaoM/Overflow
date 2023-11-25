@@ -7,12 +7,12 @@ import lombok.Data;
 public class Anonymous {
 
     @SerializedName( "id")
-    private long id;
+    public long id;
 
     @SerializedName( "name")
-    private String name;
+    public String name;
 
     @SerializedName( "flag")
-    private String flag;
+    public String flag;
 
 }

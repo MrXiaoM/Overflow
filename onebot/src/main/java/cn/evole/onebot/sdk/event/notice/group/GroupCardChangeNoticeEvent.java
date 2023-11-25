@@ -21,13 +21,13 @@ import lombok.experimental.SuperBuilder;
 public class GroupCardChangeNoticeEvent extends NoticeEvent {
 
     @SerializedName( "card_new")
-    private String cardNew;
+    public String cardNew;
 
     @SerializedName( "group_id")
-    private long groupId;
+    public long groupId;
 
     @SerializedName( "card_old")
-    private String cardOld;
+    public String cardOld;
 
 
 }

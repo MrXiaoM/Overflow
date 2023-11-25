@@ -14,11 +14,11 @@ import lombok.Data;
 public class ActionData<T> {
 
     @SerializedName("status")
-    private String status;
+    public String status;
     @SerializedName("retcode")
-    private int retCode;
+    public int retCode;
     @SerializedName("data")
-    private T data;
+    public T data;
     @SerializedName("echo")
-    private String echo;
+    public String echo;
 }

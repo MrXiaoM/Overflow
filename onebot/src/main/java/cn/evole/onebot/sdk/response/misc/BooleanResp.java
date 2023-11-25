@@ -14,6 +14,6 @@ import lombok.Data;
 public class BooleanResp {
 
     @SerializedName("yes")
-    private boolean yes;
+    public boolean yes;
 
 }

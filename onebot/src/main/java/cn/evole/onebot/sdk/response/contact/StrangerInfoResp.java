@@ -17,42 +17,42 @@ public class StrangerInfoResp {
      * QQ 号
      */
     @SerializedName("user_id")
-    private long userId;
+    public long userId;
 
     /**
      * 昵称
      */
     @SerializedName("nickname")
-    private String nickname;
+    public String nickname;
 
     /**
      * 性别 male 或 female 或 unknown
      */
     @SerializedName("sex")
-    private String sex;
+    public String sex;
 
     /**
      * 年龄
      */
     @SerializedName("age")
-    private int age;
+    public int age;
 
     /**
      * qid id 身份卡
      */
     @SerializedName("qid")
-    private String qid;
+    public String qid;
 
     /**
      * 等级
      */
     @SerializedName("level")
-    private int level;
+    public int level;
 
     /**
      * 在线天数？我猜的（
      */
     @SerializedName("login_days")
-    private int loginDays;
+    public int loginDays;
 
 }

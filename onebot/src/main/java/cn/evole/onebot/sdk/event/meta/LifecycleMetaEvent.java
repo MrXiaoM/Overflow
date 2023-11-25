@@ -21,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 public class LifecycleMetaEvent extends MetaEvent {
 
     @SerializedName("sub_type")
-    private String subType;// enable、disable、connect
+    public String subType;// enable、disable、connect
 
     public LifecycleMetaEvent(long selfId, String subType, long time){
         this.setSelfId(selfId);

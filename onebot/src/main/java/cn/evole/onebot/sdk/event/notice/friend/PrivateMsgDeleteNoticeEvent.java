@@ -21,6 +21,6 @@ import lombok.experimental.SuperBuilder;
 public class PrivateMsgDeleteNoticeEvent extends NoticeEvent {
 
     @SerializedName("message_id")
-    private long msgId;
+    public long msgId;
 
 }

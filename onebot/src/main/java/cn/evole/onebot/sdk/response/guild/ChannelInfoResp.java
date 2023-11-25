@@ -15,61 +15,61 @@ public class ChannelInfoResp {
      * 所属频道ID
      */
     @SerializedName("owner_guild_id")
-    private String ownerGuildId;
+    public String ownerGuildId;
 
     /**
      * 子频道ID
      */
     @SerializedName("channel_id")
-    private String channelId;
+    public String channelId;
 
     /**
      * 子频道类型
      */
     @SerializedName("channel_type")
-    private int channelType;
+    public int channelType;
 
     /**
      * 子频道名称
      */
     @SerializedName("channel_name")
-    private String channelName;
+    public String channelName;
 
     /**
      * 创建时间
      */
     @SerializedName("create_time")
-    private long createTime;
+    public long createTime;
 
     /**
      * 创建者ID
      */
     @SerializedName("creator_tiny_id")
-    private String creatorTinyId;
+    public String creatorTinyId;
 
     /**
      * 发言权限类型
      */
     @SerializedName("talk_permission")
-    private int talkPermission;
+    public int talkPermission;
 
     /**
      * 可视性类型
      */
     @SerializedName("visible_type")
-    private int visibleType;
+    public int visibleType;
 
     /**
      * 当前启用的慢速模式Key
      */
     @SerializedName("current_slow_mode")
-    private int currentSlowMode;
+    public int currentSlowMode;
 
     /**
      * 频道内可用慢速模式类型列表
      */
     @SerializedName("slow_modes")
-    private List<SlowModeInfo> slowModes;
+    public List<SlowModeInfo> slowModes;
 
     @Data
     private static class SlowModeInfo {
@@ -78,25 +78,25 @@ public class ChannelInfoResp {
          * 慢速模式Key
          */
         @SerializedName("slow_mode_key")
-        private int slowModeKey;
+        public int slowModeKey;
 
         /**
          * 慢速模式说明
          */
         @SerializedName("slow_mode_text")
-        private String slowModeText;
+        public String slowModeText;
 
         /**
          * 周期内发言频率限制
          */
         @SerializedName("speak_frequency")
-        private int speakFrequency;
+        public int speakFrequency;
 
         /**
          * 单位周期时间, 单位秒
          */
         @SerializedName("slow_mode_circle")
-        private int slowModeCircle;
+        public int slowModeCircle;
 
     }
 

@@ -10,12 +10,12 @@ import lombok.Data;
 public class UnidirectionalFriendListResp {
 
     @SerializedName("user_id")
-    private long userId;
+    public long userId;
 
     @SerializedName("nickname")
-    private String nickname;
+    public String nickname;
 
     @SerializedName("source")
-    private String source;
+    public String source;
 
 }

@@ -21,9 +21,9 @@ import lombok.experimental.SuperBuilder;
 public class NoticeEvent extends Event {
 
     @SerializedName( "notice_type")
-    private String noticeType;
+    public String noticeType;
 
     @SerializedName( "user_id")
-    private long userId;
+    public long userId;
 
 }

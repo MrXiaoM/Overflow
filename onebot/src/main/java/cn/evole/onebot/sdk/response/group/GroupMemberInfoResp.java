@@ -16,49 +16,49 @@ import lombok.NoArgsConstructor;
 public class GroupMemberInfoResp {
 
     @SerializedName("group_id")
-    private long groupId;
+    public long groupId;
 
     @SerializedName("user_id")
-    private long userId;
+    public long userId;
 
     @SerializedName("nickname")
-    private String nickname;
+    public String nickname;
 
     @SerializedName("card")
-    private String card;
+    public String card;
 
     @SerializedName("sex")
-    private String sex;
+    public String sex;
 
     @SerializedName("age")
-    private int age;
+    public int age;
 
     @SerializedName("area")
-    private String area;
+    public String area;
 
     @SerializedName("join_time")
-    private int joinTime;
+    public int joinTime;
 
     @SerializedName("last_sent_time")
-    private int lastSentTime;
+    public int lastSentTime;
 
     @SerializedName("level")
-    private int level;
+    public int level;
 
     @SerializedName("role")
-    private String role;
+    public String role;
 
     @SerializedName("unfriendly")
-    private boolean unfriendly;
+    public boolean unfriendly;
 
     @SerializedName("title")
-    private String title;
+    public String title;
 
     @SerializedName("title_expire_time")
-    private long titleExpireTime;
+    public long titleExpireTime;
 
     @SerializedName("card_changeable")
-    private boolean cardChangeable;
+    public boolean cardChangeable;
 
 
 

@@ -16,9 +16,9 @@ import lombok.NoArgsConstructor;
 public class LoginInfoResp {
 
     @SerializedName("user_id")
-    private long userId;
+    public long userId;
 
     @SerializedName("nickname")
-    private String nickname;
+    public String nickname;
 
 }

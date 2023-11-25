@@ -10,7 +10,7 @@ public enum SubType {
     POKE("poke"),//戳一戳
     ;
 
-    private String value;
+    public String value;
 
     SubType(String value) {
         this.value = value;

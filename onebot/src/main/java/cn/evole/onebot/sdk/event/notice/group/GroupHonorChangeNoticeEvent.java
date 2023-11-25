@@ -21,13 +21,13 @@ import lombok.experimental.SuperBuilder;
 public class GroupHonorChangeNoticeEvent extends NoticeEvent {
 
     @SerializedName( "sub_type")
-    private String subType;
+    public String subType;
 
     @SerializedName( "group_id")
-    private long groupId;
+    public long groupId;
 
     @SerializedName( "honor_type")
-    private String honorType;
+    public String honorType;
 
 
 }

@@ -20,13 +20,13 @@ import lombok.experimental.SuperBuilder;
 public class PrivateMessageEvent extends MessageEvent {
 
     @SerializedName( "message_id")
-    private int messageId;
+    public int messageId;
 
     @SerializedName( "sub_type")
-    private String subType;
+    public String subType;
 
     @SerializedName( "sender")
-    private PrivateSender privateSender;
+    public PrivateSender privateSender;
 
     /**
      * sender信息
@@ -35,16 +35,16 @@ public class PrivateMessageEvent extends MessageEvent {
     public static class PrivateSender {
 
         @SerializedName( "user_id")
-        private long userId;
+        public long userId;
 
         @SerializedName( "nickname")
-        private String nickname;
+        public String nickname;
 
         @SerializedName( "sex")
-        private String sex;
+        public String sex;
 
         @SerializedName( "age")
-        private int age;
+        public int age;
 
     }
 

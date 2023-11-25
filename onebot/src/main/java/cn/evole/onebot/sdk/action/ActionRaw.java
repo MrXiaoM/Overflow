@@ -14,10 +14,10 @@ import lombok.Data;
 public class ActionRaw{
 
     @SerializedName("status")
-    private String status;
+    public String status;
     @SerializedName("retcode")
-    private int retCode;
+    public int retCode;
     @SerializedName( "echo")
-    private long echo;
+    public long echo;
 
 }

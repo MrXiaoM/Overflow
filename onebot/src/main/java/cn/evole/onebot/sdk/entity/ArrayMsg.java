@@ -13,7 +13,7 @@ import java.util.Map;
  */
 @Data
 public class ArrayMsg {
-    private MsgTypeEnum type;
+    public MsgTypeEnum type;
 
-    private Map<String, String> data;
+    public Map<String, String> data;
 }

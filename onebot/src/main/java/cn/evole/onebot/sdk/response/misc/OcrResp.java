@@ -12,10 +12,10 @@ import java.util.List;
 public class OcrResp {
 
     @SerializedName("texts")
-    private List<TextDetection> texts;
+    public List<TextDetection> texts;
 
     @SerializedName("language")
-    private String language;
+    public String language;
 
     @Data
     private static class TextDetection {
@@ -24,19 +24,19 @@ public class OcrResp {
          * 文本
          */
         @SerializedName("text")
-        private String text;
+        public String text;
 
         /**
          * 置信度
          */
         @SerializedName("confidence")
-        private int confidence;
+        public int confidence;
 
         /**
          * 坐标
          */
         @SerializedName("coordinates")
-        private int[][] coordinates;
+        public int[][] coordinates;
 
     }
 

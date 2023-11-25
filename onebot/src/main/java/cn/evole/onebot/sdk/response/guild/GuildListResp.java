@@ -10,12 +10,12 @@ import lombok.Data;
 public class GuildListResp {
 
     @SerializedName("guild_id")
-    private String guildId;
+    public String guildId;
 
     @SerializedName("guild_name")
-    private String guildName;
+    public String guildName;
 
     @SerializedName("guild_display_id")
-    private String guildDisplayId;
+    public String guildDisplayId;
 
 }

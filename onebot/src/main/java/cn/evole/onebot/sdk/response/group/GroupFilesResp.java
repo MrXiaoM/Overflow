@@ -11,9 +11,9 @@ import java.util.List;
 @Data
 public class GroupFilesResp {
 
-    private List<Files> files;
+    public List<Files> files;
 
-    private List<Folders> folders;
+    public List<Folders> folders;
 
     /**
      * 群文件
@@ -22,32 +22,32 @@ public class GroupFilesResp {
     public static class Files {
 
         @SerializedName("file_id")
-        private String fileId;
+        public String fileId;
 
         @SerializedName("file_name")
-        private String fileName;
+        public String fileName;
 
-        private int busid;
+        public int busid;
 
         @SerializedName("file_size")
-        private long fileSize;
+        public long fileSize;
 
         @SerializedName("upload_time")
-        private long uploadTime;
+        public long uploadTime;
 
         @SerializedName("dead_time")
-        private long deadTime;
+        public long deadTime;
 
         @SerializedName("modify_time")
-        private long modifyTime;
+        public long modifyTime;
 
         @SerializedName("download_times")
-        private int downloadTimes;
+        public int downloadTimes;
 
-        private long uploader;
+        public long uploader;
 
         @SerializedName("uploader_name")
-        private String uploaderName;
+        public String uploaderName;
 
     }
 
@@ -58,21 +58,21 @@ public class GroupFilesResp {
     public static class Folders {
 
         @SerializedName("folder_id")
-        private String folderId;
+        public String folderId;
 
         @SerializedName("folder_name")
-        private String folderName;
+        public String folderName;
 
         @SerializedName("create_time")
-        private long createTime;
+        public long createTime;
 
-        private long creator;
+        public long creator;
 
         @SerializedName("creator_name")
-        private String creatorName;
+        public String creatorName;
 
         @SerializedName("total_file_count")
-        private int totalFileCount;
+        public int totalFileCount;
 
     }
 

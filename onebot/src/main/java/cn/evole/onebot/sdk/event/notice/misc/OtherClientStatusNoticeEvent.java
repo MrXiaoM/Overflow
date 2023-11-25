@@ -21,7 +21,7 @@ import lombok.experimental.SuperBuilder;
 public class OtherClientStatusNoticeEvent extends NoticeEvent {
 
     @SerializedName("online")
-    private boolean online;
+    public boolean online;
 
     @SerializedName("client")
     private Clients client;
@@ -33,16 +33,16 @@ public class OtherClientStatusNoticeEvent extends NoticeEvent {
     public static class Clients {
 
         @SerializedName("app_id")
-        private long appId;
+        public long appId;
 
         @SerializedName("platform")
-        private String platform;
+        public String platform;
 
         @SerializedName("device_name")
-        private String deviceName;
+        public String deviceName;
 
         @SerializedName("device_kind")
-        private String deviceKind;
+        public String deviceKind;
 
     }
 
