@@ -272,6 +272,66 @@ class Bot(
     }
 
     /**
+     * 获取消息
+     *
+     * @param messageType 消息类型
+     * @param userId 私聊QQ
+     * @param groupId 群号
+     * @param count 获取的消息数量（默认为20）
+     * @param messageSeq 起始消息的message_id（默认为0，表示从最后一条发言往前）
+     * @return [ActionData] of [GetHistoryMsgResp]
+     */
+    @JvmBlockingBridge
+    suspend fun getHistoryMsg(
+        messageType: String,
+        userId: Long? = null,
+        groupId: Long? = null,
+        count: Int = 20,
+        messageSeq: Int = 0
+    ): ActionData<GetHistoryMsgResp> {
+        val action = ActionPathEnum.GET_HISTORY_MSG
+        val params = JsonObject()
+        params.addProperty("message_type", messageType)
+        if (userId != null) params.addProperty("user_id", userId)
+        if (groupId != null) params.addProperty("group_id", groupId)
+        params.addProperty("count", count)
+        params.addProperty("message_seq", messageSeq)
+
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionData<GetHistoryMsgResp>>() {}.type
+        )
+    }
+
+    /**
+     * 获取消息
+     *
+     * @param groupId 群号
+     * @param count 获取的消息数量（默认为20）
+     * @param messageSeq 起始消息的message_id（默认为0，表示从最后一条发言往前）
+     * @return [ActionData] of [GetHistoryMsgResp]
+     */
+    @JvmBlockingBridge
+    suspend fun getGroupMsgHistory(
+        groupId: Long,
+        count: Int = 20,
+        messageSeq: Int = 0
+    ): ActionData<GetHistoryMsgResp> {
+        val action = ActionPathEnum.GET_GROUP_MSG_HISTORY
+        val params = JsonObject()
+        params.addProperty("group_id", groupId)
+        params.addProperty("count", count)
+        params.addProperty("message_seq", messageSeq)
+
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionData<GetHistoryMsgResp>>() {}.type
+        )
+    }
+
+    /**
      * 撤回消息
      *
      * @param msgId 消息 ID

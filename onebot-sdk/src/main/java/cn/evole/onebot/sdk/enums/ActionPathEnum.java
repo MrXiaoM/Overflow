@@ -28,6 +28,14 @@ public enum ActionPathEnum implements ActionPath {
      */
     GET_MSG("get_msg"),
     /**
+     * 获取历史消息
+     */
+    GET_HISTORY_MSG("get_history_msg"),
+    /**
+     * 获取群聊历史消息
+     */
+    GET_GROUP_MSG_HISTORY("get_group_msg_history"),
+    /**
      * 获取转发消息内容
      */
     GET_FORWARD_MSG("get_forward_msg"),
