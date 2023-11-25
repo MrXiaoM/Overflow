@@ -6,7 +6,6 @@ import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.serializer
 import net.mamoe.mirai.*
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Friend
@@ -55,21 +54,28 @@ class Overflow : IMirai, CoroutineScope {
     internal val newInviteJoinGroupRequestFlagMap = mutableMapOf<Long, String>()
     private val prettyJson = Json {
         prettyPrint = true
+        encodeDefaults = true
+    }
+    private val json = Json {
         ignoreUnknownKeys = true
     }
+
+    val configFile: File by lazy {
+        File(System.getProperty("overflow.config", "overflow.json"))
+    }
     val config: Config by lazy {
-        val text = File(System.getProperty("overflow.config", "overflow.json"))
         var config: Config? = null
-        if (text.exists()) try {
-            config = Json.decodeFromString(Config.serializer(), text.readText())
+        if (configFile.exists()) try {
+            config = json.decodeFromString(Config.serializer(), configFile.readText())
         } catch (t: Throwable) {
-            val bak = File(text.parentFile, "${text.name}.old_${System.currentTimeMillis()}.bak")
-            text.copyTo(bak, true)
+            val bak = File(configFile.parentFile, "${configFile.name}.old_${System.currentTimeMillis()}.bak")
+            configFile.copyTo(bak, true)
             logger.warning("读取配置文件错误，已保存旧文件到 ${bak.name}", t)
+        } else {
+            logger.info("配置文件不存在，正在创建")
         }
-        config = config ?: Config()
-        config.apply {
-            text.writeText(prettyJson.encodeToString(serializer(), this))
+        (config ?: Config()).apply {
+            configFile.writeText(prettyJson.encodeToString(Config.serializer(), this))
         }
     }
 
@@ -98,7 +104,7 @@ class Overflow : IMirai, CoroutineScope {
         logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
         launch {
             OnebotMessages.registerSerializers()
-
+            logger.info("连接到 WebSocket: ${config.wsHost}")
             val service = ConnectFactory.create(
                 BotConfig(config.wsHost)
             )
