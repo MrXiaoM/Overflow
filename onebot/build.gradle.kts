@@ -18,4 +18,6 @@ dependencies {
 
     annotationProcessor("org.java-websocket:Java-WebSocket:1.5.4")
     annotationProcessor("org.projectlombok:lombok:1.18.24")
+
+    testCompileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
 }

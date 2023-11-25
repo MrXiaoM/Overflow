@@ -7,5 +7,5 @@ package cn.evolvefield.onebot.client.handler
  * Version: 1.0
  */
 interface Handler<T> {
-    fun handle(t: T)
+    suspend fun handle(e: T)
 }
