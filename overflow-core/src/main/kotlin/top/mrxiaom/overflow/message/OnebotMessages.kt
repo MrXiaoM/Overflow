@@ -9,6 +9,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.message.data.WrappedAudio
+import top.mrxiaom.overflow.message.data.WrappedFileMessage
 import top.mrxiaom.overflow.message.data.WrappedVideo
 
 /**
@@ -16,13 +17,13 @@ import top.mrxiaom.overflow.message.data.WrappedVideo
  *
  * ## 反序列化未完成项
  * - 音乐分享 (music/[MusicShare])
- * - 转发消息 (forward/[ForwardMessage])
  */
 object OnebotMessages {
     @OptIn(MiraiExperimentalApi::class)
     internal fun registerSerializers() {
         MessageSerializers.registerSerializer(WrappedAudio::class, WrappedAudio.serializer())
         MessageSerializers.registerSerializer(WrappedVideo::class, WrappedVideo.serializer())
+        MessageSerializers.registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
     }
 
     fun serializeToOneBotJson(message: Message): String {

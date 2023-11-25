@@ -10,13 +10,12 @@ import net.mamoe.mirai.utils.safeCast
 data class WrappedVideo(
     val file: String
 ) : OnlineShortVideo {
-    override val fileFormat: String = ""
+    override val fileFormat: String = "mp4"
     override val fileMd5: ByteArray = ByteArray(16)
     override val fileSize: Long = 0
-
-    override val filename: String = file
+    override val filename: String = if (file.startsWith("base64://")) "base64" else file.substringAfterLast("/")
     override val urlForDownload: String = file
-    override val videoId: String = file
+    override val videoId: String = filename
 
     override fun contentToString(): String {
         return "[视频消息]"

@@ -31,6 +31,7 @@ import top.mrxiaom.overflow.contact.FriendWrapper
 import top.mrxiaom.overflow.listener.FriendMessageListener
 import top.mrxiaom.overflow.listener.GroupMessageListener
 import top.mrxiaom.overflow.message.OnebotMessages
+import top.mrxiaom.overflow.message.data.WrappedFileMessage
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.jvm.jvmName
@@ -173,7 +174,7 @@ class Overflow : IMirai, CoroutineScope {
     }
 
     override fun createFileMessage(id: String, internalId: Int, name: String, size: Long): FileMessage {
-        TODO("Not yet implemented")
+        return WrappedFileMessage(id, internalId, name, size)
     }
 
     override fun createUnsupportedMessage(struct: ByteArray): UnsupportedMessage {
