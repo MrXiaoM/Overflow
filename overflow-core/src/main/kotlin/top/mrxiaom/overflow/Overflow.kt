@@ -99,7 +99,7 @@ class Overflow : IMirai, CoroutineScope {
 
         OnebotMessages.registerSerializers()
 
-        val service = ConnectFactory(
+        val service = ConnectFactory.create(
             BotConfig(config.wsHost)
         )
         val ws = service.ws ?: throw IllegalStateException("未连接到 Onebot")

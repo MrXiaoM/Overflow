@@ -11,7 +11,7 @@ import cn.evolvefield.onebot.client.connection.ConnectFactory
 object ApiTest {
     @JvmStatic
     suspend fun main(args: Array<String>) {
-        val service = ConnectFactory(
+        val service = ConnectFactory.create(
             BotConfig("ws://127.0.0.1:8080")
         ) //创建websocket客户端
         val ws = service.ws ?: throw IllegalStateException("未连接到 Onebot")

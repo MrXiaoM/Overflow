@@ -18,9 +18,9 @@ import java.net.URI
  * @param config 配置
  * @param channel 队列消息
  */
-class ConnectFactory(
+class ConnectFactory private constructor(
     private val config: BotConfig,
-    private val channel: Channel<String> = Channel()
+    private val channel: Channel<String>
 ) {
     private val actionHandler: ActionHandler = ActionHandler()
     var ws: WSClient? = kotlin.runCatching {
@@ -68,5 +68,13 @@ class ConnectFactory(
 
     fun stop() {
         ws!!.close()
+    }
+
+    companion object {
+        @JvmStatic
+        @JvmOverloads
+        fun create(config: BotConfig, channel: Channel<String> = Channel()): ConnectFactory {
+            return ConnectFactory(config, channel)
+        }
     }
 }
