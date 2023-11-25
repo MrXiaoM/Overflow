@@ -5,8 +5,8 @@ import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import kotlinx.coroutines.*
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.serializer
 import net.mamoe.mirai.*
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.Friend
@@ -34,8 +34,7 @@ import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.data.WrappedFileMessage
 import java.io.File
 import kotlin.coroutines.CoroutineContext
-import kotlin.reflect.jvm.jvmName
-
+import kotlin.system.exitProcess
 
 val Bot.asOnebot: BotWrapper
     get() = this as? BotWrapper ?: throw IllegalStateException("Bot 非 Overflow 实现")
@@ -68,8 +67,9 @@ class Overflow : IMirai, CoroutineScope {
             text.copyTo(bak, true)
             logger.warning("读取配置文件错误，已保存旧文件到 ${bak.name}", t)
         }
-        (config ?: Config()).apply {
-            text.writeText(prettyJson.encodeToString(config))
+        config = config ?: Config()
+        config.apply {
+            text.writeText(prettyJson.encodeToString(serializer(), this))
         }
     }
 
@@ -92,23 +92,29 @@ class Overflow : IMirai, CoroutineScope {
         // 暂定禁止 mirai-console 的终端用户须知，它可能已不适用于 Overflow
         try {
             Class.forName("net.mamoe.mirai.console.enduserreadme.EndUserReadme")
-            System.setProperty("mirai.console.skip-end-user-readme", "Overflow v${BuildConstants.VERSION}")
+            System.setProperty("mirai.console.skip-end-user-readme", "true")
         } catch (ignored: ClassNotFoundException) {
         }
         logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
+        launch {
+            OnebotMessages.registerSerializers()
 
-        OnebotMessages.registerSerializers()
+            val service = ConnectFactory.create(
+                BotConfig(config.wsHost)
+            )
+            val ws = service.createWebsocketClient()
+            if (ws == null) {
+                logger.error("未连接到 Onebot")
+                if (System.getProperty("overflow.not-exit").isNullOrBlank()) exitProcess(1)
+                return@launch
+            }
+            val bot = runBlocking { ws.createBot().also { BotFactoryImpl.internalBot = it }.wrap() }
 
-        val service = ConnectFactory.create(
-            BotConfig(config.wsHost)
-        )
-        val ws = service.ws ?: throw IllegalStateException("未连接到 Onebot")
-        val bot = runBlocking { ws.createBot().also { BotFactoryImpl.internalBot = it }.wrap() }
+            val dispatchers = service.createEventBus(this)
 
-        val dispatchers = service.createEventBus(this)
-
-        dispatchers.addListener(FriendMessageListener(bot))
-        dispatchers.addListener(GroupMessageListener(bot))
+            dispatchers.addListener(FriendMessageListener(bot))
+            dispatchers.addListener(GroupMessageListener(bot))
+        }
     }
 
     override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {

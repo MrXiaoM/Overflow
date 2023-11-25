@@ -14,13 +14,13 @@ object ApiTest {
         val service = ConnectFactory.create(
             BotConfig("ws://127.0.0.1:8080")
         ) //创建websocket客户端
-        val ws = service.ws ?: throw IllegalStateException("未连接到 Onebot")
+        val ws = service.createWebsocketClient() ?: throw IllegalStateException("未连接到 Onebot")
         val bot = ws.createBot()
 
         val test = bot.sendGroupMsg(337631140, MsgUtils.builder().text("123").build(), true) //发送群消息
         //GroupMemberInfoResp sender = bot.getGroupMemberInfo(720975019, 1812165465, false).getData();//获取响应的群成员信息
         println(test.data.toString()) //打印
 
-        service.stop()
+        ws.close()
     }
 }

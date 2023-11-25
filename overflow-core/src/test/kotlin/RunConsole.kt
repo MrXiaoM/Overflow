@@ -7,9 +7,6 @@ import java.io.File
 
 @OptIn(ConsoleExperimentalApi::class, ConsoleFrontEndImplementation::class)
 suspend fun main() {
-    val runDir = File("run")
-    if (!runDir.exists()) runDir.mkdirs()
-
-    MiraiConsoleTerminalLoader.startAsDaemon(MiraiConsoleImplementationTerminal(runDir.toPath()))
+    MiraiConsoleTerminalLoader.startAsDaemon(MiraiConsoleImplementationTerminal())
     MiraiConsole.job.join()
 }

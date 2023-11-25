@@ -5,6 +5,7 @@ import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.client.handler.EventBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import java.net.URI
 
 /**
@@ -23,17 +24,13 @@ class ConnectFactory private constructor(
     private val channel: Channel<String>
 ) {
     private val actionHandler: ActionHandler = ActionHandler()
-    var ws: WSClient? = kotlin.runCatching {
-        createWebsocketClient()
-    }.onFailure {
-        WSClient.log.error("▌ §c连接错误，请检查服务端是否开启 §a┈━═☆")
-    }.getOrNull()
 
     /**
      * 创建websocket客户端(支持cqhttp和mirai类型)
      * @return 连接示例
      */
-    fun createWebsocketClient(): WSClient? {
+    @JvmBlockingBridge
+    suspend fun createWebsocketClient(): WSClient? {
         val builder = StringBuilder()
         var ws: WSClient? = null
         if (config.miraiHttp) {
@@ -54,8 +51,7 @@ class ConnectFactory private constructor(
         }
         val url = builder.toString()
         try {
-            ws = WSClient(URI.create(url), channel, actionHandler)
-            ws.connect()
+            ws = WSClient.createAndConnect(URI.create(url), channel, actionHandler)
         } catch (e: Exception) {
             WSClient.log.error("▌ §c{}连接错误，请检查服务端是否开启 §a┈━═☆", url)
         }
@@ -64,10 +60,6 @@ class ConnectFactory private constructor(
 
     fun createEventBus(scope: CoroutineScope): EventBus {
         return EventBus.create(scope, channel)
-    }
-
-    fun stop() {
-        ws!!.close()
     }
 
     companion object {

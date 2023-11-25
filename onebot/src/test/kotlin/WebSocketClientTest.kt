@@ -25,7 +25,7 @@ object WebSocketClientTest : CoroutineScope {
         val service = ConnectFactory.create(
             BotConfig("ws://127.0.0.1:8080")
         ) //创建websocket客户端
-        val ws = service.ws ?: throw IllegalStateException("未连接到 Onebot")
+        val ws = service.createWebsocketClient() ?: throw IllegalStateException("未连接到 Onebot")
         val bot = ws.createBot()
         val dispatchers = service.createEventBus(this) //创建事件分发器
 
@@ -46,7 +46,7 @@ object WebSocketClientTest : CoroutineScope {
         }) //快速监听
 
         dispatchers.stop()
-        service.stop()
+        ws.close()
     }
 
 }
