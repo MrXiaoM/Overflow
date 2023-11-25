@@ -1,7 +1,9 @@
 package top.mrxiaom.overflow
 
 import cn.evole.onebot.sdk.action.ActionRaw
+import cn.evole.onebot.sdk.entity.Anonymous
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
+import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import kotlinx.coroutines.*
@@ -24,6 +26,8 @@ import net.mamoe.mirai.utils.MiraiLogger
 import top.mrxiaom.overflow.contact.BotWrapper
 import top.mrxiaom.overflow.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.contact.FriendWrapper
+import top.mrxiaom.overflow.contact.StrangerWrapper
+import top.mrxiaom.overflow.data.asMirai
 import top.mrxiaom.overflow.listener.FriendMessageListener
 import top.mrxiaom.overflow.listener.GroupMessageListener
 import top.mrxiaom.overflow.listener.GroupNotifyListener
@@ -88,8 +92,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         }
         @JvmStatic
         @get:JvmName("getInstance")
-        val instance: Overflow
-            get() = _instance
+        val instance: Overflow get() = _instance
     }
 
     init {
@@ -120,35 +123,19 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         OnebotMessages.registerSerializers()
     }
 
-
-    override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
-        newInviteJoinGroupRequestFlagMap[event.eventId]?.also {
-            event.bot.asOnebot.impl.setGroupAddRequest(it, "invite", true, "")
-        }
+    override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
+        TODO("Not yet implemented")
     }
-
-    override suspend fun acceptMemberJoinRequest(event: MemberJoinRequestEvent) {
-        newMemberJoinRequestFlagMap[event.eventId]?.also {
-            event.bot.asOnebot.impl.setGroupAddRequest(it, "add", true, "")
-        }
+    override suspend fun getOnlineOtherClientsList(bot: Bot, mayIncludeSelf: Boolean): List<OtherClientInfo> {
+        TODO("Not yet implemented")
     }
-
-    override suspend fun acceptNewFriendRequest(event: NewFriendRequestEvent) {
-        newFriendRequestFlagMap[event.eventId]?.also {
-            event.bot.asOnebot.impl.setFriendAddRequest(it, true, "")
-        }
+    @LowLevelApi
+    override suspend fun getGroupVoiceDownloadUrl(bot: Bot, md5: ByteArray, groupId: Long, dstUin: Long): String {
+        TODO("Not yet implemented")
     }
-
-    override suspend fun rejectMemberJoinRequest(event: MemberJoinRequestEvent, blackList: Boolean, message: String) {
-        newMemberJoinRequestFlagMap[event.eventId]?.also {
-            event.bot.asOnebot.impl.setGroupAddRequest(it, "add", false, message)
-        }
-    }
-
-    override suspend fun rejectNewFriendRequest(event: NewFriendRequestEvent, blackList: Boolean) {
-        newFriendRequestFlagMap[event.eventId]?.also {
-            event.bot.asOnebot.impl.setFriendAddRequest(it, true, "")
-        }
+    @MiraiExperimentalApi
+    override suspend fun refreshKeys(bot: Bot) {
+        // TODO: 2021/4/14 MiraiImpl.refreshKeysNow
     }
 
     @OptIn(InternalEventMechanism::class)
@@ -195,18 +182,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         throw NotImplementedError("Onebot 未提供长消息下载方法")
     }
 
-    @LowLevelApi
-    override suspend fun getGroupVoiceDownloadUrl(bot: Bot, md5: ByteArray, groupId: Long, dstUin: Long): String {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun getOnlineOtherClientsList(bot: Bot, mayIncludeSelf: Boolean): List<OtherClientInfo> {
-        TODO("Not yet implemented")
-    }
 
     @LowLevelApi
     override suspend fun getRawGroupList(bot: Bot): Sequence<Long> {
-        TODO("Not yet implemented")
+        return bot.asOnebot.impl.getGroupList().data.map { it.groupId }.asSequence()
     }
 
     @LowLevelApi
@@ -216,15 +195,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         groupCode: Long,
         ownerId: Long
     ): Sequence<MemberInfo> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun ignoreInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun ignoreMemberJoinRequest(event: MemberJoinRequestEvent, blackList: Boolean) {
-        TODO("Not yet implemented")
+        return bot.asOnebot.impl.getGroupMemberList(groupUin).data.map { it.asMirai }.asSequence()
     }
 
     @LowLevelApi
@@ -235,7 +206,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         groupId: Long,
         seconds: Int
     ) {
-        TODO("Not yet implemented")
+        // TODO: 获取匿名群员列表中的 flag 应当赋值给 anonymousId
+        bot.asOnebot.impl.setGroupAnonymousBan(groupId, anonymousId, seconds)
     }
 
     @LowLevelApi
@@ -245,16 +217,12 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
 
     @LowLevelApi
     override fun newStranger(bot: Bot, strangerInfo: StrangerInfo): Stranger {
-        TODO("Not yet implemented")
+        return StrangerWrapper(bot.asOnebot, StrangerInfoResp(strangerInfo.uin, strangerInfo.nick, "", 0, "", 0, 0))
     }
 
     override suspend fun queryImageUrl(bot: Bot, image: Image): String {
         // Onebot 没有 imageId 概念，Overflow 使用 imageId 字段来存储 Onebot 中的 file 链接
         return image.imageId
-    }
-
-    override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
-        TODO("Not yet implemented")
     }
 
     @LowLevelApi
@@ -294,11 +262,6 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         bot.asOnebot.impl.deleteMsg(source.ids[0]).check("撤回消息") // 忽略多消息情况
     }
 
-    @MiraiExperimentalApi
-    override suspend fun refreshKeys(bot: Bot) {
-        // TODO
-    }
-
     override suspend fun sendNudge(bot: Bot, nudge: Nudge, receiver: Contact): Boolean {
         val msg = "[{\"type\":\"touch\",\"data\":{\"id\":${nudge.target.id}}}]"
         if (receiver is Group) {
@@ -309,41 +272,59 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         return true
     }
 
-    @LowLevelApi
-    override suspend fun solveBotInvitedJoinGroupRequestEvent(
-        bot: Bot,
-        eventId: Long,
-        invitorId: Long,
-        groupId: Long,
-        accept: Boolean
-    ) {
-        TODO("Not yet implemented")
-    }
 
-    @LowLevelApi
-    override suspend fun solveMemberJoinRequestEvent(
-        bot: Bot,
-        eventId: Long,
-        fromId: Long,
-        fromNick: String,
-        groupId: Long,
-        accept: Boolean?,
-        blackList: Boolean,
-        message: String
-    ) {
-        TODO("Not yet implemented")
+    //========== Bot Invited Join Group Request 邀请机器人加群请求 START =============
+    override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
+        solveBotInvitedJoinGroupRequestEvent(event.bot, event.eventId, event.invitorId, event.groupId, true)
     }
+    override suspend fun ignoreInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
+        solveBotInvitedJoinGroupRequestEvent(event.bot, event.eventId, event.invitorId, event.groupId, false)
+    }
+    @LowLevelApi
+    override suspend fun solveBotInvitedJoinGroupRequestEvent(bot: Bot, eventId: Long, invitorId: Long, groupId: Long, accept: Boolean) {
+        newInviteJoinGroupRequestFlagMap[eventId]?.also {
+            bot.asOnebot.impl.setGroupAddRequest(it, "invite", accept, "")
+        }
+    }
+    //========== Bot Invited Join Group Request 邀请机器人加群请求 END =============
 
-    @LowLevelApi
-    override suspend fun solveNewFriendRequestEvent(
-        bot: Bot,
-        eventId: Long,
-        fromId: Long,
-        fromNick: String,
-        accept: Boolean,
-        blackList: Boolean
-    ) {
-        TODO("Not yet implemented")
+
+    //========== Member Join Request 加群申请 START =============
+    override suspend fun acceptMemberJoinRequest(event: MemberJoinRequestEvent) {
+        solveMemberJoinRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, event.groupId, accept = true, blackList = false, message = event.message)
     }
+    override suspend fun rejectMemberJoinRequest(event: MemberJoinRequestEvent, blackList: Boolean, message: String) {
+        solveMemberJoinRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, event.groupId, accept = false, blackList = blackList, message = message)
+    }
+    override suspend fun ignoreMemberJoinRequest(event: MemberJoinRequestEvent, blackList: Boolean) {
+        solveMemberJoinRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, event.groupId, accept = null, blackList = blackList, message = event.message)
+    }
+    @LowLevelApi
+    override suspend fun solveMemberJoinRequestEvent(bot: Bot, eventId: Long, fromId: Long, fromNick: String, groupId: Long, accept: Boolean?, blackList: Boolean, message: String) {
+        if (accept == null) {
+            // TODO 忽略加群请求
+            return
+        }
+        newMemberJoinRequestFlagMap[eventId]?.also {
+            bot.asOnebot.impl.setGroupAddRequest(it, "add", accept, message)
+        }
+    }
+    //========== Member Join Request 加群申请 END =============
+
+
+    //========== New Friend Request 新好友请求 START =============
+    override suspend fun acceptNewFriendRequest(event: NewFriendRequestEvent) {
+        solveNewFriendRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, accept = true, blackList = false)
+    }
+    override suspend fun rejectNewFriendRequest(event: NewFriendRequestEvent, blackList: Boolean) {
+        solveNewFriendRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, false, blackList)
+    }
+    @LowLevelApi
+    override suspend fun solveNewFriendRequestEvent(bot: Bot, eventId: Long, fromId: Long, fromNick: String, accept: Boolean, blackList: Boolean) {
+        newFriendRequestFlagMap[eventId]?.also {
+            bot.asOnebot.impl.setFriendAddRequest(it, accept, "")
+        }
+    }
+    //========== New Friend Request 新好友请求 END =============
 
 }

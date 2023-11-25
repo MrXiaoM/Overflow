@@ -1,6 +1,7 @@
 package top.mrxiaom.overflow.contact
 
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
+import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import kotlinx.coroutines.CoroutineName
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Stranger
@@ -10,6 +11,7 @@ import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
+import top.mrxiaom.overflow.data.StrangerInfoImpl
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.message.data.WrappedVideo
@@ -18,7 +20,7 @@ import kotlin.coroutines.CoroutineContext
 
 class StrangerWrapper(
     val botWrapper: BotWrapper,
-    private var impl: FriendInfoResp,
+    private var impl: StrangerInfoResp,
 ) : Stranger {
 
     override val bot: Bot = botWrapper
@@ -26,7 +28,7 @@ class StrangerWrapper(
     override val nick: String = impl.nickname
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})Stranger/$id")
     override var remark: String
-        get() = impl.remark
+        get() = ""
         set(value) {
             Overflow.logger.warning("Onebot 未提供修改陌生人备注接口 ($id)")
         }

@@ -868,7 +868,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun setGroupAnonymousBan(groupId: Long, anonymous: Anonymous?, duration: Boolean): ActionRaw {
+    suspend fun setGroupAnonymousBan(groupId: Long, anonymous: Anonymous?, duration: Int): ActionRaw {
         val gson = GsonBuilder().create()
         val action = ActionPathEnum.SET_GROUP_ANONYMOUS_BAN
         val an = gson.toJson(anonymous, Anonymous::class.java)
@@ -889,7 +889,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun setGroupAnonymousBan(groupId: Long, flag: String?, duration: Boolean): ActionRaw {
+    suspend fun setGroupAnonymousBan(groupId: Long, flag: String?, duration: Int): ActionRaw {
         val action = ActionPathEnum.SET_GROUP_ANONYMOUS_BAN
         val params = JsonObject()
         params.addProperty("group_id", groupId)
