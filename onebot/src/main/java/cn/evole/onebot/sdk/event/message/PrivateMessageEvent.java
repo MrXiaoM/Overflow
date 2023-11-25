@@ -1,5 +1,7 @@
 package cn.evole.onebot.sdk.event.message;
 
+import cn.evole.onebot.sdk.util.json.MessageEventAdapter;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,15 +19,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
+@JsonAdapter(MessageEventAdapter.class)
 public class PrivateMessageEvent extends MessageEvent {
-
-    @SerializedName( "message_id")
     public int messageId;
-
-    @SerializedName( "sub_type")
     public String subType;
-
-    @SerializedName( "sender")
     public PrivateSender privateSender;
 
     /**

@@ -4,7 +4,6 @@ import cn.evole.onebot.sdk.event.Event;
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent;
 import cn.evole.onebot.sdk.event.message.GuildMessageEvent;
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent;
-import cn.evole.onebot.sdk.event.message.WholeMessageEvent;
 import cn.evole.onebot.sdk.event.meta.HeartbeatMetaEvent;
 import cn.evole.onebot.sdk.event.meta.LifecycleMetaEvent;
 import cn.evole.onebot.sdk.event.notice.friend.FriendAddNoticeEvent;
@@ -29,7 +28,7 @@ public class MessageMap {
     static {
         messageMap.put("groupMessage", GroupMessageEvent.class);
         messageMap.put("privateMessage", PrivateMessageEvent.class);
-        messageMap.put("wholeMessage", WholeMessageEvent.class);
+        messageMap.put("wholeMessage", GroupMessageEvent.class);
         messageMap.put("guildMessage", GuildMessageEvent.class);
 
         messageMap.put("friend", FriendAddRequestEvent.class);

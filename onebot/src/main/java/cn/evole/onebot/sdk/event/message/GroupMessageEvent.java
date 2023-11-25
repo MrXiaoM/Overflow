@@ -1,6 +1,8 @@
 package cn.evole.onebot.sdk.event.message;
 
 import cn.evole.onebot.sdk.entity.Anonymous;
+import cn.evole.onebot.sdk.util.json.MessageEventAdapter;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,21 +18,12 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = true)
+@JsonAdapter(MessageEventAdapter.class)
 public class GroupMessageEvent extends MessageEvent {
-
-    @SerializedName( "message_id")
     public int messageId;
-
-    @SerializedName( "sub_type")
     public String subType;
-
-    @SerializedName( "group_id")
     public long groupId;
-
-    @SerializedName( "anonymous")
     public Anonymous anonymous;
-
-    @SerializedName( "sender")
     public GroupSender sender;
 
     /**
