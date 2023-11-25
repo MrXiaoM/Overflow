@@ -7,7 +7,6 @@ pluginManagement {
 }
 rootProject.name = "overflow"
 
-include(":onebot-sdk")
-include(":onebot-client")
+include(":onebot")
 include(":overflow-core")
 include(":overflow-core-all")

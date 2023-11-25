@@ -4,7 +4,6 @@ plugins {
 }
 
 dependencies {
-    api(project(":onebot-sdk"))
-    api(project(":onebot-client"))
+    api(project(":onebot"))
     api(project(":overflow-core"))
 }
