@@ -18,10 +18,10 @@ public class FriendInfoResp {
     @SerializedName("user_id")
     public long userId;
 
-    @SerializedName("nickname")
+    @SerializedName(value = "nickname", alternate = {"user_name"})
     public String nickname;
 
-    @SerializedName("remark")
+    @SerializedName(value = "remark", alternate = {"user_remark"})
     public String remark;
 
 }
