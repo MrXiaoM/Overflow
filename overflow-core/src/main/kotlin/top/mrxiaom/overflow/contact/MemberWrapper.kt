@@ -103,7 +103,7 @@ class MemberWrapper(
         @Suppress("DEPRECATION_ERROR")
         return MessageReceipt(object : OnlineMessageSource.Outgoing.ToTemp(){
             override val bot: Bot = this@MemberWrapper.bot
-            override val ids: IntArray = IntArray(messageId)
+            override val ids: IntArray = arrayOf(messageId).toIntArray()
             override val internalIds: IntArray = ids
             override val isOriginalMessageInitialized: Boolean = true
             override val originalMessage: MessageChain = message.toMessageChain()

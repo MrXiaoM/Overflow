@@ -115,7 +115,7 @@ class GroupWrapper(
         @Suppress("DEPRECATION_ERROR")
         return MessageReceipt(object : OnlineMessageSource.Outgoing.ToGroup(){
             override val bot: Bot = this@GroupWrapper.bot
-            override val ids: IntArray = IntArray(messageId)
+            override val ids: IntArray = arrayOf(messageId).toIntArray()
             override val internalIds: IntArray = ids
             override val isOriginalMessageInitialized: Boolean = true
             override val originalMessage: MessageChain = message.toMessageChain()

@@ -57,7 +57,7 @@ class FriendWrapper(
         @Suppress("DEPRECATION_ERROR")
         return MessageReceipt(object : OnlineMessageSource.Outgoing.ToFriend(){
             override val bot: Bot = this@FriendWrapper.bot
-            override val ids: IntArray = IntArray(messageId)
+            override val ids: IntArray = arrayOf(messageId).toIntArray()
             override val internalIds: IntArray = ids
             override val isOriginalMessageInitialized: Boolean = true
             override val originalMessage: MessageChain = message.toMessageChain()
