@@ -29,6 +29,7 @@ import top.mrxiaom.overflow.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.contact.FriendWrapper
 import top.mrxiaom.overflow.listener.FriendMessageListener
 import top.mrxiaom.overflow.listener.GroupMessageListener
+import top.mrxiaom.overflow.listener.GroupNotifyListener
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.message.data.WrappedFileMessage
@@ -119,6 +120,7 @@ class Overflow : IMirai, CoroutineScope {
 
                 dispatchers.addListener(FriendMessageListener(bot))
                 dispatchers.addListener(GroupMessageListener(bot))
+                dispatchers.addListener(GroupNotifyListener(bot))
                 logger.info("注册事件")
             }
         }

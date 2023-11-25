@@ -18,16 +18,16 @@ object ListenerUtils {
     /**
      * 获取消息对应的实体类型
      *
-     * @param jsonsObject json
+     * @param obj json
      * @return
      */
-    fun getMessageType(jsonsObject: JsonsObject): Class<out Event> {
+    fun getMessageType(obj: JsonsObject): Class<out Event> {
         var type: String? = null
-        val postType = jsonsObject.optString("post_type")
+        val postType = obj.optString("post_type")
         if ("message" == postType) {
             type = "wholeMessage"
             //消息类型
-            val messageType = jsonsObject.optString("message_type")
+            val messageType = obj.optString("message_type")
             if ("group" == messageType) {
                 //群聊消息类型
                 type = "groupMessage"
@@ -40,13 +40,13 @@ object ListenerUtils {
             }
         } else if ("request" == postType) {
             //请求类型
-            type = jsonsObject.optString("request_type")
+            type = obj.optString("request_type")
         } else if ("notice" == postType) {
             //通知类型
-            type = jsonsObject.optString("notice_type")
+            type = obj.optString("notice_type")
         } else if ("meta_event" == postType) {
             //周期类型
-            type = jsonsObject.optString("meta_event_type")
+            type = obj.optString("meta_event_type")
         }
         return MessageMap.messageMap[type]!!
     }

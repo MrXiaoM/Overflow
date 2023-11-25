@@ -40,6 +40,7 @@ public class MessageMap {
         messageMap.put("group_increase", GroupIncreaseNoticeEvent.class);
         messageMap.put("group_ban", GroupBanNoticeEvent.class);
         messageMap.put("group_recall", GroupMsgDeleteNoticeEvent.class);
+        messageMap.put("notify", GroupNotifyNoticeEvent.class);
         messageMap.put("poke", GroupPokeNoticeEvent.class);
         messageMap.put("lucky_king", GroupLuckyKingNoticeEvent.class);
         messageMap.put("honor", GroupHonorChangeNoticeEvent.class);
