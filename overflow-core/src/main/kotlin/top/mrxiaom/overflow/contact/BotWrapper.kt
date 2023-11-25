@@ -3,6 +3,8 @@ package top.mrxiaom.overflow.contact
 import cn.evole.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.client.core.Bot
 import kotlinx.coroutines.CoroutineName
+import net.mamoe.mirai.LowLevelApi
+import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.contact.friendgroup.FriendGroups
 import net.mamoe.mirai.event.EventChannel
@@ -11,10 +13,13 @@ import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.MiraiLogger
+import net.mamoe.mirai.utils.cast
 import top.mrxiaom.overflow.Overflow
+import top.mrxiaom.overflow.data.FriendInfoImpl
+import top.mrxiaom.overflow.data.StrangerInfoImpl
 import kotlin.coroutines.CoroutineContext
 
-@OptIn(MiraiInternalApi::class)
+@OptIn(MiraiInternalApi::class, LowLevelApi::class)
 class BotWrapper private constructor(
     implBot: Bot,
     botConfiguration: BotConfiguration
@@ -60,14 +65,16 @@ class BotWrapper private constructor(
         .filterIsInstance()
 
     override val isOnline: Boolean
-        get() = true // TODO
+        get() = impl.channel.isOpen
     override val nick: String
         get() = loginInfo.nickname
 
-    override val asFriend: Friend
-        get() = TODO("Not yet implemented")
-    override val asStranger: Stranger
-        get() = TODO("Not yet implemented")
+    override val asFriend: FriendWrapper by lazy {
+        Mirai.newFriend(this, FriendInfoImpl(id, nick, "", 0)).cast()
+    }
+    override val asStranger: StrangerWrapper by lazy {
+        Mirai.newStranger(this, StrangerInfoImpl(id, bot.nick)).cast()
+    }
 
     override val friendGroups: FriendGroups
         get() = throw NotImplementedError("Onebot 未提供好友分组接口")
@@ -83,6 +90,7 @@ class BotWrapper private constructor(
 
     override fun close(cause: Throwable?) {
         if (cause != null) logger.warning(cause)
+        impl.channel.close()
     }
 
     override suspend fun login() {

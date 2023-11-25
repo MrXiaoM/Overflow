@@ -1,6 +1,7 @@
 package top.mrxiaom.overflow
 
 import cn.evole.onebot.sdk.action.ActionRaw
+import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import kotlinx.coroutines.*
@@ -26,6 +27,7 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiLogger
 import top.mrxiaom.overflow.contact.BotWrapper
 import top.mrxiaom.overflow.contact.BotWrapper.Companion.wrap
+import top.mrxiaom.overflow.contact.FriendWrapper
 import top.mrxiaom.overflow.listener.FriendMessageListener
 import top.mrxiaom.overflow.listener.GroupMessageListener
 import top.mrxiaom.overflow.message.OnebotMessages
@@ -236,7 +238,7 @@ class Overflow : IMirai, CoroutineScope {
 
     @LowLevelApi
     override fun newFriend(bot: Bot, friendInfo: FriendInfo): Friend {
-        TODO("Not yet implemented")
+        return FriendWrapper(bot.asOnebot, FriendInfoResp(friendInfo.uin, friendInfo.nick, friendInfo.remark))
     }
 
     @LowLevelApi
