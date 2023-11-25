@@ -30,6 +30,7 @@ import top.mrxiaom.overflow.contact.FriendWrapper
 import top.mrxiaom.overflow.listener.FriendMessageListener
 import top.mrxiaom.overflow.listener.GroupMessageListener
 import top.mrxiaom.overflow.message.OnebotMessages
+import top.mrxiaom.overflow.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.message.data.WrappedFileMessage
 import java.io.File
 import kotlin.coroutines.CoroutineContext
@@ -176,14 +177,7 @@ class Overflow : IMirai, CoroutineScope {
         internalIds: IntArray,
         originalMessage: MessageChain
     ): OfflineMessageSource {
-        return MessageSourceBuilder()
-            .sender(fromId)
-            .target(targetId)
-            .id(ids[0])
-            .time(time)
-            .internalId(internalIds[0])
-            .messages { addAll(originalMessage) }
-            .build(botId, kind)
+        return OfflineMessageSourceImpl(botId, fromId, ids, internalIds, true, originalMessage, targetId, time, kind)
     }
 
     override fun createFileMessage(id: String, internalId: Int, name: String, size: Long): FileMessage {
