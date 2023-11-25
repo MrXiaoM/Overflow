@@ -14,7 +14,6 @@ dependencies {
     compileOnly("org.slf4j:slf4j-api:2.0.1")
     compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
     implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
-    implementation(project(":onebot-sdk"))
     implementation("org.java-websocket:Java-WebSocket:1.5.4")
 
     annotationProcessor("org.java-websocket:Java-WebSocket:1.5.4")
