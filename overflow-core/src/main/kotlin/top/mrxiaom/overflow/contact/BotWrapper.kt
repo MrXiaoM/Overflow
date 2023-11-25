@@ -24,12 +24,13 @@ import kotlin.coroutines.CoroutineContext
 @OptIn(MiraiInternalApi::class, LowLevelApi::class)
 class BotWrapper private constructor(
     implBot: Bot,
+    defLoginInfo: LoginInfoResp,
     botConfiguration: BotConfiguration
 ) : net.mamoe.mirai.Bot {
     private var implInternal = implBot
     val impl: Bot
         get() = implInternal
-    private lateinit var loginInfo: LoginInfoResp
+    private var loginInfo: LoginInfoResp = defLoginInfo
     private var friendsInternal: ContactList<FriendWrapper> = ContactList()
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
     private var otherClientsInternal: ContactList<OtherClientWrapper> = ContactList()
@@ -44,7 +45,7 @@ class BotWrapper private constructor(
             GroupWrapper(this, it)
         }.toMutableList())
     }
-    suspend fun updateOtherClients() {
+    suspend fun updateOtherClients() = runCatching {
         val newList = impl.getOnlineClients(false).data.clients.map {
             OtherClientWrapper(this, it)
         }.toMutableList()
@@ -105,10 +106,10 @@ class BotWrapper private constructor(
             return (net.mamoe.mirai.Bot.getInstanceOrNull(impl.id) as? BotWrapper)?.apply {
                 implInternal = impl
             } ?:
-            BotWrapper(impl, botConfiguration).apply {
-                updateLoginInfo()
+            BotWrapper(impl, impl.getLoginInfo().data, botConfiguration).apply {
                 updateContacts()
-                updateOtherClients()
+
+                //updateOtherClients()
                 @Suppress("INVISIBLE_MEMBER")
                 net.mamoe.mirai.Bot._instances[id] = this
             }
