@@ -25,10 +25,13 @@ object OnebotMessages {
         MessageSerializers.registerSerializer(WrappedVideo::class, WrappedVideo.serializer())
     }
 
-    @OptIn(MiraiExperimentalApi::class)
     fun serializeToOneBotJson(message: Message): String {
+        return Json.encodeToString(serializeToOneBotJsonArray(message))
+    }
+    @OptIn(MiraiExperimentalApi::class)
+    fun serializeToOneBotJsonArray(message: Message): JsonArray {
         val messageChain = (message as? MessageChain) ?: listOf(message)
-        return Json.encodeToString(buildJsonArray {
+        return buildJsonArray {
             for (single in messageChain) {
                 addJsonObject {
                     put("type", single.messageType)
@@ -60,14 +63,31 @@ object OnebotMessages {
                                 put("image", single.pictureUrl)
                             }
                             is QuoteReply -> put("id", single.source.ids[0]) // 忽略分片消息情况
-                            // is ForwardMessage -> put("id", single.id) // TODO: 支持转发消息
+                            // is ForwardMessage -> put("id", single.id) // 转发消息有单独的发送方法
                             is LightApp -> put("data", single.content)
                             is ServiceMessage -> put("data", single.content)
                         }
                     }
                 }
             }
-        })
+        }
+    }
+    fun Message.findForwardMessage(): ForwardMessage? {
+        return when(this){
+            is ForwardMessage -> this
+            is MessageChain -> firstIsInstanceOrNull()
+            else -> null
+        }
+    }
+    fun serializeForwardNodes(nodeList: List<ForwardMessage.Node>): List<Map<String, Any>> {
+        val nodes = mutableListOf<Map<String, Any>>()
+        for (node in nodeList) {
+            val map = mutableMapOf<String, Any>("type" to "node")
+            val data = mutableMapOf<String, Any>("name" to node.senderName)
+            data["content"] = serializeToOneBotJsonArray(node.messageChain)
+            map["data"] = data
+        }
+        return nodes
     }
     @OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
     suspend fun deserializeFromOneBotJson(bot: Bot, jsonString: String, source: MessageSource? = null): MessageChain {
@@ -133,10 +153,6 @@ object OnebotMessages {
             is LightApp -> "json"
             is ServiceMessage -> "xml"
             else -> "text"
-        }
-    private val ForwardMessage.id: Long
-        get() {
-            TODO("获取转发消息ID")
         }
     private fun imageFromFile(file: String): Image = Image.fromId(file)
     private fun audioFromFile(file: String): Audio = WrappedAudio(file)

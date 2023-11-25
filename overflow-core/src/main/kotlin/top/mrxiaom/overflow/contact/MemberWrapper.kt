@@ -18,6 +18,7 @@ import net.mamoe.mirai.message.data.ShortVideo
 import net.mamoe.mirai.utils.ExternalResource
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.message.OnebotMessages
+import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.message.data.WrappedVideo
 import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
 import kotlin.coroutines.CoroutineContext
@@ -49,7 +50,7 @@ class MemberWrapper(
     override var nameCard: String
         get() = impl.card
         set(value) {
-            Overflow.instance.scope.launch {
+            Overflow.instance.launch {
                 botWrapper.impl.setGroupCard(impl.groupId, id, value)
             }
         }
@@ -64,7 +65,7 @@ class MemberWrapper(
     override var specialTitle: String
         get() = impl.title
         set(value) {
-            Overflow.instance.scope.launch {
+            Overflow.instance.launch {
                 botWrapper.impl.setGroupSpecialTitle(impl.groupId, id, value, -1)
             }
         }
@@ -89,9 +90,16 @@ class MemberWrapper(
     }
 
     override suspend fun sendMessage(message: Message): MessageReceipt<NormalMember> {
-        val msg = OnebotMessages.serializeToOneBotJson(message)
-        val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
-        val messageId = response.data.messageId
+        val forward = message.findForwardMessage()
+        val messageId = if (forward != null) {
+            val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
+            val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
+            response.data.messageId
+        } else {
+            val msg = OnebotMessages.serializeToOneBotJson(message)
+            val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
+            response.data.messageId
+        }
         TODO("MessageReceipt")
     }
 

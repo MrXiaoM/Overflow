@@ -18,6 +18,7 @@ import net.mamoe.mirai.contact.Group.Companion.setEssenceMessage
 import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.message.OnebotMessages
+import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.message.data.WrappedAudio
 import top.mrxiaom.overflow.message.data.WrappedVideo
 import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
@@ -103,9 +104,16 @@ class GroupWrapper(
     }
 
     override suspend fun sendMessage(message: Message): MessageReceipt<Group> {
-        val msg = OnebotMessages.serializeToOneBotJson(message)
-        val response = botWrapper.impl.sendGroupMsg(id, msg, false)
-        val messageId = response.data.messageId
+        val forward = message.findForwardMessage()
+        val messageId = if (forward != null) {
+            val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
+            val response = botWrapper.impl.sendGroupForwardMsg(id, nodes)
+            response.data.messageId
+        } else {
+            val msg = OnebotMessages.serializeToOneBotJson(message)
+            val response = botWrapper.impl.sendGroupMsg(id, msg, false)
+            response.data.messageId
+        }
         TODO("MessageReceipt")
     }
 

@@ -19,11 +19,8 @@ import cn.evole.onebot.sdk.response.misc.*
 import cn.evole.onebot.sdk.util.json.GsonUtil
 import cn.evole.onebot.sdk.util.json.JsonsObject
 import cn.evolvefield.onebot.client.handler.ActionHandler
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
+import com.google.gson.*
 import com.google.gson.reflect.TypeToken
-import lombok.Getter
-import lombok.Setter
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import org.java_websocket.WebSocket
 
@@ -889,15 +886,15 @@ class Bot(
      * [参考文档](https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91)
      * @return [ActionRaw]
      */
-    //suspend fun sendGroupForwardMsg(groupId: Long, msg: List<Map<String, Any>>): ActionData<MsgId> {
-    //    val action = ActionPathEnum.SEND_GROUP_FORWARD_MSG
-    //    val params = JsonObject()
-    //    params.addProperty("group_id", groupId)
-    //    params.addProperty("messages", msg)
-    //
-    //    val result = actionHandler.action(channel, action, params)
-    //    return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<MsgId>>() {}.type)
-    //}
+    suspend fun sendGroupForwardMsg(groupId: Long, msg: List<Map<String, Any>>): ActionData<MsgId> {
+        val action = ActionPathEnum.SEND_GROUP_FORWARD_MSG
+        val params = JsonObject()
+        params.addProperty("group_id", groupId)
+        params.add("messages", msg.toJsonArray())
+
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<MsgId>>() {}.type)
+    }
     /**
      * 获取群根目录文件列表
      *
@@ -1081,16 +1078,15 @@ class Bot(
      * [参考文档](https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91)
      * @return [ActionRaw]
      */
-    //    public ActionData<MsgId> sendPrivateForwardMsg(long userId, List<Map<String, Object>> msg) {
-    //        ActionPathEnum action = ActionPathEnum.SEND_PRIVATE_FORWARD_MSG;
-    //        JsonObject params = new JsonObject();
-    //            params.addProperty("user_id", userId);
-    //            params.addProperty("messages", msg);
-    //
-    //        JsonsObject result = actionHandler.action(channel, action, params);
-    //        return result != null ?  GsonUtil.fromJson(result.toString(), new TypeToken<ActionData<MsgId>>() {
-    //        }.getType()) : null;
-    //    }
+    suspend fun sendPrivateForwardMsg(userId: Long, msg: List<Map<String, Any>>): ActionData<MsgId> {
+        val action = ActionPathEnum.SEND_PRIVATE_FORWARD_MSG
+        val params = JsonObject()
+        params.addProperty("user_id", userId)
+        params.add("messages", msg.toJsonArray())
+
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<MsgId>>() {}.type)
+    }
     /**
      * 发送合并转发
      *
@@ -1099,27 +1095,18 @@ class Bot(
      * [参考文档](https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91)
      * @return [ActionRaw]
      */
-    //    public ActionData<MsgId> sendForwardMsg(GroupMessageEvent event, List<Map<String, Object>> msg) {
-    //        ActionPathEnum action = ActionPathEnum.SEND_FORWARD_MSG;
-    //        var gson = new Gson();
-    //        JsonObject params = new JsonObject();
-    //            params.addProperty("messages", msg);
-    //
-    //        switch (event.getMessageType()) {
-    //            case "private": {
-    //                params.params.addProperty("user_id", event.getUserId());
-    //                break;
-    //            }
-    //            case "group": {
-    //                params.params.addProperty("group_id", event.getGroupId());
-    //                break;
-    //            }
-    //            default:
-    //        }
-    //        JsonsObject result = actionHandler.action(channel, action, params);
-    //        return result != null ?  GsonUtil.fromJson(result.toString(), new TypeToken<ActionData<MsgId>>() {
-    //        }.getType()) : null;
-    //    }
+    suspend fun sendForwardMsg(event: GroupMessageEvent, msg: List<Map<String, Any>>): ActionData<MsgId> {
+        val action = ActionPathEnum.SEND_FORWARD_MSG
+        val params = JsonObject()
+        when (event.messageType) {
+            "private" -> params.addProperty("user_id", event.userId)
+            "group" -> params.addProperty("group_id", event.groupId)
+        }
+        params.add("messages", msg.toJsonArray())
+
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<MsgId>>() {}.type)
+    }
     /**
      * 获取中文分词
      *
@@ -1236,4 +1223,36 @@ class Bot(
             object : TypeToken<ActionList<UnidirectionalFriendListResp>>() {}.type
         )
     }
+}
+
+fun <T> List<T>.toJsonArray(): JsonArray {
+    val array = JsonArray()
+    for (any in this) {
+        when (any) {
+            is JsonElement -> array.add(any)
+            is Map<*, *> -> array.add(any.toJsonObject())
+            is List<*> -> array.add(any.toJsonArray())
+            is Boolean -> array.add(any)
+            is Number -> array.add(any)
+            is Char -> array.add(any)
+            else -> array.add(any.toString())
+        }
+    }
+    return array
+}
+fun <K,V> Map<K, V>.toJsonObject(): JsonObject {
+    val obj = JsonObject()
+    for (entry in entries) {
+        val key = entry.key.toString()
+        when (val value = entry.value) {
+            is JsonElement -> obj.add(key, value)
+            is Map<*, *> -> obj.add(key, value.toJsonObject())
+            is List<*> -> obj.add(key, value.toJsonArray())
+            is Boolean -> obj.addProperty(key, value)
+            is Number -> obj.addProperty(key, value)
+            is Char -> obj.addProperty(key, value)
+            else -> obj.addProperty(key, value.toString())
+        }
+    }
+    return obj
 }
