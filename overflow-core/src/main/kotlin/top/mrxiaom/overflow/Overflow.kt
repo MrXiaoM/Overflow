@@ -1,28 +1,29 @@
 package top.mrxiaom.overflow
 
 import cn.evole.onebot.sdk.action.ActionRaw
-import cn.evole.onebot.sdk.entity.Anonymous
+import cn.evole.onebot.sdk.event.meta.LifecycleMetaEvent
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
+import cn.evolvefield.onebot.client.listener.EventListener
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.*
+import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.data.FriendInfo
 import net.mamoe.mirai.data.MemberInfo
 import net.mamoe.mirai.data.StrangerInfo
 import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.event.Event
+import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.internal.event.EventChannelToEventDispatcherAdapter
 import net.mamoe.mirai.internal.event.InternalEventMechanism
 import net.mamoe.mirai.message.action.Nudge
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.FileCacheStrategy
-import net.mamoe.mirai.utils.MiraiExperimentalApi
-import net.mamoe.mirai.utils.MiraiLogger
+import net.mamoe.mirai.utils.*
 import top.mrxiaom.overflow.contact.BotWrapper
 import top.mrxiaom.overflow.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.contact.FriendWrapper
@@ -34,6 +35,7 @@ import top.mrxiaom.overflow.listener.GroupNotifyListener
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.message.data.WrappedFileMessage
+import top.mrxiaom.overflow.plugin.OverflowCoreAsPlugin
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
@@ -46,7 +48,7 @@ fun ActionRaw.check(failMsg: String): Boolean {
     }
     return retCode == 0
 }
-@OptIn(MiraiExperimentalApi::class, LowLevelApi::class)
+@OptIn(MiraiExperimentalApi::class, MiraiInternalApi::class, LowLevelApi::class)
 class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
     override val coroutineContext: CoroutineContext = CoroutineName("overflow")
     override val BotFactory: BotFactory
@@ -101,26 +103,41 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         try {
             Class.forName("net.mamoe.mirai.console.enduserreadme.EndUserReadme")
             System.setProperty("mirai.console.skip-end-user-readme", "true")
+            injectMiraiConsole()
         } catch (ignored: ClassNotFoundException) {
         }
+    }
+
+    @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+    private fun injectMiraiConsole() {
+        MiraiConsole.pluginManager // init
+        val pluginManager: net.mamoe.mirai.console.internal.plugin.PluginManagerImpl = MiraiConsole.pluginManager.cast()
+        pluginManager.resolvedPlugins.add(OverflowCoreAsPlugin)
+    }
+
+    suspend fun start() {
         logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
         logger.info("连接到 WebSocket: ${config.wsHost}")
         val service = ConnectFactory.create(
             BotConfig(config.wsHost)
         )
-        val ws = runBlocking { service.createWebsocketClient() }
+        val ws = service.createWebsocketClient()
         if (ws == null) {
             logger.error("未连接到 Onebot")
-            if (System.getProperty("overflow.not-exit").isNullOrBlank()) exitProcess(1)
-        } else {
-            val dispatchers = ws.createEventBus()
-            val bot = runBlocking { ws.createBot().also { BotFactoryImpl.internalBot = it }.wrap() }
-
-            dispatchers.addListener(FriendMessageListener(bot))
-            dispatchers.addListener(GroupMessageListener(bot))
-            dispatchers.addListener(GroupNotifyListener(bot))
+            if (System.getProperty("overflow.not-exit").isNullOrBlank()) {
+                exitProcess(1)
+            }
+            return
         }
-        OnebotMessages.registerSerializers()
+        val dispatchers = ws.createEventBus()
+        val botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
+
+        val bot = botImpl.wrap()
+
+        dispatchers.addListener(FriendMessageListener(bot))
+        dispatchers.addListener(GroupMessageListener(bot))
+        dispatchers.addListener(GroupNotifyListener(bot))
+        BotOnlineEvent(bot).broadcast()
     }
 
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {

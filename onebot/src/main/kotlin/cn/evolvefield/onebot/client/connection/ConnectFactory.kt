@@ -24,8 +24,7 @@ class ConnectFactory private constructor(
      * 创建websocket客户端(支持cqhttp和mirai类型)
      * @return 连接示例
      */
-    @JvmBlockingBridge
-    suspend fun createWebsocketClient(): WSClient? {
+    fun createWebsocketClient(): WSClient? {
         val builder = StringBuilder()
         var ws: WSClient? = null
         if (config.miraiHttp) {

@@ -25,20 +25,9 @@ import kotlin.coroutines.CoroutineContext
 class WSClient(uri: URI, private val actionHandler: ActionHandler) :
     WebSocketClient(uri), CoroutineScope {
     override val coroutineContext: CoroutineContext = CoroutineName("WSClient")
-    val def = CompletableDeferred<Boolean>()
     private var eventBus: EventBus? = null
     fun createBot(): Bot {
         return Bot(this, actionHandler)
-    }
-
-    private suspend fun await(): WSClient? {
-        connectionLostTimeout = 30
-        connect()
-        return if (def.await()) {
-            this
-        } else {
-            null
-        }
     }
 
     fun createEventBus(): EventBus {
@@ -47,7 +36,6 @@ class WSClient(uri: URI, private val actionHandler: ActionHandler) :
 
     override fun onOpen(handshakedata: ServerHandshake) {
         log.info("▌ 已连接到服务器 ┈━═☆")
-        if (def.isActive) def.complete(true)
     }
 
     override fun onMessage(message: String) {
@@ -72,7 +60,6 @@ class WSClient(uri: URI, private val actionHandler: ActionHandler) :
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {
         log.info("▌ 服务器因 {} 已关闭", reason)
-        if (def.isActive) def.complete(false)
     }
 
     override fun onError(ex: Exception) {
@@ -88,9 +75,9 @@ class WSClient(uri: URI, private val actionHandler: ActionHandler) :
         private const val HEART_BEAT = "heartbeat"
         private const val LIFE_CYCLE = "lifecycle"
 
-        suspend fun createAndConnect(uri: URI, actionHandler: ActionHandler): WSClient? {
+        fun createAndConnect(uri: URI, actionHandler: ActionHandler): WSClient? {
             val ws = WSClient(uri, actionHandler)
-            return ws.await()
+            return if (ws.connectBlocking()) ws else null
         }
     }
 }

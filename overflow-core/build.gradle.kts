@@ -20,6 +20,7 @@ buildConfig {
 }
 
 dependencies {
+    compileOnly("net.mamoe:mirai-console:$miraiVersion")
     implementation("net.mamoe:mirai-core-api:$miraiVersion")
     implementation("net.mamoe:mirai-core-utils:$miraiVersion")
 
