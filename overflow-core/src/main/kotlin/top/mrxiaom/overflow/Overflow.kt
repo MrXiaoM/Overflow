@@ -112,16 +112,17 @@ class Overflow : IMirai, CoroutineScope {
             if (ws == null) {
                 logger.error("未连接到 Onebot")
                 if (System.getProperty("overflow.not-exit").isNullOrBlank()) exitProcess(1)
-                return@launch
+            } else {
+                val dispatchers = ws.createEventBus()
+                val bot = runBlocking { ws.createBot().also { BotFactoryImpl.internalBot = it }.wrap() }
+
+                dispatchers.addListener(FriendMessageListener(bot))
+                dispatchers.addListener(GroupMessageListener(bot))
+                logger.info("注册事件")
             }
-            val bot = runBlocking { ws.createBot().also { BotFactoryImpl.internalBot = it }.wrap() }
-
-            val dispatchers = service.createEventBus(this)
-
-            dispatchers.addListener(FriendMessageListener(bot))
-            dispatchers.addListener(GroupMessageListener(bot))
         }
     }
+
 
     override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
         newInviteJoinGroupRequestFlagMap[event.eventId]?.also {

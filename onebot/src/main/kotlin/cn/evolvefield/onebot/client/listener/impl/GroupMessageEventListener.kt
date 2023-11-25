@@ -12,7 +12,7 @@ import cn.evolvefield.onebot.client.handler.DefaultEventHandler
 class GroupMessageEventListener : DefaultEventHandler<GroupMessageEvent>() {
     override suspend fun onMessage(e: GroupMessageEvent) {
         //处理逻辑
-        val message = e.message
+        val message = e.rawMessage
         val split = message.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         val key = split[0]
         val handler = getHandler(key)

@@ -3,14 +3,18 @@ package cn.evolvefield.onebot.client.connection
 import cn.evole.onebot.sdk.util.json.JsonsObject
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
+import cn.evolvefield.onebot.client.handler.EventBus
 import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.URI
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Project: onebot-client
@@ -18,20 +22,27 @@ import java.net.URI
  * Date: 2023/4/4 2:20
  * Description:
  */
-class WSClient(uri: URI, private val channel: Channel<String>, private val actionHandler: ActionHandler) :
-    WebSocketClient(uri) {
+class WSClient(uri: URI, private val actionHandler: ActionHandler) :
+    WebSocketClient(uri), CoroutineScope {
+    override val coroutineContext: CoroutineContext = CoroutineName("WSClient")
     val def = CompletableDeferred<Boolean>()
+    private var eventBus: EventBus? = null
     fun createBot(): Bot {
         return Bot(this, actionHandler)
     }
 
     private suspend fun await(): WSClient? {
+        connectionLostTimeout = 30
         connect()
         return if (def.await()) {
             this
         } else {
             null
         }
+    }
+
+    fun createEventBus(): EventBus {
+        return if (eventBus != null) eventBus!! else EventBus().also { eventBus = it }
     }
 
     override fun onOpen(handshakedata: ServerHandshake) {
@@ -43,13 +54,15 @@ class WSClient(uri: URI, private val channel: Channel<String>, private val actio
         try {
             val jsonObject = JsonsObject(message)
             if (HEART_BEAT != jsonObject.optString(META_EVENT)) { //过滤心跳
-                log.debug("接收到原始消息{}", jsonObject.toString())
+                log.debug("接收到原始消息 {}\n", jsonObject.toString())
                 if (jsonObject.has(API_RESULT_KEY)) {
-                    if (FAILED_STATUS == jsonObject.optString(RESULT_STATUS_KEY)) {
-                        log.debug("请求失败: {}", jsonObject.optString("wording"))
-                    } else actionHandler.onReceiveActionResp(jsonObject) //请求执行
-                } else if (!channel.trySend(message).isSuccess) { //事件监听
-                    log.error("监听错误: {}", message)
+                    actionHandler.onReceiveActionResp(jsonObject) //请求执行
+                } else {
+                    launch {
+                        mutex.withLock {
+                            eventBus?.onReceive(message)
+                        }
+                    }
                 }
             }
         } catch (e: JsonSyntaxException) {
@@ -75,9 +88,10 @@ class WSClient(uri: URI, private val channel: Channel<String>, private val actio
         private const val HEART_BEAT = "heartbeat"
         private const val LIFE_CYCLE = "lifecycle"
 
-        suspend fun createAndConnect(uri: URI, channel: Channel<String>, actionHandler: ActionHandler): WSClient? {
-            val ws = WSClient(uri, channel, actionHandler)
+        suspend fun createAndConnect(uri: URI, actionHandler: ActionHandler): WSClient? {
+            val ws = WSClient(uri, actionHandler)
             return ws.await()
         }
     }
 }
+val mutex = Mutex()

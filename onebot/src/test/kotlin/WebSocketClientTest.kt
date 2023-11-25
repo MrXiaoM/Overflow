@@ -17,9 +17,8 @@ import kotlin.coroutines.CoroutineContext
  * Date: 2022/10/2 19:06
  * Version: 1.0
  */
-object WebSocketClientTest : CoroutineScope {
+object WebSocketClientTest {
     val logger: Logger = LoggerFactory.getLogger("test")
-    override val coroutineContext: CoroutineContext = CoroutineName("test")
     @JvmStatic
     suspend fun main(args: Array<String>) {
         val service = ConnectFactory.create(
@@ -27,7 +26,7 @@ object WebSocketClientTest : CoroutineScope {
         ) //创建websocket客户端
         val ws = service.createWebsocketClient() ?: throw IllegalStateException("未连接到 Onebot")
         val bot = ws.createBot()
-        val dispatchers = service.createEventBus(this) //创建事件分发器
+        val dispatchers = ws.createEventBus() //创建事件分发器
 
         val groupMessageListener = GroupMessageEventListener() //自定义监听规则
         groupMessageListener.addHandler("test", object : Handler<GroupMessageEvent> {

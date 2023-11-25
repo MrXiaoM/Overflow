@@ -53,7 +53,7 @@ class ActionHandler {
             return JsonsObject(result1)
         }
         val reqJson = generateReqJson(action, params)
-        val actionSendUtils = ActionSendUtils(channel, 3000L)
+        val actionSendUtils = ActionSendUtils(channel, 10000L)
         apiCallbackMap[reqJson["echo"].asString] = actionSendUtils
         val result: JsonsObject = try {
             actionSendUtils.send(reqJson)
@@ -78,7 +78,7 @@ class ActionHandler {
     private fun generateReqJson(action: ActionPath, params: JsonObject?): JsonObject {
         val json = JsonObject()
         json.addProperty("action", action.path)
-        json.add("params", params)
+        if (params != null) json.add("params", params)
         json.addProperty("echo", echo++)
         return json
     }

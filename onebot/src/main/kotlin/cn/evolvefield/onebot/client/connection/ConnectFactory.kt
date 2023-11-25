@@ -2,9 +2,6 @@ package cn.evolvefield.onebot.client.connection
 
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.handler.ActionHandler
-import cn.evolvefield.onebot.client.handler.EventBus
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import java.net.URI
 
@@ -17,11 +14,9 @@ import java.net.URI
 /**
  *
  * @param config 配置
- * @param channel 队列消息
  */
 class ConnectFactory private constructor(
-    private val config: BotConfig,
-    private val channel: Channel<String>
+    private val config: BotConfig
 ) {
     private val actionHandler: ActionHandler = ActionHandler()
 
@@ -51,22 +46,17 @@ class ConnectFactory private constructor(
         }
         val url = builder.toString()
         try {
-            ws = WSClient.createAndConnect(URI.create(url), channel, actionHandler)
+            ws = WSClient.createAndConnect(URI.create(url), actionHandler)
         } catch (e: Exception) {
             WSClient.log.error("▌ §c{}连接错误，请检查服务端是否开启 §a┈━═☆", url)
         }
         return ws
     }
 
-    fun createEventBus(scope: CoroutineScope): EventBus {
-        return EventBus.create(scope, channel)
-    }
-
     companion object {
         @JvmStatic
-        @JvmOverloads
-        fun create(config: BotConfig, channel: Channel<String> = Channel()): ConnectFactory {
-            return ConnectFactory(config, channel)
+        fun create(config: BotConfig): ConnectFactory {
+            return ConnectFactory(config)
         }
     }
 }

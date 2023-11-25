@@ -6,11 +6,16 @@ import cn.evolvefield.onebot.client.listener.EnableEventListener
 import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.client.listener.message
 import cn.evolvefield.onebot.client.util.ListenerUtils
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consume
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.sync.Mutex
 import org.slf4j.LoggerFactory
+import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -19,8 +24,9 @@ import java.util.concurrent.ConcurrentHashMap
  * Date: 2023/3/19 15:45
  * Description:
  */
+val mutex = Mutex()
 @Suppress("unused")
-class EventBus private constructor(protected var channel: Channel<String>) {
+class EventBus {
 
     //存储监听器对象
     protected var eventlistenerlist: MutableList<EventListener<out Event>> = ArrayList()
@@ -43,16 +49,24 @@ class EventBus private constructor(protected var channel: Channel<String>) {
     /**
      * 执行任务
      */
-    protected suspend fun onReceive(message: String) {
+    suspend fun onReceive(message: String) {
         val messageType = ListenerUtils.getMessageType(message) //获取消息对应的实体类型
-        log.debug(String.format("接收到上报消息内容：%s", messageType))
         val bean = GsonUtil.strToJavaBean(message, messageType)!! //将消息反序列化为对象
-        val executes = cache[messageType] ?: getMethod(messageType).also {
-            cache[messageType] = it
-        }
+        log.debug(String.format("接收到上报消息内容：%s", bean.toString()))
+        val executes = getExecutes(messageType)
+        log.debug("executes: ${executes.size}\n")
         for (eventListener in executes) {
             eventListener.message(bean) //调用监听方法
         }
+    }
+
+    private fun getExecutes(type: Class<out Event>): List<EventListener<out Event>> {
+        val list = cache[type]
+        return if (list.isNullOrEmpty()) {
+            getMethod(type).also {
+                cache[type] = it
+            }
+        } else list
     }
 
     /**
@@ -65,11 +79,10 @@ class EventBus private constructor(protected var channel: Channel<String>) {
         val eventListeners: MutableList<EventListener<out Event>> = ArrayList()
         for (eventListener in eventlistenerlist) {
             try {
-                try {
-                    eventListener.javaClass.getMethod("onMessage", messageType) //判断是否注册监听器
-                } catch (e: NoSuchMethodException) {
-                    continue  //不支持则跳过
-                }
+                if (eventListener.javaClass.declaredMethods.none {
+                        it.name == "onMessage" && it.parameterTypes.any { par -> messageType == par }
+                    }) continue  //不支持则跳过
+
                 if (eventListener is EnableEventListener<*>) {
                     if (!eventListener.enable()) { //检测是否开启该插件
                         continue
@@ -95,14 +108,5 @@ class EventBus private constructor(protected var channel: Channel<String>) {
 
     companion object {
         private val log = LoggerFactory.getLogger(EventBus::class.java)
-        fun create(scope: CoroutineScope, channel: Channel<String>): EventBus {
-            return EventBus(channel).apply {
-                scope.launch {
-                    select {
-                        channel.onReceive { onReceive(it) }
-                    }
-                }
-            }
-        }
     }
 }
