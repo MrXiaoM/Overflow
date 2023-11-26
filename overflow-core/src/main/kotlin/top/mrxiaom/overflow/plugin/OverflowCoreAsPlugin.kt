@@ -2,7 +2,7 @@ package top.mrxiaom.overflow.plugin
 
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
-import net.mamoe.mirai.console.command.ConsoleCommandOwner
+import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.permission.Permission
 import net.mamoe.mirai.console.permission.PermissionId
 import net.mamoe.mirai.console.plugin.Plugin
@@ -14,7 +14,8 @@ import net.mamoe.mirai.console.util.SemVersion
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.Overflow
 
-internal object OverflowCoreAsPlugin : Plugin {
+@Suppress("PluginMainServiceNotConfigured")
+internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     override val isEnabled: Boolean get() = true
 
     override val loader: PluginLoader<*, *> get() = TheLoader
@@ -26,6 +27,20 @@ internal object OverflowCoreAsPlugin : Plugin {
         return ConsoleCommandOwner.permissionId(name)
     }
 
+    suspend fun onEnable() {
+        Overflow.instance.start()
+
+        // keep a command register example here
+        /*
+        object : SimpleCommand(
+            owner = this,
+            primaryName = "overflow",
+            secondaryNames = arrayOf()
+        ) {
+        }.register()
+         */
+    }
+
     internal object TheLoader : PluginLoader<Plugin, PluginDescription> {
         override fun listPlugins(): List<Plugin> = listOf(OverflowCoreAsPlugin)
 
@@ -35,11 +50,12 @@ internal object OverflowCoreAsPlugin : Plugin {
         override fun enable(plugin: Plugin) {
             if (plugin !== OverflowCoreAsPlugin) return
             runBlocking(CoroutineName("OverflowPluginLoader")) {
-                Overflow.instance.start()
+                plugin.onEnable()
             }
         }
 
         override fun load(plugin: Plugin) {
+            // this would never run
         }
 
         override fun getPluginDescription(plugin: Plugin): PluginDescription {
