@@ -13,9 +13,3 @@ dependencies {
     api(project(":onebot"))
     api(project(":overflow-core"))
 }
-
-tasks.shadowJar {
-    dependencies {
-        exclude(dependency("net.mamoe:mirai-console-compiler-annotations-jvm"))
-    }
-}
