@@ -11,6 +11,7 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.logging.LoggerController
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.data.FriendInfo
 import net.mamoe.mirai.data.MemberInfo
@@ -190,8 +191,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
 
     override suspend fun downloadForwardMessage(bot: Bot, resourceId: String): List<ForwardMessage.Node> {
         return bot.asOnebot.impl.getForwardMsg(resourceId).data.message.map {
-            val msg = OnebotMessages.deserializeFromOneBotJson(bot, it.content)
-            ForwardMessage.Node(it.userId.toLong(), 0, it.nickname, msg) // TODO: 时间
+            val msg = OnebotMessages.deserializeFromOneBotJson(bot, it.message)
+            ForwardMessage.Node(it.sender.userId, it.time, it.sender.nickname, msg)
         }
     }
 
