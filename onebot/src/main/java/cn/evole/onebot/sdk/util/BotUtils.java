@@ -18,9 +18,10 @@ import java.util.stream.Collectors;
  * Date: 2022/9/14 13:48
  * Version: 1.0
  */
+@SuppressWarnings({"unused"})
 public class BotUtils {
 
-    private static Logger log = LoggerFactory.getLogger("BotUtils");
+    private static final Logger log = LoggerFactory.getLogger("BotUtils");
     private final static String CQ_CODE_SPLIT = "(?<=\\[CQ:[^]]{1,99999}])|(?=\\[CQ:[^]]{1,99999}])";
 
     private final static String CQ_CODE_REGEX = "\\[CQ:([^,\\[\\]]+)((?:,[^,=\\[\\]]+=[^,\\[\\]]*)*)]";
@@ -151,6 +152,7 @@ public class BotUtils {
      * @param msg 需要修改客户端消息上报类型为 string
      * @return 消息链
      */
+    @SuppressWarnings({"unchecked"})
     public static List<MsgChainBean> stringToListChain(String msg) {
         Gson json = new Gson();
         return (List<MsgChainBean>) json.fromJson(stringToJsonChain(msg), ArrayList.class);

@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     kotlin("jvm") version "1.8.0" apply false
     kotlin("plugin.serialization") version "1.8.0" apply false
@@ -23,10 +25,10 @@ allprojects {
     repositories {
         mavenCentral()
     }
-    
+
     val javaVersion = "1.8"
     tasks {
-        withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        withType<KotlinCompile> {
             kotlinOptions.jvmTarget = javaVersion
         }
         withType<JavaCompile> {
