@@ -40,11 +40,10 @@ internal class GroupMessageListener(
                     override val time: Int = e.time.toInt()
                 }
                 miraiMessage = messageSource.plus(miraiMessage)
-                val logger = bot.configuration.botLoggerSupplier(bot)
                 if (member.id == bot.id) {
                     // TODO: 过滤自己发送的消息
                 } else {
-                    logger.info("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
+                    bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
                     net.mamoe.mirai.event.events.GroupMessageEvent(
                         e.sender.card, when (e.sender.role) {
                             "owner" -> MemberPermission.OWNER

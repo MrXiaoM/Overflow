@@ -18,6 +18,7 @@ import org.java_websocket.framing.CloseFrame
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.data.FriendInfoImpl
 import top.mrxiaom.overflow.data.StrangerInfoImpl
+import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -60,8 +61,9 @@ class BotWrapper private constructor(
     }
 
     override val id: Long = loginInfo.userId
-    override val logger: MiraiLogger = MiraiLogger.Factory.create(this::class, "Bot/$id")
     override val configuration: BotConfiguration = botConfiguration
+    override val logger: MiraiLogger = configuration.botLoggerSupplier(this)
+    internal val networkLogger: MiraiLogger by lazy { configuration.networkLoggerSupplier(this) }
     override val coroutineContext: CoroutineContext =
         CoroutineName("Bot.$id")
             .plus(logger.asCoroutineExceptionHandler())
@@ -135,11 +137,16 @@ class BotWrapper private constructor(
     }
 
     companion object {
-        suspend fun wrap(impl: Bot, botConfiguration: BotConfiguration = BotConfiguration { fileBasedDeviceInfo("device.json") }): BotWrapper {
+        suspend fun wrap(impl: Bot, botConfiguration: BotConfiguration? = null): BotWrapper {
+            val loginInfo = impl.getLoginInfo().data // also refresh bot id
             return (net.mamoe.mirai.Bot.getInstanceOrNull(impl.id) as? BotWrapper)?.apply {
                 implInternal = impl
             } ?:
-            BotWrapper(impl, impl.getLoginInfo().data, botConfiguration).apply {
+            BotWrapper(impl, loginInfo, botConfiguration ?: BotConfiguration {
+                fileBasedDeviceInfo("device.json")
+                workingDir = File("bots/${impl.id}")
+                botLoggerSupplier = { MiraiLogger.Factory.create(net.mamoe.mirai.Bot::class, "Bot.${it.id}") }
+            }).apply {
                 updateContacts()
 
                 //updateOtherClients()

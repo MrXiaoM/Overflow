@@ -22,6 +22,11 @@ internal class FriendMessageListener(
         when (e.subType) {
             "friend" -> {
                 val friend = e.privateSender.wrapAsFriend(bot)
+
+                if (friend.id == bot.id) {
+                    // TODO: 过滤自己发送的消息
+                    return
+                }
                 var miraiMessage = OnebotMessages.deserializeFromOneBotJson(bot, e.message)
                 val messageString = miraiMessage.toString()
                 val messageSource = object : OnlineMessageSource.Incoming.FromFriend() {
@@ -36,15 +41,10 @@ internal class FriendMessageListener(
                     override val time: Int = e.time.toInt()
                 }
                 miraiMessage = messageSource.plus(miraiMessage)
-                val logger = bot.configuration.botLoggerSupplier(bot)
-                if (friend.id == bot.id) {
-                    // TODO: 过滤自己发送的消息
-                } else {
-                    logger.info("${friend.remarkOrNick}(${friend.id}) -> $messageString")
-                    FriendMessageEvent(
-                        friend, miraiMessage, e.time.toInt()
-                    ).broadcast()
-                }
+                bot.logger.verbose("${friend.remarkOrNick}(${friend.id}) -> $messageString")
+                FriendMessageEvent(
+                    friend, miraiMessage, e.time.toInt()
+                ).broadcast()
             }
             "group" -> {
                 TODO("群临时会话")
