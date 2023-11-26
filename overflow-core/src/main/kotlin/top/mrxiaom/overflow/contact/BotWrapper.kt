@@ -2,9 +2,7 @@ package top.mrxiaom.overflow.contact
 
 import cn.evole.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.client.core.Bot
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.job
+import kotlinx.coroutines.*
 import net.mamoe.mirai.LowLevelApi
 import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.contact.*
@@ -14,6 +12,7 @@ import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.internal.network.components.EventDispatcher
 import net.mamoe.mirai.internal.network.components.EventDispatcherImpl
+import net.mamoe.mirai.supervisorJob
 import net.mamoe.mirai.utils.*
 import org.java_websocket.framing.CloseFrame
 import top.mrxiaom.overflow.Overflow
@@ -27,7 +26,7 @@ class BotWrapper private constructor(
     implBot: Bot,
     defLoginInfo: LoginInfoResp,
     botConfiguration: BotConfiguration
-) : net.mamoe.mirai.Bot {
+) : net.mamoe.mirai.Bot, CoroutineScope {
     private var implInternal = implBot
     val impl: Bot
         get() = implInternal
@@ -118,9 +117,16 @@ class BotWrapper private constructor(
         get() = throw NotImplementedError("Onebot 未提供陌生人列表接口")
 
     override fun close(cause: Throwable?) {
-        if (!impl.channel.isOpen || impl.channel.isClosing || impl.channel.isClosed) return
-        if (cause != null) logger.warning(cause)
-        impl.channel.close(CloseFrame.NORMAL, "主动关闭")
+        if (isActive) {
+            if (cause == null) {
+                supervisorJob.cancel()
+            } else {
+                supervisorJob.cancel(CancellationException("Bot closed", cause))
+            }
+        }
+        if (impl.channel.isOpen && !impl.channel.isClosing && !impl.channel.isClosed) {
+            impl.channel.close(CloseFrame.NORMAL, "主动关闭")
+        }
     }
 
     override suspend fun login() {
