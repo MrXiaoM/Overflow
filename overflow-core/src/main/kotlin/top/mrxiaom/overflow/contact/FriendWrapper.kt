@@ -6,6 +6,10 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Friend
 import net.mamoe.mirai.contact.friendgroup.FriendGroup
 import net.mamoe.mirai.contact.roaming.RoamingMessages
+import net.mamoe.mirai.event.broadcast
+import net.mamoe.mirai.event.events.EventCancelledException
+import net.mamoe.mirai.event.events.FriendMessagePostSendEvent
+import net.mamoe.mirai.event.events.FriendMessagePreSendEvent
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
@@ -44,27 +48,38 @@ class FriendWrapper(
 
     @OptIn(MiraiInternalApi::class)
     override suspend fun sendMessage(message: Message): MessageReceipt<Friend> {
-        val forward = message.findForwardMessage()
-        val messageId = if (forward != null) {
-            val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-            val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
-            response.data.messageId
-        } else {
-            val msg = OnebotMessages.serializeToOneBotJson(message)
-            val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
-            response.data.messageId
-        }
-        @Suppress("DEPRECATION_ERROR")
-        return MessageReceipt(object : OnlineMessageSource.Outgoing.ToFriend(){
-            override val bot: Bot = this@FriendWrapper.bot
-            override val ids: IntArray = arrayOf(messageId).toIntArray()
-            override val internalIds: IntArray = ids
-            override val isOriginalMessageInitialized: Boolean = true
-            override val originalMessage: MessageChain = message.toMessageChain()
-            override val sender: Bot = bot
-            override val target: Friend = this@FriendWrapper
-            override val time: Int = currentTimeSeconds().toInt()
-        }, this)
+        if (FriendMessagePreSendEvent(this, message).broadcast().isCancelled)
+            throw EventCancelledException("消息发送已被取消")
+
+        val messageChain = message.toMessageChain()
+        var throwable: Throwable? = null
+        val receipt = kotlin.runCatching {
+            val forward = messageChain.findForwardMessage()
+            val messageId = if (forward != null) {
+                val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
+                val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
+                response.data.messageId
+            } else {
+                val msg = OnebotMessages.serializeToOneBotJson(messageChain)
+                val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
+                response.data.messageId
+            }
+
+            @Suppress("DEPRECATION_ERROR")
+            MessageReceipt(object : OnlineMessageSource.Outgoing.ToFriend() {
+                override val bot: Bot = this@FriendWrapper.bot
+                override val ids: IntArray = arrayOf(messageId).toIntArray()
+                override val internalIds: IntArray = ids
+                override val isOriginalMessageInitialized: Boolean = true
+                override val originalMessage: MessageChain = messageChain
+                override val sender: Bot = bot
+                override val target: Friend = this@FriendWrapper
+                override val time: Int = currentTimeSeconds().toInt()
+            }, this)
+        }.onFailure { throwable = it }.getOrNull()
+        FriendMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
+
+        return receipt ?: throw throwable!!
     }
 
     override suspend fun uploadAudio(resource: ExternalResource): OfflineAudio {

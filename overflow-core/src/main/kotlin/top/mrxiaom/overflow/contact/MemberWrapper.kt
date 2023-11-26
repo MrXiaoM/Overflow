@@ -9,6 +9,8 @@ import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.NormalMember
 import net.mamoe.mirai.contact.active.MemberActive
+import net.mamoe.mirai.event.broadcast
+import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.action.MemberNudge
 import net.mamoe.mirai.message.data.*
@@ -90,27 +92,37 @@ class MemberWrapper(
 
     @OptIn(MiraiInternalApi::class)
     override suspend fun sendMessage(message: Message): MessageReceipt<NormalMember> {
-        val forward = message.findForwardMessage()
-        val messageId = if (forward != null) {
-            val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-            val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
-            response.data.messageId
-        } else {
-            val msg = OnebotMessages.serializeToOneBotJson(message)
-            val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
-            response.data.messageId
-        }
-        @Suppress("DEPRECATION_ERROR")
-        return MessageReceipt(object : OnlineMessageSource.Outgoing.ToTemp(){
-            override val bot: Bot = this@MemberWrapper.bot
-            override val ids: IntArray = arrayOf(messageId).toIntArray()
-            override val internalIds: IntArray = ids
-            override val isOriginalMessageInitialized: Boolean = true
-            override val originalMessage: MessageChain = message.toMessageChain()
-            override val sender: Bot = bot
-            override val target: Member = this@MemberWrapper
-            override val time: Int = currentTimeSeconds().toInt()
-        }, this)
+        if (GroupTempMessagePreSendEvent(this, message).broadcast().isCancelled)
+            throw EventCancelledException("消息发送已被取消")
+
+        val messageChain = message.toMessageChain()
+        var throwable: Throwable? = null
+        val receipt = kotlin.runCatching {
+            val forward = message.findForwardMessage()
+            val messageId = if (forward != null) {
+                val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
+                val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
+                response.data.messageId
+            } else {
+                val msg = OnebotMessages.serializeToOneBotJson(message)
+                val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
+                response.data.messageId
+            }
+            @Suppress("DEPRECATION_ERROR")
+            MessageReceipt(object : OnlineMessageSource.Outgoing.ToTemp() {
+                override val bot: Bot = this@MemberWrapper.bot
+                override val ids: IntArray = arrayOf(messageId).toIntArray()
+                override val internalIds: IntArray = ids
+                override val isOriginalMessageInitialized: Boolean = true
+                override val originalMessage: MessageChain = message.toMessageChain()
+                override val sender: Bot = bot
+                override val target: Member = this@MemberWrapper
+                override val time: Int = currentTimeSeconds().toInt()
+            }, this)
+        }.onFailure { throwable = it }.getOrNull()
+        GroupTempMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
+
+        return receipt ?: throw throwable!!
     }
 
     override suspend fun unmute() {

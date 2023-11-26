@@ -9,6 +9,10 @@ import net.mamoe.mirai.contact.announcement.Announcements
 import net.mamoe.mirai.contact.essence.Essences
 import net.mamoe.mirai.contact.file.RemoteFiles
 import net.mamoe.mirai.contact.roaming.RoamingMessages
+import net.mamoe.mirai.event.broadcast
+import net.mamoe.mirai.event.events.EventCancelledException
+import net.mamoe.mirai.event.events.GroupMessagePostSendEvent
+import net.mamoe.mirai.event.events.GroupMessagePreSendEvent
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.DeprecatedSinceMirai
@@ -102,27 +106,37 @@ class GroupWrapper(
     }
 
     override suspend fun sendMessage(message: Message): MessageReceipt<Group> {
-        val forward = message.findForwardMessage()
-        val messageId = if (forward != null) {
-            val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-            val response = botWrapper.impl.sendGroupForwardMsg(id, nodes)
-            response.data.messageId
-        } else {
-            val msg = OnebotMessages.serializeToOneBotJson(message)
-            val response = botWrapper.impl.sendGroupMsg(id, msg, false)
-            response.data.messageId
-        }
-        @Suppress("DEPRECATION_ERROR")
-        return MessageReceipt(object : OnlineMessageSource.Outgoing.ToGroup(){
-            override val bot: Bot = this@GroupWrapper.bot
-            override val ids: IntArray = arrayOf(messageId).toIntArray()
-            override val internalIds: IntArray = ids
-            override val isOriginalMessageInitialized: Boolean = true
-            override val originalMessage: MessageChain = message.toMessageChain()
-            override val sender: Bot = bot
-            override val target: Group = this@GroupWrapper
-            override val time: Int = currentTimeSeconds().toInt()
-        }, this)
+        if (GroupMessagePreSendEvent(this, message).broadcast().isCancelled)
+            throw EventCancelledException("消息发送已被取消")
+
+        val messageChain = message.toMessageChain()
+        var throwable: Throwable? = null
+        val receipt = kotlin.runCatching {
+            val forward = messageChain.findForwardMessage()
+            val messageId = if (forward != null) {
+                val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
+                val response = botWrapper.impl.sendGroupForwardMsg(id, nodes)
+                response.data.messageId
+            } else {
+                val msg = OnebotMessages.serializeToOneBotJson(messageChain)
+                val response = botWrapper.impl.sendGroupMsg(id, msg, false)
+                response.data.messageId
+            }
+            @Suppress("DEPRECATION_ERROR")
+            MessageReceipt(object : OnlineMessageSource.Outgoing.ToGroup() {
+                override val bot: Bot = this@GroupWrapper.bot
+                override val ids: IntArray = arrayOf(messageId).toIntArray()
+                override val internalIds: IntArray = ids
+                override val isOriginalMessageInitialized: Boolean = true
+                override val originalMessage: MessageChain = messageChain
+                override val sender: Bot = bot
+                override val target: Group = this@GroupWrapper
+                override val time: Int = currentTimeSeconds().toInt()
+            }, this)
+        }.onFailure { throwable = it }.getOrNull()
+        GroupMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
+
+        return receipt ?: throw throwable!!
     }
 
     override suspend fun setEssenceMessage(source: MessageSource): Boolean {

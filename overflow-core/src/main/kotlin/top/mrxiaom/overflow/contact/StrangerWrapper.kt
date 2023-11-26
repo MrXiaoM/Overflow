@@ -1,17 +1,17 @@
 package top.mrxiaom.overflow.contact
 
-import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import kotlinx.coroutines.CoroutineName
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Stranger
+import net.mamoe.mirai.event.broadcast
+import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
-import top.mrxiaom.overflow.data.StrangerInfoImpl
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.message.data.WrappedVideo
@@ -39,27 +39,37 @@ class StrangerWrapper(
 
     @OptIn(MiraiInternalApi::class)
     override suspend fun sendMessage(message: Message): MessageReceipt<Stranger> {
-        val forward = message.findForwardMessage()
-        val messageId = if (forward != null) {
-            val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-            val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
-            response.data.messageId
-        } else {
-            val msg = OnebotMessages.serializeToOneBotJson(message)
-            val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
-            response.data.messageId
-        }
-        @Suppress("DEPRECATION_ERROR")
-        return MessageReceipt(object : OnlineMessageSource.Outgoing.ToStranger(){
-            override val bot: Bot = this@StrangerWrapper.bot
-            override val ids: IntArray = arrayOf(messageId).toIntArray()
-            override val internalIds: IntArray = ids
-            override val isOriginalMessageInitialized: Boolean = true
-            override val originalMessage: MessageChain = message.toMessageChain()
-            override val sender: Bot = bot
-            override val target: Stranger = this@StrangerWrapper
-            override val time: Int = currentTimeSeconds().toInt()
-        }, this)
+        if (StrangerMessagePreSendEvent(this, message).broadcast().isCancelled)
+            throw EventCancelledException("消息发送已被取消")
+
+        val messageChain = message.toMessageChain()
+        var throwable: Throwable? = null
+        val receipt = kotlin.runCatching {
+            val forward = message.findForwardMessage()
+            val messageId = if (forward != null) {
+                val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
+                val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
+                response.data.messageId
+            } else {
+                val msg = OnebotMessages.serializeToOneBotJson(message)
+                val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
+                response.data.messageId
+            }
+            @Suppress("DEPRECATION_ERROR")
+            return MessageReceipt(object : OnlineMessageSource.Outgoing.ToStranger() {
+                override val bot: Bot = this@StrangerWrapper.bot
+                override val ids: IntArray = arrayOf(messageId).toIntArray()
+                override val internalIds: IntArray = ids
+                override val isOriginalMessageInitialized: Boolean = true
+                override val originalMessage: MessageChain = message.toMessageChain()
+                override val sender: Bot = bot
+                override val target: Stranger = this@StrangerWrapper
+                override val time: Int = currentTimeSeconds().toInt()
+            }, this)
+        }.onFailure { throwable = it }.getOrNull()
+        StrangerMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
+
+        return receipt ?: throw throwable!!
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {
