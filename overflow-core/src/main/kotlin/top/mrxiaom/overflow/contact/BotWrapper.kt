@@ -34,6 +34,7 @@ class BotWrapper private constructor(
     private var friendsInternal: ContactList<FriendWrapper> = ContactList()
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
     private var otherClientsInternal: ContactList<OtherClientWrapper> = ContactList()
+    private var strangersInternal: ContactList<StrangerWrapper> = ContactList()
     suspend fun updateLoginInfo() {
         loginInfo = impl.getLoginInfo().data
     }
@@ -112,9 +113,9 @@ class BotWrapper private constructor(
     override val groups: ContactList<Group>
         get() = groupsInternal
     override val otherClients: ContactList<OtherClient>
-        get() = throw NotImplementedError("Onebot 未提供陌生人列表接口")
+        get() = otherClientsInternal //TODO: Onebot 未提供陌生人列表接口
     override val strangers: ContactList<Stranger>
-        get() = throw NotImplementedError("Onebot 未提供陌生人列表接口")
+        get() = strangersInternal //TODO: Onebot 未提供陌生人列表接口
 
     override fun close(cause: Throwable?) {
         if (isActive) {
