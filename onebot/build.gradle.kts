@@ -3,10 +3,6 @@ plugins {
     id("me.him188.kotlin-jvm-blocking-bridge")
 }
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
-}
-
 setupMavenCentralPublication {
     artifact(tasks.jar)
     artifact(tasks.kotlinSourcesJar)

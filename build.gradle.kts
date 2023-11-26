@@ -23,6 +23,18 @@ allprojects {
     repositories {
         mavenCentral()
     }
+    
+    val javaVersion = "1.8"
+    tasks {
+        withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+            kotlinOptions.jvmTarget = javaVersion
+        }
+        withType<JavaCompile> {
+            options.encoding = "UTF-8"
+            sourceCompatibility = javaVersion
+            targetCompatibility = javaVersion
+        }
+    }
 }
 nexusPublishing {
     repositories {

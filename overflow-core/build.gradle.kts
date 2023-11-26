@@ -46,9 +46,3 @@ dependencies {
     testImplementation("net.mamoe:mirai-console")
     testImplementation("net.mamoe:mirai-console-terminal")
 }
-
-tasks {
-    withType<KotlinCompile> {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-}
