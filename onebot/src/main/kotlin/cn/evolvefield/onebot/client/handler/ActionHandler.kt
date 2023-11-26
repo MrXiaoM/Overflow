@@ -6,6 +6,7 @@ import cn.evolvefield.onebot.client.util.ActionSendUtils
 import com.google.gson.JsonObject
 import org.java_websocket.WebSocket
 import org.slf4j.LoggerFactory
+import java.net.ConnectException
 
 /**
  * Description:
@@ -47,10 +48,7 @@ class ActionHandler {
      */
     suspend fun action(channel: WebSocket, action: ActionPath, params: JsonObject?): JsonsObject {
         if (!channel.isOpen) {
-            val result1 = JsonObject()
-            result1.addProperty("status", "failed")
-            result1.addProperty("retcode", -2)
-            return JsonsObject(result1)
+            throw ConnectException("未连接到 Onebot")
         }
         val reqJson = generateReqJson(action, params)
         val actionSendUtils = ActionSendUtils(channel, 10000L)

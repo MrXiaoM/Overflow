@@ -33,7 +33,7 @@ class ActionSendUtils(
      */
     @Throws(TimeoutCancellationException::class)
     suspend fun send(req: JsonObject): JsonsObject {
-        return mutex.withLock {
+        val resp = mutex.withLock {
             kotlin.runCatching {
                 withTimeout(requestTimeout) {
                     log.debug(String.format("[Action] %s", req.toString()))
@@ -42,6 +42,11 @@ class ActionSendUtils(
                 }
             }.onFailure { resp.cancel() }.getOrThrow()
         }
+        if (resp.optString("status") == "failed") {
+            val action = req["action"]?.asString ?: "unknown"
+            throw IllegalStateException("[$action] ${resp.optString("message")}")
+        }
+        return resp
         //synchronized(this) { this.wait(requestTimeout) }
         //return resp
     }
@@ -50,11 +55,7 @@ class ActionSendUtils(
      * @param resp Response json data
      */
     fun onCallback(resp: JsonsObject) {
-        if (resp.optString("status") == "failed") {
-            this.resp.cancel(CancellationException(resp.optString("message")))
-        } else {
-            this.resp.complete(resp)
-        }
+        this.resp.complete(resp)
         //this.resp = resp
         //synchronized(this) { this.notify() }
     }
