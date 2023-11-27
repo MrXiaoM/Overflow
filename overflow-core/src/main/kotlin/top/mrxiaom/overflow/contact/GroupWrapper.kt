@@ -39,9 +39,7 @@ class GroupWrapper(
         impl = botWrapper.impl.getGroupInfo(impl.groupId, false).data
         membersInternal.update(botWrapper.impl.getGroupMemberList(id).data.map {
             MemberWrapper(botWrapper, this@GroupWrapper, it)
-        }) {
-            impl = it.impl
-        }
+        }) { impl = it.impl }
     }
     internal fun updateMember(member: MemberWrapper): MemberWrapper {
         return ((members[member.id] as? MemberWrapper) ?: member.also { membersInternal.delegate.add(it) }).apply {

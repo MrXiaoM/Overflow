@@ -44,25 +44,27 @@ class BotWrapper private constructor(
     suspend fun updateContacts() {
         friendsInternal.update(impl.getFriendList().data.map {
             FriendWrapper(this, it)
-        }) {
-            impl = it.impl
-        }
+        }) { impl = it.impl }
         groupsInternal.update(impl.getGroupList().data.map {
             GroupWrapper(this, it)
-        }) {
-            impl = it.impl
+        }) { impl = it.impl }
+        for (group in groupsInternal) {
+            group.queryUpdate()
         }
     }
     suspend fun updateOtherClients() = runCatching {
         otherClientsInternal.update(impl.getOnlineClients(false).data.clients.map {
             OtherClientWrapper(this, it)
-        }) {
-            impl = it.impl
-        }
+        }) { impl = it.impl }
     }
     internal fun updateFriend(friend: FriendWrapper): FriendWrapper {
         return ((friends[friend.id] as? FriendWrapper) ?: friend.also { friendsInternal.delegate.add(it) }).apply {
             impl = friend.impl
+        }
+    }
+    internal fun updateStranger(stranger: StrangerWrapper): StrangerWrapper {
+        return ((strangers[stranger.id] as? StrangerWrapper) ?: stranger.also { strangersInternal.delegate.add(it) }).apply {
+            impl = stranger.impl
         }
     }
 
