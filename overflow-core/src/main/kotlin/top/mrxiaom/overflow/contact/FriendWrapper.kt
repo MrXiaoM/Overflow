@@ -25,7 +25,7 @@ import kotlin.coroutines.CoroutineContext
 
 class FriendWrapper(
     val botWrapper: BotWrapper,
-    private var impl: FriendInfoResp,
+    internal var impl: FriendInfoResp,
 ) : Friend {
 
     override val bot: Bot = botWrapper

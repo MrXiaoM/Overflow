@@ -20,7 +20,7 @@ import kotlin.coroutines.CoroutineContext
 
 class StrangerWrapper(
     val botWrapper: BotWrapper,
-    private var impl: StrangerInfoResp,
+    internal var impl: StrangerInfoResp,
 ) : Stranger {
 
     override val bot: Bot = botWrapper

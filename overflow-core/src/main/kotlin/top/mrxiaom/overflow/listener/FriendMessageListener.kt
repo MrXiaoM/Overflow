@@ -57,9 +57,9 @@ internal class FriendMessageListener(
 }
 
 fun PrivateMessageEvent.PrivateSender.wrapAsFriend(bot: BotWrapper): FriendWrapper {
-    return FriendWrapper(bot, FriendInfoResp().also {
+    return bot.updateFriend(FriendWrapper(bot, FriendInfoResp().also {
         it.userId = userId
         it.nickname = nickname
         it.remark = ""
-    })
+    }))
 }

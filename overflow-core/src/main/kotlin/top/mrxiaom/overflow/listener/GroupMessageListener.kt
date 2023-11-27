@@ -64,16 +64,18 @@ internal class GroupMessageListener(
 }
 
 fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
-    return MemberWrapper(group.bot.asOnebot, group as GroupWrapper, GroupMemberInfoResp().also {
-        it.groupId = group.id
-        it.userId = userId.toLong()
-        it.nickname = nickname
-        it.card = card
-        it.sex = sex
-        it.age = age
-        it.area = area
-        it.level = level.toIntOrNull() ?: 0
-        it.role = role
-        it.title = title
-    })
+    return (group as GroupWrapper).updateMember(
+        MemberWrapper(group.bot.asOnebot, group, GroupMemberInfoResp().also {
+            it.groupId = group.id
+            it.userId = userId.toLong()
+            it.nickname = nickname
+            it.card = card
+            it.sex = sex
+            it.age = age
+            it.area = area
+            it.level = level.toIntOrNull() ?: 0
+            it.role = role
+            it.title = title
+        })
+    )
 }

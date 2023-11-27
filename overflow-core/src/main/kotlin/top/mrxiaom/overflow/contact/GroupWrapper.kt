@@ -24,21 +24,29 @@ import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.message.data.WrappedAudio
 import top.mrxiaom.overflow.message.data.WrappedVideo
 import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
+import top.mrxiaom.overflow.utils.update
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)
 class GroupWrapper(
     val botWrapper: BotWrapper,
-    private var impl: GroupInfoResp
+    internal var impl: GroupInfoResp
 ) : Group {
     private var membersInternal: ContactList<MemberWrapper> = ContactList()
     val data: GroupInfoResp
         get() = impl
     suspend fun queryUpdate() {
         impl = botWrapper.impl.getGroupInfo(impl.groupId, false).data
-        membersInternal = ContactList(botWrapper.impl.getGroupMemberList(id).data.map {
+        membersInternal.update(botWrapper.impl.getGroupMemberList(id).data.map {
             MemberWrapper(botWrapper, this@GroupWrapper, it)
-        }.toMutableList())
+        }) {
+            impl = it.impl
+        }
+    }
+    internal fun updateMember(member: MemberWrapper): MemberWrapper {
+        return ((members[member.id] as? MemberWrapper) ?: member.also { membersInternal.delegate.add(it) }).apply {
+            impl = member.impl
+        }
     }
 
     override val bot: Bot

@@ -15,11 +15,11 @@ import net.mamoe.mirai.internal.network.components.EventDispatcherImpl
 import net.mamoe.mirai.supervisorJob
 import net.mamoe.mirai.utils.*
 import org.java_websocket.framing.CloseFrame
-import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.data.FriendInfoImpl
 import top.mrxiaom.overflow.data.StrangerInfoImpl
 import top.mrxiaom.overflow.utils.asCoroutineExceptionHandler
 import top.mrxiaom.overflow.utils.subLogger
+import top.mrxiaom.overflow.utils.update
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
@@ -42,24 +42,28 @@ class BotWrapper private constructor(
         loginInfo = impl.getLoginInfo().data
     }
     suspend fun updateContacts() {
-        friendsInternal = ContactList(impl.getFriendList().data.map {
+        friendsInternal.update(impl.getFriendList().data.map {
             FriendWrapper(this, it)
-        }.toMutableList())
-        groupsInternal = ContactList(impl.getGroupList().data.map {
+        }) {
+            impl = it.impl
+        }
+        groupsInternal.update(impl.getGroupList().data.map {
             GroupWrapper(this, it)
-        }.toMutableList())
+        }) {
+            impl = it.impl
+        }
     }
     suspend fun updateOtherClients() = runCatching {
-        val newList = impl.getOnlineClients(false).data.clients.map {
+        otherClientsInternal.update(impl.getOnlineClients(false).data.clients.map {
             OtherClientWrapper(this, it)
-        }.toMutableList()
-        otherClientsInternal.delegate.removeIf { old ->
-            newList.none { old.impl.appId == it.impl.appId }
+        }) {
+            impl = it.impl
         }
-        newList.removeIf {
-            otherClientsInternal.any { old -> old.impl.appId == it.impl.appId }
+    }
+    internal fun updateFriend(friend: FriendWrapper): FriendWrapper {
+        return ((friends[friend.id] as? FriendWrapper) ?: friend.also { friendsInternal.delegate.add(it) }).apply {
+            impl = friend.impl
         }
-        otherClientsInternal.delegate.addAll(newList)
     }
 
     override val id: Long = loginInfo.userId

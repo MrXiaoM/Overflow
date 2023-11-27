@@ -27,7 +27,7 @@ import kotlin.coroutines.CoroutineContext
 class MemberWrapper(
     val botWrapper: BotWrapper,
     val groupWrapper: GroupWrapper,
-    private var impl: GroupMemberInfoResp
+    internal var impl: GroupMemberInfoResp
 ) : NormalMember {
 
     val data: GroupMemberInfoResp
