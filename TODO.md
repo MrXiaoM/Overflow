@@ -1,12 +1,13 @@
 # 待办事项
 
 - [x] 转发消息序列化
-- [ ] 群活跃
+- [ ] 群活跃 (群荣誉)
 - [ ] 群文件
 - [ ] 群设置
 - [x] 消息回执的转换 Onebot -> Mirai
 - [x] 群精华消息 (OpenShamrock: /set_essence_msg)
-- [ ] ~~群公告~~ (Onebot 11 没有，OpenShamrock 也未实现)
+- [ ] 获取群精华消息 (OpenShamrock: /get_essence_msg_list)
+- [x] 群公告 (OpenShamrock: /_get_group_notice)
 - [x] 联系人的持久化与新的数据更新机制，避免每次都获取不同实例
 - [ ] 商城表情消息类型识别
 - [ ] 测试发送消息
