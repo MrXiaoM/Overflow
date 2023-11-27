@@ -2,6 +2,7 @@ package top.mrxiaom.overflow.contact
 
 import cn.evole.onebot.sdk.response.group.GroupInfoResp
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.contact.active.GroupActive
@@ -19,6 +20,8 @@ import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
+import top.mrxiaom.overflow.contact.data.AnnouncementsWrapper
+import top.mrxiaom.overflow.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
 import top.mrxiaom.overflow.message.OnebotMessages
 import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.message.data.WrappedAudio
@@ -33,13 +36,17 @@ class GroupWrapper(
     internal var impl: GroupInfoResp
 ) : Group {
     private var membersInternal: ContactList<MemberWrapper> = ContactList()
+    private var announcementsInternal: AnnouncementsWrapper? = null
+
     val data: GroupInfoResp
         get() = impl
     suspend fun queryUpdate() {
         impl = botWrapper.impl.getGroupInfo(impl.groupId, false).data
+        announcementsInternal = fetchAnnouncements()
         membersInternal.update(botWrapper.impl.getGroupMemberList(id).data.map {
             MemberWrapper(botWrapper, this@GroupWrapper, it)
         }) { impl = it.impl }
+
     }
     internal fun updateMember(member: MemberWrapper): MemberWrapper {
         return ((members[member.id] as? MemberWrapper) ?: member.also { membersInternal.delegate.add(it) }).apply {
@@ -56,7 +63,11 @@ class GroupWrapper(
             TODO("Not yet implemented")
         }
     override val announcements: Announcements
-        get() = TODO("Not yet implemented")
+        get() = announcementsInternal ?: runBlocking {
+            fetchAnnouncements().also {
+                announcementsInternal = it
+            }
+        }
     override val essences: Essences
         get() {
             //for (resp in botWrapper.impl.getEssenceMsgList(id).data) {

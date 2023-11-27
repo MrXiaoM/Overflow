@@ -796,6 +796,24 @@ class Bot(
         val result = actionHandler.action(channel, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
+    
+    /**
+     * 获取群公告
+     *
+     * @param groupId 群号
+     * @return [ActionList] of [GroupNoticeResp]
+     */
+    @JvmBlockingBridge
+    suspend fun getGroupNotice(groupId: Long): ActionList<GroupNoticeResp> {
+        val action = ActionPathEnum.GET_GROUP_NOTICE
+        val params = JsonObject()
+        params.addProperty("group_id", groupId)
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionList<GroupNoticeResp>>() {}.type
+        )
+    }
 
     /**
      * 获取群 @全体成员 剩余次数

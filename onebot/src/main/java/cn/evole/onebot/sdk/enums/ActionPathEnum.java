@@ -138,7 +138,11 @@ public enum ActionPathEnum implements ActionPath {
     /**
      * 发送群公告
      */
-    SEN_GROUP_NOTICE("_send_group_notice"),
+    SEND_GROUP_NOTICE("_send_group_notice"),
+    /**
+     * 获取群公告
+     */
+    GET_GROUP_NOTICE("_get_group_notice"),
     /**
      * 获取群 @全体成员 剩余次数
      */
