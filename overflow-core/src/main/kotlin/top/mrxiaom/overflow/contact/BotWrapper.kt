@@ -18,6 +18,8 @@ import org.java_websocket.framing.CloseFrame
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.data.FriendInfoImpl
 import top.mrxiaom.overflow.data.StrangerInfoImpl
+import top.mrxiaom.overflow.utils.asCoroutineExceptionHandler
+import top.mrxiaom.overflow.utils.subLogger
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
@@ -93,7 +95,7 @@ class BotWrapper private constructor(
             }
     override val eventChannel: EventChannel<BotEvent> =
         GlobalEventChannel.filterIsInstance<BotEvent>().filter { it.bot === this@BotWrapper }
-    val eventDispatcher: EventDispatcher = EventDispatcherImpl(coroutineContext, logger.subLogger(""))
+    val eventDispatcher: EventDispatcher = EventDispatcherImpl(coroutineContext, logger.subLogger("EventDispatcher"))
 
     override val isOnline: Boolean
         get() = impl.channel.isOpen
@@ -157,21 +159,5 @@ class BotWrapper private constructor(
         suspend fun Bot.wrap(): BotWrapper {
             return wrap(this)
         }
-    }
-}
-
-@Suppress("INVISIBLE_MEMBER")
-fun MiraiLogger.subLogger(name: String): MiraiLogger {
-    return net.mamoe.mirai.internal.utils.subLoggerImpl(this, name)
-}
-fun MiraiLogger.asCoroutineExceptionHandler(
-    priority: SimpleLogger.LogPriority = SimpleLogger.LogPriority.ERROR,
-): CoroutineExceptionHandler {
-    return CoroutineExceptionHandler { context, e ->
-        call(
-            priority,
-            context[CoroutineName]?.let { "Exception in coroutine '${it.name}'." } ?: "Exception in unnamed coroutine.",
-            e
-        )
     }
 }
