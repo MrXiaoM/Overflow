@@ -9,6 +9,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.Overflow
+import top.mrxiaom.overflow.message.data.UnknownMessage
 import top.mrxiaom.overflow.message.data.WrappedAudio
 import top.mrxiaom.overflow.message.data.WrappedFileMessage
 import top.mrxiaom.overflow.message.data.WrappedVideo
@@ -104,8 +105,9 @@ object OnebotMessages {
 
             for (o in json) {
                 val obj = o.jsonObject
+                val type = obj["type"].string
                 val data = obj["data"]?.jsonObject ?: buildJsonObject {  }
-                when (obj["type"].string) {
+                when (type) {
                     "text" -> add(data["text"].string)
                     "face" -> add(Face(data["id"]!!.jsonPrimitive.int))
                     "image" -> {
@@ -136,6 +138,8 @@ object OnebotMessages {
                     }
                     "xml" -> add(SimpleServiceMessage(60, data["data"].string))
                     "json" -> add(LightApp(data["data"].string))
+                    
+                    else -> add(UnknownMessage(type, data))
                 }
             }
         }
