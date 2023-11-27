@@ -446,7 +446,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun setGroupCard(groupId: Long, userId: Long, card: String?): ActionRaw {
+    suspend fun setGroupCard(groupId: Long, userId: Long, card: String): ActionRaw {
         val action = ActionPathEnum.SET_GROUP_CARD
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -464,7 +464,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun setGroupName(groupId: Long, groupName: String?): ActionRaw {
+    suspend fun setGroupName(groupId: Long, groupName: String): ActionRaw {
         val action = ActionPathEnum.SET_GROUP_NAME
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -500,7 +500,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun setGroupSpecialTitle(groupId: Long, userId: Long, specialTitle: String?, duration: Int): ActionRaw {
+    suspend fun setGroupSpecialTitle(groupId: Long, userId: Long, specialTitle: String, duration: Int): ActionRaw {
         val action = ActionPathEnum.SET_GROUP_SPECIAL_TITLE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -520,7 +520,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun setFriendAddRequest(flag: String?, approve: Boolean, remark: String?): ActionRaw {
+    suspend fun setFriendAddRequest(flag: String, approve: Boolean, remark: String): ActionRaw {
         val action = ActionPathEnum.SET_FRIEND_ADD_REQUEST
         val params = JsonObject()
         params.addProperty("flag", flag)
@@ -540,7 +540,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun setGroupAddRequest(flag: String?, subType: String?, approve: Boolean, reason: String?): ActionRaw {
+    suspend fun setGroupAddRequest(flag: String, subType: String, approve: Boolean, reason: String): ActionRaw {
         val action = ActionPathEnum.SET_GROUP_ADD_REQUEST
         val params = JsonObject()
         params.addProperty("flag", flag)
@@ -699,7 +699,7 @@ class Bot(
      * @return [ActionData] of [GroupHonorInfoResp]
      */
     @JvmBlockingBridge
-    suspend fun getGroupHonorInfo(groupId: Long, type: String?): ActionData<GroupHonorInfoResp> {
+    suspend fun getGroupHonorInfo(groupId: Long, type: String): ActionData<GroupHonorInfoResp> {
         val action = ActionPathEnum.GET_GROUP_HONOR_INFO
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -751,7 +751,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun setGroupPortrait(groupId: Long, file: String?, cache: Int): ActionRaw {
+    suspend fun setGroupPortrait(groupId: Long, file: String, cache: Int): ActionRaw {
         val action = ActionPathEnum.SET_GROUP_PORTRAIT
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -769,7 +769,7 @@ class Bot(
      * @return [ActionData] of [CheckUrlSafelyResp]
      */
     @JvmBlockingBridge
-    suspend fun checkUrlSafely(url: String?): ActionData<CheckUrlSafelyResp> {
+    suspend fun checkUrlSafely(url: String): ActionData<CheckUrlSafelyResp> {
         val action = ActionPathEnum.CHECK_URL_SAFELY
         val params = JsonObject()
         params.addProperty("url", url)
@@ -788,8 +788,8 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun sendGroupNotice(groupId: Long, content: String?): ActionRaw {
-        val action = ActionPathEnum.SEN_GROUP_NOTICE
+    suspend fun sendGroupNotice(groupId: Long, content: String): ActionRaw {
+        val action = ActionPathEnum.SEND_GROUP_NOTICE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("content", content)
@@ -845,7 +845,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun uploadGroupFile(groupId: Long, file: String?, name: String?, folder: String?): ActionRaw {
+    suspend fun uploadGroupFile(groupId: Long, file: String, name: String, folder: String): ActionRaw {
         val action = ActionPathEnum.UPLOAD_GROUP_FILE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -867,7 +867,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun uploadGroupFile(groupId: Long, file: String?, name: String?): ActionRaw {
+    suspend fun uploadGroupFile(groupId: Long, file: String, name: String): ActionRaw {
         val action = ActionPathEnum.UPLOAD_GROUP_FILE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -907,7 +907,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun setGroupAnonymousBan(groupId: Long, flag: String?, duration: Int): ActionRaw {
+    suspend fun setGroupAnonymousBan(groupId: Long, flag: String, duration: Int): ActionRaw {
         val action = ActionPathEnum.SET_GROUP_ANONYMOUS_BAN
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -926,7 +926,7 @@ class Bot(
      * @return [ActionData] of [DownloadFileResp]
      */
     @JvmBlockingBridge
-    suspend fun downloadFile(url: String?, threadCount: Int, headers: String?): ActionData<DownloadFileResp> {
+    suspend fun downloadFile(url: String, threadCount: Int, headers: String): ActionData<DownloadFileResp> {
         val action = ActionPathEnum.DOWNLOAD_FILE
         val params = JsonObject()
         params.addProperty("url", url)
@@ -946,7 +946,7 @@ class Bot(
      * @return [ActionData] of [DownloadFileResp]
      */
     @JvmBlockingBridge
-    suspend fun downloadFile(url: String?): ActionData<DownloadFileResp> {
+    suspend fun downloadFile(url: String): ActionData<DownloadFileResp> {
         val action = ActionPathEnum.DOWNLOAD_FILE
         val params = JsonObject()
         params.addProperty("url", url)
@@ -999,7 +999,7 @@ class Bot(
      * @return [ActionData] of [GroupFilesResp]
      */
     @JvmBlockingBridge
-    suspend fun getGroupFilesByFolder(groupId: Long, folderId: String?): ActionData<GroupFilesResp> {
+    suspend fun getGroupFilesByFolder(groupId: Long, folderId: String): ActionData<GroupFilesResp> {
         val action = ActionPathEnum.GET_GROUP_FILES_BY_FOLDER
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -1132,11 +1132,11 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend fun setBotProfile(
-        nickname: String?,
-        company: String?,
-        email: String?,
-        college: String?,
-        personalNote: String?
+        nickname: String,
+        company: String,
+        email: String,
+        college: String,
+        personalNote: String
     ): ActionRaw {
         val action = ActionPathEnum.SET_QQ_PROFILE
         val params = JsonObject()
@@ -1192,7 +1192,7 @@ class Bot(
      * @return [ActionData] of [WordSlicesResp]
      */
     @JvmBlockingBridge
-    suspend fun getWordSlices(content: String?): ActionData<WordSlicesResp> {
+    suspend fun getWordSlices(content: String): ActionData<WordSlicesResp> {
         val action = ActionPathEnum.GET_WORD_SLICES
         val params = JsonObject()
         params.addProperty("content", content)
@@ -1228,7 +1228,7 @@ class Bot(
      * @return [ActionData] of [OcrResp]
      */
     @JvmBlockingBridge
-    suspend fun ocrImage(image: String?): ActionData<OcrResp> {
+    suspend fun ocrImage(image: String): ActionData<OcrResp> {
         val action = ActionPathEnum.OCR_IMAGE
         val params = JsonObject()
         params.addProperty("image", image)
@@ -1248,7 +1248,7 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun uploadPrivateFile(userId: Long, file: String?, name: String?): ActionRaw {
+    suspend fun uploadPrivateFile(userId: Long, file: String, name: String): ActionRaw {
         val action = ActionPathEnum.UPLOAD_PRIVATE_FILE
         val params = JsonObject()
         params.addProperty("user_id", userId)
