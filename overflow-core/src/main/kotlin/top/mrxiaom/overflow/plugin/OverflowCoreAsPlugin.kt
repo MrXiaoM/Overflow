@@ -13,6 +13,7 @@ import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.SemVersion
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.Overflow
+import top.mrxiaom.overflow.message.OnebotMessages
 
 @Suppress("PluginMainServiceNotConfigured")
 internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
@@ -28,6 +29,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     }
 
     suspend fun onEnable() {
+        OnebotMessages.registerSerializers()
         Overflow.instance.start()
 
         // keep a command register example here

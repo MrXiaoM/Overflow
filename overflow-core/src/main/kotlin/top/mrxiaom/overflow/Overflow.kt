@@ -113,7 +113,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
     private fun injectMiraiConsole() {
         MiraiConsole.pluginManager // init
         val pluginManager: net.mamoe.mirai.console.internal.plugin.PluginManagerImpl = MiraiConsole.pluginManager.cast()
-        pluginManager.resolvedPlugins.add(OverflowCoreAsPlugin)
+        if (!pluginManager.resolvedPlugins.contains(OverflowCoreAsPlugin)) {
+            pluginManager.resolvedPlugins.add(OverflowCoreAsPlugin)
+        }
     }
 
     suspend fun start() {

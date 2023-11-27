@@ -22,10 +22,11 @@ import top.mrxiaom.overflow.message.data.WrappedVideo
  */
 object OnebotMessages {
     @OptIn(MiraiExperimentalApi::class)
-    internal fun registerSerializers() {
-        MessageSerializers.registerSerializer(WrappedAudio::class, WrappedAudio.serializer())
-        MessageSerializers.registerSerializer(WrappedVideo::class, WrappedVideo.serializer())
-        MessageSerializers.registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
+    internal fun registerSerializers() = MessageSerializers.apply {
+        registerSerializer(WrappedAudio::class, WrappedAudio.serializer())
+        registerSerializer(WrappedVideo::class, WrappedVideo.serializer())
+        registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
+        registerSerializer(UnknownMessage::class, UnknownMessage.serializer())
     }
 
     fun serializeToOneBotJson(message: Message): String {
@@ -138,7 +139,7 @@ object OnebotMessages {
                     }
                     "xml" -> add(SimpleServiceMessage(60, data["data"].string))
                     "json" -> add(LightApp(data["data"].string))
-                    
+
                     else -> add(UnknownMessage(type, data))
                 }
             }
