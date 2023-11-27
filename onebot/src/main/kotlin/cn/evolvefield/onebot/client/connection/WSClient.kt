@@ -42,7 +42,7 @@ class WSClient(private val scope: CoroutineScope, uri: URI, private val actionHa
         try {
             val jsonObject = JsonsObject(message)
             if (HEART_BEAT != jsonObject.optString(META_EVENT)) { //过滤心跳
-                log.debug("接收到原始消息 {}", jsonObject.toString())
+                log.debug("Client received <-- {}", jsonObject.toString())
                 if (jsonObject.has(API_RESULT_KEY)) {
                     actionHandler.onReceiveActionResp(jsonObject) //请求执行
                 } else {
