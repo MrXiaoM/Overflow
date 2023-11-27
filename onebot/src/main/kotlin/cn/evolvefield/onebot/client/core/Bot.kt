@@ -788,11 +788,12 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun sendGroupNotice(groupId: Long, content: String): ActionRaw {
+    suspend fun sendGroupNotice(groupId: Long, content: String, image: String?): ActionRaw {
         val action = ActionPathEnum.SEND_GROUP_NOTICE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("content", content)
+        if (image != null) params.addProperty("image", image)
         val result = actionHandler.action(channel, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }

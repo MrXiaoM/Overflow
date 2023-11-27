@@ -34,8 +34,17 @@ class AnnouncementsWrapper(
     }
 
     override suspend fun publish(announcement: Announcement): OnlineAnnouncement {
-        impl.botWrapper.impl.sendGroupNotice(impl.id, announcement.content)
-        return OnlineAnnouncementWrapper(announcement.content, impl, impl.bot.id)
+        impl.botWrapper.impl.sendGroupNotice(
+            impl.id,
+            announcement.content,
+            announcement.parameters.image?.file
+        )
+        return OnlineAnnouncementWrapper(
+            content = announcement.content,
+            group = impl,
+            senderId = impl.bot.id,
+            parameters = announcement.parameters
+        )
     }
 
     override suspend fun uploadImage(resource: ExternalResource): AnnouncementImage {
