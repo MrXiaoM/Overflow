@@ -14,9 +14,12 @@ import net.mamoe.mirai.console.plugin.description.PluginDescription
 import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.SemVersion
+import net.mamoe.mirai.utils.weeksToMillis
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.message.OnebotMessages
+import top.mrxiaom.overflow.utils.LoggerInFolder
+import java.io.File
 
 @Suppress("PluginMainServiceNotConfigured")
 internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
@@ -32,9 +35,13 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     }
 
     @OptIn(ConsoleExperimentalApi::class)
+    @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
     suspend fun onEnable() {
+        val miraiLogger = LoggerInFolder(Overflow::class, "Onebot", File("logs/onebot"), 1.weeksToMillis)
+        val logger = net.mamoe.mirai.console.internal.logging.externalbind.slf4j.SLF4JAdapterLogger(miraiLogger)
+
         OnebotMessages.registerSerializers()
-        Overflow.instance.start(true)
+        Overflow.instance.start(true, logger)
 
         // keep a command register example here
 
