@@ -9,7 +9,7 @@
 - [ ] 获取群精华消息 (OpenShamrock: /get_essence_msg_list)
 - [x] 群公告 (OpenShamrock: /_get_group_notice)
 - [x] 联系人的持久化与新的数据更新机制，避免每次都获取不同实例
-- [ ] 商城表情消息类型识别
+- [x] 商城表情消息类型识别
 - [x] 测试发送消息
 - [x] 测试一些简单插件的运行效果
 - [x] 解决登录后 mirai-console 被阻塞导致无法关闭的问题
