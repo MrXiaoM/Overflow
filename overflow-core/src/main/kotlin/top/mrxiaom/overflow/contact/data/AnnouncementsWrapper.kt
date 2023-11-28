@@ -54,7 +54,7 @@ class AnnouncementsWrapper(
 
     companion object {
         suspend fun GroupWrapper.fetchAnnouncements(): AnnouncementsWrapper {
-            val list = botWrapper.impl.getGroupNotice(id).data.map {
+            val list = botWrapper.impl.getGroupNotice(id).data?.map {
                 OnlineAnnouncementWrapper(
                     content = it.message.text,
                     group = this,
@@ -68,7 +68,7 @@ class AnnouncementsWrapper(
                         }
                     }.build()
                 )
-            }
+            } ?: listOf()
             return AnnouncementsWrapper(this, list)
         }
     }

@@ -35,21 +35,19 @@ class GroupWrapper(
     val botWrapper: BotWrapper,
     internal var impl: GroupInfoResp
 ) : Group {
-    private var membersInternal: ContactList<MemberWrapper> = ContactList()
+    private var membersInternal: ContactList<MemberWrapper>? = null
     private var announcementsInternal: AnnouncementsWrapper? = null
 
     val data: GroupInfoResp
         get() = impl
     suspend fun queryUpdate() {
         impl = botWrapper.impl.getGroupInfo(impl.groupId, false).data
+    }
+    suspend fun updateAnnouncements() {
         announcementsInternal = fetchAnnouncements()
-        membersInternal.update(botWrapper.impl.getGroupMemberList(id).data.map {
-            MemberWrapper(botWrapper, this@GroupWrapper, it)
-        }) { impl = it.impl }
-
     }
     internal fun updateMember(member: MemberWrapper): MemberWrapper {
-        return ((members[member.id] as? MemberWrapper) ?: member.also { membersInternal.delegate.add(it) }).apply {
+        return ((members[member.id] as? MemberWrapper) ?: member.also { members.delegate.add(it) }).apply {
             impl = member.impl
         }
     }
@@ -96,7 +94,14 @@ class GroupWrapper(
         get() = impl.groupName
         set(value) { impl.groupName = value }
     override val members: ContactList<NormalMember>
-        get() = membersInternal
+        get() = membersInternal ?: runBlocking {
+            ContactList<MemberWrapper>().apply {
+                update(botWrapper.impl.getGroupMemberList(id).data.map {
+                    MemberWrapper(botWrapper, this@GroupWrapper, it)
+                }) { impl = it.impl }
+                membersInternal = this
+            }
+        }
     override val botAsMember: NormalMember
         get() = members.first { it.id == bot.id }
     override val owner: NormalMember

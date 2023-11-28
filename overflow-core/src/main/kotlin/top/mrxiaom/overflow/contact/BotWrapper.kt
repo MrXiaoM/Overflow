@@ -48,9 +48,6 @@ class BotWrapper private constructor(
         groupsInternal.update(impl.getGroupList().data.map {
             GroupWrapper(this, it)
         }) { impl = it.impl }
-        for (group in groupsInternal) {
-            group.queryUpdate()
-        }
     }
     suspend fun updateOtherClients() = runCatching {
         otherClientsInternal.update(impl.getOnlineClients(false).data.clients.map {

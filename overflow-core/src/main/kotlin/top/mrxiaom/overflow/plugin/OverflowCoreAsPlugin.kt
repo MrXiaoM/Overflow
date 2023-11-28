@@ -44,6 +44,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             secondaryNames = arrayOf(),
         ) {
             @SubCommand
+            @Description("发送群消息")
             suspend fun CommandSender.group(
                 @Name("群号") groupId: Long,
                 @Name("消息")vararg message: String
@@ -60,6 +61,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 sendMessage("消息发送成功")
             }
             @SubCommand
+            @Description("发送好友消息")
             suspend fun CommandSender.friend(
                 @Name("好友QQ") friendId: Long,
                 @Name("消息") vararg message: String
