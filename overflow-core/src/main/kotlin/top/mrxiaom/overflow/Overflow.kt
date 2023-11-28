@@ -59,6 +59,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
     internal val newFriendRequestFlagMap = mutableMapOf<Long, String>()
     internal val newMemberJoinRequestFlagMap = mutableMapOf<Long, String>()
     internal val newInviteJoinGroupRequestFlagMap = mutableMapOf<Long, String>()
+    private var miraiConsoleFlag: Boolean = false
+    val miraiConsole: Boolean
+        get() = miraiConsoleFlag
     private val prettyJson = Json {
         prettyPrint = true
         encodeDefaults = true
@@ -105,6 +108,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         try {
             Class.forName("net.mamoe.mirai.console.enduserreadme.EndUserReadme")
             System.setProperty("mirai.console.skip-end-user-readme", "true")
+            miraiConsoleFlag = true
             injectMiraiConsole()
         } catch (ignored: ClassNotFoundException) {
         }

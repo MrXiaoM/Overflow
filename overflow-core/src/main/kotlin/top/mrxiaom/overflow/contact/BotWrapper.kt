@@ -15,8 +15,10 @@ import net.mamoe.mirai.internal.network.components.EventDispatcherImpl
 import net.mamoe.mirai.supervisorJob
 import net.mamoe.mirai.utils.*
 import org.java_websocket.framing.CloseFrame
+import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.data.FriendInfoImpl
 import top.mrxiaom.overflow.data.StrangerInfoImpl
+import top.mrxiaom.overflow.utils.LoggerInFolder
 import top.mrxiaom.overflow.utils.asCoroutineExceptionHandler
 import top.mrxiaom.overflow.utils.subLogger
 import top.mrxiaom.overflow.utils.update
@@ -148,9 +150,14 @@ class BotWrapper private constructor(
                 implInternal = impl
             } ?:
             BotWrapper(impl, loginInfo, botConfiguration ?: BotConfiguration {
-                fileBasedDeviceInfo("device.json")
                 workingDir = File("bots/${impl.id}")
-                botLoggerSupplier = { MiraiLogger.Factory.create(net.mamoe.mirai.Bot::class, "Bot.${it.id}") }
+                if (Overflow.instance.miraiConsole) {
+                    botLoggerSupplier = { LoggerInFolder(net.mamoe.mirai.Bot::class, "Bot.${it.id}", workingDir.resolve("logs"), 1.weeksToMillis) }
+                    networkLoggerSupplier = { LoggerInFolder(net.mamoe.mirai.Bot::class, "Net.${it.id}", workingDir.resolve("logs"), 1.weeksToMillis) }
+                } else {
+                    botLoggerSupplier = { MiraiLogger.Factory.create(net.mamoe.mirai.Bot::class, "Bot.${it.id}") }
+                    networkLoggerSupplier = { MiraiLogger.Factory.create(net.mamoe.mirai.Bot::class, "Net.${it.id}") }
+                }
             }).apply {
                 updateContacts()
 
