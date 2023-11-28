@@ -34,8 +34,6 @@ dependencies {
     netty("transport")
 
     api(project(":onebot"))
-    compileOnly("com.google.code.gson:gson:2.10.1")
-    implementation("org.java-websocket:Java-WebSocket:1.5.4")
     implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
 
     testImplementation("com.google.code.gson:gson:2.10.1")
