@@ -22,7 +22,10 @@ public class MsgAdapter implements JsonDeserializer<GetMsgResp> {
             message = obj.get("message").getAsString();
         }
         String rawMessage = obj.get("raw_message").getAsString();
+        long peerId = obj.has("peer_id") ? obj.get("peer_id").getAsLong() : 0;
+        long groupId = obj.has("group_id") ? obj.get("group_id").getAsLong() : 0;
+        long targetId = obj.has("target_id") ? obj.get("target_id").getAsLong() : 0;
 
-        return new GetMsgResp(messageId, realId, sender, time, message, rawMessage);
+        return new GetMsgResp(messageId, realId, sender, time, message, rawMessage, peerId, groupId, targetId);
     }
 }

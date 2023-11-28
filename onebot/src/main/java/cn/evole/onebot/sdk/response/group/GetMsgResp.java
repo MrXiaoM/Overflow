@@ -19,39 +19,36 @@ public class GetMsgResp {
     /**
      * 消息id
      */
-    @SerializedName("message_id")
     public int messageId;
 
     /**
      * 消息真实id
      */
-    @SerializedName("real_id")
     public int realId;
 
     /**
      * 发送者
      */
-    @SerializedName("sender")
     public Sender sender;
 
     /**
      * 发送时间
      */
-    @SerializedName("time")
     public int time;
 
     /**
      * 消息内容
      */
-    @SerializedName("message")
     public String message;
 
     /**
      * 原始消息内容
      */
-    @SerializedName("raw_message")
     public String rawMessage;
 
+    public long peerId;
+    public long groupId;
+    public long targetId;
     /**
      * sender信息
      */

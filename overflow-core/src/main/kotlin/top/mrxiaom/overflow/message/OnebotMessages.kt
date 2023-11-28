@@ -9,6 +9,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.Overflow
+import top.mrxiaom.overflow.asOnebot
 import top.mrxiaom.overflow.message.data.*
 
 /**
@@ -137,6 +138,22 @@ object OnebotMessages {
                     "mface" -> add(WrappedMarketFace(data["id"].string, "[商城表情]")) // TODO 根据 emojiId 获取 name
                     "xml" -> add(SimpleServiceMessage(60, data["data"].string))
                     "json" -> add(LightApp(data["data"].string))
+
+                    "reply" -> {
+                        val id = data["id"]!!.jsonPrimitive.int
+                        val msgData = bot.asOnebot.impl.getMsg(id).data
+                        val msgSource = MessageSourceBuilder()
+                            .id(id)
+                            .internalId(id)
+                        if (msgData != null) msgSource
+                            .sender(msgData.sender.userId.toLong())
+                            .target(msgData.targetId)
+                            .messages { deserializeFromOneBotJson(bot, msgData.message) }
+                            .time(msgData.time)
+                        val kind = if (msgData?.groupId == 0L) MessageSourceKind.FRIEND else MessageSourceKind.GROUP
+                        
+                        add(QuoteReply(msgSource.build(bot.id, kind)))
+                    }
 
                     else -> add(UnknownMessage(type, data))
                 }
