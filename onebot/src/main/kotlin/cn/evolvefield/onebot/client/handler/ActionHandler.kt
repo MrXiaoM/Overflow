@@ -51,7 +51,10 @@ class ActionHandler(
      */
     suspend fun action(channel: WebSocket, action: ActionPath, params: JsonObject?): JsonsObject {
         if (!channel.isOpen) {
-            throw ConnectException("未连接到 Onebot")
+            return JsonsObject(JsonObject().apply {
+                addProperty("status", "failed")
+                addProperty("retcode", -1)
+            })
         }
         val reqJson = generateReqJson(action, params)
         val actionSendUtils = ActionSendUtils(logger, channel, 10000L)
@@ -60,10 +63,10 @@ class ActionHandler(
             actionSendUtils.send(reqJson)
         } catch (e: Exception) {
             logger.warn("Request failed: [${action.path}] ${e.message}")
-            val result1 = JsonObject()
-            result1.addProperty("status", "failed")
-            result1.addProperty("retcode", -1)
-            JsonsObject(result1)
+            JsonsObject(JsonObject().apply {
+                addProperty("status", "failed")
+                addProperty("retcode", -1)
+            })
         }
         return result
     }
