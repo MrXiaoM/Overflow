@@ -7,7 +7,17 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 将 `mirai-core` 实现删除，替换为 `overflow` 即可。
 
 以下为使用 MCL 迁移到 overflow 的操作示例。  
-编辑 config.json
+
+**方法一：**脚本一键安装
+
+- Windows 下载 [install_overflow_mcl.cmd](install_overflow_mcl.cmd)
+- Linux/MacOS 下载 [install_overflow_mcl.sh](install_overflow_mcl.sh)
+
+将其放置在 MCL 启动脚本所在目录，打开即可。
+
+------
+
+**方法二：**编辑 config.json
 ```json5
 {
   // ...
@@ -25,6 +35,8 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 ```
 将其中的 `"net.mamoe:mirai-core-all"` 改为 `"top.mrxiaom:overflow-core-all"` 即可。  
 `overflow-core-all` 的版本号将从 2.16.0 起，与 `mirai` 到 3.0 之前 (不包含 3.0) 的发行版保持同步。
+
+------
 
 启动后会生成配置文件 `overflow.json`，修改其中的 `ws_host` 为服务端地址，再次启动即可，服务端地址如 Shamrock 的 `主动WebSocket地址`。
 
