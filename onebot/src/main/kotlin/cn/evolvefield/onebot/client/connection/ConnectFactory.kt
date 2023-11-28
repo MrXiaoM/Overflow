@@ -5,6 +5,8 @@ import cn.evolvefield.onebot.client.handler.ActionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.net.URI
 
 /**
@@ -18,9 +20,10 @@ import java.net.URI
  * @param config 配置
  */
 class ConnectFactory private constructor(
-    private val config: BotConfig
+    private val config: BotConfig,
+    private val logger: Logger,
 ) {
-    private val actionHandler: ActionHandler = ActionHandler()
+    private val actionHandler: ActionHandler = ActionHandler(logger)
 
     /**
      * 创建websocket客户端(支持cqhttp和mirai类型)
@@ -48,17 +51,17 @@ class ConnectFactory private constructor(
         }
         val url = builder.toString()
         try {
-            ws = WSClient.createAndConnect(scope, URI.create(url), actionHandler)
+            ws = WSClient.createAndConnect(scope, URI.create(url), logger, actionHandler)
         } catch (e: Exception) {
-            WSClient.log.error("▌ §c{}连接错误，请检查服务端是否开启 §a┈━═☆", url)
+            logger.error("▌ {} 连接错误，请检查服务端是否开启 ┈━═☆", url)
         }
         return ws
     }
 
     companion object {
         @JvmStatic
-        fun create(config: BotConfig): ConnectFactory {
-            return ConnectFactory(config)
+        fun create(config: BotConfig, logger: Logger = LoggerFactory.getLogger("Onebot")): ConnectFactory {
+            return ConnectFactory(config, logger)
         }
     }
 }

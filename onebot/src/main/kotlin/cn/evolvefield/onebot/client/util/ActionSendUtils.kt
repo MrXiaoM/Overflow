@@ -9,6 +9,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
 import org.java_websocket.WebSocket
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /**
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory
  * @param requestTimeout Request Timeout
  */
 class ActionSendUtils(
+    private val logger: Logger,
     private val channel: WebSocket,
     private val requestTimeout: Long
 ) {
@@ -36,7 +38,7 @@ class ActionSendUtils(
         val resp = mutex.withLock {
             kotlin.runCatching {
                 withTimeout(requestTimeout) {
-                    log.debug("Send to server --> {}", req.toString())
+                    logger.debug("Send to server --> {}", req.toString())
                     channel.send(req.toString())
                     resp.await()
                 }
@@ -61,7 +63,6 @@ class ActionSendUtils(
     }
 
     companion object {
-        private val log = LoggerFactory.getLogger("ActionSender")
         val mutex = Mutex()
     }
 }

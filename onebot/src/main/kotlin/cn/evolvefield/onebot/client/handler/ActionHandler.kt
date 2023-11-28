@@ -5,6 +5,7 @@ import cn.evole.onebot.sdk.util.json.JsonsObject
 import cn.evolvefield.onebot.client.util.ActionSendUtils
 import com.google.gson.JsonObject
 import org.java_websocket.WebSocket
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.ConnectException
 
@@ -14,7 +15,9 @@ import java.net.ConnectException
  * Date: 2022/9/14 15:05
  * Version: 1.0
  */
-class ActionHandler {
+class ActionHandler(
+    private val logger: Logger
+) {
     /**
      * 请求回调数据
      */
@@ -51,12 +54,12 @@ class ActionHandler {
             throw ConnectException("未连接到 Onebot")
         }
         val reqJson = generateReqJson(action, params)
-        val actionSendUtils = ActionSendUtils(channel, 10000L)
+        val actionSendUtils = ActionSendUtils(logger, channel, 10000L)
         apiCallbackMap[reqJson["echo"].asString] = actionSendUtils
         val result: JsonsObject = try {
             actionSendUtils.send(reqJson)
         } catch (e: Exception) {
-            log.warn("Request failed: {}", e.message)
+            logger.warn("Request failed: {}", e.message)
             val result1 = JsonObject()
             result1.addProperty("status", "failed")
             result1.addProperty("retcode", -1)
@@ -79,9 +82,5 @@ class ActionHandler {
         if (params != null) json.add("params", params)
         json.addProperty("echo", echo++)
         return json
-    }
-
-    companion object {
-        private val log = LoggerFactory.getLogger("Action")
     }
 }
