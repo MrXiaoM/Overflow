@@ -34,7 +34,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     @OptIn(ConsoleExperimentalApi::class)
     suspend fun onEnable() {
         OnebotMessages.registerSerializers()
-        Overflow.instance.start()
+        Overflow.instance.start(true)
 
         // keep a command register example here
 

@@ -1,9 +1,6 @@
 package cn.evole.onebot.sdk.util.json;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 
 /**
  * Description:
@@ -12,6 +9,7 @@ import com.google.gson.JsonParser;
  * Version: 1.0
  */
 public class JsonsObject {
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final JsonObject jsonObject;
 
     public JsonsObject(String text){
@@ -149,5 +147,9 @@ public class JsonsObject {
     @Override
     public String toString() {
         return jsonObject.toString();
+    }
+
+    public String toPrettyString() {
+        return gson.toJson(jsonObject);
     }
 }

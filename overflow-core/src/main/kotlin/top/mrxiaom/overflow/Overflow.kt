@@ -9,6 +9,7 @@ import cn.evolvefield.onebot.client.connection.ConnectFactory
 import cn.evolvefield.onebot.client.listener.EventListener
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
+import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.logging.LoggerController
@@ -118,29 +119,38 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
         }
     }
 
-    suspend fun start() {
-        logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
-        logger.info("连接到 WebSocket: ${config.wsHost}")
+    @JvmOverloads
+    @JvmBlockingBridge
+    suspend fun start(printInfo: Boolean = false): Boolean {
+        if (printInfo) {
+            logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
+            logger.info("连接到 WebSocket: ${config.wsHost}")
+        }
         val service = ConnectFactory.create(
             BotConfig(config.wsHost)
         )
         val ws = service.createWebsocketClient(this)
         if (ws == null) {
-            logger.error("未连接到 Onebot")
-            if (System.getProperty("overflow.not-exit").isNullOrBlank()) {
-                exitProcess(1)
+            if (printInfo) {
+                logger.error("未连接到 Onebot")
+                if (System.getProperty("overflow.not-exit").isNullOrBlank()) {
+                    exitProcess(1)
+                }
             }
-            return
+            return false
         }
         val dispatchers = ws.createEventBus()
         val botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
-
+        if (printInfo) {
+            logger.info("服务端版本信息\n${botImpl.getVersionInfo().toPrettyString()}")
+        }
         val bot = botImpl.wrap()
 
         dispatchers.addListener(FriendMessageListener(bot))
         dispatchers.addListener(GroupMessageListener(bot))
         dispatchers.addListener(GroupNotifyListener(bot))
         BotOnlineEvent(bot).broadcast()
+        return true
     }
 
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {

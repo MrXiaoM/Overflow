@@ -1320,6 +1320,26 @@ class Bot(
             object : TypeToken<ActionList<UnidirectionalFriendListResp>>() {}.type
         )
     }
+
+    /**
+     * 获取运行状态
+     *
+     * @return [JsonsObject]
+     */
+    suspend fun getStatus(): JsonsObject {
+        val action = ActionPathEnum.GET_STATUS
+        return actionHandler.action(channel, action, null)
+    }
+
+    /**
+     * 获取版本信息
+     *
+     * @return [JsonsObject]
+     */
+    suspend fun getVersionInfo(): JsonsObject {
+        val action = ActionPathEnum.GET_VERSION_INFO
+        return actionHandler.action(channel, action, null)
+    }
 }
 
 fun <T> List<T>.toJsonArray(): JsonArray {

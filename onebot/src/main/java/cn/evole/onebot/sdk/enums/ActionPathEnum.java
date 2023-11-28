@@ -258,7 +258,15 @@ public enum ActionPathEnum implements ActionPath {
     /**
      * 删除单向好友
      */
-    DELETE_UNIDIRECTIONAL_FRIEND("delete_unidirectional_friend");
+    DELETE_UNIDIRECTIONAL_FRIEND("delete_unidirectional_friend"),
+    /**
+     * 获取运行状态
+     */
+    GET_STATUS("get_status"),
+    /**
+     * 获取版本信息
+     */
+    GET_VERSION_INFO("get_version_info");
 
     /**
      * 请求路径
