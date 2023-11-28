@@ -63,7 +63,7 @@ class Bot(
      * 发送私聊消息
      *
      * @param userId     对方 QQ 号
-     * @param msg        要发送的内容
+     * @param msg        要发送的内容，请使用CQ码或json数组消息
      * @param autoEscape 消息内容是否作为纯文本发送 ( 即不解析 CQ 码 ) , 只在 message 字段是字符串时有效
      * @return [ActionData] of [MsgId]
      */
@@ -72,7 +72,13 @@ class Bot(
         val action = ActionPathEnum.SEND_PRIVATE_MSG
         val params = JsonObject()
         params.addProperty("user_id", userId)
-        params.addProperty("message", msg)
+        kotlin.runCatching {
+            JsonParser.parseString(msg).asJsonArray
+        }.onSuccess {
+            params.add("message", it)
+        }.onFailure {
+            params.addProperty("message", msg)
+        }
         params.addProperty("auto_escape", autoEscape)
         val result = actionHandler.action(channel, action, params)
         return GsonUtil.fromJson(
@@ -85,7 +91,7 @@ class Bot(
      * 发送群消息
      *
      * @param groupId    群号
-     * @param msg        要发送的内容
+     * @param msg        要发送的内容，请使用CQ码或json数组消息
      * @param autoEscape 消息内容是否作为纯文本发送 ( 即不解析 CQ 码 ) , 只在 message 字段是字符串时有效
      * @return [ActionData] of [MsgId]
      */
@@ -94,7 +100,13 @@ class Bot(
         val action = ActionPathEnum.SEND_GROUP_MSG
         val params = JsonObject()
         params.addProperty("group_id", groupId)
-        params.addProperty("message", msg)
+        kotlin.runCatching {
+            JsonParser.parseString(msg).asJsonArray
+        }.onSuccess {
+            params.add("message", it)
+        }.onFailure {
+            params.addProperty("message", msg)
+        }
         params.addProperty("auto_escape", autoEscape)
         val result = actionHandler.action(channel, action, params)
         return GsonUtil.fromJson(
@@ -131,7 +143,7 @@ class Bot(
      *
      * @param guildId   频道 ID
      * @param channelId 子频道 ID
-     * @param msg       要发送的内容
+     * @param msg       要发送的内容，请使用CQ码或json数组消息
      * @return [ActionData] of [GuildMsgId]
      */
     @JvmBlockingBridge
@@ -140,7 +152,13 @@ class Bot(
         val params = JsonObject()
         params.addProperty("guild_id", guildId)
         params.addProperty("channel_id", channelId)
-        params.addProperty("message", msg)
+        kotlin.runCatching {
+            JsonParser.parseString(msg).asJsonArray
+        }.onSuccess {
+            params.add("message", it)
+        }.onFailure {
+            params.addProperty("message", msg)
+        }
         val result = actionHandler.action(channel, action, params)
         return GsonUtil.fromJson(
             result.toString(),
