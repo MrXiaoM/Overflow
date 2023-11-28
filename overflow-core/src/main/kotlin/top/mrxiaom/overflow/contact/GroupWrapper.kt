@@ -96,7 +96,8 @@ class GroupWrapper(
     override val members: ContactList<NormalMember>
         get() = membersInternal ?: runBlocking {
             ContactList<MemberWrapper>().apply {
-                update(botWrapper.impl.getGroupMemberList(id).data.map {
+                val data = botWrapper.impl.getGroupMemberList(id).data ?: return@apply
+                update(data.map {
                     MemberWrapper(botWrapper, this@GroupWrapper, it)
                 }) { impl = it.impl }
                 membersInternal = this

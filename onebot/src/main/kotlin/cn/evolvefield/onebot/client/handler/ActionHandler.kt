@@ -59,7 +59,7 @@ class ActionHandler(
         val result: JsonsObject = try {
             actionSendUtils.send(reqJson)
         } catch (e: Exception) {
-            logger.warn("Request failed: {}", e.message)
+            logger.warn("Request failed: [${action.path}] ${e.message}")
             val result1 = JsonObject()
             result1.addProperty("status", "failed")
             result1.addProperty("retcode", -1)
