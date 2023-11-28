@@ -1,6 +1,9 @@
 package cn.evole.onebot.sdk.response.group;
 
+import cn.evole.onebot.sdk.util.json.MsgAdapter;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -9,6 +12,8 @@ import lombok.Data;
  * @author cnlimiter
  */
 @Data
+@AllArgsConstructor
+@JsonAdapter(MsgAdapter.class)
 public class GetMsgResp {
 
     /**
