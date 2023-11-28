@@ -9,10 +9,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.Overflow
-import top.mrxiaom.overflow.message.data.UnknownMessage
-import top.mrxiaom.overflow.message.data.WrappedAudio
-import top.mrxiaom.overflow.message.data.WrappedFileMessage
-import top.mrxiaom.overflow.message.data.WrappedVideo
+import top.mrxiaom.overflow.message.data.*
 
 /**
  * Json 数组消息 (Onebot) 与 [MessageChain] (mirai) 的序列化与反序列化
@@ -137,6 +134,7 @@ object OnebotMessages {
                             add(raw.render(ForwardMessage.DisplayStrategy))
                         }
                     }
+                    "mface" -> add(WrappedMarketFace(data["id"].string, "[商城表情]")) // TODO 根据 emojiId 获取 name
                     "xml" -> add(SimpleServiceMessage(60, data["data"].string))
                     "json" -> add(LightApp(data["data"].string))
 
