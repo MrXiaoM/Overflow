@@ -48,7 +48,7 @@ data class WrappedImage(
     override val width: Int,
     override val height: Int,
 ): Image {
-    private val _stringValue: String? by lazy(LazyThreadSafetyMode.NONE) { "[overflow:image, url:$url, isEmoji=$isEmoji]" }
+    private val _stringValue: String? by lazy(LazyThreadSafetyMode.NONE) { "[overflow:image,url=$url,isEmoji=$isEmoji]" }
     override val imageId: String = url
 
     override fun contentToString(): String = if (isEmoji) {
