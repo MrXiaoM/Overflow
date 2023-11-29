@@ -63,7 +63,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                     sendMessage("找不到群 $groupId")
                 }
                 // TODO: 用更简洁的方法反序列化消息
-                val messageChain = OnebotMessages.deserializeFromOneBotJson(bot, message.joinToString(" "))
+                val messageChain = OnebotMessages.deserializeFromOneBot(bot, message.joinToString(" "))
                 group.sendMessage(messageChain)
                 sendMessage("消息发送成功")
             }
@@ -80,7 +80,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                     sendMessage("找不到好友 $friendId")
                 }
                 // TODO: 用更简洁的方法反序列化消息
-                val messageChain = OnebotMessages.deserializeFromOneBotJson(bot, message.joinToString(" "))
+                val messageChain = OnebotMessages.deserializeFromOneBot(bot, message.joinToString(" "))
                 friend.sendMessage(messageChain)
                 sendMessage("消息发送成功")
             }

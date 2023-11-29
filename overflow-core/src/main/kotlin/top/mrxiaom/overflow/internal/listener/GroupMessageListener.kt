@@ -31,7 +31,7 @@ internal class GroupMessageListener(
                 }
                 val member = e.sender.wrapAsMember(group)
 
-                var miraiMessage = OnebotMessages.deserializeFromOneBotJson(bot, e.message)
+                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
                 val messageString = miraiMessage.toString()
                 val messageSource = object : OnlineMessageSource.Incoming.FromGroup() {
                     override val bot: Bot = this@GroupMessageListener.bot

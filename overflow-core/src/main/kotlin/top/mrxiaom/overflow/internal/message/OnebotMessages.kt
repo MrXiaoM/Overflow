@@ -8,7 +8,6 @@ import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
-import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.data.*
 
@@ -27,9 +26,18 @@ object OnebotMessages {
         registerSerializer(UnknownMessage::class, UnknownMessage.serializer())
     }
 
+    /**
+     * @see serializeToOneBotJsonArray
+     */
     fun serializeToOneBotJson(message: Message): String {
         return Json.encodeToString(serializeToOneBotJsonArray(message))
     }
+
+    /**
+     * 将 mirai 消息序列化为 json 数组消息
+     *
+     * @param message mirai 消息，不支持转发消息
+     */
     @OptIn(MiraiExperimentalApi::class)
     fun serializeToOneBotJsonArray(message: Message): JsonArray {
         val messageChain = (message as? MessageChain) ?: listOf(message)
@@ -74,13 +82,9 @@ object OnebotMessages {
             }
         }
     }
-    fun Message.findForwardMessage(): ForwardMessage? {
-        return when(this){
-            is ForwardMessage -> this
-            is MessageChain -> firstIsInstanceOrNull()
-            else -> null
-        }
-    }
+    /**
+     * 将转发消息节点转换为可供 Onebot 发送的列表
+     */
     fun serializeForwardNodes(nodeList: List<ForwardMessage.Node>): List<Map<String, Any>> {
         val nodes = mutableListOf<Map<String, Any>>()
         for (node in nodeList) {
@@ -91,12 +95,26 @@ object OnebotMessages {
         }
         return nodes
     }
-    suspend fun deserializeFromOneBotJson(bot: Bot, json: com.google.gson.JsonArray, source: MessageSource? = null): MessageChain {
-        return deserializeFromOneBotJson(bot, Json.parseToJsonElement(json.toString()).jsonArray, source)
+
+    /**
+     * 反序列化消息
+     *
+     * @param bot 机器人实例
+     * @param message 消息内容，应为 json 数组消息，若 json 反序列化失败，将会返回为纯文本消息作为 fallback
+     * @param source 消息源
+     */
+    suspend fun deserializeFromOneBot(bot: Bot, message: String, source: MessageSource? = null): MessageChain {
+        return kotlin.runCatching { Json.parseToJsonElement(message).jsonArray }
+            .map { deserializeFromOneBotJson(bot, it, source) }.getOrNull() ?: kotlin.run {
+                source?.plus(message) ?: PlainText(message).toMessageChain()
+        }
     }
-    suspend fun deserializeFromOneBotJson(bot: Bot, jsonString: String, source: MessageSource? = null): MessageChain {
-        return deserializeFromOneBotJson(bot, Json.parseToJsonElement(jsonString).jsonArray, source)
-    }
+
+    /**
+     * 反序列化消息
+     *
+     * @see deserializeFromOneBot
+     */
     @OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
     suspend fun deserializeFromOneBotJson(bot: Bot, json: JsonArray, source: MessageSource? = null): MessageChain {
         return buildMessageChain {
@@ -148,7 +166,7 @@ object OnebotMessages {
                         if (msgData != null) msgSource
                             .sender(msgData.sender.userId.toLong())
                             .target(msgData.targetId)
-                            .messages { deserializeFromOneBotJson(bot, msgData.message) }
+                            .messages { deserializeFromOneBot(bot, msgData.message) }
                             .time(msgData.time)
                         val kind = if (msgData?.groupId == 0L) MessageSourceKind.FRIEND else MessageSourceKind.GROUP
                         
@@ -197,4 +215,12 @@ object OnebotMessages {
         get() = (this as? WrappedVideo)?.file ?: ""
     private val JsonElement?.string
         get() = this?.jsonPrimitive?.content ?: ""
+
+    fun Message.findForwardMessage(): ForwardMessage? {
+        return when(this){
+            is ForwardMessage -> this
+            is MessageChain -> firstIsInstanceOrNull()
+            else -> null
+        }
+    }
 }

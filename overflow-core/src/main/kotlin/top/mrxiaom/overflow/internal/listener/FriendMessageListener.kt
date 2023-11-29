@@ -27,7 +27,7 @@ internal class FriendMessageListener(
                     // TODO: 过滤自己发送的消息
                     return
                 }
-                var miraiMessage = OnebotMessages.deserializeFromOneBotJson(bot, e.message)
+                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
                 val messageString = miraiMessage.toString()
                 val messageSource = object : OnlineMessageSource.Incoming.FromFriend() {
                     override val bot: Bot = this@FriendMessageListener.bot

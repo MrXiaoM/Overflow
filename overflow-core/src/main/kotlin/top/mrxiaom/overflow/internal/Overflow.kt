@@ -1,18 +1,15 @@
 package top.mrxiaom.overflow.internal
 
 import cn.evole.onebot.sdk.action.ActionRaw
-import cn.evole.onebot.sdk.event.meta.LifecycleMetaEvent
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
-import cn.evolvefield.onebot.client.listener.EventListener
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.logging.LoggerController
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.data.FriendInfo
 import net.mamoe.mirai.data.MemberInfo
@@ -26,7 +23,6 @@ import net.mamoe.mirai.internal.event.InternalEventMechanism
 import net.mamoe.mirai.message.action.Nudge
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
-import net.mamoe.mirai.utils.LoggerAdapters.asMiraiLogger
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.mrxiaom.overflow.BuildConstants
@@ -212,7 +208,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
 
     override suspend fun downloadForwardMessage(bot: Bot, resourceId: String): List<ForwardMessage.Node> {
         return bot.asOnebot.impl.getForwardMsg(resourceId).data.message.map {
-            val msg = OnebotMessages.deserializeFromOneBotJson(bot, it.message)
+            val msg = OnebotMessages.deserializeFromOneBot(bot, it.message)
             ForwardMessage.Node(it.sender.userId, it.time, it.sender.nickname, msg)
         }
     }
