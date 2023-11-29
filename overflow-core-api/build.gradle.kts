@@ -9,6 +9,8 @@ setupMavenCentralPublication {
     artifact(tasks.kotlinSourcesJar)
 }
 
+val miraiVersion = rootProject.ext["miraiVersion"].toString()
+
 dependencies {
     implementation(platform("net.mamoe:mirai-bom:$miraiVersion"))
 
