@@ -30,6 +30,7 @@ import top.mrxiaom.overflow.contact.OverflowAPI
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
+import top.mrxiaom.overflow.internal.contact.GroupWrapper
 import top.mrxiaom.overflow.internal.contact.StrangerWrapper
 import top.mrxiaom.overflow.internal.data.asMirai
 import top.mrxiaom.overflow.internal.listener.FriendMessageListener
@@ -55,7 +56,7 @@ fun ActionRaw.check(failMsg: String): Boolean {
 class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override val coroutineContext: CoroutineContext = CoroutineName("overflow")
     override val BotFactory: BotFactory
-        get() = top.mrxiaom.overflow.internal.BotFactoryImpl
+        get() = BotFactoryImpl
     override var FileCacheStrategy: FileCacheStrategy = net.mamoe.mirai.utils.FileCacheStrategy.PlatformDefault
     internal val newFriendRequestFlagMap = mutableMapOf<Long, String>()
     internal val newMemberJoinRequestFlagMap = mutableMapOf<Long, String>()
@@ -146,7 +147,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             return false
         }
         val dispatchers = ws.createEventBus()
-        val botImpl = ws.createBot().also { top.mrxiaom.overflow.internal.BotFactoryImpl.internalBot = it }
+        val botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
         if (printInfo) {
             logger.info("服务端版本信息\n${botImpl.getVersionInfo().toPrettyString()}")
         }
@@ -165,7 +166,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override fun serializeMessage(message: Message): String = OnebotMessages.serializeToOneBotJson(message)
     @JvmBlockingBridge
     override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain = OnebotMessages.deserializeFromOneBot(bot, message, null)
-
+    @JvmBlockingBridge
+    override suspend fun updateGroupMemberList(group: Group): ContactList<NormalMember> = (group as? GroupWrapper)?.updateMembers() ?: ContactList()
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
         TODO("Not yet implemented")
     }

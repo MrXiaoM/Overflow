@@ -13,6 +13,8 @@ interface OverflowAPI {
     fun serializeMessage(message: Message): String
     @JvmBlockingBridge
     suspend fun deserializeMessage(bot: Bot, message: String): MessageChain
+    @JvmBlockingBridge
+    suspend fun updateGroupMemberList(group: Group): ContactList<NormalMember>
 
     companion object {
         @JvmStatic

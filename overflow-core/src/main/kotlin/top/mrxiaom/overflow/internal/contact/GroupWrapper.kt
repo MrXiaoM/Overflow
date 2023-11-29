@@ -53,6 +53,16 @@ class GroupWrapper(
         }
     }
 
+    internal suspend fun updateMembers(): ContactList<MemberWrapper> {
+        return (membersInternal ?: ContactList<MemberWrapper>()).apply {
+            val data = botWrapper.impl.getGroupMemberList(id).data ?: return@apply
+            update(data.map {
+                MemberWrapper(botWrapper, this@GroupWrapper, it)
+            }) { impl = it.impl }
+            membersInternal = this
+        }
+    }
+
     override val bot: Bot
         get() = botWrapper
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${botWrapper.id})Group/$id")
@@ -96,13 +106,7 @@ class GroupWrapper(
         set(value) { impl.groupName = value }
     override val members: ContactList<NormalMember>
         get() = membersInternal ?: runBlocking {
-            ContactList<MemberWrapper>().apply {
-                val data = botWrapper.impl.getGroupMemberList(id).data ?: return@apply
-                update(data.map {
-                    MemberWrapper(botWrapper, this@GroupWrapper, it)
-                }) { impl = it.impl }
-                membersInternal = this
-            }
+            updateMembers()
         }
     override val botAsMember: NormalMember
         get() = members.first { it.id == bot.id }
