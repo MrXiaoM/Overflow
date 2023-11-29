@@ -70,6 +70,26 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 * 音乐分享 返回的消息有可能没有音乐链接，与 mirai 相差较大
 * 转发消息 无法使用转发消息ID从Shamrock正常下载转发消息，暂未测试
 
+## 资源相关消息说明
+
+任何需要上传的消息 (图片、语音、视频)，由于 Onebot 没有资源上传概念，  
+上传行为将会变成使用`base64`进行编码保存到消息实例中，发送消息时直接调用。  
+这是目前我能想到的最容易兼容所有 Onebot 实现的方法，  
+但是这有一个很明显的缺点，资源以Base64字符串形式存在变量里，难以释放。  
+
+为减少运行内存占用，你可以使用以下方法
+
+```kotlin
+val image = OverflowAPI.get().imageFromFile("https://xxxxx")
+val audio = OverflowAPI.get().audioFromFile("https://xxxxx")
+val video = OverflowAPI.get().videoFromFile("https://xxxxx")
+
+// 其中的链接与 Onebot 的 file 参数相同，有三种格式
+// 本地文件: file:///path/file
+// 网络文件: http(s)://xxxx
+// Base64: base64://b3ZlcmZsb3c=
+```
+
 # 长期支持
 
 当前处于溢出核心项目长期支持的 Onebot 协议实现如下

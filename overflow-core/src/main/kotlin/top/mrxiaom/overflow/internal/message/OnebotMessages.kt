@@ -201,9 +201,9 @@ object OnebotMessages {
             is ServiceMessage -> "xml"
             else -> "text"
         }
-    private fun imageFromFile(file: String): Image = Image.fromId(file)
-    private fun audioFromFile(file: String): Audio = WrappedAudio(file)
-    private fun videoFromFile(file: String): ShortVideo = WrappedVideo(file)
+    internal fun imageFromFile(file: String): Image = Image.fromId(file)
+    internal fun audioFromFile(file: String): Audio = WrappedAudio(file)
+    internal fun videoFromFile(file: String): ShortVideo = WrappedVideo(file)
 
     private val Image.onebotFile: String
         get() = imageId
