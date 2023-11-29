@@ -16,6 +16,7 @@ import net.mamoe.mirai.utils.toUHexString
 
 @OptIn(MiraiInternalApi::class)
 internal class WrappedImageProtocol : InternalImageProtocol {
+    @OptIn(MiraiExperimentalApi::class)
     override fun createImage(
         imageId: String,
         size: Long,

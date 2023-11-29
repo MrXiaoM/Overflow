@@ -29,7 +29,7 @@ class StrangerWrapper(
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})Stranger/$id")
     override var remark: String
         get() = ""
-        set(value) {
+        set(_) {
             Overflow.logger.warning("Onebot 未提供修改陌生人备注接口 ($id)")
         }
 

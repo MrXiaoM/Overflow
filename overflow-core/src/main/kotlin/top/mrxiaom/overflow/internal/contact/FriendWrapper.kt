@@ -36,7 +36,7 @@ class FriendWrapper(
         get() = throw NotImplementedError("Onebot 未提供好友分组接口")
     override var remark: String
         get() = impl.remark
-        set(value) {
+        set(_) {
             Overflow.logger.warning("Onebot 未提供修改好友备注接口 ($id)")
         }
     override val roamingMessages: RoamingMessages
