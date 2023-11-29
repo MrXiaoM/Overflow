@@ -24,7 +24,7 @@ mirai {
 }
 dependencies {
     // 若需要使用 Overflow 的接口，请取消注释下面这行
-    // compileOnly("top.mrxiaom:overflow-core:$VERSION")
+    // compileOnly("top.mrxiaom:overflow-core-api:$VERSION")
     
     testImplementation("top.mrxiaom:overflow-core:$VERSION")
 }
@@ -32,7 +32,7 @@ dependencies {
 
 ## 纯 mirai-core 开发
 
-将 `net.mamoe:mirai-core` 依赖替换为 `top.mrxiaom:overflow-core-all` 即可。
+将 `net.mamoe:mirai-core` 依赖替换为 `top.mrxiaom:overflow-core` 即可。
 
 # 鸣谢
 

@@ -11,5 +11,6 @@ setupMavenCentralPublication {
 
 dependencies {
     api(project(":onebot"))
+    api(project(":overflow-core-api"))
     api(project(":overflow-core"))
 }
