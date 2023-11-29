@@ -72,13 +72,13 @@ fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
             it.groupId = group.id
             it.userId = userId.toLong()
             it.nickname = nickname
-            it.card = card
-            it.sex = sex
-            it.age = age
-            it.area = area
+            it.card = card ?: ""
+            it.sex = sex ?: ""
+            it.age = age ?: 0
+            it.area = area ?: ""
             it.level = level.toIntOrNull() ?: 0
-            it.role = role
-            it.title = title
+            it.role = role ?: "member"
+            it.title = title ?: ""
         })
     )
 }
