@@ -25,10 +25,16 @@ internal class GroupNotifyListener(
 ) : EventListener<GroupNotifyNoticeEvent> {
     @OptIn(MiraiInternalApi::class)
     override suspend fun onMessage(e: GroupNotifyNoticeEvent) {
-        val group = bot.groups.getOrFail(e.groupId)
-        when(e.subType) {
+        val group = bot.getGroup(e.groupId) ?: kotlin.run {
+            val data = bot.impl.getGroupInfo(e.groupId, false).data ?: throw IllegalStateException("无法取得群信息")
+            bot.updateGroup(GroupWrapper(bot, data))
+        }
+        when (e.subType) {
             "poke" -> {
-                // TODO: 戳一戳事件
+                val operator = group.members[e.operatorId] ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取操作者")
+                val target = group.members[e.targetId] ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取目标")
+                // TODO: 戳一戳无法获取被戳一方的动作、后缀信息
+                NudgeEvent(operator, target, group, "拍了拍", "").broadcast()
             }
         }
     }
