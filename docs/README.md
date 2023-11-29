@@ -21,9 +21,10 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 ------
 
+**方法二：** 编辑 MCL 的 config.json
+
 > 此方法暂不可用
 
-**方法二：** 编辑 MCL 的 config.json
 ```json5
 {
   // ...
