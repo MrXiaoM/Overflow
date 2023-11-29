@@ -25,7 +25,10 @@ internal class GroupMessageListener(
     override suspend fun onMessage(e: GroupMessageEvent) {
         when(e.subType) {
             "normal" -> {
-                val group = bot.getGroupOrFail(e.groupId)
+                val group = bot.getGroup(e.groupId) ?: kotlin.run {
+                    val data = bot.impl.getGroupInfo(e.groupId, false).data ?: throw IllegalStateException("无法取得群信息")
+                    bot.updateGroup(GroupWrapper(bot, data))
+                }
                 val member = e.sender.wrapAsMember(group)
 
                 var miraiMessage = OnebotMessages.deserializeFromOneBotJson(bot, e.message)

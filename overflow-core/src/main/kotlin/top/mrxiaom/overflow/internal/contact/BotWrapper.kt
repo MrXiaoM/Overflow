@@ -58,6 +58,11 @@ class BotWrapper private constructor(
             OtherClientWrapper(this, it)
         }) { impl = it.impl }
     }
+    internal fun updateGroup(group: GroupWrapper): GroupWrapper {
+        return ((groups[group.id] as? GroupWrapper) ?: group.also { groupsInternal.delegate.add(it) }). apply {
+            impl = group.impl
+        }
+    }
     internal fun updateFriend(friend: FriendWrapper): FriendWrapper {
         return ((friends[friend.id] as? FriendWrapper) ?: friend.also { friendsInternal.delegate.add(it) }).apply {
             impl = friend.impl
