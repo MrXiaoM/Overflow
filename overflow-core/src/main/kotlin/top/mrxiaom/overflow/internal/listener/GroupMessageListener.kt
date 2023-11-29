@@ -76,7 +76,7 @@ fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
             it.sex = sex ?: ""
             it.age = age ?: 0
             it.area = area ?: ""
-            it.level = level.toIntOrNull() ?: 0
+            it.level = level?.toIntOrNull() ?: 0
             it.role = role ?: "member"
             it.title = title ?: ""
         })
