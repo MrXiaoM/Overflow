@@ -20,6 +20,7 @@ import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
+import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
 import top.mrxiaom.overflow.internal.message.OnebotMessages
@@ -34,13 +35,13 @@ import kotlin.coroutines.CoroutineContext
 class GroupWrapper(
     val botWrapper: BotWrapper,
     internal var impl: GroupInfoResp
-) : Group {
+) : Group, Updatable {
     private var membersInternal: ContactList<MemberWrapper>? = null
     private var announcementsInternal: AnnouncementsWrapper? = null
 
     val data: GroupInfoResp
         get() = impl
-    suspend fun queryUpdate() {
+    override suspend fun queryUpdate() {
         impl = botWrapper.impl.getGroupInfo(impl.groupId, false).data
     }
     suspend fun updateAnnouncements() {

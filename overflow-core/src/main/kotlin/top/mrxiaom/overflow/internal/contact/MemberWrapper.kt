@@ -17,6 +17,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
+import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
@@ -28,11 +29,11 @@ class MemberWrapper(
     val botWrapper: BotWrapper,
     val groupWrapper: GroupWrapper,
     internal var impl: GroupMemberInfoResp
-) : NormalMember {
+) : NormalMember, Updatable {
 
     val data: GroupMemberInfoResp
         get() = impl
-    suspend fun queryUpdate() {
+    override suspend fun queryUpdate() {
         impl = botWrapper.impl.getGroupMemberInfo(impl.groupId, impl.userId, false).data
     }
 
