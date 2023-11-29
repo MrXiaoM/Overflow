@@ -17,6 +17,7 @@ import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.weeksToMillis
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.utils.LoggerInFolder
 import java.io.File
@@ -50,6 +51,15 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             primaryName = "overflow",
             secondaryNames = arrayOf(),
         ) {
+            @SubCommand
+            @Description("重新连接 Onebot")
+            suspend fun CommandSender.reconnect() {
+                if (Bot.instances.isEmpty()) Overflow.instance.start(true, logger)
+                else Bot.instances.forEach {
+                    it.asOnebot.impl.channel.reconnectBlocking()
+                }
+                sendMessage("重新连接执行完成")
+            }
             @SubCommand
             @Description("发送群消息")
             suspend fun CommandSender.group(
