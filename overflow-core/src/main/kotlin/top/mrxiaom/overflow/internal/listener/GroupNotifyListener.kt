@@ -14,11 +14,11 @@ import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.NudgeEvent
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiInternalApi
-import top.mrxiaom.overflow.asOnebot
-import top.mrxiaom.overflow.contact.BotWrapper
-import top.mrxiaom.overflow.contact.GroupWrapper
-import top.mrxiaom.overflow.contact.MemberWrapper
-import top.mrxiaom.overflow.message.OnebotMessages
+import top.mrxiaom.overflow.internal.asOnebot
+import top.mrxiaom.overflow.internal.contact.BotWrapper
+import top.mrxiaom.overflow.internal.contact.GroupWrapper
+import top.mrxiaom.overflow.internal.contact.MemberWrapper
+import top.mrxiaom.overflow.internal.message.OnebotMessages
 
 internal class GroupNotifyListener(
     val bot: BotWrapper

@@ -7,9 +7,9 @@ import net.mamoe.mirai.contact.NormalMember
 import net.mamoe.mirai.contact.announcement.*
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.currentTimeSeconds
-import top.mrxiaom.overflow.contact.GroupWrapper
-import top.mrxiaom.overflow.utils.FastImageInfo
-import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
+import top.mrxiaom.overflow.internal.contact.GroupWrapper
+import top.mrxiaom.overflow.internal.utils.FastImageInfo
+import top.mrxiaom.overflow.internal.utils.ResourceUtils.toBase64File
 
 class AnnouncementsWrapper(
     val impl: GroupWrapper,

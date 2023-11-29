@@ -20,14 +20,14 @@ import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
-import top.mrxiaom.overflow.contact.data.AnnouncementsWrapper
-import top.mrxiaom.overflow.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
-import top.mrxiaom.overflow.message.OnebotMessages
-import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.message.data.WrappedAudio
-import top.mrxiaom.overflow.message.data.WrappedVideo
-import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
-import top.mrxiaom.overflow.utils.update
+import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper
+import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
+import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
+import top.mrxiaom.overflow.internal.message.data.WrappedAudio
+import top.mrxiaom.overflow.internal.message.data.WrappedVideo
+import top.mrxiaom.overflow.internal.utils.ResourceUtils.toBase64File
+import top.mrxiaom.overflow.internal.utils.update
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)

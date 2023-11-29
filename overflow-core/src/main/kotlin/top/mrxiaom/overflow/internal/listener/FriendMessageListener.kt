@@ -10,9 +10,9 @@ import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.OnlineMessageSource
 import net.mamoe.mirai.utils.MiraiInternalApi
-import top.mrxiaom.overflow.contact.BotWrapper
-import top.mrxiaom.overflow.contact.FriendWrapper
-import top.mrxiaom.overflow.message.OnebotMessages
+import top.mrxiaom.overflow.internal.contact.BotWrapper
+import top.mrxiaom.overflow.internal.contact.FriendWrapper
+import top.mrxiaom.overflow.internal.message.OnebotMessages
 
 internal class FriendMessageListener(
     val bot: BotWrapper

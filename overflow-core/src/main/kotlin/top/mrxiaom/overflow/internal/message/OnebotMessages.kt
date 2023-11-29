@@ -8,9 +8,9 @@ import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
-import top.mrxiaom.overflow.Overflow
-import top.mrxiaom.overflow.asOnebot
-import top.mrxiaom.overflow.message.data.*
+import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.asOnebot
+import top.mrxiaom.overflow.internal.message.data.*
 
 /**
  * Json 数组消息 (Onebot) 与 [MessageChain] (mirai) 的序列化与反序列化

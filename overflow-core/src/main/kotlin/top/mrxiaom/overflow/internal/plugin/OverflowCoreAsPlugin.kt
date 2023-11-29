@@ -16,9 +16,9 @@ import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.weeksToMillis
 import top.mrxiaom.overflow.internal.BuildConstants
-import top.mrxiaom.overflow.Overflow
-import top.mrxiaom.overflow.message.OnebotMessages
-import top.mrxiaom.overflow.utils.LoggerInFolder
+import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.utils.LoggerInFolder
 import java.io.File
 
 @Suppress("PluginMainServiceNotConfigured")

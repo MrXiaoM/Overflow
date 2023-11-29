@@ -7,8 +7,8 @@ import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
-import top.mrxiaom.overflow.message.data.WrappedVideo
-import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
+import top.mrxiaom.overflow.internal.message.data.WrappedVideo
+import top.mrxiaom.overflow.internal.utils.ResourceUtils.toBase64File
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)

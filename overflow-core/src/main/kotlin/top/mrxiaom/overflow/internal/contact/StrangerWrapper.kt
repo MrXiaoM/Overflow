@@ -11,11 +11,11 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
-import top.mrxiaom.overflow.Overflow
-import top.mrxiaom.overflow.message.OnebotMessages
-import top.mrxiaom.overflow.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.message.data.WrappedVideo
-import top.mrxiaom.overflow.utils.ResourceUtils.toBase64File
+import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
+import top.mrxiaom.overflow.internal.message.data.WrappedVideo
+import top.mrxiaom.overflow.internal.utils.ResourceUtils.toBase64File
 import kotlin.coroutines.CoroutineContext
 
 class StrangerWrapper(
