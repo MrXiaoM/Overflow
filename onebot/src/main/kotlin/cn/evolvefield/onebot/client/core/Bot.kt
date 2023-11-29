@@ -1072,6 +1072,17 @@ class Bot(
         val result = actionHandler.action(channel, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
+    /**
+     * 自定义请求
+     *
+     * @param action 请求路径
+     * @param params 请求参数
+     * @return [ActionRaw]
+     */
+    @JvmBlockingBridge
+    suspend fun customRequest(action: ActionPath, params: String?): JsonsObject {
+        return actionHandler.action(channel, action, params?.run { JsonParser.parseString(this).asJsonObject })
+    }
 
     /**
      * 获取精华消息列表

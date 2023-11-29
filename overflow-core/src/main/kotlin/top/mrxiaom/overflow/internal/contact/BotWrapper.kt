@@ -3,6 +3,7 @@ package top.mrxiaom.overflow.internal.contact
 import cn.evole.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.client.core.Bot
 import kotlinx.coroutines.*
+import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.LowLevelApi
 import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.contact.*
@@ -16,6 +17,7 @@ import net.mamoe.mirai.supervisorJob
 import net.mamoe.mirai.utils.*
 import org.java_websocket.framing.CloseFrame
 import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.internal.data.FriendInfoImpl
 import top.mrxiaom.overflow.internal.data.StrangerInfoImpl
 import top.mrxiaom.overflow.internal.utils.LoggerInFolder
@@ -31,7 +33,7 @@ class BotWrapper private constructor(
     implBot: Bot,
     defLoginInfo: LoginInfoResp,
     botConfiguration: BotConfiguration
-) : net.mamoe.mirai.Bot, CoroutineScope {
+) : net.mamoe.mirai.Bot, RemoteBot, CoroutineScope {
     private var implInternal = implBot
     val impl: Bot
         get() = implInternal
@@ -141,6 +143,11 @@ class BotWrapper private constructor(
 
     override suspend fun login() {
         logger.warning("Bot 已由 OneBot 进行管理，溢出核心不会进行登录操作")
+    }
+
+    @JvmBlockingBridge
+    override suspend fun executeAction(path: String, json: String?): String {
+        return impl.customRequest({ path }, json).toString()
     }
 
     companion object {
