@@ -146,8 +146,8 @@ class BotWrapper private constructor(
     }
 
     @JvmBlockingBridge
-    override suspend fun executeAction(path: String, json: String?): String {
-        return impl.customRequest({ path }, json).toString()
+    override suspend fun executeAction(actionPath: String, params: String?): String {
+        return impl.customRequest({ actionPath }, params).toString()
     }
 
     companion object {

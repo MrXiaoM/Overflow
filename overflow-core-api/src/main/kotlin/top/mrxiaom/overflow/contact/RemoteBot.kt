@@ -9,12 +9,12 @@ interface RemoteBot {
      * 执行自定义动作
      *
      * 详见 [Onebot 11 公开 API](https://github.com/botuniverse/onebot-11/blob/master/api/public.md)。
-     * @param path API请求路径
-     * @param json 请求参数，可为空
+     * @param actionPath API请求路径
+     * @param params 请求参数，可为空
      * @return 服务端返回信息，格式为 json
      */
     @JvmBlockingBridge
-    suspend fun executeAction(path: String, json: String?): String
+    suspend fun executeAction(actionPath: String, params: String?): String
 
     companion object {
         /**
