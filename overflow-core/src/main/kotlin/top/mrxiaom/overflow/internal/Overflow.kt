@@ -29,6 +29,7 @@ import net.mamoe.mirai.utils.*
 import net.mamoe.mirai.utils.LoggerAdapters.asMiraiLogger
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
@@ -130,7 +131,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor {
     @JvmBlockingBridge
     suspend fun start(printInfo: Boolean = false, logger: Logger = LoggerFactory.getLogger("Onebot")): Boolean {
         if (printInfo) {
-            logger.info("Overflow v${top.mrxiaom.overflow.internal.BuildConstants.VERSION} 正在运行")
+            logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
             logger.info("连接到 WebSocket: ${config.wsHost}")
         }
 

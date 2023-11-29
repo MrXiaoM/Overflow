@@ -1,13 +1,22 @@
+import org.ajoberstar.grgit.Grgit
+
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     id("com.github.gmazzo.buildconfig")
     id("me.him188.kotlin-jvm-blocking-bridge")
+    id("org.ajoberstar.grgit")
 }
 
 setupMavenCentralPublication {
     artifact(tasks.jar)
     artifact(tasks.kotlinSourcesJar)
+}
+
+var commitHash = "local"
+if (File(rootProject.projectDir, ".git").exists()) {
+    val repo = Grgit.open(mapOf("currentDir" to rootProject.projectDir))
+    commitHash = repo.head().abbreviatedId
 }
 
 val miraiVersion = rootProject.ext["miraiVersion"].toString()
@@ -19,6 +28,7 @@ buildConfig {
 
     buildConfigField("String", "VERSION", "\"${project.version}\"")
     buildConfigField("String", "MIRAI_VERSION", "\"$miraiVersion\"")
+    buildConfigField("String", "COMMIT_HASH", "\"$commitHash\"")
 }
 
 dependencies {
