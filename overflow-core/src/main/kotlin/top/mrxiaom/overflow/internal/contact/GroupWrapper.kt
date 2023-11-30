@@ -48,9 +48,9 @@ class GroupWrapper(
     suspend fun updateAnnouncements() {
         announcementsInternal = fetchAnnouncements()
     }
-    internal fun updateMember(member: MemberWrapper): MemberWrapper {
-        return ((members[member.id] as? MemberWrapper) ?: member.also { members.delegate.add(it) }).apply {
-            impl = member.impl
+    internal fun updateMember(member: GroupMemberInfoResp): MemberWrapper {
+        return ((members[member.userId] as? MemberWrapper) ?: MemberWrapper(botWrapper, this, member).also { members.delegate.add(it) }).apply {
+            impl = member
         }
     }
 

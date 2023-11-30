@@ -46,12 +46,12 @@ internal class GroupMessageListener(
                 val messageString = miraiMessage.toString()
                 val messageSource = object : OnlineMessageSource.Incoming.FromGroup() {
                     override val bot: Bot = this@GroupMessageListener.bot
-                    override val ids: IntArray = arrayOf(e.messageId).toIntArray()
+                    override val ids: IntArray = intArrayOf(e.messageId)
                     override val internalIds: IntArray = ids
                     override val isOriginalMessageInitialized: Boolean = true
                     override val originalMessage: MessageChain = miraiMessage
                     override val sender: Member = member
-                    override val time: Int = e.time.toInt()
+                    override val time: Int = (e.time / 1000).toInt()
                 }
                 miraiMessage = messageSource.plus(miraiMessage)
                 if (member.id == bot.id) {
@@ -59,11 +59,7 @@ internal class GroupMessageListener(
                 } else {
                     bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
                     net.mamoe.mirai.event.events.GroupMessageEvent(
-                        member.nameCardOrNick, when (e.sender.role) {
-                            "owner" -> MemberPermission.OWNER
-                            "admin" -> MemberPermission.ADMINISTRATOR
-                            else -> MemberPermission.MEMBER
-                        }, member, miraiMessage, e.time.toInt()
+                        member.nameCardOrNick, member.permission, member, miraiMessage, messageSource.time
                     ).broadcast()
                 }
             }
@@ -114,7 +110,7 @@ internal class GroupMessageRecallListener(
 
 fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
     return (group as GroupWrapper).updateMember(
-        MemberWrapper(group.bot.asOnebot, group, GroupMemberInfoResp().also {
+        GroupMemberInfoResp().also {
             it.groupId = group.id
             it.userId = userId.toLong()
             it.nickname = nickname
@@ -125,7 +121,7 @@ fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
             it.level = level?.toIntOrNull() ?: 0
             it.role = role ?: "member"
             it.title = title ?: ""
-        })
+        }
     )
 }
 

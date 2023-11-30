@@ -46,12 +46,12 @@ internal class FriendMessageListener(
                     override val sender: Friend = friend
                     override val subject: Friend = friend
                     override val target: ContactOrBot = bot
-                    override val time: Int = e.time.toInt()
+                    override val time: Int = (e.time / 1000).toInt()
                 }
                 miraiMessage = messageSource.plus(miraiMessage)
                 bot.logger.verbose("${friend.remarkOrNick}(${friend.id}) -> $messageString")
                 FriendMessageEvent(
-                    friend, miraiMessage, e.time.toInt()
+                    friend, miraiMessage, messageSource.time
                 ).broadcast()
             }
             "group" -> {
