@@ -2,17 +2,20 @@ package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
+import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.FriendMessageEvent
+import net.mamoe.mirai.event.events.StrangerMessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.OnlineMessageSource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
+import top.mrxiaom.overflow.internal.contact.StrangerWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 
 fun EventBus.addFriendListeners(bot: BotWrapper) {
@@ -58,7 +61,30 @@ internal class FriendMessageListener(
                 TODO("群临时会话")
             }
             "other" -> {
-                TODO("其它")
+                val stranger = e.privateSender.wrapAsStranger(bot)
+
+                if (stranger.id == bot.id) {
+                    // TODO: 过滤自己发送的消息
+                    return
+                }
+                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
+                val messageString = miraiMessage.toString()
+                val messageSource = object : OnlineMessageSource.Incoming.FromStranger() {
+                    override val bot: Bot = this@FriendMessageListener.bot
+                    override val ids: IntArray = arrayOf(e.messageId).toIntArray()
+                    override val internalIds: IntArray = ids
+                    override val isOriginalMessageInitialized: Boolean = true
+                    override val originalMessage: MessageChain = miraiMessage
+                    override val sender: Stranger = stranger
+                    override val subject: Stranger = stranger
+                    override val target: ContactOrBot = bot
+                    override val time: Int = (e.time / 1000).toInt()
+                }
+                miraiMessage = messageSource.plus(miraiMessage)
+                bot.logger.verbose("${stranger.remarkOrNick}(${stranger.id}) -> $messageString")
+                StrangerMessageEvent(
+                    stranger, miraiMessage, messageSource.time
+                ).broadcast()
             }
         }
     }
@@ -70,4 +96,16 @@ fun PrivateMessageEvent.PrivateSender.wrapAsFriend(bot: BotWrapper): FriendWrapp
         it.nickname = nickname
         it.remark = ""
     }))
+}
+
+fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
+    return bot.updateStranger(StrangerWrapper(bot, StrangerInfoResp(
+        userId,
+        nickname,
+        "",
+        0,
+        "",
+        0,
+        0
+    )))
 }
