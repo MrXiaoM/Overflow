@@ -50,7 +50,7 @@ class MemberWrapper(
         get() = TODO("Not yet implemented")
     override val coroutineContext: CoroutineContext = CoroutineName("((Bot/${bot.id})Group/${group.id})Member/$id")
     override var nameCard: String
-        get() = impl.card
+        get() = impl.card ?: "Gensokyo - DefaultNameCard" // 给个默认值
         set(value) {
             Overflow.instance.launch {
                 botWrapper.impl.setGroupCard(impl.groupId, id, value)
