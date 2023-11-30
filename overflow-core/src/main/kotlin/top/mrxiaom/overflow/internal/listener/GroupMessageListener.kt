@@ -48,7 +48,7 @@ internal class GroupMessageListener(
                 } else {
                     bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
                     net.mamoe.mirai.event.events.GroupMessageEvent(
-                        e.sender.card, when (e.sender.role) {
+                        member.nameCardOrNick, when (e.sender.role) {
                             "owner" -> MemberPermission.OWNER
                             "admin" -> MemberPermission.ADMINISTRATOR
                             else -> MemberPermission.MEMBER
