@@ -2,6 +2,7 @@ package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
+import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.*
@@ -13,6 +14,13 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
+
+fun EventBus.addFriendListeners(bot: BotWrapper) {
+    listOf(
+        FriendMessageListener(bot),
+
+    ).forEach(::addListener)
+}
 
 internal class FriendMessageListener(
     val bot: BotWrapper

@@ -5,6 +5,7 @@ import cn.evole.onebot.sdk.event.message.GroupMessageEvent.GroupSender
 import cn.evole.onebot.sdk.event.notice.group.GroupMsgDeleteNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupNotifyNoticeEvent
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
+import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Group
@@ -21,6 +22,15 @@ import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
 import top.mrxiaom.overflow.internal.contact.MemberWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
+
+fun EventBus.addGroupListeners(bot: BotWrapper) {
+    listOf(
+        GroupMessageListener(bot),
+        GroupNotifyListener(bot),
+        GroupMessageRecallListener(bot),
+
+    ).forEach(::addListener)
+}
 
 internal class GroupMessageListener(
     val bot: BotWrapper

@@ -33,9 +33,7 @@ import top.mrxiaom.overflow.internal.contact.FriendWrapper
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
 import top.mrxiaom.overflow.internal.contact.StrangerWrapper
 import top.mrxiaom.overflow.internal.data.asMirai
-import top.mrxiaom.overflow.internal.listener.FriendMessageListener
-import top.mrxiaom.overflow.internal.listener.GroupMessageListener
-import top.mrxiaom.overflow.internal.listener.GroupNotifyListener
+import top.mrxiaom.overflow.internal.listener.*
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
@@ -153,9 +151,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
         val bot = botImpl.wrap()
 
-        dispatchers.addListener(FriendMessageListener(bot))
-        dispatchers.addListener(GroupMessageListener(bot))
-        dispatchers.addListener(GroupNotifyListener(bot))
+        dispatchers.addGroupListeners(bot)
+        dispatchers.addFriendListeners(bot)
+        
         BotOnlineEvent(bot).broadcast()
         return true
     }
