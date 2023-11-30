@@ -1,6 +1,7 @@
 package top.mrxiaom.overflow.internal.contact
 
 import cn.evole.onebot.sdk.response.group.GroupInfoResp
+import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
@@ -109,7 +110,12 @@ class GroupWrapper(
             updateMembers()
         }
     override val botAsMember: NormalMember
-        get() = members.first { it.id == bot.id }
+        get() = members.firstOrNull { it.id == bot.id } ?: runBlocking {
+            val data = botWrapper.impl.getGroupMemberInfo(id, bot.id, false).data
+            MemberWrapper(botWrapper, this@GroupWrapper, data ?: GroupMemberInfoResp(
+                id, bot.id, bot.nick, "", "", 0, "", 0, 0, 0, "member", false, "", 0, true
+            ))
+        }
     override val owner: NormalMember
         get() = members.first { it.permission == MemberPermission.OWNER }
     override val roamingMessages: RoamingMessages
