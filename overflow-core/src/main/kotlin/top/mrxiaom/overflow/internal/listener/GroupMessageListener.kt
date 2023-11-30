@@ -46,9 +46,10 @@ internal class GroupMessageListener(
                 if (member.id == bot.id) {
                     // TODO: 过滤自己发送的消息
                 } else {
+                    val fakeSenderCard = e.sender.card ?: "luanyao"
                     bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
                     net.mamoe.mirai.event.events.GroupMessageEvent(
-                        e.sender.card, when (e.sender.role) {
+                        fakeSenderCard, when (e.sender.role) {
                             "owner" -> MemberPermission.OWNER
                             "admin" -> MemberPermission.ADMINISTRATOR
                             else -> MemberPermission.MEMBER
