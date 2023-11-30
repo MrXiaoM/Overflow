@@ -55,20 +55,20 @@ class FriendWrapper(
         var throwable: Throwable? = null
         val receipt = kotlin.runCatching {
             val forward = messageChain.findForwardMessage()
-            val messageId = if (forward != null) {
+            val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
                 val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
-                response.data.messageId
+                response.data?.run { intArrayOf(messageId) } ?: IntArray(0)
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(messageChain)
                 val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
-                response.data.messageId
+                response.data?.run { intArrayOf(messageId) } ?: IntArray(0)
             }
 
             @Suppress("DEPRECATION_ERROR")
             MessageReceipt(object : OnlineMessageSource.Outgoing.ToFriend() {
                 override val bot: Bot = this@FriendWrapper.bot
-                override val ids: IntArray = arrayOf(messageId).toIntArray()
+                override val ids: IntArray = messageIds
                 override val internalIds: IntArray = ids
                 override val isOriginalMessageInitialized: Boolean = true
                 override val originalMessage: MessageChain = messageChain

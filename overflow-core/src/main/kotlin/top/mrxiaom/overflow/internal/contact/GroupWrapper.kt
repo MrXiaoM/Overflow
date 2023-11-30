@@ -141,19 +141,19 @@ class GroupWrapper(
         var throwable: Throwable? = null
         val receipt = kotlin.runCatching {
             val forward = messageChain.findForwardMessage()
-            val messageId = if (forward != null) {
+            val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
                 val response = botWrapper.impl.sendGroupForwardMsg(id, nodes)
-                response.data.messageId
+                response.data?.run { intArrayOf(messageId) } ?: IntArray(0)
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(messageChain)
                 val response = botWrapper.impl.sendGroupMsg(id, msg, false)
-                response.data.messageId
+                response.data?.run { intArrayOf(messageId) } ?: IntArray(0)
             }
             @Suppress("DEPRECATION_ERROR")
             MessageReceipt(object : OnlineMessageSource.Outgoing.ToGroup() {
                 override val bot: Bot = this@GroupWrapper.bot
-                override val ids: IntArray = arrayOf(messageId).toIntArray()
+                override val ids: IntArray = messageIds
                 override val internalIds: IntArray = ids
                 override val isOriginalMessageInitialized: Boolean = true
                 override val originalMessage: MessageChain = messageChain
