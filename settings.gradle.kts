@@ -5,7 +5,7 @@ pluginManagement {
     }
     
 }
-rootProject.name = "overflow"
+rootProject.name = "Overflow"
 
 include(":onebot")
 include(":overflow-core-api")
