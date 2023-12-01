@@ -2,6 +2,7 @@ package top.mrxiaom.overflow.contact
 
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.message.data.MessageChain
 import kotlin.jvm.Throws
 
 interface RemoteBot {
@@ -15,6 +16,13 @@ interface RemoteBot {
      */
     @JvmBlockingBridge
     suspend fun executeAction(actionPath: String, params: String?): String
+
+    /**
+     * 通过消息id获取消息，并反序列化为 mirai 格式消息
+     * @param messageId 消息id
+     */
+    @JvmBlockingBridge
+    suspend fun getMsg(messageId: Int): MessageChain?
 
     companion object {
         /**

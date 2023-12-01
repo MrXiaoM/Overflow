@@ -4,6 +4,7 @@ import cn.evole.onebot.sdk.response.group.GroupInfoResp
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
+import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.contact.active.GroupActive
@@ -21,6 +22,7 @@ import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
+import top.mrxiaom.overflow.contact.RemoteGroup
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
@@ -36,7 +38,7 @@ import kotlin.coroutines.CoroutineContext
 class GroupWrapper(
     val botWrapper: BotWrapper,
     internal var impl: GroupInfoResp
-) : Group, Updatable {
+) : Group, RemoteGroup, Updatable {
     private var membersInternal: ContactList<MemberWrapper>? = null
     private var announcementsInternal: AnnouncementsWrapper? = null
 
@@ -54,8 +56,9 @@ class GroupWrapper(
         }
     }
 
-    internal suspend fun updateMembers(): ContactList<MemberWrapper> {
-        return (membersInternal ?: ContactList<MemberWrapper>()).apply {
+    @JvmBlockingBridge
+    override suspend fun updateGroupMemberList(): ContactList<MemberWrapper> {
+        return (membersInternal ?: ContactList()).apply {
             val data = botWrapper.impl.getGroupMemberList(id).data ?: return@apply
             update(data.map {
                 MemberWrapper(botWrapper, this@GroupWrapper, it)
@@ -107,7 +110,7 @@ class GroupWrapper(
         set(value) { impl.groupName = value }
     override val members: ContactList<NormalMember>
         get() = membersInternal ?: runBlocking {
-            updateMembers()
+            updateGroupMemberList()
         }
     override val botAsMember: NormalMember
         get() = members.firstOrNull { it.id == bot.id } ?: runBlocking {

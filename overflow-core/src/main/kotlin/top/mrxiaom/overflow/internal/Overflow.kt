@@ -26,7 +26,7 @@ import net.mamoe.mirai.utils.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import top.mrxiaom.overflow.BuildConstants
-import top.mrxiaom.overflow.contact.OverflowAPI
+import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
@@ -164,8 +164,6 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override fun serializeMessage(message: Message): String = OnebotMessages.serializeToOneBotJson(message)
     @JvmBlockingBridge
     override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain = OnebotMessages.deserializeFromOneBot(bot, message, null)
-    @JvmBlockingBridge
-    override suspend fun updateGroupMemberList(group: Group): ContactList<NormalMember> = (group as? GroupWrapper)?.updateMembers() ?: ContactList()
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
         TODO("Not yet implemented")
     }

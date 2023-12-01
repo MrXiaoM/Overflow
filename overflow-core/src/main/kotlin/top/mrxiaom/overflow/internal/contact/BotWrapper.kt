@@ -13,6 +13,7 @@ import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.internal.network.components.EventDispatcher
 import net.mamoe.mirai.internal.network.components.EventDispatcherImpl
+import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.supervisorJob
 import net.mamoe.mirai.utils.*
 import org.java_websocket.framing.CloseFrame
@@ -21,6 +22,7 @@ import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.data.FriendInfoImpl
 import top.mrxiaom.overflow.internal.data.StrangerInfoImpl
+import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.utils.LoggerInFolder
 import top.mrxiaom.overflow.internal.utils.asCoroutineExceptionHandler
 import top.mrxiaom.overflow.internal.utils.subLogger
@@ -78,6 +80,13 @@ class BotWrapper private constructor(
         return ((strangers[stranger.id] as? StrangerWrapper) ?: stranger.also { strangersInternal.delegate.add(it) }).apply {
             impl = stranger.impl
         }
+    }
+    @JvmBlockingBridge
+    override suspend fun getMsg(messageId: Int): MessageChain? {
+        val bot = (net.mamoe.mirai.Bot.instances.firstOrNull() as? BotWrapper) ?: return null
+        val data = bot.impl.getMsg(messageId).data ?: return null
+        if (data.message == null) return null
+        return OnebotMessages.deserializeFromOneBot(bot, data.message)
     }
 
     override val id: Long = loginInfo.userId
