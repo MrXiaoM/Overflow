@@ -116,6 +116,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 warning("你的 mirai-console 中已安装签名服务!")
                 warning("这在 overflow 中是不必要的，请移除签名服务相关插件")
                 warning("当前已装载签名服务: ${it::class.jvmName}")
+                warning("类加载器名称: ${it::class.java.classLoader.name}")
                 warning("-------------------------------------------")
             }
         }
