@@ -3,8 +3,11 @@ package top.mrxiaom.overflow.internal.plugin
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.console.ConsoleFrontEndImplementation
+import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
+import net.mamoe.mirai.console.extensions.PostStartupExtension
 import net.mamoe.mirai.console.permission.Permission
 import net.mamoe.mirai.console.permission.PermissionId
 import net.mamoe.mirai.console.plugin.Plugin
@@ -21,8 +24,9 @@ import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.utils.LoggerInFolder
 import java.io.File
+import kotlin.reflect.jvm.jvmName
 
-@Suppress("PluginMainServiceNotConfigured")
+@Suppress("PluginMainServiceNotConfigured", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     override val isEnabled: Boolean get() = true
 
@@ -35,14 +39,21 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
         return ConsoleCommandOwner.permissionId(name)
     }
 
-    @OptIn(ConsoleExperimentalApi::class)
-    @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+    fun net.mamoe.mirai.console.internal.extension.AbstractConcurrentComponentStorage.contributePostStartupExtension(
+        instance: PostStartupExtension
+    ): Unit = contribute(PostStartupExtension, this@OverflowCoreAsPlugin, lazyInstance = { instance })
+
+    @OptIn(ConsoleExperimentalApi::class, ConsoleFrontEndImplementation::class)
     suspend fun onEnable() {
         val miraiLogger = LoggerInFolder(Overflow::class, "Onebot", File("logs/onebot"), 1.weeksToMillis)
-        val logger = net.mamoe.mirai.console.internal.logging.externalbind.slf4j.SLF4JAdapterLogger(miraiLogger)
+        val oneBotLogger = net.mamoe.mirai.console.internal.logging.externalbind.slf4j.SLF4JAdapterLogger(miraiLogger)
+
+        MiraiConsoleImplementation.getBridge().globalComponentStorage.contributePostStartupExtension {
+            onPostStartup()
+        }
 
         OnebotMessages.registerSerializers()
-        Overflow.instance.start(true, logger)
+        Overflow.instance.start(true, oneBotLogger)
 
         // keep a command register example here
 
@@ -54,7 +65,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             @SubCommand
             @Description("重新连接 Onebot")
             suspend fun CommandSender.reconnect() {
-                if (Bot.instances.isEmpty()) Overflow.instance.start(true, logger)
+                if (Bot.instances.isEmpty()) Overflow.instance.start(true, oneBotLogger)
                 else Bot.instances.forEach {
                     it.asOnebot.impl.channel.reconnectBlocking()
                 }
@@ -95,6 +106,19 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 sendMessage("消息发送成功")
             }
         }.register()
+    }
+
+    @Suppress("DEPRECATION_ERROR")
+    fun onPostStartup() {
+        net.mamoe.mirai.internal.spi.EncryptService.factory?.also {
+            Overflow.logger.apply {
+                warning("-------------------------------------------")
+                warning("你的 mirai-console 中已安装签名服务!")
+                warning("这在 overflow 中是不必要的，请移除签名服务相关插件")
+                warning("当前已装载签名服务: ${it::class.jvmName}")
+                warning("-------------------------------------------")
+            }
+        }
     }
 
     internal object TheLoader : PluginLoader<Plugin, PluginDescription> {
