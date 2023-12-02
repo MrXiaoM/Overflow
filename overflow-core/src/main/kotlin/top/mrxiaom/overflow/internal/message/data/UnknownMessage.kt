@@ -22,7 +22,7 @@ data class UnknownMessage(
         logFile.createFileIfNotExists()
         logFile.appendText("${currentTime()} I/UnknownMessage: ${contentToString()}\n")
     }
-    
+
     override fun contentToString(): String {
         data.toString()
         return "[overflow,unknown:$type,${Json.encodeToString(data)}]"

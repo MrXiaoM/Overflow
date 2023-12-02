@@ -1,3 +1,4 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
 import cn.evole.onebot.sdk.response.misc.ClientsResp
@@ -8,7 +9,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.message.data.WrappedVideo
-import top.mrxiaom.overflow.internal.utils.ResourceUtils.toBase64File
+import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)
@@ -30,7 +31,7 @@ class OtherClientWrapper(
         video: ExternalResource,
         fileName: String?
     ): ShortVideo {
-        return WrappedVideo(video.toBase64File())
+        return WrappedVideo(FileService.instance!!.upload(video))
     }
 
 }

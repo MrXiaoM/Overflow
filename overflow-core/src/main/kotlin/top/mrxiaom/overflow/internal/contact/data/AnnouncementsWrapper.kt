@@ -1,3 +1,4 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact.data
 
 import kotlinx.coroutines.flow.Flow
@@ -9,7 +10,7 @@ import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
 import top.mrxiaom.overflow.internal.utils.FastImageInfo
-import top.mrxiaom.overflow.internal.utils.ResourceUtils.toBase64File
+import top.mrxiaom.overflow.spi.FileService
 
 class AnnouncementsWrapper(
     val impl: GroupWrapper,
@@ -49,7 +50,7 @@ class AnnouncementsWrapper(
 
     override suspend fun uploadImage(resource: ExternalResource): AnnouncementImage {
         val size = FastImageInfo(resource.inputStream())
-        return AnnouncementImage.create("\n${resource.toBase64File()}\n", size?.height ?: 0, size?.width ?: 0)
+        return AnnouncementImage.create("\n${FileService.instance!!.upload(resource)}\n", size?.height ?: 0, size?.width ?: 0)
     }
 
     companion object {

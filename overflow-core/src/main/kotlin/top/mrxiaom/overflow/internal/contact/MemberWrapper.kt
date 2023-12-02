@@ -1,3 +1,4 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
@@ -22,7 +23,7 @@ import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.WrappedVideo
-import top.mrxiaom.overflow.internal.utils.ResourceUtils.toBase64File
+import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
 class MemberWrapper(
@@ -131,7 +132,7 @@ class MemberWrapper(
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {
-        return Image.fromId(resource.toBase64File())
+        return Image.fromId(FileService.instance!!.upload(resource))
     }
 
     override suspend fun uploadShortVideo(
@@ -139,6 +140,6 @@ class MemberWrapper(
         video: ExternalResource,
         fileName: String?
     ): ShortVideo {
-        return WrappedVideo(video.toBase64File())
+        return WrappedVideo(FileService.instance!!.upload(video))
     }
 }
