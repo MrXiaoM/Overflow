@@ -116,7 +116,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 warning("你的 mirai-console 中已安装签名服务!")
                 warning("这在 overflow 中是不必要的，请移除签名服务相关插件")
                 warning("当前已装载签名服务: ${it::class.jvmName}")
-                warning("类加载器名称: ${it::class.java.classLoader.name}")
+                warning("位置: ${it::class.java.classLoader}")
                 warning("-------------------------------------------")
             }
         }
@@ -151,10 +151,9 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
         override val id: String get() = "top.mrxiaom.overflow"
         override val name: String get() = "溢出核心"
         override val author: String get() = "MrXiaoM"
-        override val version: SemVersion get() = SemVersion(BuildConstants.VERSION)
+        override val version: SemVersion get() = SemVersion("${BuildConstants.VERSION}-${BuildConstants.COMMIT_HASH.chunked(6)[0]}")
         override val info: String get() = ""
         override val dependencies: Set<PluginDependency> get() = setOf()
-
 
         override fun toString(): String {
             return "PluginDescription[ overflow-core ]"
