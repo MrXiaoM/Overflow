@@ -13,6 +13,7 @@ fun Project.setupMavenCentralPublication(artifactsBlock: MavenPublication.() -> 
     extensions.configure(PublishingExtension::class) {
         publications {
             create<MavenPublication>("mavenRelease") {
+                from(components.getByName("kotlin"))
                 groupId = rootProject.group.toString()
                 artifactId = project.name
                 version = rootProject.version.toString()

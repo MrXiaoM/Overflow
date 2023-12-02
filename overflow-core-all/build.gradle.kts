@@ -4,7 +4,6 @@ plugins {
 }
 
 setupMavenCentralPublication {
-    artifact(tasks.jar)
     artifact(tasks.shadowJar)
     artifact(tasks.kotlinSourcesJar)
 }
