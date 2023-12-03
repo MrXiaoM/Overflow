@@ -1,4 +1,4 @@
-# Overflow 用户手册与开发手册
+# Overflow 用户手册
 
 Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实现使 mirai 在Bot协议寒冬中续命。
 
@@ -112,18 +112,7 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 
 若使用 OpenShamrock，另请参见 [overflow-shamrock-ext](https://github.com/project-tRNA/overflow-shamrock-ext)
 
-为减少运行内存占用，你可以使用以下方法
-
-```kotlin
-val image = OverflowAPI.get().imageFromFile("https://xxxxx")
-val audio = OverflowAPI.get().audioFromFile("https://xxxxx")
-val video = OverflowAPI.get().videoFromFile("https://xxxxx")
-
-// 其中的链接与 Onebot 的 file 参数相同，有三种格式
-// 本地文件: file:///path/file
-// 网络文件: http(s)://xxxx
-// Base64: base64://b3ZlcmZsb3c=
-```
+[开发者上传资源解决方案](/docs/dev/README/md#资源相关消息说明)
 
 # JVM 参数
 
