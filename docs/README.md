@@ -91,7 +91,7 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 | 猜拳        | RockPaperScissors | rps     | ❌   | ✅   |
 | 骰子        | Dice              | dice    | ❌   | ✅   |
 | 戳一戳(手指动画) | PokeMessage       | poke    | ✅   | ✅   |
-| 音乐分享      | MusicShare        | music   | ❌   | ✅   |
+| 音乐分享      | MusicShare        | music   | *✅* | ✅   |
 | 引用回复      | QuoteReply        | quote   | ✅   | ✅   |
 | 小程序       | LightApp          | json    | ✅   | ✅   |
 | XML消息     | ServiceMessage    | xml     | ✅   | ✅   |
@@ -100,7 +100,7 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 ## 不支持消息相关说明
 * 猜拳 类型无法获取其数值（石头、剪刀、布），接收消息没有意义
 * 骰子 同上
-* 音乐分享 返回的消息有可能没有音乐链接，与 mirai 相差较大
+* 音乐分享 返回的消息有可能没有音乐链接，与 mirai 相差较大，目前仅支持网易云和QQ音乐
 * 转发消息 无法使用转发消息ID从Shamrock正常下载转发消息，暂未测试
 
 ## 资源相关消息说明
