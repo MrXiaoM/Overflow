@@ -149,8 +149,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
         val dispatchers = ws.createEventBus()
         val botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
+        val versionInfo = botImpl.getVersionInfo()
+        OnebotMessages.appName = versionInfo.optJSONObject("data").get("app_name").asString.trim().lowercase()
         if (printInfo) {
-            logger.info("服务端版本信息\n${botImpl.getVersionInfo().toPrettyString()}")
+            logger.info("服务端版本信息\n${versionInfo.toPrettyString()}")
         }
         val bot = botImpl.wrap()
 

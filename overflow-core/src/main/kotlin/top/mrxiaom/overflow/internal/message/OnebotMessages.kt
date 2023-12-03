@@ -22,6 +22,7 @@ import java.net.URL
  * - 音乐分享 (music/[MusicShare])
  */
 object OnebotMessages {
+    internal var appName = "onebot"
     @OptIn(MiraiExperimentalApi::class)
     internal fun registerSerializers() = MessageSerializers.apply {
         registerSerializer(WrappedAudio::class, WrappedAudio.serializer())
@@ -138,7 +139,7 @@ object OnebotMessages {
                 val data = obj["data"]?.jsonObject ?: buildJsonObject {  }
                 when (type) {
                     "text" -> add(data["text"].string)
-                    "face" -> add(Face(data["id"]!!.jsonPrimitive.int))
+                    "face" -> add(Face(data["id"].int))
                     "image" -> {
                         val image = imageFromFile((data["url"] ?: data["file"]).string)
                         if (data["type"].string == "flash") {
@@ -151,10 +152,11 @@ object OnebotMessages {
                     "video" -> add(videoFromFile(data["file"].string))
                     "at" -> add(At(data["qq"]!!.jsonPrimitive.long))
                     // TODO "rps" "dice" 无法通过 OneBot 获取其具体值，先搁置
+                    "new_dice" -> add(Dice(data["id"].int))
                     "poke" -> add(PokeMessage(
                         data["name"].string,
-                        data["type"]!!.jsonPrimitive.int,
-                        data["id"]!!.jsonPrimitive.int
+                        data["type"].int,
+                        data["id"].int
                     ))
                     "music" -> {
                         val id = data["id"].string
@@ -183,7 +185,7 @@ object OnebotMessages {
                     "json" -> add(LightApp(data["data"].string))
 
                     "reply" -> {
-                        val id = data["id"]!!.jsonPrimitive.int
+                        val id = data["id"].int
                         val msgData = bot.asOnebot.impl.getMsg(id).data
                         val msgSource = MessageSourceBuilder()
                             .id(id)
@@ -268,7 +270,12 @@ object OnebotMessages {
             is ShortVideo -> "video"
             is At -> "at"
             is RockPaperScissors -> "rps"
-            is Dice -> "dice"
+            is Dice -> {
+                when (appName) {
+                    "shamrock" -> "new_dice"
+                    else -> "dice"
+                }
+            }
             is PokeMessage -> "poke"
             //is ServiceMessage -> "share"
             // 推荐好友/推荐群 contact
