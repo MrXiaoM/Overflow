@@ -46,7 +46,7 @@ val Bot.asOnebot: BotWrapper
     get() = this as? BotWrapper ?: throw IllegalStateException("Bot 非 Overflow 实现")
 fun ActionRaw.check(failMsg: String): Boolean {
     if (retCode != 0) {
-        Overflow.logger.warning("$failMsg, static=$status, retCode=$retCode, echo=$echo")
+        Overflow.logger.warning("$failMsg, status=$status, retCode=$retCode, echo=$echo")
     }
     return retCode == 0
 }
@@ -100,6 +100,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         @JvmStatic
         @get:JvmName("getInstance")
         val instance: Overflow get() = _instance
+
+        @JvmStatic
+        val version = "${BuildConstants.VERSION}-${BuildConstants.COMMIT_HASH.chunked(6)[0]}"
     }
 
     init {
@@ -127,7 +130,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     @JvmBlockingBridge
     suspend fun start(printInfo: Boolean = false, logger: Logger = LoggerFactory.getLogger("Onebot")): Boolean {
         if (printInfo) {
-            logger.info("Overflow v${BuildConstants.VERSION} 正在运行")
+            logger.info("Overflow v$version 正在运行")
             logger.info("连接到 WebSocket: ${config.wsHost}")
         }
 

@@ -151,7 +151,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
         override val id: String get() = "top.mrxiaom.overflow"
         override val name: String get() = "溢出核心"
         override val author: String get() = "MrXiaoM"
-        override val version: SemVersion get() = SemVersion("${BuildConstants.VERSION}-${BuildConstants.COMMIT_HASH.chunked(6)[0]}")
+        override val version: SemVersion get() = SemVersion(Overflow.version)
         override val info: String get() = ""
         override val dependencies: Set<PluginDependency> get() = setOf()
 
