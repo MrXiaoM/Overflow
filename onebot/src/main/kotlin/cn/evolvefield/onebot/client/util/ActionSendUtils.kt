@@ -45,8 +45,8 @@ class ActionSendUtils(
             }.onFailure { resp.cancel() }.getOrThrow()
         }
         if (resp.optString("status") == "failed") {
-            val action = req["action"]?.asString ?: "unknown"
-            throw IllegalStateException("[$action] ${resp.optString("message")}")
+            val ret = resp.optInt("retcode").takeIf { it == 0 }?.run { ", retcode=$this" } ?: ""
+            throw ActionFailedException("${resp.optString("message")}$ret", resp)
         }
         return resp
         //synchronized(this) { this.wait(requestTimeout) }

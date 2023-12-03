@@ -2,6 +2,7 @@ package cn.evolvefield.onebot.client.handler
 
 import cn.evole.onebot.sdk.action.ActionPath
 import cn.evole.onebot.sdk.util.json.JsonsObject
+import cn.evolvefield.onebot.client.util.ActionFailedException
 import cn.evolvefield.onebot.client.util.ActionSendUtils
 import com.google.gson.JsonObject
 import org.java_websocket.WebSocket
@@ -54,21 +55,24 @@ class ActionHandler(
             return JsonsObject(JsonObject().apply {
                 addProperty("status", "failed")
                 addProperty("retcode", -1)
+                addProperty("message", "WebSocket channel is not opened")
             })
         }
         val reqJson = generateReqJson(action, params)
         val actionSendUtils = ActionSendUtils(logger, channel, 10000L)
-        apiCallbackMap[reqJson["echo"].asString] = actionSendUtils
-        val result: JsonsObject = try {
+        val echo = reqJson["echo"].asString
+        apiCallbackMap[echo] = actionSendUtils
+        return try {
             actionSendUtils.send(reqJson)
         } catch (e: Exception) {
-            logger.warn("Request failed: [${action.path}] ${e.message}")
-            JsonsObject(JsonObject().apply {
+            logger.warn("Request failed: [${action.path}, echo=$echo] ${e.message}")
+            if (e is ActionFailedException) e.json
+            else JsonsObject(JsonObject().apply {
                 addProperty("status", "failed")
                 addProperty("retcode", -1)
+                addProperty("message", e.message ?: "")
             })
         }
-        return result
     }
 
     /**
