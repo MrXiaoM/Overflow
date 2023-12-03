@@ -110,6 +110,8 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 这是目前我能想到的最容易兼容所有 Onebot 实现的方法，  
 但是这有一个很明显的缺点，资源以Base64字符串形式存在变量里，难以释放。  
 
+若使用 OpenShamrock，另请参见 [overflow-shamrock-ext](https://github.com/project-tRNA/overflow-shamrock-ext)
+
 为减少运行内存占用，你可以使用以下方法
 
 ```kotlin
