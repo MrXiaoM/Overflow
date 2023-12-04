@@ -1,4 +1,6 @@
 <div align="center">
+  <a href="https://github.com/MrXiaoM/Overflow/discussions" target="_blank"><img width="100%" src="/docs/header.webp"/></a>
+
   <h1>Overflow WIP</h1>
   
   欢迎回到 mirai
