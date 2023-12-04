@@ -2,7 +2,7 @@
 
 Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实现使 mirai 在Bot协议寒冬中续命。
 
-文档有点乱，凑合着看吧，后续会整理。
+要运行或开发 Overflow，至少需要的 Java 版本为 8 或以上。
 
 # 快速开始-使用者
 
@@ -54,7 +54,7 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 创建 `libs` 文件夹，将以上内容放入该文件夹。  
 创建启动脚本，`start.cmd`(Windows) 或 `start.sh`(Linux/MacOS)，按需写入以下内容。
 
-`start.cmd` (Windows) 如下
+`start.cmd`(Windows) 如下
 ```shell
 java -cp ./libs/* net.mamoe.mirai.console.terminal.MiraiConsoleTerminalLoader
 pause
