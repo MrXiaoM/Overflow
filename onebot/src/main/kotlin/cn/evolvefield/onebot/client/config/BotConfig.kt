@@ -33,7 +33,4 @@ class BotConfig(
      * 重连间隔
      */
     val maxReconnectAttempts: Int = 20,
-) {
-    constructor(url: String) : this(url, "", 0, false, false, true, 20)
-    constructor(url: String, botId: Long) : this(url, "", botId, false, true, true, 20)
-}
+)
