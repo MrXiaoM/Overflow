@@ -1,22 +1,7 @@
 package top.mrxiaom.overflow.internal.utils
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonNull
-import net.mamoe.mirai.utils.CheckableResponseA
 import net.mamoe.mirai.utils.ExternalResource
-import net.mamoe.mirai.utils.JsonStruct
-import net.mamoe.mirai.utils.loadAs
-import top.mrxiaom.overflow.internal.contact.BotWrapper
 import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
-import java.net.URLEncoder
 import java.util.*
 
 fun ExternalResource.toBase64File(): String {

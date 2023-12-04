@@ -2,7 +2,6 @@ package cn.evolvefield.onebot.client.util
 
 import cn.evole.onebot.sdk.util.json.JsonsObject
 import com.google.gson.JsonObject
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.sync.Mutex
@@ -10,7 +9,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
 import org.java_websocket.WebSocket
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 /**
  * Description:

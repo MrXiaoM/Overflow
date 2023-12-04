@@ -6,20 +6,16 @@ import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.util.ActionSendUtils
 import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.java_websocket.WebSocket
-import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ClientHandshake
-import org.java_websocket.handshake.ServerHandshake
 import org.java_websocket.server.WebSocketServer
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
-import java.net.URI
-import kotlin.coroutines.CoroutineContext
 
 /**
  * Project: onebot-client

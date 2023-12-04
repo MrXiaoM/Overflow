@@ -7,8 +7,6 @@ import cn.evolvefield.onebot.client.util.ActionSendUtils
 import com.google.gson.JsonObject
 import org.java_websocket.WebSocket
 import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import java.net.ConnectException
 
 /**
  * Description:

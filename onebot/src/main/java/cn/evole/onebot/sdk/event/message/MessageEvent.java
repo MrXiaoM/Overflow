@@ -1,16 +1,11 @@
 package cn.evole.onebot.sdk.event.message;
 
-import cn.evole.onebot.sdk.entity.MsgChainBean;
 import cn.evole.onebot.sdk.event.Event;
-import com.google.gson.JsonArray;
-import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.util.List;
 
 /**
  * @author cnlimiter

@@ -4,15 +4,11 @@ package top.mrxiaom.overflow.internal.message.data
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.contact.Group
-import net.mamoe.mirai.contact.User
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.ImageType
 import net.mamoe.mirai.message.data.InternalImageProtocol
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.cast
-import net.mamoe.mirai.utils.toUHexString
 
 @OptIn(MiraiInternalApi::class)
 internal class WrappedImageProtocol : InternalImageProtocol {

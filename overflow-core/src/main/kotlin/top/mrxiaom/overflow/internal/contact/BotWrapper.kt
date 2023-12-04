@@ -17,9 +17,9 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.supervisorJob
 import net.mamoe.mirai.utils.*
 import org.java_websocket.framing.CloseFrame
-import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.contact.Updatable
+import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.data.FriendInfoImpl
 import top.mrxiaom.overflow.internal.data.StrangerInfoImpl
 import top.mrxiaom.overflow.internal.message.OnebotMessages
