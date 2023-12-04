@@ -86,46 +86,9 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 
 **反向WebSocket当前为实验性功能，可能存在问题，勿投入生产环境使用。**
 
-# 已实现消息类型
+# 项目进度相关说明
 
-> ✅ - 支持  
-> ❌ - 不支持  
-> ❔ - 未知
-
-| 消息类型      | mirai             | Onebot  | 接收  | 发送  |
-|-----------|-------------------|---------|-----|-----|
-| 纯文本       | PlainText         | text    | ✅   | ✅   |
-| 自带表情      | Face              | face    | ✅   | ✅   |
-| 图片        | Image             | image   | ✅   | ✅   |
-| 闪照        | FlashImage        | image   | ✅   | ✅   |
-| 语音        | Audio             | record  | ✅   | ✅   |
-| 短视频       | ShortVideo        | video   | ✅   | ✅   |
-| `@`       | At                | at      | ✅   | ✅   |
-| 猜拳        | RockPaperScissors | rps     | ❌   | ✅   |
-| 骰子        | Dice              | dice    | *❌* | ✅   |
-| 戳一戳(手指动画) | PokeMessage       | poke    | ✅   | ✅   |
-| 音乐分享      | MusicShare        | music   | *✅* | ✅   |
-| 引用回复      | QuoteReply        | quote   | ✅   | ✅   |
-| 小程序       | LightApp          | json    | ✅   | ✅   |
-| XML消息     | ServiceMessage    | xml     | ✅   | ✅   |
-| 转发消息      | ForwardMessage    | forward | ❔   | ❔   |
-
-## 不支持消息相关说明
-* 猜拳 类型无法获取其数值（石头、剪刀、布），接收消息没有意义
-* 骰子 同上，当连接实例为 OpenShamrock 时，将会使用 new_dice 消息类型收发消息。
-* 音乐分享 返回的消息有可能没有音乐链接，与 mirai 相差较大，目前仅支持网易云和QQ音乐
-* 转发消息 无法使用转发消息ID从Shamrock正常下载转发消息，暂未测试
-
-## 资源相关消息说明
-
-任何需要上传的消息 (图片、语音、视频)，由于 Onebot 没有资源上传概念，  
-上传行为将会变成使用`base64`进行编码保存到消息实例中，发送消息时直接调用。  
-这是目前我能想到的最容易兼容所有 Onebot 实现的方法，  
-但是这有一个很明显的缺点，资源以Base64字符串形式存在变量里，难以释放。  
-
-若使用 OpenShamrock，另请参见 [overflow-shamrock-ext](https://github.com/project-tRNA/overflow-shamrock-ext)
-
-[开发者上传资源解决方案](/docs/dev/README.md#资源相关消息说明)
+另请参见 [Overflow 项目进度](progress.md)
 
 # JVM 参数
 

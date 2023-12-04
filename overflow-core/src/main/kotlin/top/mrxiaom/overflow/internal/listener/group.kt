@@ -98,6 +98,6 @@ internal class GroupMessageRecallListener(
             (e.time / 1000).toInt(),
             operator, group,
             group.botAsMember // TODO: Onebot 无法获取被撤回消息的发送者
-        )
+        ).broadcast()
     }
 }
