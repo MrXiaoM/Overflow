@@ -104,6 +104,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
         @JvmStatic
         val version = "${BuildConstants.VERSION}-${BuildConstants.COMMIT_HASH.chunked(6)[0]}"
+
+        private val isNotExit by lazy {
+            !System.getProperty("overflow.not-exit").isNullOrBlank()
+        }
     }
 
     init {
@@ -150,9 +154,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             if (ws == null) {
                 if (printInfo) {
                     logger.error("未连接到 Onebot")
-                    if (System.getProperty("overflow.not-exit").isNullOrBlank()) {
-                        exitProcess(1)
-                    }
+                    if (!isNotExit) exitProcess(1)
                 }
                 return false
             }
@@ -163,9 +165,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             if (ws == null) {
                 if (printInfo) {
                     logger.error("未连接到 Onebot")
-                    if (System.getProperty("overflow.not-exit").isNullOrBlank()) {
-                        exitProcess(1)
-                    }
+                    if (!isNotExit) exitProcess(1)
+
                 }
                 return false
             }
@@ -173,7 +174,14 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
         }
         val versionInfo = botImpl.getVersionInfo()
-        OnebotMessages.appName = versionInfo.optJSONObject("data").get("app_name").asString.trim().lowercase()
+        OnebotMessages.appName = (versionInfo.optJSONObject("data").get("app_name")?.asString ?: "onebot").trim().lowercase()
+        if (!botImpl.channel.isOpen) {
+            if (printInfo) {
+                logger.error("未连接到 Onebot")
+                if (!isNotExit) exitProcess(1)
+            }
+            return false
+        }
         if (printInfo) {
             logger.info("服务端版本信息\n${versionInfo.toPrettyString()}")
         }
