@@ -1,8 +1,6 @@
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
-import cn.evole.onebot.sdk.response.contact.FriendInfoResp
-import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.Bot
@@ -14,9 +12,8 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.OnlineMessageSource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.contact.BotWrapper
-import top.mrxiaom.overflow.internal.contact.FriendWrapper
-import top.mrxiaom.overflow.internal.contact.StrangerWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.utils.*
 
 fun EventBus.addFriendListeners(bot: BotWrapper) {
     listOf(
@@ -88,24 +85,4 @@ internal class FriendMessageListener(
             }
         }
     }
-}
-
-fun PrivateMessageEvent.PrivateSender.wrapAsFriend(bot: BotWrapper): FriendWrapper {
-    return bot.updateFriend(FriendWrapper(bot, FriendInfoResp().also {
-        it.userId = userId
-        it.nickname = nickname
-        it.remark = ""
-    }))
-}
-
-fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
-    return bot.updateStranger(StrangerWrapper(bot, StrangerInfoResp(
-        userId,
-        nickname,
-        "",
-        0,
-        "",
-        0,
-        0
-    )))
 }

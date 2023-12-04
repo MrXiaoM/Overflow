@@ -29,12 +29,11 @@ import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper.Companion.fetchEssences
-import top.mrxiaom.overflow.internal.listener.wrapAsMember
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.WrappedAudio
 import top.mrxiaom.overflow.internal.message.data.WrappedVideo
-import top.mrxiaom.overflow.internal.utils.update
+import top.mrxiaom.overflow.internal.utils.*
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 

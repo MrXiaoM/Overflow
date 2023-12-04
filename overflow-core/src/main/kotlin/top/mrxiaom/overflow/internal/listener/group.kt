@@ -1,27 +1,21 @@
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
-import cn.evole.onebot.sdk.event.message.GroupMessageEvent.GroupSender
 import cn.evole.onebot.sdk.event.notice.group.GroupMsgDeleteNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupNotifyNoticeEvent
-import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.Member
-import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.MessageRecallEvent
 import net.mamoe.mirai.event.events.NudgeEvent
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiInternalApi
-import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.contact.BotWrapper
-import top.mrxiaom.overflow.internal.contact.GroupWrapper
-import top.mrxiaom.overflow.internal.contact.MemberWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.utils.*
 
 fun EventBus.addGroupListeners(bot: BotWrapper) {
     listOf(
@@ -105,31 +99,5 @@ internal class GroupMessageRecallListener(
             operator, group,
             group.botAsMember // TODO: Onebot 无法获取被撤回消息的发送者
         )
-    }
-}
-
-fun GroupMemberInfoResp.wrapAsMember(group: Group): MemberWrapper {
-    return (group as GroupWrapper).updateMember(this)
-}
-
-fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
-    return GroupMemberInfoResp().also {
-        it.groupId = group.id
-        it.userId = userId.toLong()
-        it.nickname = nickname
-        it.card = card ?: ""
-        it.sex = sex ?: ""
-        it.age = age ?: 0
-        it.area = area ?: ""
-        it.level = level?.toIntOrNull() ?: 0
-        it.role = role ?: "member"
-        it.title = title ?: ""
-    }.wrapAsMember(group)
-}
-
-private suspend fun BotWrapper.group(groupId: Long): Group {
-    return getGroup(groupId) ?: kotlin.run {
-        val data = impl.getGroupInfo(groupId, false).data ?: throw IllegalStateException("无法取得群信息")
-        updateGroup(GroupWrapper(this, data))
     }
 }
