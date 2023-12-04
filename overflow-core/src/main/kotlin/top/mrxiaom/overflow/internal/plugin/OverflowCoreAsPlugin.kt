@@ -18,6 +18,7 @@ import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.weeksToMillis
+import org.java_websocket.client.WebSocketClient
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.asOnebot
@@ -67,7 +68,8 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             suspend fun CommandSender.reconnect() {
                 if (Bot.instances.isEmpty()) Overflow.instance.start(true, oneBotLogger)
                 else Bot.instances.forEach {
-                    it.asOnebot.impl.channel.reconnectBlocking()
+                    // TODO: WebSocketServer
+                    (it.asOnebot.impl.channel as? WebSocketClient)?.reconnectBlocking()
                 }
                 sendMessage("重新连接执行完成")
             }
