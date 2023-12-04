@@ -6,7 +6,7 @@
 - [ ] 群设置
 - [x] 消息回执的转换 Onebot -> Mirai
 - [x] 群精华消息 (OpenShamrock: /set_essence_msg)
-- [ ] 获取群精华消息 (OpenShamrock: /get_essence_msg_list)
+- [x] 获取群精华消息 (OpenShamrock: /get_essence_msg_list)
 - [x] 群公告 (OpenShamrock: /_get_group_notice)
 - [x] 联系人的持久化与新的数据更新机制，避免每次都获取不同实例
 - [x] 商城表情消息类型识别

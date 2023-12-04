@@ -27,6 +27,8 @@ import top.mrxiaom.overflow.contact.RemoteGroup
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
+import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper
+import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper.Companion.fetchEssences
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.WrappedAudio
@@ -42,6 +44,7 @@ class GroupWrapper(
 ) : Group, RemoteGroup, Updatable {
     private var membersInternal: ContactList<MemberWrapper>? = null
     private var announcementsInternal: AnnouncementsWrapper? = null
+    private var essencesInternal: EssencesWrapper? = null
 
     val data: GroupInfoResp
         get() = impl
@@ -83,11 +86,10 @@ class GroupWrapper(
             }
         }
     override val essences: Essences
-        get() {
-            //for (resp in botWrapper.impl.getEssenceMsgList(id).data) {
-            //
-            //}
-            TODO("Not yet implemented")
+        get() = essencesInternal ?: runBlocking {
+            fetchEssences().also {
+                essencesInternal = it
+            }
         }
     override val files: RemoteFiles
         get() {
