@@ -10,6 +10,11 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 ## 安装方法
 
+<details>
+  <summary><i>已隐藏的不可用方法</i></summary>
+
+------
+
 **方法一：** MCL + 脚本一键安装
 
 > 此方法暂不可用
@@ -43,7 +48,10 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 将其中的 `"net.mamoe:mirai-core-all"` 改为 `"top.mrxiaom:overflow-core-all"` 即可。  
 `overflow-core-all` 的版本号将从 2.16.0 起，与 `mirai` 到 3.0 之前 (不包含 3.0) 的发行版保持同步。
 
+</details>
+
 ------
+
 **方法三：** 替换 mirai-core 类库
 
 需要准备：
