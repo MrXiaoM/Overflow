@@ -266,7 +266,21 @@ public enum ActionPathEnum implements ActionPath {
     /**
      * 获取版本信息
      */
-    GET_VERSION_INFO("get_version_info");
+    GET_VERSION_INFO("get_version_info"),
+    /**
+     * 获取 Cookie
+     */
+    GET_COOKIES("get_cookies"),
+    /**
+     * 获取 CSRF Token
+     */
+    GET_CSRF_TOKEN("get_csrf_token"),
+    /**
+     * 获取 Cookie 和 CSRF Token
+     */
+    GET_CREDENTIALS("get_credentials"),
+
+    ;
 
     /**
      * 请求路径

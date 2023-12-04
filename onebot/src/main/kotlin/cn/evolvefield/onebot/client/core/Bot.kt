@@ -1109,11 +1109,14 @@ class Bot(
      * @param groupId 群号
      * @return [ActionList] of [EssenceMsgResp]
      */
+    @JvmOverloads
     @JvmBlockingBridge
-    suspend fun getEssenceMsgList(groupId: Long): ActionList<EssenceMsgResp> {
+    suspend fun getEssenceMsgList(groupId: Long, page: Int = 0, pageSize: Int = 20): ActionList<EssenceMsgResp> {
         val action = ActionPathEnum.GET_ESSENCE_MSG_LIST
         val params = JsonObject()
         params.addProperty("group_id", groupId)
+        params.addProperty("page", page)
+        params.addProperty("page_size", pageSize)
         val result = actionHandler.action(channel, action, params)
         return GsonUtil.fromJson(
             result.toString(),
@@ -1324,6 +1327,7 @@ class Bot(
      *
      * @return [ActionList] of [UnidirectionalFriendListResp]
      */
+    @JvmBlockingBridge
     suspend fun getUnidirectionalFriendList(): ActionList<UnidirectionalFriendListResp> {
         val action = ActionPathEnum.GET_UNIDIRECTIONAL_FRIEND_LIST
         val result = actionHandler.action(channel, action, null)
@@ -1338,6 +1342,7 @@ class Bot(
      *
      * @return [JsonsObject]
      */
+    @JvmBlockingBridge
     suspend fun getStatus(): JsonsObject {
         val action = ActionPathEnum.GET_STATUS
         return actionHandler.action(channel, action, null)
@@ -1348,9 +1353,59 @@ class Bot(
      *
      * @return [JsonsObject]
      */
+    @JvmBlockingBridge
     suspend fun getVersionInfo(): JsonsObject {
         val action = ActionPathEnum.GET_VERSION_INFO
         return actionHandler.action(channel, action, null)
+    }
+
+    /**
+     * 获取 Cookie
+     *
+     * @return [ActionData] of [CookiesResp]
+     */
+    @JvmBlockingBridge
+    suspend fun getCookies(domain: String): ActionData<CookiesResp> {
+        val action = ActionPathEnum.GET_COOKIES
+        val params = JsonObject()
+        params.addProperty("domain", domain)
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionData<CookiesResp>>() {}.type
+        )
+    }
+
+    /**
+     * 获取 CSRF Token
+     *
+     * @return [ActionData] of [CSRFTokenResp]
+     */
+    @JvmBlockingBridge
+    suspend fun getCSRFToken(): ActionData<CSRFTokenResp> {
+        val action = ActionPathEnum.GET_CSRF_TOKEN
+        val result = actionHandler.action(channel, action, null)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionData<CSRFTokenResp>>() {}.type
+        )
+    }
+
+    /**
+     * 获取 Cookie 和 CSRF Token
+     *
+     * @return [ActionData] of [CredentialsResp]
+     */
+    @JvmBlockingBridge
+    suspend fun getCredentials(domain: String): ActionData<CredentialsResp> {
+        val action = ActionPathEnum.GET_CREDENTIALS
+        val params = JsonObject()
+        params.addProperty("domain", domain)
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionData<CredentialsResp>>() {}.type
+        )
     }
 }
 
