@@ -9,4 +9,6 @@ data class Config(
     var wsHost: String = "ws://127.0.0.1:5800",
     @SerialName("reversed_ws_port")
     var reversedWSPort: Int = -1,
+    @SerialName("token")
+    var token: String = ""
 )

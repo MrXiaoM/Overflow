@@ -145,7 +145,12 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
 
         val service = ConnectFactory.create(
-            BotConfig(config.wsHost, config.reversedWSPort), logger
+            BotConfig(
+                url = config.wsHost,
+                reversedPort = config.reversedWSPort,
+                token = config.token,
+                isAccessToken = config.token.isNotBlank()
+            ), logger
         )
         val dispatchers: EventBus
         val botImpl: cn.evolvefield.onebot.client.core.Bot
