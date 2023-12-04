@@ -34,6 +34,7 @@ class ConnectFactory private constructor(
     @JvmOverloads
     fun createWebsocketClient(scope: CoroutineScope = CoroutineScope(CoroutineName("WSClient"))): WSClient? {
         val builder = StringBuilder()
+        val header = mutableMapOf<String, String>()
         var ws: WSClient? = null
         if (config.miraiHttp) {
             builder.append(config.url)
@@ -49,11 +50,12 @@ class ConnectFactory private constructor(
             if (config.isAccessToken) {
                 builder.append("?access_token=")
                 builder.append(config.token)
+                header["Authorization"] = "Bearer ${config.token}"
             }
         }
         val url = builder.toString()
         try {
-            ws = WSClient.createAndConnect(scope, URI.create(url), logger, actionHandler)
+            ws = WSClient.createAndConnect(scope, URI.create(url), logger, actionHandler, header)
         } catch (e: Exception) {
             logger.error("▌ {} 连接错误，请检查服务端是否开启 ┈━═☆", url)
         }
@@ -66,7 +68,6 @@ class ConnectFactory private constructor(
      */
     @JvmOverloads
     suspend fun createWebsocketServerAndWaitConnect(scope: CoroutineScope = CoroutineScope(CoroutineName("WSServer"))): Pair<WSServer, Bot>? {
-        val builder = StringBuilder()
         var pair: Pair<WSServer, Bot>? = null
         try {
             val address = InetSocketAddress(config.reversedPort)

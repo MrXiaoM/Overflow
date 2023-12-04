@@ -27,8 +27,9 @@ class WSClient(
     private val scope: CoroutineScope,
     uri: URI,
     private val logger: Logger,
-    private val actionHandler: ActionHandler
-) : WebSocketClient(uri) {
+    private val actionHandler: ActionHandler,
+    header: Map<String, String> = mapOf()
+) : WebSocketClient(uri, header) {
     private var eventBus: EventBus? = null
     fun createBot(): Bot {
         return Bot(this, actionHandler)
@@ -79,8 +80,8 @@ class WSClient(
         private const val HEART_BEAT = "heartbeat"
 
         val mutex = Mutex()
-        fun createAndConnect(scope: CoroutineScope, uri: URI, logger: Logger, actionHandler: ActionHandler): WSClient? {
-            val ws = WSClient(scope, uri, logger, actionHandler)
+        fun createAndConnect(scope: CoroutineScope, uri: URI, logger: Logger, actionHandler: ActionHandler, header: Map<String, String> = mapOf()): WSClient? {
+            val ws = WSClient(scope, uri, logger, actionHandler, header)
             return if (ws.connectBlocking()) ws else null
         }
     }
