@@ -16,6 +16,7 @@ import top.mrxiaom.overflow.internal.contact.BotWrapper
 import java.io.*
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 import java.util.*
 
 fun ExternalResource.toBase64File(): String {
@@ -164,15 +165,35 @@ private fun <T> DigestData.loadData(serializer: KSerializer<T>): T {
 internal suspend fun BotWrapper.shareDigest(
     groupCode: Long, msgSeq: Long, msgRandom: Long, targetGroupCode: Long
 ): DigestShare {
-    val credentials = impl.getCredentials("qun.qq.com").data ?: throw IllegalStateException("credentials is empty")
+    return httpGet(
+        url = "https://qun.qq.com/cgi-bin/group_digest/share_digest",
+        cookieDomain = "qun.qq.com",
+        params = mapOf(
+            "group_code" to groupCode,
+            "msg_seq" to msgSeq,
+            "msg_random" to msgRandom,
+            "target_group_code" to targetGroupCode
+        )
+    ).loadAs(DigestData.serializer()).loadData(DigestShare.serializer())
+}
+internal suspend fun BotWrapper.httpGet(
+    url: String, cookieDomain: String,
+    header: Map<String, Any> = mapOf(),
+    params: Map<String, Any> = mapOf()
+): String {
+    val credentials = impl.getCredentials(cookieDomain).data ?: throw IllegalStateException("credentials is empty")
     val cookie = credentials.cookies
     val bkn = credentials.token
     return withContext(Dispatchers.IO) {
-        val conn = URL("https://qun.qq.com/cgi-bin/group_digest/share_digest?group_code=$groupCode&msg_seq=$msgSeq&msg_random=$msgRandom&target_group_code=$targetGroupCode&bkn=$bkn").openConnection() as HttpURLConnection
+        val paramString = params.map { "${it.key}=${URLEncoder.encode(it.value.toString(), "UTF-8")}" }.joinToString("&")
+        val conn = URL("$url?$paramString&bkn=$bkn").openConnection() as HttpURLConnection
 
         conn.requestMethod = "get"
         conn.addRequestProperty("cookie", cookie)
+        for ((key, value) in header) {
+            conn.addRequestProperty(key, value.toString())
+        }
         conn.connect()
-        conn.inputStream.readBytes().toString(Charsets.UTF_8).loadAs(DigestData.serializer()).loadData(DigestShare.serializer())
+        conn.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
     }
 }
