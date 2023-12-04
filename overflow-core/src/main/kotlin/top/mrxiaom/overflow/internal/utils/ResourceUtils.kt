@@ -164,9 +164,9 @@ private fun <T> DigestData.loadData(serializer: KSerializer<T>): T {
 internal suspend fun BotWrapper.shareDigest(
     groupCode: Long, msgSeq: Long, msgRandom: Long, targetGroupCode: Long
 ): DigestShare {
-    val cookie = impl.getCookies("qun.qq.com").data?.cookies ?: throw IllegalStateException("cookies is empty")
-    val skey = cookie.replace(" ", "").substringAfter(";skey=").substringBefore(";")
-    val bkn = bkn(skey)
+    val credentials = impl.getCredentials("qun.qq.com").data ?: throw IllegalStateException("credentials is empty")
+    val cookie = credentials.cookies
+    val bkn = credentials.token
     return withContext(Dispatchers.IO) {
         val conn = URL("https://qun.qq.com/cgi-bin/group_digest/share_digest?group_code=$groupCode&msg_seq=$msgSeq&msg_random=$msgRandom&target_group_code=$targetGroupCode&bkn=$bkn").openConnection() as HttpURLConnection
 
@@ -175,15 +175,4 @@ internal suspend fun BotWrapper.shareDigest(
         conn.connect()
         conn.inputStream.readBytes().toString(Charsets.UTF_8).loadAs(DigestData.serializer()).loadData(DigestShare.serializer())
     }
-}
-
-fun bkn(skey: String): Int {
-    var bkn = 5381
-    var i = 0
-    val length = skey.length
-    while (i < length) {
-        bkn += (bkn shl 5) + skey[i].code
-        i += 1
-    }
-    return bkn and 2147483647
 }
