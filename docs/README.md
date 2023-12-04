@@ -73,7 +73,7 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 启动后会生成配置文件 `overflow.json`，修改其中的 `ws_host` 为服务端地址，再次启动即可，  
 服务端地址如 Shamrock 的 `主动WebSocket地址`。
 
-若修改 `reversed_ws_port` 为 `[1, 65535]` 区间的数 (端口号有效值)，则代表使用`反向WebSocket` (又称`被动WebSocket`)连接
+若修改 `reversed_ws_port` 为 `[1, 65535]` 区间的数 (端口号有效值)，则代表使用`反向WebSocket` (又称`被动WebSocket`)连接。  
 该选项会覆盖`正向WebSocket` (又称 `主动WebSocket`) 地址配置。
 
 **反向WebSocket当前为实验性功能，可能存在问题，勿投入生产环境使用。**
