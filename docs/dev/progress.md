@@ -4,7 +4,7 @@
 
 ## 已实现消息类型
 
-[top.mrxiaom.overflow.internal.message](/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/message)
+[top.mrxiaom.overflow.internal.message](/top/mrxiaom/overflow/internal/message)
 
 > ✅ - 支持  
 > ❌ - 不支持  
@@ -47,7 +47,7 @@
 
 ## 已实现事件
 
-[top.mrxiaom.overflow.internal.listener](/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/listener)
+[top.mrxiaom.overflow.internal.listener](/top/mrxiaom/overflow/internal/listener)
 
 由于 onebot 事件有子类型，此表中 onebot 事件格式为 `事件类型 -> 子类型`
 
@@ -59,6 +59,6 @@
 | 好友消息             | FriendMessageEvent            | privateMessage -> friend  | ✅    |
 | 群临时会话消息          | GroupTempMessageEvent         | privateMessage -> group   | ❌    |
 | 陌生人消息            | StrangerMessageEvent          | privateMessage -> other   | ✅    |
-| 群戳一戳             | -                             | notify -> poke            | *✅*  |
-| 群撤回消息            | MessageRecallEvent.GroupEvent | group_recall              | ✅    |
+| 群戳一戳             | NudgeEvent                    | notify -> poke            | *✅*  |
+| 群撤回消息            | MessageRecallEvent.GroupEvent | group_recall              | *✅*  |
 | *Coming soon...* | -                             | -                         | ❔    |

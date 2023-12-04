@@ -88,7 +88,7 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 
 # 项目进度相关说明
 
-另请参见 [Overflow 项目进度](progress.md)
+另请参见 [Overflow 项目进度](dev/progress.md)
 
 # JVM 参数
 
