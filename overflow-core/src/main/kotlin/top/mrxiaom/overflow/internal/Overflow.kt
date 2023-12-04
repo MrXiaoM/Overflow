@@ -5,6 +5,7 @@ import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
+import cn.evolvefield.onebot.client.handler.EventBus
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
@@ -129,26 +130,48 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     @JvmOverloads
     @JvmBlockingBridge
     suspend fun start(printInfo: Boolean = false, logger: Logger = LoggerFactory.getLogger("Onebot")): Boolean {
+        val reversed = config.reversedWSPort in 1..65535
         if (printInfo) {
             logger.info("Overflow v$version 正在运行")
-            logger.info("连接到 WebSocket: ${config.wsHost}")
+            if (reversed) {
+                logger.info("在端口 ${config.reversedWSPort} 开启反向 WebSocket 服务端")
+            } else {
+                logger.info("连接到 WebSocket: ${config.wsHost}")
+            }
         }
 
         val service = ConnectFactory.create(
-            BotConfig(config.wsHost), logger
+            BotConfig(config.wsHost, config.reversedWSPort), logger
         )
-        val ws = service.createWebsocketClient(this)
-        if (ws == null) {
-            if (printInfo) {
-                logger.error("未连接到 Onebot")
-                if (System.getProperty("overflow.not-exit").isNullOrBlank()) {
-                    exitProcess(1)
+        val dispatchers: EventBus
+        val botImpl: cn.evolvefield.onebot.client.core.Bot
+        if (reversed) {
+            val ws = service.createWebsocketServerAndWaitConnect(this)
+            if (ws == null) {
+                if (printInfo) {
+                    logger.error("未连接到 Onebot")
+                    if (System.getProperty("overflow.not-exit").isNullOrBlank()) {
+                        exitProcess(1)
+                    }
                 }
+                return false
             }
-            return false
+            dispatchers = ws.first.createEventBus()
+            botImpl = ws.second
+        } else {
+            val ws = service.createWebsocketClient(this)
+            if (ws == null) {
+                if (printInfo) {
+                    logger.error("未连接到 Onebot")
+                    if (System.getProperty("overflow.not-exit").isNullOrBlank()) {
+                        exitProcess(1)
+                    }
+                }
+                return false
+            }
+            dispatchers = ws.createEventBus()
+            botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
         }
-        val dispatchers = ws.createEventBus()
-        val botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
         val versionInfo = botImpl.getVersionInfo()
         OnebotMessages.appName = versionInfo.optJSONObject("data").get("app_name").asString.trim().lowercase()
         if (printInfo) {

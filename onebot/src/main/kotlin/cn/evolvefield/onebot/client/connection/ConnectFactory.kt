@@ -1,12 +1,14 @@
 package cn.evolvefield.onebot.client.connection
 
 import cn.evolvefield.onebot.client.config.BotConfig
+import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.net.InetSocketAddress
 import java.net.URI
 
 /**
@@ -27,7 +29,7 @@ class ConnectFactory private constructor(
 
     /**
      * 创建websocket客户端(支持cqhttp和mirai类型)
-     * @return 连接示例
+     * @return 连接实例
      */
     @JvmOverloads
     fun createWebsocketClient(scope: CoroutineScope = CoroutineScope(CoroutineName("WSClient"))): WSClient? {
@@ -56,6 +58,24 @@ class ConnectFactory private constructor(
             logger.error("▌ {} 连接错误，请检查服务端是否开启 ┈━═☆", url)
         }
         return ws
+    }
+
+    /**
+     * 创建反向Websocket服务端，并等待连接
+     * @return 连接实例
+     */
+    @JvmOverloads
+    suspend fun createWebsocketServerAndWaitConnect(scope: CoroutineScope = CoroutineScope(CoroutineName("WSServer"))): Pair<WSServer, Bot>? {
+        val builder = StringBuilder()
+        var pair: Pair<WSServer, Bot>? = null
+        try {
+            val address = InetSocketAddress(config.reversedPort)
+            pair = WSServer.createAndWaitConnect(scope, address, logger, actionHandler)
+        } catch (e: Exception) {
+            logger.error("▌ 反向 WebSocket 绑定端口 {} 或连接客户端时出现错误 ┈━═☆", config.reversedPort)
+            logger.error(e.stackTraceToString())
+        }
+        return pair
     }
 
     companion object {

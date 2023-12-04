@@ -12,6 +12,10 @@ class BotConfig(
      */
     val url: String = "ws://127.0.0.1:8080",
     /**
+     * 反向 websocket 端口
+     */
+    val reversedPort: Int = -1,
+    /**
      * token或者verifyKey鉴权
      */
     val token: String = "",

@@ -37,7 +37,7 @@ import org.java_websocket.WebSocket
  */
 @Suppress("unused")
 class Bot(
-    val channel: WSClient,
+    val channel: WebSocket,
     val actionHandler: ActionHandler
 ) {
     private var idInternal: Long = 0
