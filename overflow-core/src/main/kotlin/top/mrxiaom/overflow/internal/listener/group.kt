@@ -108,21 +108,23 @@ internal class GroupMessageRecallListener(
     }
 }
 
+fun GroupMemberInfoResp.wrapAsMember(group: Group): MemberWrapper {
+    return (group as GroupWrapper).updateMember(this)
+}
+
 fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
-    return (group as GroupWrapper).updateMember(
-        GroupMemberInfoResp().also {
-            it.groupId = group.id
-            it.userId = userId.toLong()
-            it.nickname = nickname
-            it.card = card ?: ""
-            it.sex = sex ?: ""
-            it.age = age ?: 0
-            it.area = area ?: ""
-            it.level = level?.toIntOrNull() ?: 0
-            it.role = role ?: "member"
-            it.title = title ?: ""
-        }
-    )
+    return GroupMemberInfoResp().also {
+        it.groupId = group.id
+        it.userId = userId.toLong()
+        it.nickname = nickname
+        it.card = card ?: ""
+        it.sex = sex ?: ""
+        it.age = age ?: 0
+        it.area = area ?: ""
+        it.level = level?.toIntOrNull() ?: 0
+        it.role = role ?: "member"
+        it.title = title ?: ""
+    }.wrapAsMember(group)
 }
 
 private suspend fun BotWrapper.group(groupId: Long): Group {

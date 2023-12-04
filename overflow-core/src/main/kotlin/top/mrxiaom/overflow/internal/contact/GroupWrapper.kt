@@ -29,6 +29,7 @@ import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper.Companion.fetchEssences
+import top.mrxiaom.overflow.internal.listener.wrapAsMember
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.WrappedAudio
@@ -58,6 +59,11 @@ class GroupWrapper(
         return ((members[member.userId] as? MemberWrapper) ?: MemberWrapper(botWrapper, this, member).also { members.delegate.add(it) }).apply {
             impl = member
         }
+    }
+
+    internal suspend fun queryMember(userId: Long): MemberWrapper? {
+        return (members[userId] as? MemberWrapper) ?: botWrapper.impl
+            .getGroupMemberInfo(id, userId, false).data?.wrapAsMember(this)
     }
 
     @JvmBlockingBridge

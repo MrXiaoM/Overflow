@@ -54,10 +54,9 @@ class EssencesWrapper(
         @OptIn(MiraiInternalApi::class)
         suspend fun GroupWrapper.fetchEssencesList(page: Int = 0): List<EssenceMessageRecord> {
             return botWrapper.impl.getEssenceMsgList(id, page).data.map {
-                // TODO: 获取不到 NormalMember 时尝试通过 get_member_info 获取
                 EssenceMessageRecord(
-                    this, this[it.senderId], it.senderId, it.senderNick, it.senderTime.toInt(),
-                    this[it.operatorId], it.operatorId, it.operatorNick, it.operatorTime.toInt()
+                    this, queryMember(it.senderId), it.senderId, it.senderNick, it.senderTime.toInt(),
+                    queryMember(it.operatorId), it.operatorId, it.operatorNick, it.operatorTime.toInt()
                 ) { parse ->
                     MessageSourceBuilder().apply {
                         id(it.messageId)
