@@ -121,10 +121,11 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 
 # JVM 参数
 
-| 参数                     | 说明                       |
-|------------------------|--------------------------|
-| `-Doverflow.config=路径` | 修改配置文件(overflow.json)的路径 |
-| `-Doverflow.not-exit`  | 设置无法连接到 Onebot 时不结束进程    |
+| 参数                        | 说明                                        |
+|---------------------------|-------------------------------------------|
+| `-Doverflow.config=路径`    | 修改配置文件(overflow.json)的路径                  |
+| `-Doverflow.not-exit`     | 设置无法连接到 Onebot 时不结束进程                     |
+| `-Doverflow.timeout=超时时间` | 设置主动发送 action 的请求超时时间(毫秒)，默认为10000毫秒(10秒) |
 
 # 长期支持
 

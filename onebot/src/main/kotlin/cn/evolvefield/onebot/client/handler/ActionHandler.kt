@@ -59,7 +59,7 @@ class ActionHandler(
             })
         }
         val reqJson = generateReqJson(action, params)
-        val actionSendUtils = ActionSendUtils(logger, channel, 10000L)
+        val actionSendUtils = ActionSendUtils(logger, channel, timeout)
         val echo = reqJson["echo"].asString
         apiCallbackMap[echo] = actionSendUtils
         return try {
@@ -89,5 +89,11 @@ class ActionHandler(
         if (params != null) json.add("params", params)
         json.addProperty("echo", echo++)
         return json
+    }
+
+    companion object {
+        val timeout by lazy {
+            System.getProperty("overflow.timeout")?.toLongOrNull() ?: 10000L
+        }
     }
 }
