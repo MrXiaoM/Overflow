@@ -1,10 +1,24 @@
 package top.mrxiaom.overflow.internal.utils
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import net.mamoe.mirai.utils.CheckableResponseA
 import net.mamoe.mirai.utils.ExternalResource
+import net.mamoe.mirai.utils.JsonStruct
+import net.mamoe.mirai.utils.loadAs
+import top.mrxiaom.overflow.internal.contact.BotWrapper
 import java.io.*
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.*
 
- fun ExternalResource.toBase64File(): String {
+fun ExternalResource.toBase64File(): String {
      return inputStream().use {
          "base64://" + Base64.getEncoder().encodeToString(it.readBytes())
      }
@@ -120,4 +134,56 @@ class FastImageInfo private constructor(
             return ret
         }
     }
+}
+
+internal val defaultJson: Json = Json {
+    isLenient = true
+    ignoreUnknownKeys = true
+}
+@Serializable
+data class DigestShare(
+    @SerialName("share_key")
+    val shareKey: String = ""
+)
+
+@Serializable
+internal data class DigestData(
+    @SerialName("data") val `data`: JsonElement = JsonNull,
+    @SerialName("wording") val reason: String = "",
+    @SerialName("retmsg") override val errorMessage: String,
+    @SerialName("retcode") override val errorCode: Int
+) : CheckableResponseA(), JsonStruct
+
+private fun <T> DigestData.loadData(serializer: KSerializer<T>): T {
+    return try {
+        defaultJson.decodeFromJsonElement(serializer, this.data)
+    } catch (cause: Exception) {
+        throw IllegalStateException("parse digest data error, status: $errorCode - $errorMessage", cause)
+    }
+}
+internal suspend fun BotWrapper.shareDigest(
+    groupCode: Long, msgSeq: Long, msgRandom: Long, targetGroupCode: Long
+): DigestShare {
+    val cookie = impl.getCookies("qun.qq.com").data?.cookies ?: throw IllegalStateException("cookies is empty")
+    val skey = cookie.replace(" ", "").substringAfter(";skey=").substringBefore(";")
+    val bkn = bkn(skey)
+    return withContext(Dispatchers.IO) {
+        val conn = URL("https://qun.qq.com/cgi-bin/group_digest/share_digest?group_code=$groupCode&msg_seq=$msgSeq&msg_random=$msgRandom&target_group_code=$targetGroupCode&bkn=$bkn").openConnection() as HttpURLConnection
+
+        conn.requestMethod = "get"
+        conn.addRequestProperty("cookie", cookie)
+        conn.connect()
+        conn.inputStream.readBytes().toString(Charsets.UTF_8).loadAs(DigestData.serializer()).loadData(DigestShare.serializer())
+    }
+}
+
+fun bkn(skey: String): Int {
+    var bkn = 5381
+    var i = 0
+    val length = skey.length
+    while (i < length) {
+        bkn += (bkn shl 5) + skey[i].code
+        i += 1
+    }
+    return bkn and 2147483647
 }

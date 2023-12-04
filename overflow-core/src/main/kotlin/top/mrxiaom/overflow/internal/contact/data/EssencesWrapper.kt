@@ -2,10 +2,8 @@ package top.mrxiaom.overflow.internal.contact.data
 
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
-import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.checkBotPermission
 import net.mamoe.mirai.contact.essence.EssenceMessageRecord
@@ -13,6 +11,7 @@ import net.mamoe.mirai.contact.essence.Essences
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
+import top.mrxiaom.overflow.internal.utils.shareDigest
 
 class EssencesWrapper(
     val impl: GroupWrapper,
@@ -42,7 +41,13 @@ class EssencesWrapper(
     }
 
     override suspend fun share(source: MessageSource): String {
-        TODO("Not yet implemented")
+        val shareKey = impl.botWrapper.shareDigest(
+            groupCode = impl.id,
+            msgSeq = source.ids.first().toLong().and(0xFFFF_FFFF),
+            msgRandom = source.internalIds.first().toLong().and(0xFFFF_FFFF),
+            targetGroupCode = 0
+        )
+        return "https://qun.qq.com/essence/share?_wv=3&_wwv=128&_wvx=2&sharekey=$shareKey"
     }
 
     companion object {
