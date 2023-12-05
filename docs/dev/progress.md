@@ -4,7 +4,7 @@
 
 ## 已实现消息类型
 
-[top.mrxiaom.overflow.internal.message](/top/mrxiaom/overflow/internal/message)
+[top.mrxiaom.overflow.internal.message](/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/messag)
 
 > ✅ - 支持  
 > ❌ - 不支持  
@@ -27,12 +27,14 @@
 | 小程序       | LightApp          | json    | ✅   | ✅   |
 | XML消息     | ServiceMessage    | xml     | ✅   | ✅   |
 | 转发消息      | ForwardMessage    | forward | ❔   | ❔   |
+| 文件消息      | FileMessage       | file    | *✅* | -   |
 
 ## 不支持消息相关说明
 * 猜拳 类型无法获取其数值（石头、剪刀、布），接收消息没有意义
 * 骰子 同上，当连接实例为 OpenShamrock 时，将会使用 new_dice 消息类型收发消息。
 * 音乐分享 返回的消息有可能没有音乐链接，与 mirai 相差较大，目前仅支持网易云和QQ音乐
 * 转发消息 无法使用转发消息ID从Shamrock正常下载转发消息，暂未测试
+* 文件消息 在 mirai 的定义中是只接收不发送。目前群文件支持暂未完成，接收的意义不大
 
 ## 资源相关消息说明
 
@@ -47,7 +49,7 @@
 
 ## 已实现事件
 
-[top.mrxiaom.overflow.internal.listener](/top/mrxiaom/overflow/internal/listener)
+[top.mrxiaom.overflow.internal.listener](/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/listener)
 
 由于 onebot 事件有子类型，此表中 onebot 事件格式为 `事件类型 -> 子类型`
 
