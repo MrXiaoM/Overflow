@@ -185,7 +185,7 @@ class GroupWrapper(
     }
 
     override suspend fun setEssenceMessage(source: MessageSource): Boolean {
-        // TODO 权限
+        checkBotPermission(MemberPermission.ADMINISTRATOR)
         botWrapper.impl.setEssenceMsg(source.ids[0])
         return true
     }
