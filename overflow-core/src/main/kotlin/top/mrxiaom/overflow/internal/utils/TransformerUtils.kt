@@ -100,7 +100,7 @@ fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderW
 fun List<GroupFilesResp.Folders>.toMiraiFolders(group: GroupWrapper, parent: FolderWrapper? = null): List<FolderWrapper> {
     return map {
         FolderWrapper(group, parent,
-            it.folderId, it.folderName, it.createTime, it.createTime, it.creator
+            it.folderId, it.folderName, it.createTime, it.createTime, it.creator, it.totalFileCount
         )
     }
 }

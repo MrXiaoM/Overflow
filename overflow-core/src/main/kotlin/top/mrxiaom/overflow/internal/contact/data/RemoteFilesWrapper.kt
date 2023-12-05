@@ -23,7 +23,7 @@ class RemoteFilesWrapper(
             val data = botWrapper.impl.getGroupRootFiles(id).data
 
             val root = FolderWrapper(
-                this, null, "/", "/", 0, 0, 0,
+                this, null, "/", "/", 0, 0, 0, data.files.size
             )
             root.folders.addAll(data.folders.toMiraiFolders(this))
             root.files.addAll(data.files.toMiraiFiles(this))
@@ -41,6 +41,7 @@ class FolderWrapper(
     override val lastModifiedTime: Long,
     override val uploadTime: Long,
     override val uploaderId: Long,
+    override var contentsCount: Int,
 ) : AbsoluteFolder {
     val folders: MutableList<FolderWrapper> = mutableListOf()
     val files: MutableList<FileWrapper> = mutableListOf()
@@ -77,9 +78,6 @@ class FolderWrapper(
     override suspend fun renameTo(newName: String): Boolean {
         TODO("Not yet implemented")
     }
-
-    override val contentsCount: Int
-        get() = TODO("Not yet implemented")
 
     override suspend fun children(): Flow<AbsoluteFileFolder> {
         TODO("Not yet implemented")
