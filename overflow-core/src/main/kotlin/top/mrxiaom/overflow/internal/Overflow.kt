@@ -39,6 +39,7 @@ import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
 import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin
+import top.mrxiaom.overflow.internal.utils.wrapAsOtherClientInfo
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
@@ -213,7 +214,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         return UserProfileImpl(age, data.mail, 0, data.name, data.level, UserProfile.Sex.UNKNOWN, data.hobbyEntry)
     }
     override suspend fun getOnlineOtherClientsList(bot: Bot, mayIncludeSelf: Boolean): List<OtherClientInfo> {
-        TODO("Not yet implemented")
+        val data = bot.asOnebot.impl.getOnlineClients(false).data ?: throw IllegalStateException("Can not fetch online clients.")
+        return data.clients.map {
+            it.wrapAsOtherClientInfo()
+        }
     }
     @LowLevelApi
     override suspend fun getGroupVoiceDownloadUrl(bot: Bot, md5: ByteArray, groupId: Long, dstUin: Long): String {

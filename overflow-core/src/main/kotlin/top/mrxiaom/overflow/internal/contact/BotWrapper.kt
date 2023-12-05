@@ -43,7 +43,7 @@ class BotWrapper private constructor(
     private var loginInfo: LoginInfoResp = defLoginInfo
     private var friendsInternal: ContactList<FriendWrapper> = ContactList()
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
-    private var otherClientsInternal: ContactList<OtherClientWrapper> = ContactList()
+    private var otherClientsInternal: ContactList<OtherClientWrapper>? = null
     private var strangersInternal: ContactList<StrangerWrapper> = ContactList()
     suspend fun updateLoginInfo() {
         loginInfo = impl.getLoginInfo().data
@@ -61,10 +61,15 @@ class BotWrapper private constructor(
         updateLoginInfo()
         updateContacts()
     }
-    suspend fun updateOtherClients() = runCatching {
-        otherClientsInternal.update(impl.getOnlineClients(false).data.clients.map {
-            OtherClientWrapper(this, it)
-        }) { impl = it.impl }
+    suspend fun updateOtherClients(): ContactList<OtherClientWrapper> {
+        return (otherClientsInternal ?: ContactList()).apply {
+            runCatching {
+                update(Mirai.getOnlineOtherClientsList(this@BotWrapper).map {
+                    OtherClientWrapper(this@BotWrapper, it)
+                }) { info = it.info }
+            }
+            otherClientsInternal = this
+        }
     }
     internal fun updateGroup(group: GroupWrapper): GroupWrapper {
         return ((groups[group.id] as? GroupWrapper) ?: group.also { groupsInternal.delegate.add(it) }). apply {
@@ -144,9 +149,11 @@ class BotWrapper private constructor(
     override val groups: ContactList<Group>
         get() = groupsInternal
     override val otherClients: ContactList<OtherClient>
-        get() = otherClientsInternal //TODO: Onebot 未提供陌生人列表接口
+        get() = otherClientsInternal ?: runBlocking {
+            updateOtherClients()
+        }
     override val strangers: ContactList<Stranger>
-        get() = strangersInternal //TODO: Onebot 未提供陌生人列表接口
+        get() = strangersInternal // TODO: Onebot 未提供陌生人列表接口
 
     override fun close(cause: Throwable?) {
         if (isActive) {

@@ -1,3 +1,4 @@
+@file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.utils
 
 import cn.evole.onebot.sdk.entity.MsgId
@@ -7,9 +8,8 @@ import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evole.onebot.sdk.response.group.GroupFilesResp
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
-import net.mamoe.mirai.contact.Contact
-import net.mamoe.mirai.contact.ContactList
-import net.mamoe.mirai.contact.Group
+import cn.evole.onebot.sdk.response.misc.ClientsResp
+import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.hexToBytes
 import top.mrxiaom.overflow.internal.contact.*
@@ -21,7 +21,6 @@ import top.mrxiaom.overflow.internal.contact.data.FolderWrapper
  * @param list 新的列表
  * @param updater this 是旧的，it 是新的，应当把新的内容放进旧的
  */
-@OptIn(MiraiInternalApi::class)
 internal inline fun <reified T : Contact> ContactList<T>.update(
     list: List<T>,
     updater: T.(T) -> Unit
@@ -83,6 +82,11 @@ fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerW
         0,
         0
     ).wrapAsStranger(bot)
+}
+
+fun ClientsResp.Clients.wrapAsOtherClientInfo(): OtherClientInfo {
+    val platform = Platform.getByTerminalId(loginPlatform.toInt())
+    return OtherClientInfo(appId.toInt(), platform, deviceName, deviceKind)
 }
 
 val MsgId?.safeMessageIds: IntArray

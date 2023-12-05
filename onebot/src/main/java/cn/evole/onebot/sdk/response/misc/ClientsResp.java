@@ -1,5 +1,7 @@
 package cn.evole.onebot.sdk.response.misc;
 
+import cn.evole.onebot.sdk.util.json.ClientsAdapter;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
@@ -15,17 +17,15 @@ public class ClientsResp {
     public List<Clients> clients;
 
     @Data
+    @JsonAdapter(ClientsAdapter.class)
     public static class Clients {
-
-        @SerializedName("app_id")
         public long appId;
-
-        @SerializedName("device_name")
         public String deviceName;
-
-        @SerializedName("device_kind")
         public String deviceKind;
-
+        public long loginTime = 0;
+        public long loginPlatform = 0;
+        public String location = "";
+        public String guid = "";
     }
 
 }
