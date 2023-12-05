@@ -1,5 +1,7 @@
 package cn.evole.onebot.sdk.response.group;
 
+import cn.evole.onebot.sdk.util.json.GroupFilesAdapter;
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import lombok.Data;
 
@@ -19,36 +21,21 @@ public class GroupFilesResp {
      * 群文件
      */
     @Data
+    @JsonAdapter(GroupFilesAdapter.Files.class)
     public static class Files {
-
-        @SerializedName("file_id")
         public String fileId;
-
-        @SerializedName("file_name")
         public String fileName;
-
         public int busid;
-
-        @SerializedName("file_size")
         public long fileSize;
-
-        @SerializedName("upload_time")
         public long uploadTime;
-
-        @SerializedName("dead_time")
         public long deadTime;
-
-        @SerializedName("modify_time")
         public long modifyTime;
-
-        @SerializedName("download_times")
         public int downloadTimes;
-
         public long uploader;
-
-        @SerializedName("uploader_name")
         public String uploaderName;
-
+        public String md5 = null;
+        public String sha1 = null;
+        public String sha3 = null;
     }
 
     /**
