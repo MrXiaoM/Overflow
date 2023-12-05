@@ -1,14 +1,10 @@
 package cn.evole.onebot.sdk.util.json;
 
 
-import cn.evole.onebot.sdk.response.group.ForwardMsgResp;
 import cn.evole.onebot.sdk.response.group.GroupFilesResp;
-import cn.evole.onebot.sdk.util.FileUtils;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GroupFilesAdapter {
     Gson gson = new Gson();
