@@ -1,5 +1,6 @@
 package top.mrxiaom.overflow.internal.utils
 
+import cn.evole.onebot.sdk.entity.MsgId
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
@@ -80,3 +81,5 @@ fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerW
     ).wrapAsStranger(bot)
 }
 
+val MsgId?.safeMessageIds: IntArray
+    get() = this?.messageId?.run { intArrayOf(this) } ?: intArrayOf()

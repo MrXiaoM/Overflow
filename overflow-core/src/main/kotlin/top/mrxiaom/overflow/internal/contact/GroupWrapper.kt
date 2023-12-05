@@ -161,11 +161,11 @@ class GroupWrapper(
             val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
                 val response = botWrapper.impl.sendGroupForwardMsg(id, nodes)
-                response.data?.run { intArrayOf(messageId) } ?: IntArray(0)
+                response.data.safeMessageIds
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(messageChain)
                 val response = botWrapper.impl.sendGroupMsg(id, msg, false)
-                response.data?.run { intArrayOf(messageId) } ?: IntArray(0)
+                response.data.safeMessageIds
             }
             @Suppress("DEPRECATION_ERROR")
             MessageReceipt(object : OnlineMessageSource.Outgoing.ToGroup() {

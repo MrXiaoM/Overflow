@@ -21,6 +21,7 @@ import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.WrappedAudio
 import top.mrxiaom.overflow.internal.message.data.WrappedVideo
+import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
@@ -59,11 +60,11 @@ class FriendWrapper(
             val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
                 val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
-                response.data?.run { intArrayOf(messageId) } ?: IntArray(0)
+                response.data.safeMessageIds
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(messageChain)
                 val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
-                response.data?.run { intArrayOf(messageId) } ?: IntArray(0)
+                response.data.safeMessageIds
             }
 
             @Suppress("DEPRECATION_ERROR")
