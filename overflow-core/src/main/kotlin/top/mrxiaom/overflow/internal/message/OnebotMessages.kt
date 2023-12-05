@@ -200,6 +200,18 @@ object OnebotMessages {
                         add(QuoteReply(msgSource.build(bot.id, kind)))
                     }
 
+                    "file" -> { // OpenShamrock
+                        val sub = data["sub"].string
+                        val biz = data["biz"].int
+                        val size = data["size"].long
+                        val expire = data["expire"].int
+                        val name = data["name"].string
+                        val id = data["id"].string
+                        val url = data["url"].string
+
+                        add(WrappedFileMessage(id, 0, name, size, url))
+                    }
+
                     else -> add(UnknownMessage(type, data))
                 }
             }
@@ -285,6 +297,7 @@ object OnebotMessages {
             is ForwardMessage -> "forward"
             is LightApp -> "json"
             is ServiceMessage -> "xml"
+            is FileMessage -> "file"
             else -> "text"
         }
     internal fun imageFromFile(file: String): Image = Image.fromId(file)
@@ -303,6 +316,8 @@ object OnebotMessages {
         get() = this?.jsonPrimitive?.content ?: ""
     private val JsonElement?.int
         get() = this?.jsonPrimitive?.intOrNull ?: throw IllegalStateException()
+    private val JsonElement?.long
+        get() = this?.jsonPrimitive?.longOrNull ?: throw IllegalStateException()
 
     fun Message.findForwardMessage(): ForwardMessage? {
         return when(this){

@@ -10,7 +10,8 @@ data class WrappedFileMessage(
     override val id: String,
     override val internalId: Int,
     override val name: String,
-    override val size: Long
+    override val size: Long,
+    val url: String = ""
 ) : FileMessage {
     override suspend fun toAbsoluteFile(contact: FileSupported): AbsoluteFile? {
         return contact.files.root.resolveFileById(id, true)
