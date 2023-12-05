@@ -102,7 +102,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         val instance: Overflow get() = _instance
 
         @JvmStatic
-        val version = "${BuildConstants.VERSION}-${BuildConstants.COMMIT_HASH.chunked(6)[0]}"
+        val version = "${BuildConstants.VERSION}-${BuildConstants.COMMIT_HASH.chunked(7)[0]}"
 
         private val isNotExit by lazy {
             !System.getProperty("overflow.not-exit").isNullOrBlank()
