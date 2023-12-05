@@ -29,6 +29,8 @@ import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper.Companion.fetchEssences
+import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper
+import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper.Companion.fetchFiles
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.WrappedAudio
@@ -45,6 +47,7 @@ class GroupWrapper(
     private var membersInternal: ContactList<MemberWrapper>? = null
     private var announcementsInternal: AnnouncementsWrapper? = null
     private var essencesInternal: EssencesWrapper? = null
+    private var remoteFilesInternal: RemoteFilesWrapper? = null
 
     val data: GroupInfoResp
         get() = impl
@@ -97,9 +100,10 @@ class GroupWrapper(
             }
         }
     override val files: RemoteFiles
-        get() {
-            //val resp = botWrapper.impl.getGroupRootFiles(id).data
-            TODO("Not yet implemented")
+        get() = remoteFilesInternal ?: runBlocking {
+            fetchFiles().also {
+                remoteFilesInternal = it
+            }
         }
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(

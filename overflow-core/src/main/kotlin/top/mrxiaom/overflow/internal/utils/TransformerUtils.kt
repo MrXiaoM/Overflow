@@ -5,12 +5,16 @@ import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
+import cn.evole.onebot.sdk.response.group.GroupFilesResp
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.contact.ContactList
 import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.utils.MiraiInternalApi
+import net.mamoe.mirai.utils.hexToBytes
 import top.mrxiaom.overflow.internal.contact.*
+import top.mrxiaom.overflow.internal.contact.data.FileWrapper
+import top.mrxiaom.overflow.internal.contact.data.FolderWrapper
 
 
 /**
@@ -83,3 +87,20 @@ fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerW
 
 val MsgId?.safeMessageIds: IntArray
     get() = this?.messageId?.run { intArrayOf(this) } ?: intArrayOf()
+
+fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderWrapper? = null): List<FileWrapper> {
+    return map {
+        val md5 = it.md5?.hexToBytes() ?: ByteArray(16)
+        val sha1 = it.sha1?.hexToBytes() ?: ByteArray(16)
+        FileWrapper(group, parent,
+            it.fileId, it.fileName, md5, sha1, it.fileSize, it.deadTime, it.modifyTime, it.uploadTime, it.uploader
+        )
+    }
+}
+fun List<GroupFilesResp.Folders>.toMiraiFolders(group: GroupWrapper, parent: FolderWrapper? = null): List<FolderWrapper> {
+    return map {
+        FolderWrapper(group, parent,
+            it.folderId, it.folderName, it.createTime, it.createTime, it.creator
+        )
+    }
+}
