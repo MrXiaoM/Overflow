@@ -301,7 +301,7 @@ object OnebotMessages {
             else -> "text"
         }
     internal fun imageFromFile(file: String): Image = Image.fromId(file)
-    internal fun audioFromFile(file: String): Audio = WrappedAudio(file)
+    internal fun audioFromFile(file: String): Audio = WrappedAudio(file, 0)
     internal fun videoFromFile(file: String): ShortVideo = WrappedVideo(file)
 
     private val Image.onebotFile: String

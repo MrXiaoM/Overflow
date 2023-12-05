@@ -85,7 +85,7 @@ class FriendWrapper(
     }
 
     override suspend fun uploadAudio(resource: ExternalResource): OfflineAudio {
-        return WrappedAudio(FileService.instance!!.upload(resource))
+        return OnebotMessages.audioFromFile(FileService.instance!!.upload(resource)) as OfflineAudio
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {
