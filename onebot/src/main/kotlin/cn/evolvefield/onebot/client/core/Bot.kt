@@ -1406,6 +1406,24 @@ class Bot(
             object : TypeToken<ActionData<CredentialsResp>>() {}.type
         )
     }
+
+    /**
+     * 获取用户资料卡
+     *
+     * @return [ActionData] of [UserInfoResp]
+     */
+    @JvmBlockingBridge
+    suspend fun getUserInfo(userId: Long, noCache: Boolean): ActionData<UserInfoResp> {
+        val action = ActionPathEnum.GET_USER_INFO
+        val params = JsonObject()
+        params.addProperty("user_id", userId)
+        params.addProperty("refresh", noCache)
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionData<UserInfoResp>>() {}.type
+        )
+    }
 }
 
 fun <T> List<T>.toJsonArray(): JsonArray {

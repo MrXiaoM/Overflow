@@ -32,6 +32,7 @@ import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
 import top.mrxiaom.overflow.internal.contact.StrangerWrapper
+import top.mrxiaom.overflow.internal.data.UserProfileImpl
 import top.mrxiaom.overflow.internal.data.asMirai
 import top.mrxiaom.overflow.internal.listener.*
 import top.mrxiaom.overflow.internal.message.OnebotMessages
@@ -205,7 +206,11 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     @JvmBlockingBridge
     override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain = OnebotMessages.deserializeFromOneBot(bot, message, null)
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
-        TODO("Not yet implemented")
+        val data = bot.asOnebot.impl.getUserInfo(targetId, false).data
+        // TODO: 不确定 birthday 的单位是毫秒还是秒
+        val age = if (data.birthday > 0) ((currentTimeSeconds() - data.birthday) / 365.daysToSeconds).toInt() else 0
+        // TODO: 获取性别
+        return UserProfileImpl(age, data.mail, 0, data.name, data.level, UserProfile.Sex.UNKNOWN, data.hobbyEntry)
     }
     override suspend fun getOnlineOtherClientsList(bot: Bot, mayIncludeSelf: Boolean): List<OtherClientInfo> {
         TODO("Not yet implemented")
