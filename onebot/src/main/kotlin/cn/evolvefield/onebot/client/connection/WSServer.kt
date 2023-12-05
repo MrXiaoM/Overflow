@@ -37,11 +37,12 @@ class WSServer(
     }
 
     override fun onStart() {
-        logger.info("▌ 启动反向WebSocket服务端 $address")
+        logger.info("▌ 反向 WebSocket 服务端已在 $address 启动")
+        logger.info("▌ 正在等待客户端连接...")
     }
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
-        logger.info("▌ 反向WebSocket ${conn.remoteSocketAddress} 已连接 ┈━═☆")
+        logger.info("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 已连接 ┈━═☆")
         def.complete(Bot(conn, actionHandler))
     }
 
