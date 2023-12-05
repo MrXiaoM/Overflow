@@ -199,7 +199,7 @@ class GroupWrapper(
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {
-        return Image.fromId(FileService.instance!!.upload(resource))
+        return OnebotMessages.imageFromFile(FileService.instance!!.upload(resource))
     }
 
     override suspend fun uploadShortVideo(
@@ -207,7 +207,7 @@ class GroupWrapper(
         video: ExternalResource,
         fileName: String?
     ): ShortVideo {
-        return WrappedVideo(FileService.instance!!.upload(video))
+        return OnebotMessages.videoFromFile(FileService.instance!!.upload(video))
     }
 
     @Suppress("DEPRECATION_ERROR")
