@@ -67,14 +67,14 @@ class WSServer(
     }
 
     override fun onClose(conn: WebSocket, code: Int, reason: String, remote: Boolean) {
-        logger.info("▌ 反向WebSocket ${conn.remoteSocketAddress} 连接因 {} 已关闭", reason)
+        logger.info("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 连接因 {} 已关闭", reason)
         eventBus?.stop()
         if (mutex.isLocked) mutex.unlock()
         if (ActionSendUtils.mutex.isLocked) ActionSendUtils.mutex.unlock()
     }
 
     override fun onError(conn: WebSocket, ex: Exception) {
-        logger.error("▌ 反向WebSocket ${conn.remoteSocketAddress} 出现错误 {} 或未连接 ┈━═☆", ex.localizedMessage)
+        logger.error("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 出现错误 {} 或未连接 ┈━═☆", ex.localizedMessage)
     }
 
     companion object {
