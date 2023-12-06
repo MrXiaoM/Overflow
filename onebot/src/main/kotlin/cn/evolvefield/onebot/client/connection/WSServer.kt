@@ -48,8 +48,6 @@ class WSServer(
             conn.close(1401, "Overflow 不支持多客户端连接")
             return
         }
-        logger.info(conn.resourceDescriptor)
-        logger.info(handshake.resourceDescriptor)
         if (token.isNotBlank()) {
             if (handshake.hasFieldValue("Authorization")) {
                 val param = handshake.getFieldValue("Authorization").removePrefix("Bearer ")
