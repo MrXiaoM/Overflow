@@ -1,0 +1,98 @@
+name: Bug 报告
+description: 提交一个 bug
+labels:
+  - "z:question"
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢你来到这里
+
+        在反馈前, 请确认你已经做了下面这些事情
+        - 阅读过 [「提问的智慧」](https://github.com/ryanhanwu/How-To-Ask-Questions-The-Smart-Way/blob/main/README-zh_CN.md)
+        - 阅读过 [「如何有效地报告 Bug」](https://www.chiark.greenend.org.uk/~sgtatham/bugs-cn.html)
+        - 对照过 [Releases](https://github.com/MrXiaoM/Overflow/releases)，相关问题未在近期更新中解决
+        - 搜索了已有的 [issues](https://github.com/MrXiaoM/Overflow/issues?q=is%3Aissue) 列表中有没相关的信息
+        - 阅读了 [Overflow 的相关文档](https://github.com/MrXiaoM/Overflow/tree/main/docs)
+        - 已做过初步调查，确定该问题来自 Overflow，而不是来自 mirai、业务逻辑、插件，或 OpenShamrock 等 Onebot 实现。
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: 问题描述
+      description: 在此详细描述你遇到的问题
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现
+      description: 在这里简略说明如何让这个问题再次发生
+      placeholder: |
+        在这里简略说明如何让这个问题再次发生
+        可使用 1.  2.  3.  的列表格式，或其他任意恰当的格式
+        如果你不确定如何复现, 请尽量描述发生当时的情景
+        
+        建议提供相关代码
+    validations:
+      required: true
+
+  - type: input
+    id: version-overflow
+    attributes:
+      label: Overflow 版本
+      description: "正式发布之前，版本号为 short commit hash，即启动信息显示的 2.16.0- 后面的7位字符，示例: fffffff"
+    validations:
+      required: true
+
+  - type: textarea
+    id: version-others
+    attributes:
+      label: 其他组件版本
+      description: |
+        如 mirai-console 版本 (如果有)
+        如 OpenShamrock 等 Overflow 连接到的 Onebot 实现的版本
+
+  - type: textarea
+    id: journal-system
+    attributes:
+      label: 系统日志
+      description: |
+        请提供全面的相关日志. 请不要截图.
+        如果日志过大, 可以在 `补充信息` 上传文件.
+        如果你遇到的问题是 "消息收不到", "收消息报错" 等与协议有关的问题, 请一定提交日志. 若不提交日志, 你的问题可能会被直接关闭.
+      render: 'text'
+    validations:
+      required: false
+
+  - type: textarea
+    id: journal-network
+    attributes:
+      label: 网络日志
+      description: |
+        请提供全面的网络日志（如果需要）. 请不要截图.
+        网络日志一般在 `logs/onebot/*.yml`.
+        如果日志过大, 可以在 `补充信息` 上传文件.
+      render: text
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 补充信息
+      description: 如有必要，你可以在下文继续添加其他信息
+
+  - type: markdown
+    attributes:
+      value: |
+        ----
+
+        在发出 issue 前, 请确认
+
+        - 全部信息已经填写完毕, 特别是 「其他组件版本」
+        - 报告中没有令人反感的语言
+        - 「复现」的描述是否足够详细准确
+        - 若内容有你认为的敏感数据，请使用星号代替
