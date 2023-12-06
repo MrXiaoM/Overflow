@@ -70,7 +70,7 @@ class ConnectFactory private constructor(
         var pair: Pair<WSServer, Bot>? = null
         try {
             val address = InetSocketAddress(config.reversedPort)
-            pair = WSServer.createAndWaitConnect(scope, address, logger, actionHandler)
+            pair = WSServer.createAndWaitConnect(scope, address, logger, actionHandler, config.token)
         } catch (e: Exception) {
             logger.error("▌ 反向 WebSocket 绑定端口 {} 或连接客户端时出现错误 ┈━═☆", config.reversedPort)
             logger.error(e.stackTraceToString())

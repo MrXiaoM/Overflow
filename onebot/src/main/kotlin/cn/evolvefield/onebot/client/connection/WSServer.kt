@@ -27,7 +27,8 @@ class WSServer(
     private val scope: CoroutineScope,
     address: InetSocketAddress,
     private val logger: Logger,
-    private val actionHandler: ActionHandler
+    private val actionHandler: ActionHandler,
+    private val token: String
 ) : WebSocketServer(address) {
     private var eventBus: EventBus? = null
     private var bot: Bot? = null
@@ -46,6 +47,26 @@ class WSServer(
         if (bot?.channel?.isOpen == true) {
             conn.close(1401, "Overflow 不支持多客户端连接")
             return
+        }
+        logger.info(conn.resourceDescriptor)
+        logger.info(handshake.resourceDescriptor)
+        if (token.isNotBlank()) {
+            if (handshake.hasFieldValue("Authorization")) {
+                val param = handshake.getFieldValue("Authorization").removePrefix("Bearer ")
+                if (param != token) {
+                    conn.close(1401, "token 错误")
+                    return
+                }
+            } else if (handshake.resourceDescriptor.contains("access_token=")) {
+                val param = handshake.resourceDescriptor.substringAfter("access_token=").substringBefore("&")
+                if (param != token) {
+                    conn.close(1401, "token 错误")
+                    return
+                }
+            } else {
+                conn.close(1401, "未提供 token")
+                return
+            }
         }
         logger.info("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 已连接 ┈━═☆")
         (bot ?: Bot(conn, actionHandler).also {
@@ -90,10 +111,10 @@ class WSServer(
         private const val HEART_BEAT = "heartbeat"
 
         val mutex = Mutex()
-        suspend fun createAndWaitConnect(scope: CoroutineScope, address: InetSocketAddress, logger: Logger, actionHandler: ActionHandler): Pair<WSServer, Bot> {
-            val ws = WSServer(scope, address, logger, actionHandler)
+        suspend fun createAndWaitConnect(scope: CoroutineScope, address: InetSocketAddress, logger: Logger, actionHandler: ActionHandler, token: String): Pair<WSServer, Bot> {
+            val ws = WSServer(scope, address, logger, actionHandler, token)
             ws.start()
-            return ws to ws.def.await().also { ws.bot = it }
+            return ws to ws.def.await()
         }
     }
 }
