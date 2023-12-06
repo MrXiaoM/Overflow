@@ -90,7 +90,9 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 
 设置反向 WebSocket 的端口，将在启动时开启反向 WebSocket 服务器等待连接。该选项优先级比正向 WebSocket 高，也就是设置了反向连接配置后将不使用正向连接。
 
-修改 `reversed_ws_port` 为 `[1, 65535]` 区间的数 (端口号有效值) 即可。
+修改 `reversed_ws_port` 为 `[1, 65535]` 区间的数 (端口号有效值)，再次启动即可。
+
+反向 WebSocket 仅支持一个客户端连接，目前没有支持多客户端以及多 Bot 的打算。
 
 # 项目进度相关说明
 

@@ -30,6 +30,7 @@ class WSServer(
     private val actionHandler: ActionHandler
 ) : WebSocketServer(address) {
     private var eventBus: EventBus? = null
+    private var bot: Bot? = null
     val def = CompletableDeferred<Bot>()
 
     fun createEventBus(): EventBus {
@@ -42,8 +43,15 @@ class WSServer(
     }
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
+        if (bot?.channel?.isOpen == true) {
+            conn.close(1401, "Overflow 不支持多客户端连接")
+            return
+        }
         logger.info("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 已连接 ┈━═☆")
-        def.complete(Bot(conn, actionHandler))
+        (bot ?: Bot(conn, actionHandler).also {
+            bot = it
+            def.complete(it)
+        }).channel = conn
     }
 
     override fun onMessage(conn: WebSocket, message: String) {
@@ -67,14 +75,13 @@ class WSServer(
     }
 
     override fun onClose(conn: WebSocket, code: Int, reason: String, remote: Boolean) {
-        logger.info("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 连接因 {} 已关闭", reason)
-        eventBus?.stop()
+        logger.info("▌ 反向 WebSocket 客户端连接因 {} 已关闭", reason)
         if (mutex.isLocked) mutex.unlock()
         if (ActionSendUtils.mutex.isLocked) ActionSendUtils.mutex.unlock()
     }
 
     override fun onError(conn: WebSocket, ex: Exception) {
-        logger.error("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 出现错误 {} 或未连接 ┈━═☆", ex.localizedMessage)
+        logger.error("▌ 反向 WebSocket 客户端连接出现错误 {} 或未连接 ┈━═☆", ex.localizedMessage)
     }
 
     companion object {
@@ -86,7 +93,7 @@ class WSServer(
         suspend fun createAndWaitConnect(scope: CoroutineScope, address: InetSocketAddress, logger: Logger, actionHandler: ActionHandler): Pair<WSServer, Bot> {
             val ws = WSServer(scope, address, logger, actionHandler)
             ws.start()
-            return ws to ws.def.await()
+            return ws to ws.def.await().also { ws.bot = it }
         }
     }
 }
