@@ -51,7 +51,7 @@ class WSServer(
         (bot ?: Bot(conn, actionHandler).also {
             bot = it
             def.complete(it)
-        }).channel = conn
+        }).conn = conn
     }
 
     override fun onMessage(conn: WebSocket, message: String) {

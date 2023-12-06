@@ -36,9 +36,11 @@ import org.java_websocket.WebSocket
  */
 @Suppress("unused")
 class Bot(
-    internal var channel: WebSocket,
+    internal var conn: WebSocket,
     val actionHandler: ActionHandler
 ) {
+    val channel: WebSocket
+        get() = conn
     private var idInternal: Long = 0
     val id: Long
         get() = idInternal
