@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.java_websocket.WebSocket
+import org.java_websocket.framing.CloseFrame
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.server.WebSocketServer
 import org.slf4j.Logger
@@ -45,24 +46,24 @@ class WSServer(
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
         if (bot?.channel?.isOpen == true) {
-            conn.close(1401, "Overflow 不支持多客户端连接")
+            conn.close(CloseFrame.NORMAL, "Overflow 不支持多客户端连接")
             return
         }
         if (token.isNotBlank()) {
             if (handshake.hasFieldValue("Authorization")) {
                 val param = handshake.getFieldValue("Authorization").removePrefix("Bearer ")
                 if (param != token) {
-                    conn.close(1401, "token 错误")
+                    conn.close(CloseFrame.NORMAL, "token 错误")
                     return
                 }
             } else if (handshake.resourceDescriptor.contains("access_token=")) {
                 val param = handshake.resourceDescriptor.substringAfter("access_token=").substringBefore("&")
                 if (param != token) {
-                    conn.close(1401, "token 错误")
+                    conn.close(CloseFrame.NORMAL, "token 错误")
                     return
                 }
             } else {
-                conn.close(1401, "未提供 token")
+                conn.close(CloseFrame.NORMAL, "未提供 token")
                 return
             }
         }
