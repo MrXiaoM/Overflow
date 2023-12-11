@@ -291,6 +291,10 @@ public enum ActionPathEnum implements ActionPath {
      * 删除群文件夹
      */
     DELETE_GROUP_FOLDER("delete_group_folder"),
+    /**
+     * 获取群文件下载链接
+     */
+    GET_GROUP_FILE_URL("get_group_file_url"),
 
     ;
 

@@ -203,7 +203,7 @@ class FileWrapper(
     }
 
     override suspend fun getUrl(): String? {
-        TODO("Not yet implemented")
+        return contact.botWrapper.impl.getGroupFileUrl(contact.id, id, busid).data?.url
     }
 
     override suspend fun moveTo(folder: AbsoluteFolder): Boolean {

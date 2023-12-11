@@ -1031,6 +1031,27 @@ class Bot(
             object : TypeToken<ActionData<GroupFilesResp>>() {}.type
         )
     }
+    /**
+     * 获取群文件下载链接
+     *
+     * @param groupId  群号
+     * @param fileId 文件ID
+     * @param busid 此参数可在群文件相关接口中获取
+     * @return [ActionData] of [GroupFileUrlResp]
+     */
+    @JvmBlockingBridge
+    suspend fun getGroupFileUrl(groupId: Long, fileId: String, busid: Int): ActionData<GroupFileUrlResp> {
+        val action = ActionPathEnum.GET_GROUP_FILE_URL
+        val params = JsonObject()
+        params.addProperty("group_id", groupId)
+        params.addProperty("file_id", fileId)
+        params.addProperty("busid", busid)
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(
+            result.toString(),
+            object : TypeToken<ActionData<GroupFileUrlResp>>() {}.type
+        )
+    }
 
     /**
      * 自定义请求 ActionData
