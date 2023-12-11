@@ -283,6 +283,14 @@ public enum ActionPathEnum implements ActionPath {
      * 获取用户资料卡
      */
     GET_USER_INFO("get_user_info"),
+    /**
+     * 删除群文件
+     */
+    DELETE_GROUP_FILE("delete_group_file"),
+    /**
+     * 删除群文件夹
+     */
+    DELETE_GROUP_FOLDER("delete_group_folder"),
 
     ;
 

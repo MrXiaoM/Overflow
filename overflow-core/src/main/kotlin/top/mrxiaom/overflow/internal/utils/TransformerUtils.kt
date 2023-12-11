@@ -97,7 +97,7 @@ fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderW
         val md5 = it.md5?.hexToBytes() ?: ByteArray(16)
         val sha1 = it.sha1?.hexToBytes() ?: ByteArray(16)
         FileWrapper(group, parent,
-            it.fileId, it.fileName, md5, sha1, it.fileSize, it.deadTime, it.modifyTime, it.uploadTime, it.uploader
+            it.fileId, it.fileName, md5, sha1, it.fileSize, it.deadTime, it.modifyTime, it.uploadTime, it.uploader, it.busid
         )
     }
 }

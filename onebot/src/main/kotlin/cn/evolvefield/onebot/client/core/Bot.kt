@@ -1426,6 +1426,42 @@ class Bot(
             object : TypeToken<ActionData<UserInfoResp>>() {}.type
         )
     }
+
+    /**
+     * 删除群文件
+     *
+     * @param groupId 群号
+     * @param fileId 文件ID
+     * @param busid 此参数可在群文件相关接口中获取
+     * @return [ActionRaw]
+     */
+    @JvmBlockingBridge
+    suspend fun deleteGroupFile(groupId: Long, fileId: String, busid: Int): ActionRaw {
+        val action = ActionPathEnum.DELETE_GROUP_FILE
+        val params = JsonObject()
+        params.addProperty("group_id", groupId)
+        params.addProperty("file_id", fileId)
+        params.addProperty("busid", busid)
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
+    }
+
+    /**
+     * 删除群文件夹
+     *
+     * @param groupId 群号
+     * @param folderId 文件夹ID
+     * @return [ActionRaw]
+     */
+    @JvmBlockingBridge
+    suspend fun deleteGroupFolder(groupId: Long, folderId: String): ActionRaw {
+        val action = ActionPathEnum.DELETE_GROUP_FOLDER
+        val params = JsonObject()
+        params.addProperty("group_id", groupId)
+        params.addProperty("folder_id", folderId)
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
+    }
 }
 
 fun <T> List<T>.toJsonArray(): JsonArray {

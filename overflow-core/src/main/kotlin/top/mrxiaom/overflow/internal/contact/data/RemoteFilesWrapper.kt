@@ -60,7 +60,7 @@ class FolderWrapper(
         }
 
     override suspend fun delete(): Boolean {
-        TODO("Not yet implemented")
+        return contact.botWrapper.impl.deleteGroupFolder(contact.id, id).status != "failed"
     }
 
     override suspend fun exists(): Boolean {
@@ -179,7 +179,8 @@ class FileWrapper(
     override val expiryTime: Long,
     override val lastModifiedTime: Long,
     override val uploadTime: Long,
-    override val uploaderId: Long
+    override val uploaderId: Long,
+    val busid: Int,
 ) : AbsoluteFile {
     override val isFile: Boolean = true
     override val isFolder: Boolean = false
@@ -194,7 +195,7 @@ class FileWrapper(
         }
 
     override suspend fun delete(): Boolean {
-        TODO("Not yet implemented")
+        return contact.botWrapper.impl.deleteGroupFile(contact.id, id, busid).status != "failed"
     }
 
     override suspend fun exists(): Boolean {
