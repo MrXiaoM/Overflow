@@ -51,7 +51,9 @@ class WSServer(
         }
         if (token.isNotBlank()) {
             if (handshake.hasFieldValue("Authorization")) {
-                val param = handshake.getFieldValue("Authorization").removePrefix("Bearer ")
+                val param = handshake.getFieldValue("Authorization").run {
+                    if (lowercase().startsWith("bearer ")) substring(7) else this
+                }
                 if (param != token) {
                     conn.close(CloseFrame.NORMAL, "token 错误")
                     return
