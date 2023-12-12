@@ -29,7 +29,12 @@ jobs:
       - name: Build Package
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :overflow-core-all:shadowJar
+          arguments: :overflow-core-all:shadowJar publishGithubPackagePublicationToGithubRepository
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ORG_GRADLE_PROJECT_VERSION_OVERRIDE: ${{ env.SHORT_SHA }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:

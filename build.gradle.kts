@@ -19,6 +19,10 @@ val miraiVersion = "2.16.0"
 rootProject.ext["miraiVersion"] = miraiVersion
 version = miraiVersion
 
+if (findProperty("VERSION_OVERRIDE") != null) {
+    version = "$version-${findProperty("VERSION_OVERRIDE")}"
+}
+
 allprojects {
     group = rootProject.group
     version = rootProject.version
@@ -46,6 +50,18 @@ nexusPublishing {
             snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
             username.set(findProperty("MAVEN_USERNAME")?.toString())
             password.set(findProperty("MAVEN_PASSWORD")?.toString())
+        }
+    }
+}
+publishing {
+    repositories {
+        val owner = System.getenv("GITHUB_REPOSITORY_OWNER")
+        maven("https://maven.pkg.github.com/$owner/Overflow") {
+            name = "github"
+            credentials {
+                username = owner
+                password = findProperty("GITHUB_TOKEN").toString()
+            }
         }
     }
 }
