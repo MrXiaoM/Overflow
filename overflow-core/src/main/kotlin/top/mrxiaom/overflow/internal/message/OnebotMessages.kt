@@ -62,6 +62,7 @@ object OnebotMessages {
                             is Audio -> put("file", single.onebotFile)
                             is ShortVideo -> put("file", single.onebotFile)
                             is At -> put("qq", single.target)
+                            is AtAll -> put("qq", "all")
                             is RockPaperScissors -> put("id", single.id) // Onebot 11 不支持自定义石头剪刀布
                             is Dice -> put("id", single.value) // Onebot 11 不支持自定义骰子
                             is PokeMessage -> {
@@ -150,7 +151,12 @@ object OnebotMessages {
                     }
                     "record" -> add(audioFromFile(data["file"].string))
                     "video" -> add(videoFromFile(data["file"].string))
-                    "at" -> add(At(data["qq"]!!.jsonPrimitive.long))
+                    "at" -> {
+                        if (data["qq"].string.lowercase() == "all")
+                            add(AtAll)
+                        else
+                            add(At(data["qq"]!!.jsonPrimitive.long))
+                    }
                     // TODO "rps" "dice" 无法通过 OneBot 获取其具体值，先搁置
                     "new_dice" -> add(Dice(data["id"].int))
                     "poke" -> add(PokeMessage(
@@ -281,6 +287,7 @@ object OnebotMessages {
             is Audio -> "record"
             is ShortVideo -> "video"
             is At -> "at"
+            is AtAll -> "at"
             is RockPaperScissors -> "rps"
             is Dice -> {
                 when (appName) {
