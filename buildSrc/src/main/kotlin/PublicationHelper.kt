@@ -21,15 +21,6 @@ fun Project.setupMavenCentralPublication(artifactsBlock: MavenPublication.() -> 
                 artifactsBlock()
                 pom(mavenPom(artifactId))
             }
-            create<MavenPublication>("githubPackage") {
-                from(components.getByName("kotlin"))
-                groupId = rootProject.group.toString()
-                artifactId = project.name
-                version = rootProject.version.toString()
-
-                artifactsBlock()
-                pom(mavenPom(artifactId))
-            }
         }
     }
     extensions.configure(SigningExtension::class) {
