@@ -22,6 +22,16 @@ fun Project.setupMavenCentralPublication(artifactsBlock: MavenPublication.() -> 
                 pom(mavenPom(artifactId))
             }
         }
+        repositories {
+            val owner = System.getenv("GITHUB_REPOSITORY_OWNER")
+            maven("https://maven.pkg.github.com/$owner/Overflow") {
+                name = "github"
+                credentials {
+                    username = owner
+                    password = findProperty("GITHUB_TOKEN").toString()
+                }
+            }
+        }
     }
     extensions.configure(SigningExtension::class) {
         val signingKey = findProperty("signingKey")?.toString()
