@@ -45,22 +45,22 @@ jobs:
         with:
           package-name: 'overflow-core-api'
           package-type: 'maven'
-          min-versions-to-keep: 10
+          min-versions-to-keep: 30
       - name: Delete Old onebot
         uses: actions/delete-package-versions@v4.1.1
         with:
           package-name: 'onebot'
           package-type: 'maven'
-          min-versions-to-keep: 10
+          min-versions-to-keep: 30
       - name: Delete Old overflow-core
         uses: actions/delete-package-versions@v4.1.1
         with:
           package-name: 'overflow-core'
           package-type: 'maven'
-          min-versions-to-keep: 10
+          min-versions-to-keep: 30
       - name: Delete Old overflow-core-all
         uses: actions/delete-package-versions@v4.1.1
         with:
           package-name: 'overflow-core-all'
           package-type: 'maven'
-          min-versions-to-keep: 10
+          min-versions-to-keep: 30

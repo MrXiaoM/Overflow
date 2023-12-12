@@ -1,5 +1,20 @@
 # Overflow 开发文档
 
+# 开发版使用说明
+
+由于当前项目进度缓慢，将来可能有越来越多人有开发需求，故暂时将包发布到了 Github Packages。如需在开发环境中使用 Overflow，添加以下仓库
+
+```kotlin
+repositories {
+    maven("https://maven.pkg.github.com/MrXiaoM/Overflow") {
+        credentials {
+            username = "MrXiaoM"
+            password = "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" // 该 token 仅有 package:read 权限
+        }
+    }
+}
+```
+开发版仓库中依赖版本的格式为 `${miraiVersion}-${shortCommitHash}`，如 `2.16.0-0abcdef`，如果需要保持依赖为最新版，则使用 `2.16.0+`
 
 # 在 mirai-console 中开发
 
