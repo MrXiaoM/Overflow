@@ -108,7 +108,9 @@ java -cp "$CLASSPATH:./libs/*" net.mamoe.mirai.console.terminal.MiraiConsoleTerm
 
 # 长期支持
 
-当前处于溢出核心项目长期支持的 Onebot 协议实现如下
+当前处于 Overflow 长期支持的 Onebot 协议实现，以及适配该实现的负责人如下
 
-* [whitechi73/OpenShamrock](https://github.com/whitechi73/OpenShamrock)
+* [whitechi73/OpenShamrock](https://github.com/whitechi73/OpenShamrock) - [MrXiaoM](https://github.com/MrXiaoM)
 * *Coming soon...*
+
+有意愿适配其它实现的开发者可提交 Pull Requests
