@@ -43,24 +43,24 @@ jobs:
       - name: Delete Old overflow-core-api
         uses: actions/delete-package-versions@v4.1.1
         with:
-          package-name: 'overflow-core-api'
+          package-name: 'top.mrxiaom.overflow-core-api'
           package-type: 'maven'
           min-versions-to-keep: 30
       - name: Delete Old onebot
         uses: actions/delete-package-versions@v4.1.1
         with:
-          package-name: 'onebot'
+          package-name: 'top.mrxiaom.onebot'
           package-type: 'maven'
           min-versions-to-keep: 30
       - name: Delete Old overflow-core
         uses: actions/delete-package-versions@v4.1.1
         with:
-          package-name: 'overflow-core'
+          package-name: 'top.mrxiaom.overflow-core'
           package-type: 'maven'
           min-versions-to-keep: 30
       - name: Delete Old overflow-core-all
         uses: actions/delete-package-versions@v4.1.1
         with:
-          package-name: 'overflow-core-all'
+          package-name: 'top.mrxiaom.overflow-core-all'
           package-type: 'maven'
           min-versions-to-keep: 30
