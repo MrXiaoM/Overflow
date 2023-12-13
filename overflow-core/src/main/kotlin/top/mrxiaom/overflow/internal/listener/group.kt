@@ -2,6 +2,7 @@
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
+import cn.evole.onebot.sdk.event.notice.group.GroupBanNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupMsgDeleteNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupNotifyNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupTitleChangeNoticeEvent
@@ -27,6 +28,7 @@ fun EventBus.addGroupListeners(bot: BotWrapper) {
         GroupMessageRecallListener(bot),
         GroupAddRequestListener(bot),
         GroupTitleChangeNoticeListener(bot),
+        GroupBanNoticeListener(bot),
 
     ).forEach(::addListener)
 }
@@ -148,4 +150,46 @@ internal class GroupTitleChangeNoticeListener(
             operator = group.owner // 目前只有群主可以更改群头衔
         )
     }
+}
+
+internal class GroupBanNoticeListener(
+    val bot: BotWrapper
+): EventListener<GroupBanNoticeEvent> {
+    override suspend fun onMessage(e: GroupBanNoticeEvent) {
+        val mute = when(e.subType) {
+            "ban" -> true
+            "lift_ban" -> false
+            else -> return
+        }
+        val group = bot.group(e.groupId)
+        if (e.userId == bot.id) {
+            val operator = group.queryMember(e.operatorId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+            if (mute) {
+                BotMuteEvent(
+                    durationSeconds = e.duration.toInt(),
+                    operator = operator
+                ).broadcast()
+            } else {
+                BotUnmuteEvent(
+                    operator = operator
+                ).broadcast()
+            }
+        } else {
+            val operator = group.queryMember(e.operatorId)
+            val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+            if (mute) {
+                MemberMuteEvent(
+                    member = member,
+                    durationSeconds = e.duration.toInt(),
+                    operator = operator
+                ).broadcast()
+            } else {
+                MemberUnmuteEvent(
+                    member = member,
+                    operator = operator
+                ).broadcast()
+            }
+        }
+    }
+
 }

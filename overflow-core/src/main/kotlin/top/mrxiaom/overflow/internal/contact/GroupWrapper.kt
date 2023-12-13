@@ -64,6 +64,7 @@ class GroupWrapper(
     }
 
     internal suspend fun queryMember(userId: Long): MemberWrapper? {
+        if (userId == bot.id) return botAsMember
         return (members[userId] as? MemberWrapper) ?: botWrapper.impl
             .getGroupMemberInfo(id, userId, false).data?.wrapAsMember(this)
     }
@@ -120,11 +121,11 @@ class GroupWrapper(
     override var name: String
         get() = impl.groupName
         set(value) { impl.groupName = value }
-    override val members: ContactList<NormalMember>
+    override val members: ContactList<MemberWrapper>
         get() = membersInternal ?: runBlocking {
             updateGroupMemberList()
         }
-    override val botAsMember: NormalMember
+    override val botAsMember: MemberWrapper
         get() = members.firstOrNull { it.id == bot.id } ?: runBlocking {
             val data = botWrapper.impl.getGroupMemberInfo(id, bot.id, false).data
             MemberWrapper(botWrapper, this@GroupWrapper, data ?: GroupMemberInfoResp(
