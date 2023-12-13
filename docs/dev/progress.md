@@ -53,14 +53,18 @@
 
 由于 onebot 事件有子类型，此表中 onebot 事件格式为 `事件类型 -> 子类型`
 
-| 事件类型             | mirai                         | onebot                    | 是否支持 |
-|------------------|-------------------------------|---------------------------|------|
-| 群消息              | GroupMessageEvent             | groupMessage -> normal    | ✅    |
-| 群匿名消息            | GroupMessageEvent             | groupMessage -> anonymous | ❌    |
-| 群系统提示            | -                             | groupMessage -> notice    | ❌    |
-| 好友消息             | FriendMessageEvent            | privateMessage -> friend  | ✅    |
-| 群临时会话消息          | GroupTempMessageEvent         | privateMessage -> group   | ❌    |
-| 陌生人消息            | StrangerMessageEvent          | privateMessage -> other   | ✅    |
-| 群戳一戳             | NudgeEvent                    | notify -> poke            | *✅*  |
-| 群撤回消息            | MessageRecallEvent.GroupEvent | group_recall              | *✅*  |
-| *Coming soon...* | -                             | -                         | ❔    |
+| 事件类型             | mirai                           | onebot                        | 是否支持 |
+|------------------|---------------------------------|-------------------------------|------|
+| 群消息              | GroupMessageEvent               | message -> group -> normal    | ✅    |
+| 群匿名消息            | GroupMessageEvent               | message -> group -> anonymous | ❌    |
+| 群系统提示            | -                               | message -> group -> notice    | ❌    |
+| 好友消息             | FriendMessageEvent              | message -> private -> friend  | ✅    |
+| 群临时会话消息          | GroupTempMessageEvent           | message -> private -> group   | ❌    |
+| 陌生人消息            | StrangerMessageEvent            | message -> private -> other   | ✅    |
+| 群戳一戳             | NudgeEvent                      | notify -> poke                | *✅*  |
+| 群撤回消息            | MessageRecallEvent.GroupEvent   | group_recall                  | *✅*  |
+| 群名片更改            | MemberCardChangeEvent           | -                             | ✅    |
+| 加群验证消息           | MemberJoinRequestEvent          | request -> group -> add       | ✅    |
+| 被邀请加群            | BotInvitedJoinGroupRequestEvent | request -> group -> invite    | ✅    |
+| 加好友验证            | NewFriendRequestEvent           | request -> friend             | ✅    |
+| *Coming soon...* | -                               | -                             | ❔    |
