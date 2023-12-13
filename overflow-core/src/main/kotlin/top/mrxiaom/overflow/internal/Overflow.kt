@@ -364,6 +364,13 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
 
     //========== Bot Invited Join Group Request 邀请机器人加群请求 START =============
+    fun putInventedJoinGroupRequestFlag(flag: String): Long {
+        var eventId = newInviteJoinGroupRequestFlagMap.size.toLong()
+        while (newInviteJoinGroupRequestFlagMap.containsKey(eventId)) {
+            eventId++
+        }
+        return eventId.also { newInviteJoinGroupRequestFlagMap[it] = flag }
+    }
     override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
         solveBotInvitedJoinGroupRequestEvent(event.bot, event.eventId, event.invitorId, event.groupId, true)
     }
@@ -380,6 +387,13 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
 
     //========== Member Join Request 加群申请 START =============
+    fun putMemberJoinRequestFlag(flag: String): Long {
+        var eventId = newMemberJoinRequestFlagMap.size.toLong()
+        while (newMemberJoinRequestFlagMap.containsKey(eventId)) {
+            eventId++
+        }
+        return eventId.also { newMemberJoinRequestFlagMap[it] = flag }
+    }
     override suspend fun acceptMemberJoinRequest(event: MemberJoinRequestEvent) {
         solveMemberJoinRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, event.groupId, accept = true, blackList = false, message = event.message)
     }
@@ -403,6 +417,13 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
 
     //========== New Friend Request 新好友请求 START =============
+    fun putNewFriendRequestFlag(flag: String): Long {
+        var eventId = newFriendRequestFlagMap.size.toLong()
+        while (newFriendRequestFlagMap.containsKey(eventId)) {
+            eventId++
+        }
+        return eventId.also { newFriendRequestFlagMap[it] = flag }
+    }
     override suspend fun acceptNewFriendRequest(event: NewFriendRequestEvent) {
         solveNewFriendRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, accept = true, blackList = false)
     }

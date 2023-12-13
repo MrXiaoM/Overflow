@@ -8,9 +8,11 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
+import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.utils.CheckableResponseA
 import net.mamoe.mirai.utils.JsonStruct
 import net.mamoe.mirai.utils.loadAs
+import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import java.net.HttpURLConnection
 import java.net.URL
@@ -76,4 +78,15 @@ internal suspend fun BotWrapper.httpGet(
         conn.connect()
         conn.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
     }
+}
+
+internal suspend inline fun <reified T : Any> BotWrapper.queryProfile(
+    targetId: Long,
+    block: UserProfile.() -> T
+): T? {
+    return runCatching {
+        Overflow.instance.queryProfile(this, targetId).block()
+    }.onFailure {
+        Overflow.logger.warning("获取用户 $targetId 的资料卡时出现一个异常", it)
+    }.getOrNull()
 }

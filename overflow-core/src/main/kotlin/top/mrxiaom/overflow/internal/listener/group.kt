@@ -4,16 +4,20 @@ package top.mrxiaom.overflow.internal.listener
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupMsgDeleteNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupNotifyNoticeEvent
+import cn.evole.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.broadcast
+import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
+import net.mamoe.mirai.event.events.MemberJoinRequestEvent
 import net.mamoe.mirai.event.events.MessageRecallEvent
 import net.mamoe.mirai.event.events.NudgeEvent
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiInternalApi
+import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.utils.*
@@ -23,6 +27,7 @@ fun EventBus.addGroupListeners(bot: BotWrapper) {
         GroupMessageListener(bot),
         GroupNotifyListener(bot),
         GroupMessageRecallListener(bot),
+        GroupAddRequestListener(bot),
 
     ).forEach(::addListener)
 }
@@ -97,5 +102,36 @@ internal class GroupMessageRecallListener(
             operator, group,
             group.botAsMember // TODO: Onebot 无法获取被撤回消息的发送者
         ).broadcast()
+    }
+}
+
+internal class GroupAddRequestListener(
+    val bot: BotWrapper
+): EventListener<GroupAddRequestEvent> {
+    override suspend fun onMessage(e: GroupAddRequestEvent) {
+        when (e.subType) {
+            "add" -> {
+                MemberJoinRequestEvent(
+                    bot = bot,
+                    eventId = Overflow.instance.putMemberJoinRequestFlag(e.flag),
+                    message = e.comment,
+                    fromId = e.userId,
+                    groupId = e.groupId,
+                    groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),
+                    fromNick = bot.queryProfile(e.userId) { nickname } ?: "",
+                    invitorId = null // TODO: 获取邀请者
+                ).broadcast()
+            }
+            "invite" -> {
+                BotInvitedJoinGroupRequestEvent(
+                    bot = bot,
+                    eventId = Overflow.instance.putInventedJoinGroupRequestFlag(e.flag),
+                    invitorId = e.userId,
+                    groupId = e.groupId,
+                    groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),
+                    invitorNick = bot.queryProfile(e.userId) { nickname } ?: ""
+                ).broadcast()
+            }
+        }
     }
 }
