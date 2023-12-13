@@ -2,16 +2,19 @@
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
+import cn.evole.onebot.sdk.event.request.FriendAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.FriendMessageEvent
+import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.event.events.StrangerMessageEvent
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.OnlineMessageSource
 import net.mamoe.mirai.utils.MiraiInternalApi
+import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.utils.*
@@ -19,6 +22,7 @@ import top.mrxiaom.overflow.internal.utils.*
 fun EventBus.addFriendListeners(bot: BotWrapper) {
     listOf(
         FriendMessageListener(bot),
+        FriendAddRequestListener(bot),
 
     ).forEach(::addListener)
 }
@@ -84,5 +88,20 @@ internal class FriendMessageListener(
                 ).broadcast()
             }
         }
+    }
+}
+
+internal class FriendAddRequestListener(
+    val bot: BotWrapper
+): EventListener<FriendAddRequestEvent> {
+    override suspend fun onMessage(e: FriendAddRequestEvent) {
+        NewFriendRequestEvent(
+            bot = bot,
+            eventId = Overflow.instance.putNewFriendRequestFlag(e.flag),
+            message = e.comment,
+            fromId = e.userId,
+            fromGroupId = 0, // TODO: 获取来自哪个群
+            fromNick = bot.queryProfile(e.userId) { nickname } ?: ""
+        ).broadcast()
     }
 }
