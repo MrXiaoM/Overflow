@@ -5,10 +5,7 @@ import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.contact.Group
-import net.mamoe.mirai.contact.Member
-import net.mamoe.mirai.contact.MemberPermission
-import net.mamoe.mirai.contact.NormalMember
+import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.contact.active.MemberActive
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.*
@@ -59,6 +56,9 @@ class MemberWrapper(
     override var nameCard: String
         get() = impl.card ?: ""
         set(value) {
+            if (id != bot.id) {
+                group.checkBotPermission(MemberPermission.ADMINISTRATOR)
+            }
             Overflow.instance.launch {
                 botWrapper.impl.setGroupCard(impl.groupId, id, value)
             }
