@@ -74,7 +74,7 @@ class GroupWrapper(
             val data = botWrapper.impl.getGroupMemberList(id).data ?: return@apply
             update(data.map {
                 MemberWrapper(botWrapper, this@GroupWrapper, it)
-            }) { impl = it.impl }
+            }) { setImpl(it.impl) }
             membersInternal = this
         }
     }

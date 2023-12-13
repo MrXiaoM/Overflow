@@ -24,6 +24,7 @@ import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
+@OptIn(MiraiInternalApi::class)
 class MemberWrapper(
     val botWrapper: BotWrapper,
     val groupWrapper: GroupWrapper,
@@ -33,7 +34,16 @@ class MemberWrapper(
     val data: GroupMemberInfoResp
         get() = impl
     override suspend fun queryUpdate() {
-        impl = botWrapper.impl.getGroupMemberInfo(impl.groupId, impl.userId, false).data
+        setImpl(botWrapper.impl.getGroupMemberInfo(impl.groupId, impl.userId, false).data)
+    }
+    
+    fun setImpl(impl: GroupMemberInfoResp) {
+        if (impl.card != impl.card) {
+            botWrapper.eventDispatcher.broadcastAsync(
+                MemberCardChangeEvent(this.impl.card, impl.card, this)
+            )
+        }
+        this.impl = impl
     }
 
     override val active: MemberActive
