@@ -1,3 +1,4 @@
+@file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
@@ -25,7 +26,6 @@ fun EventBus.addFriendListeners(bot: BotWrapper) {
 internal class FriendMessageListener(
     val bot: BotWrapper
 ) : EventListener<PrivateMessageEvent> {
-    @OptIn(MiraiInternalApi::class)
     override suspend fun onMessage(e: PrivateMessageEvent) {
         when (e.subType) {
             "friend" -> {

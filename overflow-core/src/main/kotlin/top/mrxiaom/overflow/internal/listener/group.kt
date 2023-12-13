@@ -1,3 +1,4 @@
+@file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
@@ -29,7 +30,6 @@ fun EventBus.addGroupListeners(bot: BotWrapper) {
 internal class GroupMessageListener(
     val bot: BotWrapper
 ) : EventListener<GroupMessageEvent> {
-    @OptIn(MiraiInternalApi::class)
     override suspend fun onMessage(e: GroupMessageEvent) {
         when(e.subType) {
             "normal" -> {
@@ -70,7 +70,6 @@ internal class GroupMessageListener(
 internal class GroupNotifyListener(
     val bot: BotWrapper
 ) : EventListener<GroupNotifyNoticeEvent> {
-    @OptIn(MiraiInternalApi::class)
     override suspend fun onMessage(e: GroupNotifyNoticeEvent) {
         val group = bot.group(e.groupId)
         when (e.subType) {
@@ -87,7 +86,6 @@ internal class GroupNotifyListener(
 internal class GroupMessageRecallListener(
     val bot: BotWrapper
 ): EventListener<GroupMsgDeleteNoticeEvent> {
-    @OptIn(MiraiInternalApi::class)
     override suspend fun onMessage(e: GroupMsgDeleteNoticeEvent) {
         val group = bot.group(e.groupId)
         val operator = group.members[e.operatorId]
