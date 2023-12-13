@@ -4,6 +4,7 @@ package top.mrxiaom.overflow.internal.listener
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupMsgDeleteNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupNotifyNoticeEvent
+import cn.evole.onebot.sdk.event.notice.group.GroupTitleChangeNoticeEvent
 import cn.evole.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
@@ -11,10 +12,7 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.broadcast
-import net.mamoe.mirai.event.events.BotInvitedJoinGroupRequestEvent
-import net.mamoe.mirai.event.events.MemberJoinRequestEvent
-import net.mamoe.mirai.event.events.MessageRecallEvent
-import net.mamoe.mirai.event.events.NudgeEvent
+import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
@@ -28,6 +26,7 @@ fun EventBus.addGroupListeners(bot: BotWrapper) {
         GroupNotifyListener(bot),
         GroupMessageRecallListener(bot),
         GroupAddRequestListener(bot),
+        GroupTitleChangeNoticeListener(bot),
 
     ).forEach(::addListener)
 }
@@ -133,5 +132,20 @@ internal class GroupAddRequestListener(
                 ).broadcast()
             }
         }
+    }
+}
+
+internal class GroupTitleChangeNoticeListener(
+    val bot: BotWrapper
+): EventListener<GroupTitleChangeNoticeEvent> {
+    override suspend fun onMessage(e: GroupTitleChangeNoticeEvent) {
+        val group = bot.group(e.groupId)
+        val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+        MemberSpecialTitleChangeEvent(
+            origin = e.titleOld,
+            new = e.titleNew,
+            member = member,
+            operator = group.owner // 目前只有群主可以更改群头衔
+        )
     }
 }

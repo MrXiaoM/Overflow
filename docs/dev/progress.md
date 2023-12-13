@@ -19,6 +19,7 @@
 | 语音        | Audio             | record  | ✅   | ✅   |
 | 短视频       | ShortVideo        | video   | ✅   | ✅   |
 | `@`       | At                | at      | ✅   | ✅   |
+| `@全体成员`   | AtAll             | at      | ✅   | ✅   |
 | 猜拳        | RockPaperScissors | rps     | ❌   | ✅   |
 | 骰子        | Dice              | dice    | *❌* | ✅   |
 | 戳一戳(手指动画) | PokeMessage       | poke    | ✅   | ✅   |
@@ -67,4 +68,8 @@
 | 加群验证消息           | MemberJoinRequestEvent          | request -> group -> add       | ✅    |
 | 被邀请加群            | BotInvitedJoinGroupRequestEvent | request -> group -> invite    | ✅    |
 | 加好友验证            | NewFriendRequestEvent           | request -> friend             | ✅    |
+| 群头衔变更            | MemberSpecialTitleChangeEvent   | *Not Found*                   | *✅*  |
 | *Coming soon...* | -                               | -                             | ❔    |
+
+实现事件说明如下
+* 群头衔变更事件 onebot-sdk 里有但是没用到，先实现再说。

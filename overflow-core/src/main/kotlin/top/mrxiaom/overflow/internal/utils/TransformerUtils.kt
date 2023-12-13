@@ -52,8 +52,8 @@ fun GroupMessageEvent.GroupSender.wrapAsMember(group: Group): MemberWrapper {
     }.wrapAsMember(group)
 }
 
-suspend fun BotWrapper.group(groupId: Long): Group {
-    return getGroup(groupId) ?: kotlin.run {
+suspend fun BotWrapper.group(groupId: Long): GroupWrapper {
+    return getGroup(groupId) as? GroupWrapper ?: kotlin.run {
         val data = impl.getGroupInfo(groupId, false).data ?: throw IllegalStateException("无法取得群信息")
         updateGroup(GroupWrapper(this, data))
     }
