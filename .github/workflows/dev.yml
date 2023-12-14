@@ -29,38 +29,10 @@ jobs:
       - name: Build Package
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: :overflow-core-all:shadowJar publishMavenReleasePublicationToGithubRepository
-        env:
-          ORG_GRADLE_PROJECT_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ORG_GRADLE_PROJECT_VERSION_OVERRIDE: ${{ env.SHORT_SHA }}
+          arguments: :overflow-core-all:shadowJar
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: overflow-core-all-${{ env.SHORT_SHA }}
           path: overflow-core-all/build/libs/*-all.jar
           if-no-files-found: error
-
-      - name: Delete Old overflow-core-api
-        uses: actions/delete-package-versions@v4.1.1
-        with:
-          package-name: 'top.mrxiaom.overflow-core-api'
-          package-type: 'maven'
-          min-versions-to-keep: 30
-      - name: Delete Old onebot
-        uses: actions/delete-package-versions@v4.1.1
-        with:
-          package-name: 'top.mrxiaom.onebot'
-          package-type: 'maven'
-          min-versions-to-keep: 30
-      - name: Delete Old overflow-core
-        uses: actions/delete-package-versions@v4.1.1
-        with:
-          package-name: 'top.mrxiaom.overflow-core'
-          package-type: 'maven'
-          min-versions-to-keep: 30
-      - name: Delete Old overflow-core-all
-        uses: actions/delete-package-versions@v4.1.1
-        with:
-          package-name: 'top.mrxiaom.overflow-core-all'
-          package-type: 'maven'
-          min-versions-to-keep: 30

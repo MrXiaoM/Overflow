@@ -1,0 +1,35 @@
+name: Publish Snapshots
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '*.md'
+permissions:
+  contents: write
+jobs:
+  build:
+    permissions:
+      contents: write
+      packages: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Java 8
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 8
+      - name: Get short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+      - name: Publish Package
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: publishMavenPublicationToSonatypeRepository closeAndReleaseSonatypeStagingRepository
+        env:
+          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
+          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+          ORG_GRADLE_PROJECT_MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          ORG_GRADLE_PROJECT_MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          # 加上 VERSION_OVERRIDE 将会设为 -SNAPSHOT 版本
+          ORG_GRADLE_PROJECT_VERSION_OVERRIDE: ${{ env.SHORT_SHA }}

@@ -20,7 +20,7 @@ rootProject.ext["miraiVersion"] = miraiVersion
 version = miraiVersion
 
 if (findProperty("VERSION_OVERRIDE") != null) {
-    version = "$version-${findProperty("VERSION_OVERRIDE")}"
+    version = "$version-${findProperty("VERSION_OVERRIDE")}-SNAPSHOT"
 }
 
 println("overflow version: $version")

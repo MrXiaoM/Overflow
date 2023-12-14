@@ -12,7 +12,7 @@ fun Project.setupMavenCentralPublication(artifactsBlock: MavenPublication.() -> 
 
     extensions.configure(PublishingExtension::class) {
         publications {
-            create<MavenPublication>("mavenRelease") {
+            create<MavenPublication>("maven") {
                 from(components.getByName("kotlin"))
                 groupId = rootProject.group.toString()
                 artifactId = project.name
@@ -20,16 +20,6 @@ fun Project.setupMavenCentralPublication(artifactsBlock: MavenPublication.() -> 
 
                 artifactsBlock()
                 pom(mavenPom(artifactId))
-            }
-        }
-        repositories {
-            val owner = System.getenv("GITHUB_REPOSITORY_OWNER")
-            maven("https://maven.pkg.github.com/$owner/Overflow") {
-                name = "github"
-                credentials {
-                    username = owner
-                    password = findProperty("GITHUB_TOKEN").toString()
-                }
             }
         }
     }
