@@ -30,6 +30,9 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: :overflow-core-all:shadowJar
+        env:
+          # 加上 VERSION_OVERRIDE 将会设为 -SNAPSHOT 版本
+          ORG_GRADLE_PROJECT_VERSION_OVERRIDE: ${{ env.SHORT_SHA }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
         with:
