@@ -28,7 +28,7 @@ fun Project.setupMavenCentralPublication(artifactsBlock: MavenPublication.() -> 
         val signingPassword = findProperty("signingPassword")?.toString()
         if (signingKey != null && signingPassword != null) {
             useInMemoryPgpKeys(signingKey, signingPassword)
-            sign(extensions.getByType(PublishingExtension::class).publications.getByName("mavenRelease"))
+            sign(extensions.getByType(PublishingExtension::class).publications.getByName("maven"))
         } else {
             logger.warn("子模块 ${project.name} 未找到签名配置")
         }
