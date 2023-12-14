@@ -6,20 +6,14 @@
 
 ```kotlin
 repositories {
-    maven("https://maven.pkg.github.com/MrXiaoM/Overflow") {
-        credentials {
-            username = "MrXiaoM"
-            password = "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" // 该 token 仅有 package:read 权限
-        }
-    }
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 ```
-开发版仓库中依赖版本的格式为 `${miraiVersion}-${shortCommitHash}`，如 `2.16.0-0abcdef`，如果需要保持依赖为最新版，则使用 `2.16.0+`
+快照仓库中依赖版本的格式为 `${miraiVersion}-${shortCommitHash}-SNAPSHOT`，如 `2.16.0-0abcdef-SNAPSHOT`
+
+你可以在 [这里](https://s01.oss.sonatype.org/content/repositories/snapshots/top/mrxiaom/overflow-core/) 查询已发布的开发版本列表 
 
 # 在 mirai-console 中开发
-
-> 在项目正式发布到 Maven Central 之前，此方法不可用。  
-> 你也可以先拉取本项目，执行 `publishToMavenLocal` 任务，再在自己项目的仓库中添加 `mavenLocal()` 来使用此方法。
 
 此方法仅 Gradle 可用。
 
@@ -52,9 +46,6 @@ dependencies {
 ```
 
 # 在 mirai-core 中开发
-
-> 在项目正式发布到 Maven Central 之前，此方法不可用。  
-> 你也可以先拉取本项目，执行 `publishToMavenLocal` 任务，再在自己项目的仓库中添加 `mavenLocal()` 来使用此方法。
 
 将依赖 `net.mamoe:mirai-core` 替换为 `top.mrxiaom:overflow-core` 即可。
 
