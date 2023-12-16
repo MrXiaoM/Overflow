@@ -88,7 +88,6 @@ class GroupWrapper(
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${botWrapper.id})Group/$id")
     override val active: GroupActive
         get() {
-            //val resp = botWrapper.impl.getGroupHonorInfo(id, "all").data
             TODO("Not yet implemented")
         }
     override val announcements: Announcements
@@ -131,7 +130,7 @@ class GroupWrapper(
         get() = throw NotImplementedError("Onebot 未提供消息漫游接口")
     override val settings: GroupSettingsWrapper = GroupSettingsWrapper(this)
 
-    val honors: GroupHonorInfoResp
+    internal val honors: GroupHonorInfoResp
         get() = honorsInternal ?: runBlocking {
             botWrapper.impl.getGroupHonorInfo(id, "all").data.also { honorsInternal = it }
         }
