@@ -112,7 +112,13 @@ class GroupWrapper(
         get() = impl.groupId
     override var name: String
         get() = impl.groupName
-        set(value) { impl.groupName = value }
+        set(value) {
+            checkBotPermission(MemberPermission.ADMINISTRATOR)
+            runBlocking {
+                botWrapper.impl.setGroupName(id, value)
+                impl.groupName = value
+            }
+        }
     override val members: ContactList<MemberWrapper>
         get() = membersInternal ?: runBlocking {
             updateGroupMemberList()
