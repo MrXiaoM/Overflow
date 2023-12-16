@@ -106,16 +106,6 @@ class GroupWrapper(
                 remoteFilesInternal = it
             }
         }
-    @Suppress("DEPRECATION_ERROR")
-    @Deprecated(
-        "Please use files instead.",
-        replaceWith = ReplaceWith("files.root"),
-        level = DeprecationLevel.ERROR
-    ) // deprecated since 2.8.0-RC
-    @DeprecatedSinceMirai(warningSince = "2.8", errorSince = "2.14")
-    public override val filesRoot: net.mamoe.mirai.utils.RemoteFile
-        get() = throw IllegalStateException("Deprecated")
-
     override val id: Long
         get() = impl.groupId
     override var name: String
@@ -212,6 +202,16 @@ class GroupWrapper(
     ): ShortVideo {
         return OnebotMessages.videoFromFile(FileService.instance!!.upload(video))
     }
+
+    @Suppress("DEPRECATION_ERROR")
+    @Deprecated(
+        "Please use files instead.",
+        replaceWith = ReplaceWith("files.root"),
+        level = DeprecationLevel.ERROR
+    ) // deprecated since 2.8.0-RC
+    @DeprecatedSinceMirai(warningSince = "2.8", errorSince = "2.14")
+    public override val filesRoot: net.mamoe.mirai.utils.RemoteFile
+        get() = throw IllegalStateException("Deprecated")
 
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(
