@@ -86,6 +86,11 @@ class GroupWrapper(
     override val bot: Bot
         get() = botWrapper
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${botWrapper.id})Group/$id")
+
+    /**
+     * 几乎全是 http api，但是也挺多的，有空再写
+     * https://github.com/mamoe/mirai/blob/dev/mirai-core/src/commonMain/kotlin/contact/active/GroupActiveProtocol.kt
+     */
     override val active: GroupActive
         get() {
             TODO("Not yet implemented")
