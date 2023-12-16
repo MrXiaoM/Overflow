@@ -29,6 +29,7 @@ import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper.Companion.fetchEssences
+import top.mrxiaom.overflow.internal.contact.data.GroupSettingsWrapper
 import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper
 import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper.Companion.fetchFiles
 import top.mrxiaom.overflow.internal.message.OnebotMessages
@@ -126,8 +127,7 @@ class GroupWrapper(
         get() = members.first { it.permission == MemberPermission.OWNER }
     override val roamingMessages: RoamingMessages
         get() = throw NotImplementedError("Onebot 未提供消息漫游接口")
-    override val settings: GroupSettings
-        get() = TODO("Not yet implemented")
+    override val settings: GroupSettingsWrapper = GroupSettingsWrapper(this)
 
     override fun contains(id: Long): Boolean {
         return members.contains(id)
