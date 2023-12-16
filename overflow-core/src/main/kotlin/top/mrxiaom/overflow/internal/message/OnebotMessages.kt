@@ -157,7 +157,11 @@ object OnebotMessages {
                         else
                             add(At(data["qq"]!!.jsonPrimitive.long))
                     }
+                    
                     // TODO "rps" "dice" 无法通过 OneBot 获取其具体值，先搁置
+                    "rps" -> add(RockPaperScissors.random())
+                    "dice" -> add(Dice.random())
+
                     "new_dice" -> add(Dice(data["id"].int))
                     "poke" -> add(PokeMessage(
                         data["name"].string,
