@@ -17,6 +17,7 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.contact.data.MemberActiveWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.WrappedVideo
@@ -30,7 +31,6 @@ class MemberWrapper(
     val groupWrapper: GroupWrapper,
     internal var impl: GroupMemberInfoResp
 ) : NormalMember, Updatable {
-
     val data: GroupMemberInfoResp
         get() = impl
     override suspend fun queryUpdate() {
@@ -46,8 +46,7 @@ class MemberWrapper(
         this.impl = impl
     }
 
-    override val active: MemberActive
-        get() = TODO("Not yet implemented")
+    override val active: MemberActiveWrapper = MemberActiveWrapper(this)
     override val bot: Bot = botWrapper
     override val group: Group = groupWrapper
     override val id: Long = impl.userId

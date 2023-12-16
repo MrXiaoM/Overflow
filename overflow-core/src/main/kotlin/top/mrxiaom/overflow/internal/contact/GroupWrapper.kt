@@ -1,6 +1,7 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
+import cn.evole.onebot.sdk.response.group.GroupHonorInfoResp
 import cn.evole.onebot.sdk.response.group.GroupInfoResp
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
@@ -49,6 +50,7 @@ class GroupWrapper(
     private var announcementsInternal: AnnouncementsWrapper? = null
     private var essencesInternal: EssencesWrapper? = null
     private var remoteFilesInternal: RemoteFilesWrapper? = null
+    private var honorsInternal: GroupHonorInfoResp? = null
 
     val data: GroupInfoResp
         get() = impl
@@ -128,6 +130,11 @@ class GroupWrapper(
     override val roamingMessages: RoamingMessages
         get() = throw NotImplementedError("Onebot 未提供消息漫游接口")
     override val settings: GroupSettingsWrapper = GroupSettingsWrapper(this)
+
+    val honors: GroupHonorInfoResp
+        get() = honorsInternal ?: runBlocking {
+            botWrapper.impl.getGroupHonorInfo(id, "all").data.also { honorsInternal = it }
+        }
 
     override fun contains(id: Long): Boolean {
         return members.contains(id)
