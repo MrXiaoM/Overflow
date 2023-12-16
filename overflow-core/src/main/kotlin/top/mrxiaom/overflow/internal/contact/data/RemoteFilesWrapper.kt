@@ -12,6 +12,7 @@ import top.mrxiaom.overflow.internal.contact.GroupWrapper
 import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
 import top.mrxiaom.overflow.internal.utils.toMiraiFiles
 import top.mrxiaom.overflow.internal.utils.toMiraiFolders
+import top.mrxiaom.overflow.spi.FileService
 import java.util.stream.Stream
 
 class RemoteFilesWrapper(
@@ -43,8 +44,9 @@ class FolderWrapper(
     override val uploaderId: Long,
     override var contentsCount: Int,
 ) : AbsoluteFolder {
-    val folders: MutableList<FolderWrapper> = mutableListOf()
-    val files: MutableList<FileWrapper> = mutableListOf()
+    internal val impl = contact.botWrapper.impl
+    internal val folders: MutableList<FolderWrapper> = mutableListOf()
+    internal val files: MutableList<FileWrapper> = mutableListOf()
 
     override val isFolder: Boolean = true
     override val isFile: Boolean = false
@@ -60,7 +62,7 @@ class FolderWrapper(
         }
 
     override suspend fun delete(): Boolean {
-        return contact.botWrapper.impl.deleteGroupFolder(contact.id, id).status != "failed"
+        return impl.deleteGroupFolder(contact.id, id).status != "failed"
     }
 
     override suspend fun exists(): Boolean {
@@ -140,13 +142,14 @@ class FolderWrapper(
         TODO("Not yet implemented")
     }
 
+    @Suppress("INVISIBLE_MEMBER")
     override suspend fun uploadNewFile(
         filepath: String,
         content: ExternalResource,
         callback: ProgressionCallback<AbsoluteFile, Long>?
     ): AbsoluteFile {
-
-        TODO("Not yet implemented")
+        impl.uploadGroupFile(contact.id, FileService.instance!!.upload(content), filepath, id)
+        TODO("文件上传回执")
     }
 
     override fun toString(): String = "AbsoluteFolder(name=$name, absolutePath=$absolutePath, id=$id)"
@@ -182,6 +185,7 @@ class FileWrapper(
     override val uploaderId: Long,
     val busid: Int,
 ) : AbsoluteFile {
+    internal val impl = contact.botWrapper.impl
     override val isFile: Boolean = true
     override val isFolder: Boolean = false
 
@@ -195,15 +199,15 @@ class FileWrapper(
         }
 
     override suspend fun delete(): Boolean {
-        return contact.botWrapper.impl.deleteGroupFile(contact.id, id, busid).status != "failed"
+        return impl.deleteGroupFile(contact.id, id, busid).status != "failed"
     }
 
     override suspend fun exists(): Boolean {
-        TODO("Not yet implemented")
+        return getUrl() != null
     }
 
     override suspend fun getUrl(): String? {
-        return contact.botWrapper.impl.getGroupFileUrl(contact.id, id, busid).data?.url
+        return impl.getGroupFileUrl(contact.id, id, busid).data?.url
     }
 
     override suspend fun moveTo(folder: AbsoluteFolder): Boolean {
