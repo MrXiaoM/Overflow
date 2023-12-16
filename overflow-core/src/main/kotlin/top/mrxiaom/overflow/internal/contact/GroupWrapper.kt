@@ -186,6 +186,8 @@ class GroupWrapper(
         }.onFailure { throwable = it }.getOrNull()
         GroupMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
+        bot.logger.verbose("Friend($id) <- $messageChain")
+
         return receipt ?: throw throwable!!
     }
 

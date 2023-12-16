@@ -81,6 +81,8 @@ class FriendWrapper(
         }.onFailure { throwable = it }.getOrNull()
         FriendMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
+        bot.logger.verbose("Friend($id) <- $messageChain")
+
         return receipt ?: throw throwable!!
     }
 

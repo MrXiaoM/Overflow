@@ -71,6 +71,8 @@ class StrangerWrapper(
         }.onFailure { throwable = it }.getOrNull()
         StrangerMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
+        bot.logger.verbose("Stranger($id) <- $messageChain")
+
         return receipt ?: throw throwable!!
     }
 

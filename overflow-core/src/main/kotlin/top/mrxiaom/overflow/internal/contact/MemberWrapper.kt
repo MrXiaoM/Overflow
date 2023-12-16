@@ -140,6 +140,8 @@ class MemberWrapper(
         }.onFailure { throwable = it }.getOrNull()
         GroupTempMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
+        bot.logger.verbose("Member(${group.id}:$id) <- $messageChain")
+
         return receipt ?: throw throwable!!
     }
 
