@@ -58,7 +58,7 @@ internal class GroupMessageListener(
                     // TODO: 过滤自己发送的消息
                 } else {
                     bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
-                    net.mamoe.mirai.event.events.GroupMessageEvent(
+                    GroupMessageEvent(
                         member.nameCardOrNick, member.permission, member, miraiMessage, messageSource.time
                     ).broadcast()
                 }

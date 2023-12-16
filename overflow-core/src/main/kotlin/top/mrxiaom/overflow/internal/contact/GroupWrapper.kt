@@ -58,14 +58,14 @@ class GroupWrapper(
         announcementsInternal = fetchAnnouncements()
     }
     internal fun updateMember(member: GroupMemberInfoResp): MemberWrapper {
-        return ((members[member.userId] as? MemberWrapper) ?: MemberWrapper(botWrapper, this, member).also { members.delegate.add(it) }).apply {
+        return (members[member.userId] ?: MemberWrapper(botWrapper, this, member).also { members.delegate.add(it) }).apply {
             impl = member
         }
     }
 
     internal suspend fun queryMember(userId: Long): MemberWrapper? {
         if (userId == bot.id) return botAsMember
-        return (members[userId] as? MemberWrapper) ?: botWrapper.impl
+        return members[userId] ?: botWrapper.impl
             .getGroupMemberInfo(id, userId, false).data?.wrapAsMember(this)
     }
 
