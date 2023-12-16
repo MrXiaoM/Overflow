@@ -16,20 +16,20 @@ public class ForwardMsgAdapter implements JsonDeserializer<ForwardMsgResp> {
         JsonObject jsonObj = json.getAsJsonObject();
         JsonArray messagesArray = jsonObj.get("messages").getAsJsonArray();
         for (JsonElement jsonElement : messagesArray) {
-            JsonObject obj = jsonElement.getAsJsonObject();
-            int time = obj.get("time").getAsInt();
-            String messageType = obj.get("message_type").getAsString();
-            int messageId = obj.get("message_id").getAsInt();
-            int realId = obj.get("real_id").getAsInt();
-            ForwardMsgResp.Sender sender = gson.fromJson(obj.get("anonymous"), ForwardMsgResp.Sender.class);
+            JsonsObject obj = new JsonsObject(jsonElement.getAsJsonObject());
+            int time = obj.optInt("time");
+            String messageType = obj.optString("message_type");
+            int messageId = obj.optInt("message_id");
+            int realId = obj.optInt("real_id");
+            ForwardMsgResp.Sender sender = gson.fromJson(obj.optJSONObject("anonymous"), ForwardMsgResp.Sender.class);
             String message;
-            if (obj.get("message").isJsonArray()) {
-                message = gson.toJson(obj.get("message").getAsJsonArray());
+            if (obj.getJsonElement("message").isJsonArray()) {
+                message = gson.toJson(obj.optJSONArray("message"));
             } else {
-                message = obj.get("message").getAsString();
+                message = obj.optString("message");
             }
-            long peerId = obj.get("peer_id").getAsLong();
-            long targetId = obj.get("target_id").getAsLong();
+            long peerId = obj.optLong("peer_id");
+            long targetId = obj.optLong("target_id");
             nodes.add(new ForwardMsgResp.Node(time, messageType, messageId, realId, peerId, targetId, sender, message));
         }
         return new ForwardMsgResp(nodes);
