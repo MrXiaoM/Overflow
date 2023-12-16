@@ -38,6 +38,8 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 另请参见 [Overflow 项目进度](dev/progress.md)
 
+若出现不支持的消息类型 (`[overflow,unknown:type,{}]`)，将会在日志 `logs/unknown_messages.log` 输出其详细信息，可以此日志提交 Issues 或 Pull Requests 请求添加该消息类型支持。
+
 # JVM 参数
 
 | 参数                         | 说明                                        |
