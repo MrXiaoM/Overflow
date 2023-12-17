@@ -51,7 +51,7 @@ data class WrappedImage(
         val file = if (url.startsWith("base64://") && url.length > 60) {
             val s = url.substring(9)
             val len = base64Length(s)
-            "${s.substring(0, 32)}... (about ${lengthToString(len)})"
+            "base64://${s.substring(0, 32)}... (about ${lengthToString(len)})"
         } else url
         "[overflow:image,url=$file,isEmoji=$isEmoji]"
     }

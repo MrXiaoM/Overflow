@@ -20,7 +20,7 @@ data class WrappedAudio(
         val fileString = if (file.startsWith("base64://") && file.length > 60) {
             val s = file.substring(9)
             val len = base64Length(s)
-            "${s.substring(0, 32)}... (about ${lengthToString(len)})"
+            "base64://${s.substring(0, 32)}... (about ${lengthToString(len)})"
         } else file
         "[overflow:audio,file=$fileString]"
     }
