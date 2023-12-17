@@ -5,6 +5,7 @@ import net.mamoe.mirai.message.data.AbstractPolymorphicMessageKey
 import net.mamoe.mirai.message.data.OnlineShortVideo
 import net.mamoe.mirai.message.data.ShortVideo
 import net.mamoe.mirai.utils.safeCast
+import top.mrxiaom.overflow.internal.utils.base64Length
 
 @Serializable
 data class WrappedVideo(
@@ -12,7 +13,10 @@ data class WrappedVideo(
 ) : OnlineShortVideo {
     override val fileFormat: String = "mp4"
     override val fileMd5: ByteArray = ByteArray(16)
-    override val fileSize: Long = 0
+    override val fileSize: Long by lazy {
+        if (!file.startsWith("base64://")) 0
+        else base64Length(file.substring(9))
+    }
     override val filename: String = if (file.startsWith("base64://")) "base64" else file.substringAfterLast("/")
     override val urlForDownload: String = file
     override val videoId: String = filename

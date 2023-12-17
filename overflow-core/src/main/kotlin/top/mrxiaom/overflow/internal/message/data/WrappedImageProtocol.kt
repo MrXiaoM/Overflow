@@ -9,6 +9,8 @@ import net.mamoe.mirai.message.data.ImageType
 import net.mamoe.mirai.message.data.InternalImageProtocol
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
+import top.mrxiaom.overflow.internal.utils.base64Length
+import top.mrxiaom.overflow.internal.utils.lengthToString
 
 @OptIn(MiraiInternalApi::class)
 internal class WrappedImageProtocol : InternalImageProtocol {
@@ -45,7 +47,14 @@ data class WrappedImage(
     override val width: Int,
     override val height: Int,
 ): Image {
-    private val _stringValue: String? by lazy(LazyThreadSafetyMode.NONE) { "[overflow:image,url=$url,isEmoji=$isEmoji]" }
+    private val _stringValue: String? by lazy(LazyThreadSafetyMode.NONE) {
+        val file = if (url.startsWith("base64://") && url.length > 60) {
+            val s = url.substring(9)
+            val len = base64Length(s)
+            "${s.substring(0, 32)}... (about ${lengthToString(len)})"
+        } else url
+        "[overflow:image,url=$file,isEmoji=$isEmoji]"
+    }
     override val imageId: String = url
 
     override fun contentToString(): String = if (isEmoji) {
@@ -59,5 +68,4 @@ data class WrappedImage(
     }
 
     override fun toString(): String  = _stringValue!!
-
 }

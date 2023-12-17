@@ -3,6 +3,8 @@ package top.mrxiaom.overflow.internal.message.data
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.safeCast
+import top.mrxiaom.overflow.internal.utils.base64Length
+import top.mrxiaom.overflow.internal.utils.lengthToString
 
 @Serializable
 data class WrappedAudio(
@@ -14,12 +16,23 @@ data class WrappedAudio(
         public const val SERIAL_NAME: String = "WrappedAudio"
     }
 
+    private val _stringValue: String? by lazy(LazyThreadSafetyMode.NONE) {
+        val fileString = if (file.startsWith("base64://") && file.length > 60) {
+            val s = file.substring(9)
+            val len = base64Length(s)
+            "${s.substring(0, 32)}... (about ${lengthToString(len)})"
+        } else file
+        "[overflow:audio,file=$fileString]"
+    }
     override val codec: AudioCodec = AudioCodec.AMR
     override val extraData: ByteArray? = null
     override val fileMd5: ByteArray = ByteArray(16)
-    override val fileSize: Long = 0
+    override val fileSize: Long by lazy {
+        length.takeIf { it > 0 } ?: if (!file.startsWith("base64://")) 0
+        else base64Length(file.substring(9))
+    }
     override val filename: String = urlForDownload.substringAfterLast("/")
     val file: String = urlForDownload
 
-    override fun toString(): String = "[overflow:audio,file=$filename]"
+    override fun toString(): String = _stringValue!!
 }

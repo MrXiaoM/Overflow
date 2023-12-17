@@ -5,11 +5,23 @@ import java.io.*
 import java.util.*
 
 fun ExternalResource.toBase64File(): String {
-     return inputStream().use {
-         "base64://" + Base64.getEncoder().encodeToString(it.readBytes())
-     }
- }
-
+    return inputStream().use {
+        "base64://" + Base64.getEncoder().encodeToString(it.readBytes())
+    }
+}
+fun base64Length(s: String): Long {
+    return s.length.toLong() - (s.length.toLong() / 8L) * 2L
+}
+fun lengthToString(len: Long): String {
+    var value = len.toDouble()
+    var unit = "bytes"
+    for (u in arrayOf("KB", "MB")) {
+        if (value < 1024) break
+        value /= 1024
+        unit = u
+    }
+    return String.format("%.2f %s", value, unit)
+}
 /**
  * 快速获取图片的大小
  *
