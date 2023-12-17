@@ -18,11 +18,21 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 按以上任意一种方法安装好后，请往下看进行进一步配置。
 
-## 安装完成后的配置
+## 部署 Onebot 协议实现
 
-启动后会生成配置文件 `overflow.json`，编辑配置文件再次启动即可。
+部署一个 Onebot 协议实现，以下是一些示例
++ [whitechi73/OpenShamrock](https://whitechi73.github.io/OpenShamrock/guide/getting-started.html) Xposed/LSPatch hook QQ 并实现 Onebot
++ [Hoshinonyaruko/Gensokyo](https://github.com/Hoshinonyaruko/Gensokyo) (非稳定支持) 官方Bot 转 Onebot
+
+部署完成后，选择一种连接方式进行下一步操作。
+
+## 连接
+
+启动 Overflow 后会生成配置文件 `overflow.json`，编辑配置文件再次启动即可。
 
 需要注意的是，**OpenShamrock** 不管是主动(正向) WebSocket 还是被动(反向) WebSocket 的接口信息配置，都需要**重新启动QQ**才能生效
+
+------
 
 ### 正向 WebSocket
 
@@ -35,6 +45,8 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 修改 `reversed_ws_port` 为 `[1, 65535]` 区间的数 (端口号有效值)，再次启动即可。
 
 反向 WebSocket 仅支持一个客户端连接，目前没有支持多客户端以及多 Bot 的打算。
+
+------
 
 # 项目进度相关说明
 
