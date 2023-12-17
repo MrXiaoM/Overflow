@@ -10,9 +10,11 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 ## 安装方法
 
-+ **方法一：** [MCL + 脚本安装](/docs/install/MCLScript.md)
-+ **方法二：** [编辑 MCL 的 config.json](/docs/install/MCL.md)
++ ~~**方法一：** [MCL + 脚本安装](/docs/install/MCLScript.md)~~
++ ~~**方法二：** [编辑 MCL 的 config.json](/docs/install/MCL.md)~~
 + **方法三：** [替换 mirai-core 类库](/docs/install/Raw.md) (最简单)
+
+**注意:** MCL 无法使用 sonatype snapshots 仓库获取包，故 MCL 安装方法全部不可用。
 
 按以上任意一种方法安装好后，请往下看进行进一步配置。
 
