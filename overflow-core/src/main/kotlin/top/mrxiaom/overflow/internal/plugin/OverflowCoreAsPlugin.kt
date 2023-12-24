@@ -8,6 +8,7 @@ import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.extensions.PostStartupExtension
+import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
 import net.mamoe.mirai.console.permission.Permission
 import net.mamoe.mirai.console.permission.PermissionId
 import net.mamoe.mirai.console.plugin.Plugin
@@ -107,6 +108,20 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 sendMessage("消息发送成功")
             }
         }.register()
+
+        // No AutoLogin
+        val dataScope: MiraiConsoleImplementation.ConsoleDataScope = net.mamoe.mirai.console.internal.data.builtins.DataScope
+        dataScope.find(AutoLoginConfig::class)?.run {
+            if (accounts.isNotEmpty()) {
+                val configFolder = MiraiConsoleImplementation.getInstance().rootPath.resolve("config").toFile()
+
+                val file = File(configFolder, "Console/AutoLogin.yml")
+                val backup = File(configFolder, "Console/AutoLogin.yml.overflow.${System.currentTimeMillis()}.old")
+                file.copyTo(backup)
+                accounts.clear()
+                Overflow.logger.warning("由于 mirai 端不再需要处理登录，Overflow 已清空自动登录配置，旧配置已备份到 ${backup.name}")
+            }
+        }
     }
 
     @Suppress("DEPRECATION_ERROR")
