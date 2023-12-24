@@ -1,5 +1,6 @@
 package top.mrxiaom.overflow.internal.message
 
+import com.google.gson.JsonParser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -105,7 +106,7 @@ object OnebotMessages {
                 "type" to "node",
                 "data" to mutableMapOf(
                     "name" to it.senderName,
-                    "content" to serializeToOneBotJsonArray(it.messageChain)
+                    "content" to JsonParser.parseString(serializeToOneBotJson(it.messageChain))
                 )
             )
         }
