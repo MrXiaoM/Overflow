@@ -100,14 +100,15 @@ object OnebotMessages {
      * 将转发消息节点转换为可供 Onebot 发送的列表
      */
     fun serializeForwardNodes(nodeList: List<ForwardMessage.Node>): List<Map<String, Any>> {
-        val nodes = mutableListOf<Map<String, Any>>()
-        for (node in nodeList) {
-            val map = mutableMapOf<String, Any>("type" to "node")
-            val data = mutableMapOf<String, Any>("name" to node.senderName)
-            data["content"] = serializeToOneBotJsonArray(node.messageChain)
-            map["data"] = data
+        return nodeList.map {
+            mutableMapOf(
+                "type" to "node",
+                "data" to mutableMapOf(
+                    "name" to it.senderName,
+                    "content" to serializeToOneBotJsonArray(it.messageChain)
+                )
+            )
         }
-        return nodes
     }
 
     /**
