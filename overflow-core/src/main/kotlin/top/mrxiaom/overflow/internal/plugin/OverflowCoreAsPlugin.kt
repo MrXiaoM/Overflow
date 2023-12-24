@@ -122,6 +122,12 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 Overflow.logger.warning("由于 mirai 端不再需要处理登录，Overflow 已清空自动登录配置，旧配置已备份到 ${backup.name}")
             }
         }
+        val unregisterCommands = arrayOf("login", "autoLogin")
+        CommandManager.INSTANCE.allRegisteredCommands.filter {
+            it.owner == ConsoleCommandOwner && unregisterCommands.contains(it.primaryName)
+        }.forEach {
+            CommandManager.INSTANCE.unregisterCommand(it)
+        }
     }
 
     @Suppress("DEPRECATION_ERROR")
