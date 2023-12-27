@@ -1,5 +1,7 @@
 # 编辑 MCL 的 config.json
 
+> 需要 [该版本 MCL](https://github.com/iTXTech/mirai-console-loader/pull/192) 才可使用本方法。
+
 首先，使用文本编辑器打开 config.json 大概是这样的
 
 ```json5
@@ -21,7 +23,7 @@
   }
 }
 ```
-
+## 第一步. 加仓库
 在 `maven_repo` 中加入快照仓库地址，添加完成后如下
 
 ```json5
@@ -35,9 +37,11 @@
 }
 ```
 
-将其中的 `"net.mamoe:mirai-core-all"` 改为 `"top.mrxiaom:overflow-core-all"`。
+## 第二步. 加依赖
 
-将 `version` 的值 `2.16.0` 改为 Overflow 版本号。
+- 将其中的 `"net.mamoe:mirai-core-all"` 改为 `"top.mrxiaom:overflow-core-all"`
+- 将其中的 `"maven-stable"` 改为 `"maven-snapshots"`
+- 将 `version` 的值 `2.16.0` 改为 Overflow 版本号
 
 快照仓库中 Overflow 版本号的格式为 `${mirai版本}-${短提交哈希值}-SNAPSHOT`，如 `2.16.0-0abcdef-SNAPSHOT`
 
