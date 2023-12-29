@@ -4,6 +4,8 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 要运行或开发 Overflow，需要 Java 版本为 8 或以上。
 
+另请参见：[开发文档](dev/README.md)。
+
 # 快速开始-使用者
 
 将 `mirai-core` 实现删除，替换为 `overflow` 即可。
@@ -20,7 +22,8 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 ## 部署 Onebot 协议实现
 
-部署一个 Onebot 协议实现，以下是一些示例
+部署一个 Onebot 协议实现，以下是一些示例：
+
 + [whitechi73/OpenShamrock](https://whitechi73.github.io/OpenShamrock/guide/getting-started.html) Xposed/LSPatch hook QQ 并实现 Onebot
 + [Hoshinonyaruko/Gensokyo](https://github.com/Hoshinonyaruko/Gensokyo) (非稳定支持) 官方Bot 转 Onebot
 
@@ -30,19 +33,45 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 启动 Overflow 后会生成配置文件 `overflow.json`，编辑配置文件再次启动即可。
 
-需要注意的是，**OpenShamrock** 不管是主动(正向) WebSocket 还是被动(反向) WebSocket 的接口信息配置，都需要**重新启动QQ**才能生效
+需要注意的是，**OpenShamrock** 不管是主动(正向) WebSocket 还是被动(反向) WebSocket 的接口信息配置，都需要**重新启动QQ**才能生效。
+
+从下方选择任意一种连接方式，**仅能选择一种**。
+
+以下提到的 `Onebot 端`，均为 `Onebot 协议实现`，如 OpenShamrock。
 
 ------
 
 ### 正向 WebSocket
 
-修改其中的 `ws_host` 为服务端地址，如 `ws://127.0.0.1:5700`，再次启动即可。
+让 Overflow 去连接 Onebot 协议实现。
+
+关键配置项：`ws_host` - 连接目标地址。
+
+在 `Onebot 端` 获取如下信息：
+
++ 正向 WebSocket **端口** (也叫做主动 WebSocket 端口)
++ 在 Overflow 侧可以与其**建立连接**的IP地址，可以是内网、公网或者内网穿透等等，模拟器可能需要配置端口转发。
+
+将以上信息以 `ws://IP:端口` 的格式填入 `ws_host`，如 `ws://127.0.0.1:5700`，再次启动即可。
 
 ### 反向 WebSocket
 
-设置反向 WebSocket 的端口，将在启动时开启反向 WebSocket 服务器等待连接。该选项优先级比正向 WebSocket 高，也就是设置了反向连接配置后将不使用正向连接。
+让 Onebot 协议实现去连接 Overflow。
 
-修改 `reversed_ws_port` 为 `[1, 65535]` 区间的数 (端口号有效值)，再次启动即可。
+> 设置此项以后，正向 WebSocket 的配置将会失效。
+
+关键配置项：`reversed_ws_port` - 反向服务器端口。
+
+首先修改 `reversed_ws_port` 为 `[1, 65535]` 区间的数 (端口号有效值)，启动 Overflow，确保端口没有冲突，若有冲突请自行更改。
+
+在 `Overflow 侧` 获取以下信息：
+
++ 反向服务器**端口**，即 `reversed_ws_port` 的值。
++ 在 `Onebot 端` 可以与其**建立连接**的IP地址。
+
+将以上信息以 `ws://IP:端口` 的格式写好备用，这个就叫做`反向 WebSocket 地址`了，如 `ws://127.0.0.1:5800`。
+
+在 `Onebot 端` 的设置中找到 `反向 WebSocket 地址` 的配置，有些实现中它也叫作 `被动 WebSocket 地址`，将上面获取到的地址填入即可。
 
 反向 WebSocket 仅支持一个客户端连接，目前没有支持多客户端以及多 Bot 的打算。
 
@@ -69,4 +98,4 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 * [whitechi73/OpenShamrock](https://github.com/whitechi73/OpenShamrock) - [MrXiaoM](https://github.com/MrXiaoM)
 * *Coming soon...*
 
-有意愿适配其它实现的开发者可提交 Pull Requests
+有意愿适配其它实现的开发者可提交 [Pull Requests](https://github.com/MrXiaoM/Overflow/compare)。

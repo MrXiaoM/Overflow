@@ -11,7 +11,7 @@ repositories {
 ```
 快照仓库中依赖版本的格式为 `${miraiVersion}-${shortCommitHash}-SNAPSHOT`，如 `2.16.0-0abcdef-SNAPSHOT`
 
-你可以在 [这里](https://s01.oss.sonatype.org/content/repositories/snapshots/top/mrxiaom/overflow-core/) 查询已发布的开发版本列表 
+你可以在 [这里](https://s01.oss.sonatype.org/content/repositories/snapshots/top/mrxiaom/overflow-core/maven-metadata.xml) 查询已发布的开发版本列表 
 
 # 在 mirai-console 中开发
 
