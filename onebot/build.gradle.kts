@@ -1,10 +1,19 @@
 plugins {
     kotlin("jvm")
+    id("org.jetbrains.dokka")
     id("me.him188.kotlin-jvm-blocking-bridge")
+}
+
+tasks.register<Jar>("dokkaJavadocJar") {
+    group = "documentation"
+    dependsOn(tasks.dokkaJavadoc)
+    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
+    archiveClassifier.set("javadoc")
 }
 
 setupMavenCentralPublication {
     artifact(tasks.kotlinSourcesJar)
+    artifact(tasks.getByName("dokkaJavadocJar"))
 }
 
 dependencies {
