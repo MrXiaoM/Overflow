@@ -58,7 +58,7 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 让 Onebot 协议实现去连接 Overflow。
 
-> 设置此项以后，正向 WebSocket 的配置将会失效。
+> 设置此项以后，正向 WebSocket 的配置将会**失效**。
 
 关键配置项：`reversed_ws_port` - 反向服务器端口。
 
