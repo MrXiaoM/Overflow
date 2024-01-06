@@ -101,4 +101,6 @@ class FriendWrapper(
     ): ShortVideo {
         return OnebotMessages.videoFromFile(FileService.instance!!.upload(video))
     }
+
+    override fun toString(): String = "Friend($id)"
 }

@@ -87,4 +87,6 @@ class StrangerWrapper(
     ): ShortVideo {
         return OnebotMessages.videoFromFile(FileService.instance!!.upload(video))
     }
+
+    override fun toString(): String = "Stranger($id)"
 }

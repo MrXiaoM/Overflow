@@ -159,4 +159,6 @@ class MemberWrapper(
     ): ShortVideo {
         return OnebotMessages.videoFromFile(FileService.instance!!.upload(video))
     }
+
+    override fun toString(): String = "NormalMember($id)"
 }

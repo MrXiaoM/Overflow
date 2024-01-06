@@ -177,6 +177,8 @@ class BotWrapper private constructor(
         return impl.customRequest({ actionPath }, params).toString()
     }
 
+    override fun toString(): String = "Bot($id)"
+
     companion object {
         suspend fun wrap(impl: Bot, botConfiguration: BotConfiguration? = null): BotWrapper {
             val loginInfo = impl.getLoginInfo().data // also refresh bot id

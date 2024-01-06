@@ -220,6 +220,8 @@ class GroupWrapper(
         return OnebotMessages.videoFromFile(FileService.instance!!.upload(video))
     }
 
+    override fun toString(): String = "Group($id)"
+
     @Suppress("DEPRECATION_ERROR")
     @Deprecated(
         "Please use files instead.",
