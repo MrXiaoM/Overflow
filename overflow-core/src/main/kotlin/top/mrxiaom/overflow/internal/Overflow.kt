@@ -117,6 +117,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         try {
             Class.forName("net.mamoe.mirai.console.enduserreadme.EndUserReadme")
             System.setProperty("mirai.console.skip-end-user-readme", "true")
+        } catch (ignored: ClassNotFoundException) {
+        }
+        try {
+            Class.forName("net.mamoe.mirai.console.MiraiConsole")
             miraiConsoleFlag = true
             injectMiraiConsole()
         } catch (ignored: ClassNotFoundException) {
