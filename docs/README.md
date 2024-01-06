@@ -24,7 +24,7 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 部署一个 Onebot 协议实现，以下是一些示例：
 
-+ [whitechi73/OpenShamrock](https://whitechi73.github.io/OpenShamrock/guide/getting-started.html) Xposed/LSPatch hook QQ 并实现 Onebot
++ [whitechi73/OpenShamrock](https://wiki.mrxiaom.top/overflow/openshamrock/) (**详细教程**) Xposed/LSPatch hook QQ 并实现 Onebot
 + [Hoshinonyaruko/Gensokyo](https://github.com/Hoshinonyaruko/Gensokyo) (非稳定支持) 官方Bot 转 Onebot
 
 部署完成后，选择一种连接方式进行下一步操作。
