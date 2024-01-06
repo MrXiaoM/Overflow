@@ -119,7 +119,7 @@ internal class GroupAddRequestListener(
                     fromId = e.userId,
                     groupId = e.groupId,
                     groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),
-                    fromNick = bot.queryProfile(e.userId) { nickname } ?: "",
+                    fromNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: "",
                     invitorId = null // TODO: 获取邀请者
                 ).broadcast()
             }
@@ -130,7 +130,7 @@ internal class GroupAddRequestListener(
                     invitorId = e.userId,
                     groupId = e.groupId,
                     groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),
-                    invitorNick = bot.queryProfile(e.userId) { nickname } ?: ""
+                    invitorNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: ""
                 ).broadcast()
             }
         }

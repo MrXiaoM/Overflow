@@ -101,7 +101,7 @@ internal class FriendAddRequestListener(
             message = e.comment,
             fromId = e.userId,
             fromGroupId = 0, // TODO: 获取来自哪个群
-            fromNick = bot.queryProfile(e.userId) { nickname } ?: ""
+            fromNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: ""
         ).broadcast()
     }
 }
