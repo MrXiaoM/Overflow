@@ -54,13 +54,9 @@ class MemberWrapper(
         get() = impl.joinTime
     override val lastSpeakTimestamp: Int
         get() = impl.lastSentTime
-    var _muteTimestamp: Int = 0 // TODO: Onebot 无法获取禁言剩余时间
     override val muteTimeRemaining: Int
-        get() = if (_muteTimestamp == 0 || _muteTimestamp == 0xFFFFFFFF.toInt()) {
-            0
-        } else {
-            (_muteTimestamp - currentTimeSeconds().toInt()).coerceAtLeast(0)
-        }
+        get() = (impl.shutUpTimestamp - currentTimeSeconds()).takeIf { it > 0 }?.toInt() ?: 0
+
     override val coroutineContext: CoroutineContext = CoroutineName("((Bot/${bot.id})Group/${group.id})Member/$id")
     override var nameCard: String
         get() = impl.card ?: ""

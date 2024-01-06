@@ -60,6 +60,7 @@ public class GroupMemberInfoResp {
     @SerializedName("card_changeable")
     public boolean cardChangeable;
 
-
+    @SerializedName("shut_up_timestamp")
+    public long shutUpTimestamp;
 
 }
