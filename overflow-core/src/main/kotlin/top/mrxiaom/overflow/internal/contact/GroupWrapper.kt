@@ -132,7 +132,7 @@ class GroupWrapper(
         get() = members.firstOrNull { it.id == bot.id } ?: runBlocking {
             val data = botWrapper.impl.getGroupMemberInfo(id, bot.id, false).data
             MemberWrapper(botWrapper, this@GroupWrapper, data ?: GroupMemberInfoResp(
-                id, bot.id, bot.nick, "", "", 0, "", 0, 0, 0, "member", false, "", 0, true
+                id, bot.id, bot.nick, "", "", 0, "", 0, 0, 0, "member", false, "", 0, true, 0
             ))
         }
     override val owner: NormalMember
