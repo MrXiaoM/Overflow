@@ -62,10 +62,11 @@ class WSClient(
     }
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {
-        logger.info("▌ 服务器连接因 {} 已关闭", reason)
-        eventBus?.stop()
-        if (mutex.isLocked) mutex.unlock()
-        if (ActionSendUtils.mutex.isLocked) ActionSendUtils.mutex.unlock()
+        logger.info("▌ 服务器连接因 {} 已关闭 ({})", reason, code)
+        runCatching {
+            if (mutex.isLocked) mutex.unlock()
+            if (ActionSendUtils.mutex.isLocked) ActionSendUtils.mutex.unlock()
+        }
     }
 
     override fun onError(ex: Exception) {
