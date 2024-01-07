@@ -26,7 +26,10 @@ class WSClient(
     uri: URI,
     private val logger: Logger,
     private val actionHandler: ActionHandler,
-    header: Map<String, String> = mapOf()
+    val retryTimes: Int = 5,
+    val retryWaitMills: Long = 5000L,
+    val retryRestMills: Long = 60000L,
+    header: Map<String, String> = mapOf(),
 ) : WebSocketClient(uri, header) {
     private var eventBus: EventBus? = null
     fun createBot(): Bot {
@@ -79,8 +82,8 @@ class WSClient(
         private const val HEART_BEAT = "heartbeat"
 
         val mutex = Mutex()
-        fun createAndConnect(scope: CoroutineScope, uri: URI, logger: Logger, actionHandler: ActionHandler, header: Map<String, String> = mapOf()): WSClient? {
-            val ws = WSClient(scope, uri, logger, actionHandler, header)
+        fun createAndConnect(scope: CoroutineScope, uri: URI, logger: Logger, actionHandler: ActionHandler, retryTimes: Int, retryWaitMills: Long, retryRestMills: Long, header: Map<String, String> = mapOf()): WSClient? {
+            val ws = WSClient(scope, uri, logger, actionHandler, retryTimes, retryWaitMills, retryRestMills, header)
             return if (ws.connectBlocking()) ws else null
         }
     }

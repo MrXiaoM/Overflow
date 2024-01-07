@@ -54,7 +54,7 @@ class ConnectFactory private constructor(
         }
         val url = builder.toString()
         try {
-            ws = WSClient.createAndConnect(scope, URI.create(url), logger, actionHandler, header)
+            ws = WSClient.createAndConnect(scope, URI.create(url), logger, actionHandler, config.retryTimes, config.retryWaitMills, config.retryRestMills, header)
         } catch (e: Exception) {
             logger.error("▌ {} 连接错误，请检查服务端是否开启 ┈━═☆", url)
         }

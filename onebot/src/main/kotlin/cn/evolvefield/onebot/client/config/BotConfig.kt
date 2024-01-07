@@ -30,11 +30,15 @@ class BotConfig(
      */
     val miraiHttp: Boolean = false,
     /**
-     * 是否开启重连
+     * 重连尝试次数
      */
-    val reconnect: Boolean = true,
+    val retryTimes: Int = 5,
     /**
-     * 重连间隔
+     * 重连间隔 (毫秒)
      */
-    val maxReconnectAttempts: Int = 20,
+    val retryWaitMills: Long = 5000L,
+    /**
+     * 重连休息时间 (毫秒)
+     */
+    val retryRestMills: Long = 60000L,
 )

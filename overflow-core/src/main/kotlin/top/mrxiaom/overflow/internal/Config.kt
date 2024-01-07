@@ -10,5 +10,11 @@ data class Config(
     @SerialName("reversed_ws_port")
     var reversedWSPort: Int = -1,
     @SerialName("token")
-    var token: String = ""
+    var token: String = "",
+    @SerialName("retry_times")
+    var retryTimes: Int = 5,
+    @SerialName("retry_wait_mills")
+    var retryWaitMills: Long = 5_000L,
+    @SerialName("retry_rest_mills")
+    var retryRestMills: Long = 60_000L,
 )

@@ -154,7 +154,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 url = config.wsHost,
                 reversedPort = config.reversedWSPort,
                 token = config.token,
-                isAccessToken = config.token.isNotBlank()
+                isAccessToken = config.token.isNotBlank(),
+                retryTimes = config.retryTimes,
+                retryWaitMills = config.retryWaitMills,
+                retryRestMills = config.retryRestMills,
             ), logger
         )
         val dispatchers: EventBus
