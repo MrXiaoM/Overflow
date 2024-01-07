@@ -91,6 +91,10 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 | `-Doverflow.not-exit=true` | 设置无法连接到 Onebot 时不结束进程                     |
 | `-Doverflow.timeout=超时时间`  | 设置主动发送 action 的请求超时时间(毫秒)，默认为10000毫秒(10秒) |
 
+# 配置文件
+
+另请参见 [配置文件说明](configuration.md)
+
 # 长期支持
 
 当前处于 Overflow 长期支持的 Onebot 协议实现，以及适配该实现的负责人如下
