@@ -13,6 +13,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.java_websocket.client.WebSocketClient
+import org.java_websocket.framing.CloseFrame
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.Logger
 import java.net.URI
@@ -97,6 +98,9 @@ class WSClient(
         runCatching {
             if (mutex.isLocked) mutex.unlock()
             if (ActionSendUtils.mutex.isLocked) ActionSendUtils.mutex.unlock()
+        }
+        if (retryCount < 1 && code != CloseFrame.NORMAL) { // TODO: 测试确认异常关闭码
+            reconnectBlocking()
         }
     }
 
