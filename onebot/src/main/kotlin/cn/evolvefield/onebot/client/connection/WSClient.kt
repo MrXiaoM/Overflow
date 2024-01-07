@@ -7,7 +7,9 @@ import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.util.ActionSendUtils
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.java_websocket.client.WebSocketClient
@@ -31,6 +33,7 @@ class WSClient(
     val retryRestMills: Long = 60000L,
     header: Map<String, String> = mapOf(),
 ) : WebSocketClient(uri, header) {
+    private var retryCount = 0
     private var eventBus: EventBus? = null
     fun createBot(): Bot {
         return Bot(this, actionHandler)
@@ -38,6 +41,31 @@ class WSClient(
 
     fun createEventBus(): EventBus {
         return if (eventBus != null) eventBus!! else EventBus().also { eventBus = it }
+    }
+
+    override fun connectBlocking(): Boolean {
+        if (retryTimes < 1) return super.connectBlocking()
+        return runBlocking {
+            val wait = 0L.coerceAtLeast(retryWaitMills)
+            val waitFormatted = String.format("%.1f", wait / 1000.0)
+            val restFormatted = String.format("%.1f", 0L.coerceAtLeast(retryRestMills) / 1000.0)
+            while (!super.connectBlocking()) {
+                if (retryCount >= retryTimes) {
+                    if (retryRestMills < 0) {
+                        logger.warn("重连 $retryTimes 次失败，放弃连接")
+                        return@runBlocking false
+                    }
+                    logger.warn("重连 $retryTimes 次失败，将在 $restFormatted 秒后再尝试连接")
+                    delay(retryRestMills)
+                    retryCount = 0
+                    continue
+                }
+                logger.warn("连接失败，将在 $waitFormatted 秒后尝试第 ${++retryCount} 次重连")
+                delay(wait)
+            }
+            retryCount = 0
+            return@runBlocking true
+        }
     }
 
     override fun onOpen(handshakedata: ServerHandshake) {
