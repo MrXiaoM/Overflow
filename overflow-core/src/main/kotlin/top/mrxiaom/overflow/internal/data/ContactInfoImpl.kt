@@ -4,6 +4,7 @@ package top.mrxiaom.overflow.internal.data
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
+import com.google.gson.JsonObject
 import net.mamoe.mirai.LowLevelApi
 import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.data.FriendInfo
@@ -45,7 +46,15 @@ class MemberInfoImpl(
 val FriendInfo.asOnebot: FriendInfoResp
     get() = FriendInfoResp(uin, nick, remark)
 val StrangerInfo.asOnebot: StrangerInfoResp
-    get() = StrangerInfoResp(uin, nick, "", 0, "", 0, 0, null)
+    get() = StrangerInfoResp(uin, nick, "", 0, "", 0, 0, JsonObject().also {
+        if (fromGroup > 0) it.addProperty("add_src_id", fromGroup)
+    })
+val StrangerInfoResp.asMirai: StrangerInfo
+    get() = StrangerInfoImpl(
+        uin = userId,
+        nick = nickname,
+        fromGroup = ext?.get("add_src_id")?.asLong ?: 0,
+    )
 
 val GroupMemberInfoResp.asMirai: MemberInfoImpl
     get() = MemberInfoImpl(setOf(), false, joinTime, lastSentTime, 0, card,

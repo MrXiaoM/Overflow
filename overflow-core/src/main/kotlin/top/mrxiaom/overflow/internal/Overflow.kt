@@ -34,6 +34,7 @@ import top.mrxiaom.overflow.internal.contact.FriendWrapper
 import top.mrxiaom.overflow.internal.contact.StrangerWrapper
 import top.mrxiaom.overflow.internal.data.UserProfileImpl
 import top.mrxiaom.overflow.internal.data.asMirai
+import top.mrxiaom.overflow.internal.data.asOnebot
 import top.mrxiaom.overflow.internal.listener.*
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.OfflineMessageSourceImpl
@@ -314,7 +315,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     @LowLevelApi
     override fun newStranger(bot: Bot, strangerInfo: StrangerInfo): Stranger {
-        return StrangerWrapper(bot.asOnebot, StrangerInfoResp(strangerInfo.uin, strangerInfo.nick, "", 0, "", 0, 0, null))
+        return StrangerWrapper(bot.asOnebot, strangerInfo.asOnebot)
     }
 
     override suspend fun queryImageUrl(bot: Bot, image: Image): String {
