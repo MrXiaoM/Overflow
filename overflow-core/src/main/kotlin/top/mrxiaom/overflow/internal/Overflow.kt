@@ -224,14 +224,20 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 "female" -> UserProfile.Sex.FEMALE
                 else -> UserProfile.Sex.UNKNOWN
             }
-            
+
             val age = strangerInfo?.age ?:
                 // TODO: 不确定 birthday 的单位是毫秒还是秒
                 if (data.birthday > 0) ((currentTimeSeconds() - data.birthday) / 365.daysToSeconds).toInt() else 0
 
             return UserProfileImpl(age, data.mail, 0, data.name, data.level, sex, data.hobbyEntry)
         } else {
-            TODO()
+            val data = bot.asOnebot.impl.getStrangerInfo(targetId, false).data ?: throw IllegalStateException("Can not fetch stranger info (profile card).")
+            val sex = when(data.sex.lowercase()) {
+                "male" -> UserProfile.Sex.MALE
+                "female" -> UserProfile.Sex.FEMALE
+                else -> UserProfile.Sex.UNKNOWN
+            }
+            return UserProfileImpl(data.age, "", 0, data.nickname, data.level, sex, "")
         }
     }
     override suspend fun getOnlineOtherClientsList(bot: Bot, mayIncludeSelf: Boolean): List<OtherClientInfo> {
