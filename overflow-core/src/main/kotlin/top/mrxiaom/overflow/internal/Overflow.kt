@@ -314,7 +314,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     @LowLevelApi
     override fun newStranger(bot: Bot, strangerInfo: StrangerInfo): Stranger {
-        return StrangerWrapper(bot.asOnebot, StrangerInfoResp(strangerInfo.uin, strangerInfo.nick, "", 0, "", 0, 0))
+        return StrangerWrapper(bot.asOnebot, StrangerInfoResp(strangerInfo.uin, strangerInfo.nick, "", 0, "", 0, 0, null))
     }
 
     override suspend fun queryImageUrl(bot: Bot, image: Image): String {

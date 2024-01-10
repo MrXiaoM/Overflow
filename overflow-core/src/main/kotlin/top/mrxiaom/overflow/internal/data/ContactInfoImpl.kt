@@ -45,7 +45,7 @@ class MemberInfoImpl(
 val FriendInfo.asOnebot: FriendInfoResp
     get() = FriendInfoResp(uin, nick, remark)
 val StrangerInfo.asOnebot: StrangerInfoResp
-    get() = StrangerInfoResp(uin, nick, "", 0, "", 0, 0)
+    get() = StrangerInfoResp(uin, nick, "", 0, "", 0, 0, null)
 
 val GroupMemberInfoResp.asMirai: MemberInfoImpl
     get() = MemberInfoImpl(setOf(), false, joinTime, lastSentTime, 0, card,

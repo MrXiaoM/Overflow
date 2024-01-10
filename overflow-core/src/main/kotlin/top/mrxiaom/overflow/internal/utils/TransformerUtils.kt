@@ -80,7 +80,8 @@ fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerW
         0,
         "",
         0,
-        0
+        0,
+        null
     ).wrapAsStranger(bot)
 }
 

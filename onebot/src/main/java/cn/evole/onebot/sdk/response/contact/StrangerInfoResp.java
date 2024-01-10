@@ -1,5 +1,6 @@
 package cn.evole.onebot.sdk.response.contact;
 
+import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -55,4 +56,6 @@ public class StrangerInfoResp {
     @SerializedName("login_days")
     public int loginDays;
 
+    @SerializedName("ext")
+    public JsonObject ext;
 }
