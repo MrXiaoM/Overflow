@@ -1437,7 +1437,7 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend fun getUserInfo(userId: Long, noCache: Boolean): ActionData<UserInfoResp> {
-        val action = ActionPathEnum.GET_USER_INFO
+        val action = ActionPathEnum.GET_STRANGER_INFO
         val params = JsonObject()
         params.addProperty("user_id", userId)
         params.addProperty("refresh", noCache)
