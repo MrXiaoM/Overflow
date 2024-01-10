@@ -215,11 +215,24 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     @JvmBlockingBridge
     override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain = OnebotMessages.deserializeFromOneBot(bot, message, null)
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
-        val data = bot.asOnebot.impl.getUserInfo(targetId, false).data ?: throw IllegalStateException("Can not fetch profile card.")
-        // TODO: 不确定 birthday 的单位是毫秒还是秒
-        val age = if (data.birthday > 0) ((currentTimeSeconds() - data.birthday) / 365.daysToSeconds).toInt() else 0
-        // TODO: 获取性别
-        return UserProfileImpl(age, data.mail, 0, data.name, data.level, UserProfile.Sex.UNKNOWN, data.hobbyEntry)
+        if (OnebotMessages.appName == "shamrock") {
+            val data = bot.asOnebot.impl.getUserInfo(targetId, false).data
+                ?: throw IllegalStateException("Can not fetch profile card.")
+            val strangerInfo = bot.asOnebot.impl.getStrangerInfo(targetId, false).data
+            val sex = when(strangerInfo?.sex?.lowercase() ?: "") {
+                "male" -> UserProfile.Sex.MALE
+                "female" -> UserProfile.Sex.FEMALE
+                else -> UserProfile.Sex.UNKNOWN
+            }
+            
+            val age = strangerInfo?.age ?:
+                // TODO: 不确定 birthday 的单位是毫秒还是秒
+                if (data.birthday > 0) ((currentTimeSeconds() - data.birthday) / 365.daysToSeconds).toInt() else 0
+
+            return UserProfileImpl(age, data.mail, 0, data.name, data.level, sex, data.hobbyEntry)
+        } else {
+            TODO()
+        }
     }
     override suspend fun getOnlineOtherClientsList(bot: Bot, mayIncludeSelf: Boolean): List<OtherClientInfo> {
         val data = bot.asOnebot.impl.getOnlineClients(false).data ?: throw IllegalStateException("Can not fetch online clients.")
