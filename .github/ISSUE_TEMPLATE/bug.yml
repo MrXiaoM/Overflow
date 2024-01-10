@@ -1,7 +1,7 @@
 name: Bug 报告
 description: 提交一个 bug
 labels:
-  - "z:question"
+  - "question"
 
 body:
   - type: markdown
@@ -73,7 +73,7 @@ body:
       label: 网络日志
       description: |
         请提供全面的网络日志（如果需要）. 请不要截图.
-        网络日志一般在 `logs/onebot/*.yml`.
+        网络日志一般在 `logs/onebot/*.log`.
         如果日志过大, 可以在 `补充信息` 上传文件.
       render: text
     validations:

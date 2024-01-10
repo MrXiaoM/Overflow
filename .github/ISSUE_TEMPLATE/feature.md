@@ -2,7 +2,7 @@
 name: 特性申请
 about: 申请 Overflow 添加新的特性
 title: ''
-labels: 't:feature'
+labels: 'feature'
 assignees: ''
 
 ---
