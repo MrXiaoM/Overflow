@@ -15,12 +15,7 @@ public class MsgAdapter implements JsonDeserializer<GetMsgResp> {
         int realId = obj.get("real_id").getAsInt();
         GetMsgResp.Sender sender = gson.fromJson(obj.get("sender"), GetMsgResp.Sender.class);
         int time = obj.get("time").getAsInt();
-        String message;
-        if (obj.get("message").isJsonArray()) {
-            message = gson.toJson(obj.get("message").getAsJsonArray());
-        } else {
-            message = obj.get("message").getAsString();
-        }
+        String message = gson.toJson(obj.get("message"));
         String rawMessage = obj.has("raw_message") ? obj.get("raw_message").getAsString() : "";
         long peerId = obj.has("peer_id") ? obj.get("peer_id").getAsLong() : 0;
         long groupId = obj.has("group_id") ? obj.get("group_id").getAsLong() : 0;

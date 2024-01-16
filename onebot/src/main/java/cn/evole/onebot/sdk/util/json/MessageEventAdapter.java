@@ -18,12 +18,7 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
         JsonObject obj = json.getAsJsonObject();
         String messageType = obj.get("message_type").getAsString();
         long userId = obj.get("user_id").getAsLong();
-        String message;
-        if (obj.get("message").isJsonArray()) {
-            message = gson.toJson(obj.get("message").getAsJsonArray());
-        } else {
-            message = obj.get("message").getAsString();
-        }
+        String message = gson.toJson(obj.get("message"));
         String rawMessage = obj.get("raw_message").getAsString();
         int font = obj.get("font").getAsInt();
         switch (messageType) {
