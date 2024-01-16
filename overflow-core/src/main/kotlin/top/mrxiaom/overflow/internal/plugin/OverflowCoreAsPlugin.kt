@@ -58,7 +58,27 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
         OnebotMessages.registerSerializers()
         Overflow.instance.start(true, oneBotLogger)
 
-        // keep a command register example here
+        // No AutoLogin
+        val dataScope: MiraiConsoleImplementation.ConsoleDataScope = net.mamoe.mirai.console.internal.data.builtins.DataScope
+        dataScope.find(AutoLoginConfig::class)?.run {
+            if (accounts.isNotEmpty()) {
+                val configFolder = MiraiConsoleImplementation.getInstance().rootPath.resolve("config").toFile()
+
+                val file = File(configFolder, "Console/AutoLogin.yml")
+                val backup = File(configFolder, "Console/AutoLogin.yml.overflow.${System.currentTimeMillis()}.old")
+                file.copyTo(backup)
+                accounts.clear()
+                Overflow.logger.warning("由于 mirai 端不再需要处理登录，Overflow 已清空自动登录配置，旧配置已备份到 ${backup.name}")
+            }
+        }
+        val unregisterCommands = arrayOf("login", "autoLogin", "status")
+        CommandManager.INSTANCE.allRegisteredCommands.filter {
+            it.owner == ConsoleCommandOwner && unregisterCommands.contains(it.primaryName)
+        }.forEach {
+            CommandManager.INSTANCE.unregisterCommand(it)
+        }
+
+        BuiltInCommands.StatusCommand.register()
 
         object : CompositeCommand(
             owner = this,
@@ -111,27 +131,6 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             }
         }.register()
 
-        // No AutoLogin
-        val dataScope: MiraiConsoleImplementation.ConsoleDataScope = net.mamoe.mirai.console.internal.data.builtins.DataScope
-        dataScope.find(AutoLoginConfig::class)?.run {
-            if (accounts.isNotEmpty()) {
-                val configFolder = MiraiConsoleImplementation.getInstance().rootPath.resolve("config").toFile()
-
-                val file = File(configFolder, "Console/AutoLogin.yml")
-                val backup = File(configFolder, "Console/AutoLogin.yml.overflow.${System.currentTimeMillis()}.old")
-                file.copyTo(backup)
-                accounts.clear()
-                Overflow.logger.warning("由于 mirai 端不再需要处理登录，Overflow 已清空自动登录配置，旧配置已备份到 ${backup.name}")
-            }
-        }
-        val unregisterCommands = arrayOf("login", "autoLogin", "status")
-        CommandManager.INSTANCE.allRegisteredCommands.filter {
-            it.owner == ConsoleCommandOwner && unregisterCommands.contains(it.primaryName)
-        }.forEach {
-            CommandManager.INSTANCE.unregisterCommand(it)
-        }
-
-        BuiltInCommands.StatusCommand.register()
     }
 
     @Suppress("DEPRECATION_ERROR")
