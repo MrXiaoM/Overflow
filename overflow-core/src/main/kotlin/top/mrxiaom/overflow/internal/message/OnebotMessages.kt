@@ -24,6 +24,7 @@ import java.net.URL
  */
 object OnebotMessages {
     internal var appName = "onebot"
+    internal var appVersion = "Unknown"
     @OptIn(MiraiExperimentalApi::class)
     internal fun registerSerializers() = MessageSerializers.apply {
         registerSerializer(WrappedAudio::class, WrappedAudio.serializer())
@@ -296,7 +297,7 @@ object OnebotMessages {
             is AtAll -> "at"
             is RockPaperScissors -> "rps"
             is Dice -> {
-                when (appName) {
+                when (appName.lowercase()) {
                     "shamrock" -> "new_dice"
                     else -> "dice"
                 }

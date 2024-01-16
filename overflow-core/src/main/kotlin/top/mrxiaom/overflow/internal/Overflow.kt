@@ -188,7 +188,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
         }
         val versionInfo = botImpl.getVersionInfo()
-        OnebotMessages.appName = (versionInfo.optJSONObject("data").get("app_name")?.asString ?: "onebot").trim().lowercase()
+        val data = versionInfo.optJSONObject("data")
+        OnebotMessages.appName = (data.get("app_name")?.asString ?: "onebot").trim()
+        OnebotMessages.appVersion = (data.get("app_version")?.asString ?: "Unknown").trim()
         if (!botImpl.channel.isOpen) {
             if (printInfo) {
                 logger.error("未连接到 Onebot")
