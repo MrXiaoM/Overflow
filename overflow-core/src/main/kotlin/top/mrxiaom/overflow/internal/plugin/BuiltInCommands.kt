@@ -152,7 +152,7 @@ object BuiltInCommands {
                 val l3 = renderMemoryUsage(memoryUsageGet.nonHeapMemoryUsage)
                 val lmax = calculateMax(l1, l2.first, l3.first)
 
-                append("          　")
+                append("  　　　　　　")
                 l1.forEachIndexed { index, s ->
                     if (index != 0) append(" | ")
                     val s1 = lmax[index] - s.length * 1.5
