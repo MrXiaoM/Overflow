@@ -15,6 +15,7 @@ import net.mamoe.mirai.utils.toUHexString
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.data.*
 import top.mrxiaom.overflow.message.data.ContactRecommend
+import top.mrxiaom.overflow.message.data.Location
 import top.mrxiaom.overflow.message.data.Markdown
 import java.net.URL
 
@@ -101,6 +102,12 @@ object OnebotMessages {
                             is ContactRecommend -> {
                                 put("type", single.type.name.lowercase())
                                 put("id", single.id)
+                            }
+                            is Location -> {
+                                put("lat", single.lat)
+                                put("lon", single.lon)
+                                if (single.title.isNotEmpty()) put("title", single.title)
+                                if (single.content.isNotEmpty()) put("content", single.content)
                             }
                         }
                     }
@@ -252,6 +259,14 @@ object OnebotMessages {
                         add(ContactRecommend(contactType, id))
                     }
 
+                    "location" -> {
+                        val lat = data["lat"].string.toFloat()
+                        val lon = data["lon"].string.toFloat()
+                        val title = data["title"].string
+                        val content = data["content"].string
+                        add(Location(lat, lon, title, content))
+                    }
+
                     else -> add(UnknownMessage(type, data))
                 }
             }
@@ -341,6 +356,7 @@ object OnebotMessages {
             is FileMessage -> "file"
             is Markdown -> "markdown"
             is ContactRecommend -> "contact"
+            is Location -> "location"
             else -> "text"
         }
     internal fun imageFromFile(file: String): Image = Image.fromId(file)
