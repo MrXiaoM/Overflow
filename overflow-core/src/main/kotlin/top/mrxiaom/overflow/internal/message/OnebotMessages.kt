@@ -14,6 +14,7 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.toUHexString
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.data.*
+import top.mrxiaom.overflow.message.data.Markdown
 import java.net.URL
 
 /**
@@ -92,6 +93,10 @@ object OnebotMessages {
                             // is ForwardMessage -> put("id", single.id) // 转发消息有单独的发送方法
                             is LightApp -> put("data", single.content)
                             is ServiceMessage -> put("data", single.content)
+                            is Markdown -> when (appName.lowercase()) { // 其它实现可能有其它格式，预留判断
+                                "shamrock" -> put("content", single.content)
+                                else -> put("content", single.content)
+                            }
                         }
                     }
                 }
@@ -225,6 +230,11 @@ object OnebotMessages {
                         add(WrappedFileMessage(id, 0, name, size, url))
                     }
 
+                    "markdown" -> when (appName.lowercase()) { // 其它实现可能有其它格式，预留判断
+                        "shamrock" -> add(Markdown(data["content"].string))
+                        else -> add(Markdown(data["content"].string))
+                    }
+
                     else -> add(UnknownMessage(type, data))
                 }
             }
@@ -312,6 +322,7 @@ object OnebotMessages {
             is LightApp -> "json"
             is ServiceMessage -> "xml"
             is FileMessage -> "file"
+            is Markdown -> "markdown"
             else -> "text"
         }
     internal fun imageFromFile(file: String): Image = Image.fromId(file)
