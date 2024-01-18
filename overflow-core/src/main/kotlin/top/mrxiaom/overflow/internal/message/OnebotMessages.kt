@@ -250,7 +250,7 @@ object OnebotMessages {
                     "contact" -> {
                         val contactType = when (val typeStr = data["type"].string.lowercase()) {
                             "group" -> ContactRecommend.ContactType.Group
-                            "private" -> ContactRecommend.ContactType.Private
+                            "private", "qq" -> ContactRecommend.ContactType.Private
                             else -> throw IllegalArgumentException("未知联系人类型 $typeStr")
                         }
                         val id = data["id"].string
