@@ -20,12 +20,16 @@ import net.mamoe.mirai.console.plugin.version
 import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import top.mrxiaom.overflow.BuildConstants
+import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import java.lang.management.ManagementFactory
 import java.lang.management.MemoryMXBean
 import java.lang.management.MemoryUsage
+import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
+import kotlin.time.Duration.Companion.milliseconds
 
 object BuiltInCommands {
     public object StatusCommand : SimpleCommand(
@@ -81,6 +85,20 @@ object BuiltInCommands {
             val max: Long,
         )
 
+        fun dateTime(timestamp: Long): String {
+            return SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date(timestamp))
+        }
+
+        fun time(time: Long): String = buildString {
+            val seconds = time / 1000
+            val minutes = (seconds / 60) % 60
+            val hours = (seconds / 60 / 60) % 24
+            val days = seconds / 60 / 60 / 24
+            if (days > 0) append(days).append("天 ")
+            if (hours > 0 || days > 0) append(hours).append("时 ")
+            append(minutes).append("分")
+        }
+
         @OptIn(MiraiExperimentalApi::class)
         @Handler
         suspend fun CommandSender.handle() {
@@ -95,7 +113,9 @@ object BuiltInCommands {
                 append("正在运行 Overflow v")
                 gold().append(BuildConstants.VERSION)
                 reset().append(".\n")
-                append(MiraiConsoleImplementation.getInstance().frontEndDescription.render()).append("\n\n")
+                append(MiraiConsoleImplementation.getInstance().frontEndDescription.render()).append("\n")
+                append("启动时间: ").green().append(dateTime(Overflow.instance.startupTime)).reset().append(", 已运行 ").green().append(time(System.currentTimeMillis() - Overflow.instance.startupTime)).reset().append(".\n\n")
+
                 append("权限服务: ").append(
                     if (PermissionService.INSTANCE is BuiltInPermissionService) {
                         lightYellow()

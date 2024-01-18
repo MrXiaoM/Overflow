@@ -63,6 +63,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     internal val newMemberJoinRequestFlagMap = mutableMapOf<Long, String>()
     internal val newInviteJoinGroupRequestFlagMap = mutableMapOf<Long, String>()
     private var miraiConsoleFlag: Boolean = false
+    val startupTime = System.currentTimeMillis()
     val miraiConsole: Boolean
         get() = miraiConsoleFlag
     private val prettyJson = Json {
