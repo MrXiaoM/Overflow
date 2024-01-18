@@ -45,7 +45,7 @@ class MemberActiveWrapper(
     override val point: Int
         get() = 0 // TODO: Not yet implemented
     override val rank: Int
-        get() = 0 // TODO: Not yet implemented
+        get() = 1 // TODO: Not yet implemented
     override val temperature: Int
         get() = member.impl.level
 
