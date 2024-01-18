@@ -14,6 +14,7 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.toUHexString
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.data.*
+import top.mrxiaom.overflow.message.data.ContactRecommend
 import top.mrxiaom.overflow.message.data.Markdown
 import java.net.URL
 
@@ -96,6 +97,10 @@ object OnebotMessages {
                             is Markdown -> when (appName.lowercase()) { // 其它实现可能有其它格式，预留判断
                                 "shamrock" -> put("content", single.content)
                                 else -> put("content", single.content)
+                            }
+                            is ContactRecommend -> {
+                                put("type", single.type.name.lowercase())
+                                put("id", single.id)
                             }
                         }
                     }
@@ -235,6 +240,18 @@ object OnebotMessages {
                         else -> add(Markdown(data["content"].string))
                     }
 
+                    "contact" -> {
+                        val contactType = when (val typeStr = data["type"].string.lowercase()) {
+                            "group" -> ContactRecommend.ContactType.Group
+                            "private" -> ContactRecommend.ContactType.Private
+                            else -> throw IllegalArgumentException("未知联系人类型 $typeStr")
+                        }
+                        val id = data["id"].string
+                            .substringBefore("&") // OpenShamrock bug
+                            .toLong()
+                        add(ContactRecommend(contactType, id))
+                    }
+
                     else -> add(UnknownMessage(type, data))
                 }
             }
@@ -323,6 +340,7 @@ object OnebotMessages {
             is ServiceMessage -> "xml"
             is FileMessage -> "file"
             is Markdown -> "markdown"
+            is ContactRecommend -> "contact"
             else -> "text"
         }
     internal fun imageFromFile(file: String): Image = Image.fromId(file)
