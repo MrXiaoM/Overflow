@@ -97,7 +97,11 @@ class WSServer(
     }
 
     override fun onClose(conn: WebSocket, code: Int, reason: String, remote: Boolean) {
-        logger.info("▌ 反向 WebSocket 客户端连接因 {} 已关闭 ({})", reason, code)
+        logger.info(
+            "▌ 反向 WebSocket 客户端连接因 {} 已关闭 (关闭码: {})",
+            reason.ifEmpty { "未知原因" },
+            CloseCode.valueOf(code) ?: code
+        )
         runCatching {
             if (mutex.isLocked) mutex.unlock()
             if (ActionSendUtils.mutex.isLocked) ActionSendUtils.mutex.unlock()
