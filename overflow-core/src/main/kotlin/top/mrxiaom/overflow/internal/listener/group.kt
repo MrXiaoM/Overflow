@@ -19,6 +19,7 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.message.data.IncomingSource
 import top.mrxiaom.overflow.internal.utils.*
 
 fun EventBus.addGroupListeners(bot: BotWrapper) {
@@ -44,15 +45,15 @@ internal class GroupMessageListener(
 
                 var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
                 val messageString = miraiMessage.toString()
-                val messageSource = object : OnlineMessageSource.Incoming.FromGroup() {
-                    override val bot: Bot = this@GroupMessageListener.bot
-                    override val ids: IntArray = intArrayOf(e.messageId)
-                    override val internalIds: IntArray = ids
-                    override val isOriginalMessageInitialized: Boolean = true
-                    override val originalMessage: MessageChain = miraiMessage
-                    override val sender: Member = member
-                    override val time: Int = (e.time / 1000).toInt()
-                }
+                val messageSource = IncomingSource.group(
+                    bot = bot,
+                    ids = intArrayOf(e.messageId),
+                    internalIds = intArrayOf(e.messageId),
+                    isOriginalMessageInitialized = true,
+                    originalMessage = miraiMessage,
+                    sender = member,
+                    time = (e.time / 1000).toInt()
+                )
                 miraiMessage = messageSource.plus(miraiMessage)
                 if (member.id == bot.id) {
                     // TODO: 过滤自己发送的消息

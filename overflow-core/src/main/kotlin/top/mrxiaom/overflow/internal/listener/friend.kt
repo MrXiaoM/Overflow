@@ -17,6 +17,7 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.message.data.IncomingSource
 import top.mrxiaom.overflow.internal.utils.*
 
 fun EventBus.addFriendListeners(bot: BotWrapper) {
@@ -41,17 +42,17 @@ internal class FriendMessageListener(
                 }
                 var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
                 val messageString = miraiMessage.toString()
-                val messageSource = object : OnlineMessageSource.Incoming.FromFriend() {
-                    override val bot: Bot = this@FriendMessageListener.bot
-                    override val ids: IntArray = arrayOf(e.messageId).toIntArray()
-                    override val internalIds: IntArray = ids
-                    override val isOriginalMessageInitialized: Boolean = true
-                    override val originalMessage: MessageChain = miraiMessage
-                    override val sender: Friend = friend
-                    override val subject: Friend = friend
-                    override val target: ContactOrBot = bot
-                    override val time: Int = (e.time / 1000).toInt()
-                }
+                val messageSource = IncomingSource.friend(
+                    bot = bot,
+                    ids = intArrayOf(e.messageId),
+                    internalIds = intArrayOf(e.messageId),
+                    isOriginalMessageInitialized = true,
+                    originalMessage = miraiMessage,
+                    sender = friend,
+                    subject = friend,
+                    target = bot,
+                    time = (e.time / 1000).toInt()
+                )
                 miraiMessage = messageSource.plus(miraiMessage)
                 bot.logger.verbose("${friend.remarkOrNick}(${friend.id}) -> $messageString")
                 FriendMessageEvent(
@@ -70,17 +71,17 @@ internal class FriendMessageListener(
                 }
                 var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
                 val messageString = miraiMessage.toString()
-                val messageSource = object : OnlineMessageSource.Incoming.FromStranger() {
-                    override val bot: Bot = this@FriendMessageListener.bot
-                    override val ids: IntArray = arrayOf(e.messageId).toIntArray()
-                    override val internalIds: IntArray = ids
-                    override val isOriginalMessageInitialized: Boolean = true
-                    override val originalMessage: MessageChain = miraiMessage
-                    override val sender: Stranger = stranger
-                    override val subject: Stranger = stranger
-                    override val target: ContactOrBot = bot
-                    override val time: Int = (e.time / 1000).toInt()
-                }
+                val messageSource = IncomingSource.stranger(
+                    bot = bot,
+                    ids = intArrayOf(e.messageId),
+                    internalIds = intArrayOf(e.messageId),
+                    isOriginalMessageInitialized = true,
+                    originalMessage = miraiMessage,
+                    sender = stranger,
+                    subject = stranger,
+                    target = bot,
+                    time = (e.time / 1000).toInt()
+                )
                 miraiMessage = messageSource.plus(miraiMessage)
                 bot.logger.verbose("${stranger.remarkOrNick}(${stranger.id}) -> $messageString")
                 StrangerMessageEvent(

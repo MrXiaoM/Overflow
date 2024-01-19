@@ -19,8 +19,8 @@ import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.internal.message.data.WrappedAudio
-import top.mrxiaom.overflow.internal.message.data.WrappedVideo
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
 import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
@@ -55,7 +55,7 @@ class FriendWrapper(
 
         val messageChain = message.toMessageChain()
         var throwable: Throwable? = null
-        val receipt = kotlin.runCatching {
+        val receipt = runCatching {
             val forward = messageChain.findForwardMessage()
             val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
@@ -67,17 +67,16 @@ class FriendWrapper(
                 response.data.safeMessageIds
             }
 
-            @Suppress("DEPRECATION_ERROR")
-            MessageReceipt(object : OnlineMessageSource.Outgoing.ToFriend() {
-                override val bot: Bot = this@FriendWrapper.bot
-                override val ids: IntArray = messageIds
-                override val internalIds: IntArray = ids
-                override val isOriginalMessageInitialized: Boolean = true
-                override val originalMessage: MessageChain = messageChain
-                override val sender: Bot = bot
-                override val target: Friend = this@FriendWrapper
-                override val time: Int = currentTimeSeconds().toInt()
-            }, this)
+            OutgoingSource.friend(
+                bot = bot,
+                ids = messageIds,
+                internalIds = messageIds,
+                isOriginalMessageInitialized = true,
+                originalMessage = messageChain,
+                sender = bot,
+                target = this@FriendWrapper,
+                time = currentTimeSeconds().toInt()
+            ).receipt(this)
         }.onFailure { throwable = it }.getOrNull()
         FriendMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 

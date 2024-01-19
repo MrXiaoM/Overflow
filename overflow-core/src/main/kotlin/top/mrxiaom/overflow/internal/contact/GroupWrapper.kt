@@ -35,8 +35,8 @@ import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper
 import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper.Companion.fetchFiles
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.internal.message.data.WrappedAudio
-import top.mrxiaom.overflow.internal.message.data.WrappedVideo
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
 import top.mrxiaom.overflow.internal.utils.*
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
@@ -171,7 +171,7 @@ class GroupWrapper(
 
         val messageChain = message.toMessageChain()
         var throwable: Throwable? = null
-        val receipt = kotlin.runCatching {
+        val receipt = runCatching {
             val forward = messageChain.findForwardMessage()
             val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
@@ -182,17 +182,17 @@ class GroupWrapper(
                 val response = botWrapper.impl.sendGroupMsg(id, msg, false)
                 response.data.safeMessageIds
             }
-            @Suppress("DEPRECATION_ERROR")
-            MessageReceipt(object : OnlineMessageSource.Outgoing.ToGroup() {
-                override val bot: Bot = this@GroupWrapper.bot
-                override val ids: IntArray = messageIds
-                override val internalIds: IntArray = ids
-                override val isOriginalMessageInitialized: Boolean = true
-                override val originalMessage: MessageChain = messageChain
-                override val sender: Bot = bot
-                override val target: Group = this@GroupWrapper
-                override val time: Int = currentTimeSeconds().toInt()
-            }, this)
+
+            OutgoingSource.group(
+                bot = bot,
+                ids = messageIds,
+                internalIds = messageIds,
+                isOriginalMessageInitialized = true,
+                originalMessage = messageChain,
+                sender = bot,
+                target = this,
+                time = currentTimeSeconds().toInt()
+            ).receipt(this)
         }.onFailure { throwable = it }.getOrNull()
         GroupMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 

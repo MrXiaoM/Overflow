@@ -6,16 +6,22 @@ import kotlinx.coroutines.CoroutineName
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Stranger
 import net.mamoe.mirai.event.broadcast
-import net.mamoe.mirai.event.events.*
+import net.mamoe.mirai.event.events.EventCancelledException
+import net.mamoe.mirai.event.events.StrangerMessagePostSendEvent
+import net.mamoe.mirai.event.events.StrangerMessagePreSendEvent
 import net.mamoe.mirai.message.MessageReceipt
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.Image
+import net.mamoe.mirai.message.data.Message
+import net.mamoe.mirai.message.data.ShortVideo
+import net.mamoe.mirai.message.data.toMessageChain
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.internal.message.data.WrappedVideo
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
 import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
@@ -57,17 +63,17 @@ class StrangerWrapper(
                 val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
                 response.data.safeMessageIds
             }
-            @Suppress("DEPRECATION_ERROR")
-            return MessageReceipt(object : OnlineMessageSource.Outgoing.ToStranger() {
-                override val bot: Bot = this@StrangerWrapper.bot
-                override val ids: IntArray = messageIds
-                override val internalIds: IntArray = ids
-                override val isOriginalMessageInitialized: Boolean = true
-                override val originalMessage: MessageChain = message.toMessageChain()
-                override val sender: Bot = bot
-                override val target: Stranger = this@StrangerWrapper
-                override val time: Int = currentTimeSeconds().toInt()
-            }, this)
+
+            return OutgoingSource.stranger(
+                bot = bot,
+                ids = messageIds,
+                internalIds = messageIds,
+                isOriginalMessageInitialized = true,
+                originalMessage = message.toMessageChain(),
+                sender = bot,
+                target = this,
+                time = currentTimeSeconds().toInt()
+            ).receipt(this)
         }.onFailure { throwable = it }.getOrNull()
         StrangerMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 

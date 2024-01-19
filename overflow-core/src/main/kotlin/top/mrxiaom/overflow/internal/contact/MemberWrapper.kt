@@ -6,9 +6,11 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.*
-import net.mamoe.mirai.contact.active.MemberActive
 import net.mamoe.mirai.event.broadcast
-import net.mamoe.mirai.event.events.*
+import net.mamoe.mirai.event.events.EventCancelledException
+import net.mamoe.mirai.event.events.GroupTempMessagePostSendEvent
+import net.mamoe.mirai.event.events.GroupTempMessagePreSendEvent
+import net.mamoe.mirai.event.events.MemberCardChangeEvent
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.action.MemberNudge
 import net.mamoe.mirai.message.data.*
@@ -21,7 +23,8 @@ import top.mrxiaom.overflow.internal.check
 import top.mrxiaom.overflow.internal.contact.data.MemberActiveWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.internal.message.data.WrappedVideo
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
 import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
@@ -142,7 +145,7 @@ class MemberWrapper(
 
         val messageChain = message.toMessageChain()
         var throwable: Throwable? = null
-        val receipt = kotlin.runCatching {
+        val receipt = runCatching {
             val forward = message.findForwardMessage()
             val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
@@ -153,17 +156,16 @@ class MemberWrapper(
                 val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
                 response.data.safeMessageIds
             }
-            @Suppress("DEPRECATION_ERROR")
-            MessageReceipt(object : OnlineMessageSource.Outgoing.ToTemp() {
-                override val bot: Bot = this@MemberWrapper.bot
-                override val ids: IntArray = messageIds
-                override val internalIds: IntArray = ids
-                override val isOriginalMessageInitialized: Boolean = true
-                override val originalMessage: MessageChain = message.toMessageChain()
-                override val sender: Bot = bot
-                override val target: Member = this@MemberWrapper
-                override val time: Int = currentTimeSeconds().toInt()
-            }, this)
+            OutgoingSource.temp(
+                bot = bot,
+                ids = messageIds,
+                internalIds = messageIds,
+                isOriginalMessageInitialized = true,
+                originalMessage = message.toMessageChain(),
+                sender = bot,
+                target = this,
+                time = currentTimeSeconds().toInt()
+            ).receipt(this)
         }.onFailure { throwable = it }.getOrNull()
         GroupTempMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
