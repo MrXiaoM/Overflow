@@ -23,36 +23,33 @@ import java.util.Map;
  * Version: 1.0
  */
 public class MessageMap {
-    public static Map<String, Class<? extends Event>> messageMap = new HashMap<>();
+    public static Map<String, Class<? extends Event>> messageMap = new HashMap<String, Class<? extends Event>>() {{
+        put("groupMessage", GroupMessageEvent.class);
+        put("privateMessage", PrivateMessageEvent.class);
+        put("wholeMessage", GroupMessageEvent.class);
+        put("guildMessage", GuildMessageEvent.class);
 
-    static {
-        messageMap.put("groupMessage", GroupMessageEvent.class);
-        messageMap.put("privateMessage", PrivateMessageEvent.class);
-        messageMap.put("wholeMessage", GroupMessageEvent.class);
-        messageMap.put("guildMessage", GuildMessageEvent.class);
+        put("friend", FriendAddRequestEvent.class);
+        put("group", GroupAddRequestEvent.class);
 
-        messageMap.put("friend", FriendAddRequestEvent.class);
-        messageMap.put("group", GroupAddRequestEvent.class);
+        put("group_upload", GroupUploadNoticeEvent.class);
+        put("group_admin", GroupAdminNoticeEvent.class);
+        put("group_decrease", GroupDecreaseNoticeEvent.class);
+        put("group_increase", GroupIncreaseNoticeEvent.class);
+        put("group_ban", GroupBanNoticeEvent.class);
+        put("group_recall", GroupMsgDeleteNoticeEvent.class);
+        put("notify", GroupNotifyNoticeEvent.class);
+        put("poke", GroupPokeNoticeEvent.class);
+        put("lucky_king", GroupLuckyKingNoticeEvent.class);
+        put("honor", GroupHonorChangeNoticeEvent.class);
+        put("group_card", GroupCardChangeNoticeEvent.class);
 
-        messageMap.put("group_upload", GroupUploadNoticeEvent.class);
-        messageMap.put("group_admin", GroupAdminNoticeEvent.class);
-        messageMap.put("group_decrease", GroupDecreaseNoticeEvent.class);
-        messageMap.put("group_increase", GroupIncreaseNoticeEvent.class);
-        messageMap.put("group_ban", GroupBanNoticeEvent.class);
-        messageMap.put("group_recall", GroupMsgDeleteNoticeEvent.class);
-        messageMap.put("notify", GroupNotifyNoticeEvent.class);
-        messageMap.put("poke", GroupPokeNoticeEvent.class);
-        messageMap.put("lucky_king", GroupLuckyKingNoticeEvent.class);
-        messageMap.put("honor", GroupHonorChangeNoticeEvent.class);
-        messageMap.put("group_card", GroupCardChangeNoticeEvent.class);
+        put("friend_add", FriendAddNoticeEvent.class);
+        put("friend_recall", PrivateMsgDeleteNoticeEvent.class);
+        put("essence", GroupEssenceNoticeEvent.class);
+        put("offline_file", ReceiveOfflineFilesNoticeEvent.class);
 
-        messageMap.put("friend_add", FriendAddNoticeEvent.class);
-        messageMap.put("friend_recall", PrivateMsgDeleteNoticeEvent.class);
-        messageMap.put("essence", GroupEssenceNoticeEvent.class);
-        messageMap.put("offline_file", ReceiveOfflineFilesNoticeEvent.class);
-
-        messageMap.put("lifecycle", LifecycleMetaEvent.class);
-        messageMap.put("heartbeat", HeartbeatMetaEvent.class);
-
-    }
+        put("lifecycle", LifecycleMetaEvent.class);
+        put("heartbeat", HeartbeatMetaEvent.class);
+    }};
 }
