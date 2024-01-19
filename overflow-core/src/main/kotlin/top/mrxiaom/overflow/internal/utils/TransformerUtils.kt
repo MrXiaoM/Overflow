@@ -33,18 +33,18 @@ internal inline fun <reified T : Contact> ContactList<T>.update(
     delegate.addAll(list.filterNot { delegate.any { old -> old.id == it.id } })
 }
 
-fun GroupMemberInfoResp.wrapAsMember(group: Group): MemberWrapper {
+internal fun GroupMemberInfoResp.wrapAsMember(group: Group): MemberWrapper {
     return (group as GroupWrapper).updateMember(this)
 }
 
-fun GroupMessageEvent.GroupSender.wrapAsMember(group: Group): MemberWrapper {
+internal fun GroupMessageEvent.GroupSender.wrapAsMember(group: Group): MemberWrapper {
     return GroupMemberInfoResp().also {
         it.groupId = group.id
         it.userId = userId.toLong()
         it.nickname = nickname
         it.card = card ?: ""
         it.sex = sex ?: ""
-        it.age = age ?: 0
+        it.age = age
         it.area = area ?: ""
         it.level = level?.toIntOrNull() ?: 0
         it.role = role ?: "member"
@@ -52,7 +52,7 @@ fun GroupMessageEvent.GroupSender.wrapAsMember(group: Group): MemberWrapper {
     }.wrapAsMember(group)
 }
 
-suspend fun BotWrapper.group(groupId: Long): GroupWrapper {
+internal suspend fun BotWrapper.group(groupId: Long): GroupWrapper {
     return getGroup(groupId) as? GroupWrapper ?: kotlin.run {
         val data = impl.getGroupInfo(groupId, false).data ?: throw IllegalStateException("无法取得群信息")
         updateGroup(GroupWrapper(this, data))
@@ -60,7 +60,7 @@ suspend fun BotWrapper.group(groupId: Long): GroupWrapper {
 }
 
 
-fun PrivateMessageEvent.PrivateSender.wrapAsFriend(bot: BotWrapper): FriendWrapper {
+internal fun PrivateMessageEvent.PrivateSender.wrapAsFriend(bot: BotWrapper): FriendWrapper {
     return bot.updateFriend(FriendWrapper(bot, FriendInfoResp().also {
         it.userId = userId
         it.nickname = nickname
@@ -68,11 +68,11 @@ fun PrivateMessageEvent.PrivateSender.wrapAsFriend(bot: BotWrapper): FriendWrapp
     }))
 }
 
-fun StrangerInfoResp.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
+internal fun StrangerInfoResp.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
     return bot.updateStranger(StrangerWrapper(bot, this))
 }
 
-fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
+internal fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
     return StrangerInfoResp(
         userId,
         nickname,
@@ -85,15 +85,15 @@ fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerW
     ).wrapAsStranger(bot)
 }
 
-fun ClientsResp.Clients.wrapAsOtherClientInfo(): OtherClientInfo {
+internal fun ClientsResp.Clients.wrapAsOtherClientInfo(): OtherClientInfo {
     val platform = Platform.getByTerminalId(loginPlatform.toInt())
     return OtherClientInfo(appId.toInt(), platform, deviceName, deviceKind)
 }
 
-val MsgId?.safeMessageIds: IntArray
+internal val MsgId?.safeMessageIds: IntArray
     get() = this?.messageId?.run { intArrayOf(this) } ?: intArrayOf()
 
-fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderWrapper? = null): List<FileWrapper> {
+internal fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderWrapper? = null): List<FileWrapper> {
     return map {
         val md5 = it.md5?.hexToBytes() ?: ByteArray(16)
         val sha1 = it.sha1?.hexToBytes() ?: ByteArray(16)
@@ -102,7 +102,7 @@ fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderW
         )
     }
 }
-fun List<GroupFilesResp.Folders>.toMiraiFolders(group: GroupWrapper, parent: FolderWrapper? = null): List<FolderWrapper> {
+internal fun List<GroupFilesResp.Folders>.toMiraiFolders(group: GroupWrapper, parent: FolderWrapper? = null): List<FolderWrapper> {
     return map {
         FolderWrapper(group, parent,
             it.folderId, it.folderName, it.createTime, it.createTime, it.creator, it.totalFileCount

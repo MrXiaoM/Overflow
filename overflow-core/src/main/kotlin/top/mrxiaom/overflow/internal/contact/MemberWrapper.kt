@@ -30,7 +30,7 @@ import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)
-class MemberWrapper(
+internal class MemberWrapper(
     val botWrapper: BotWrapper,
     val groupWrapper: GroupWrapper,
     internal var impl: GroupMemberInfoResp

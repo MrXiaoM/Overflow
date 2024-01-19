@@ -9,20 +9,19 @@ import cn.evole.onebot.sdk.event.notice.group.GroupTitleChangeNoticeEvent
 import cn.evole.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
-import net.mamoe.mirai.Bot
-import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.*
-import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
-import top.mrxiaom.overflow.internal.utils.*
+import top.mrxiaom.overflow.internal.utils.group
+import top.mrxiaom.overflow.internal.utils.queryProfile
+import top.mrxiaom.overflow.internal.utils.wrapAsMember
 
-fun EventBus.addGroupListeners(bot: BotWrapper) {
+internal fun EventBus.addGroupListeners(bot: BotWrapper) {
     listOf(
         GroupMessageListener(bot),
         GroupNotifyListener(bot),

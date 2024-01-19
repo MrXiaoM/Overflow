@@ -12,21 +12,21 @@ import net.mamoe.mirai.data.GroupHonorType
 import net.mamoe.mirai.data.MemberInfo
 import net.mamoe.mirai.data.StrangerInfo
 
-class FriendInfoImpl(
+internal class FriendInfoImpl(
     override val uin: Long,
     override val nick: String,
     override var remark: String,
     override val friendGroupId: Int = 0
 ) : FriendInfo
 
-class StrangerInfoImpl(
+internal class StrangerInfoImpl(
     override val uin: Long,
     override val nick: String,
     override val fromGroup: Long = 0,
     override val remark: String = "",
 ): StrangerInfo
 
-class MemberInfoImpl(
+internal class MemberInfoImpl(
     override val honors: Set<GroupHonorType>,
     override val isOfficialBot: Boolean,
     override val joinTimestamp: Int,
@@ -43,20 +43,20 @@ class MemberInfoImpl(
     override val uin: Long
 ): MemberInfo
 
-val FriendInfo.asOnebot: FriendInfoResp
+internal val FriendInfo.asOnebot: FriendInfoResp
     get() = FriendInfoResp(uin, nick, remark)
-val StrangerInfo.asOnebot: StrangerInfoResp
+internal val StrangerInfo.asOnebot: StrangerInfoResp
     get() = StrangerInfoResp(uin, nick, "", 0, "", 0, 0, JsonObject().also {
         if (fromGroup > 0) it.addProperty("add_src_id", fromGroup)
     })
-val StrangerInfoResp.asMirai: StrangerInfo
+internal val StrangerInfoResp.asMirai: StrangerInfo
     get() = StrangerInfoImpl(
         uin = userId,
         nick = nickname,
         fromGroup = ext?.get("add_src_id")?.asLong ?: 0,
     )
 
-val GroupMemberInfoResp.asMirai: MemberInfoImpl
+internal val GroupMemberInfoResp.asMirai: MemberInfoImpl
     get() = MemberInfoImpl(setOf(), false, joinTime, lastSentTime, 0, card,
         when(role) {
             "owner" -> MemberPermission.OWNER

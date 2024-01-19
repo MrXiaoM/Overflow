@@ -15,12 +15,12 @@ import top.mrxiaom.overflow.internal.utils.toMiraiFolders
 import top.mrxiaom.overflow.spi.FileService
 import java.util.stream.Stream
 
-class RemoteFilesWrapper(
+internal class RemoteFilesWrapper(
     override val contact: GroupWrapper,
     override val root: FolderWrapper
 ) : RemoteFiles {
     companion object {
-        suspend fun GroupWrapper.fetchFiles(): RemoteFilesWrapper {
+        internal suspend fun GroupWrapper.fetchFiles(): RemoteFilesWrapper {
             val data = botWrapper.impl.getGroupRootFiles(id).data
 
             val root = FolderWrapper(
@@ -33,8 +33,7 @@ class RemoteFilesWrapper(
     }
 }
 
-
-class FolderWrapper(
+internal class FolderWrapper(
     override val contact: GroupWrapper,
     override val parent: AbsoluteFolder? = null,
     override val id: String,
@@ -171,7 +170,7 @@ class FolderWrapper(
     }
 }
 
-class FileWrapper(
+internal class FileWrapper(
     override val contact: GroupWrapper,
     override val parent: FolderWrapper?,
     override val id: String,

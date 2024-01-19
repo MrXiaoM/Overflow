@@ -8,7 +8,7 @@ import net.mamoe.mirai.utils.safeCast
 import top.mrxiaom.overflow.internal.utils.base64Length
 
 @Serializable
-data class WrappedVideo(
+internal data class WrappedVideo(
     val file: String
 ) : OnlineShortVideo {
     override val fileFormat: String = "mp4"

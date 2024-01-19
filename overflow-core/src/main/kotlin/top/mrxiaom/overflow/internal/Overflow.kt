@@ -2,7 +2,6 @@ package top.mrxiaom.overflow.internal
 
 import cn.evole.onebot.sdk.action.ActionRaw
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
-import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import cn.evolvefield.onebot.client.handler.EventBus
@@ -45,9 +44,9 @@ import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
 
-val Bot.asOnebot: BotWrapper
+internal val Bot.asOnebot: BotWrapper
     get() = this as? BotWrapper ?: throw IllegalStateException("Bot 非 Overflow 实现")
-fun ActionRaw.check(failMsg: String): Boolean {
+internal fun ActionRaw.check(failMsg: String): Boolean {
     if (retCode != 0) {
         Overflow.logger.warning("$failMsg, status=$status, retCode=$retCode, echo=$echo")
     }

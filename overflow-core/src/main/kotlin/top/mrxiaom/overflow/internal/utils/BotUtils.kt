@@ -24,7 +24,7 @@ internal val defaultJson: Json = Json {
     ignoreUnknownKeys = true
 }
 @Serializable
-data class DigestShare(
+internal data class DigestShare(
     @SerialName("share_key")
     val shareKey: String = ""
 )

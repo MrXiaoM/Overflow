@@ -1,4 +1,4 @@
-@file:OptIn(ConsoleFrontEndImplementation::class, ConsoleExperimentalApi::class)
+@file:OptIn(ConsoleFrontEndImplementation::class, ConsoleExperimentalApi::class, MiraiExperimentalApi::class)
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
 package top.mrxiaom.overflow.internal.plugin
@@ -29,10 +29,9 @@ import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
-import kotlin.time.Duration.Companion.milliseconds
 
-object BuiltInCommands {
-    public object StatusCommand : SimpleCommand(
+internal object BuiltInCommands {
+    object StatusCommand : SimpleCommand(
         ConsoleCommandOwner, "status", "states", "状态",
         description = "获取 Mirai Console 运行状态"
     ), Command, BuiltInCommand {
@@ -85,11 +84,11 @@ object BuiltInCommands {
             val max: Long,
         )
 
-        fun dateTime(timestamp: Long): String {
+        private fun dateTime(timestamp: Long): String {
             return SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date(timestamp))
         }
 
-        fun time(time: Long): String = buildString {
+        private fun time(time: Long): String = buildString {
             val seconds = time / 1000
             val minutes = (seconds / 60) % 60
             val hours = (seconds / 60 / 60) % 24
@@ -99,7 +98,6 @@ object BuiltInCommands {
             append(minutes).append("分")
         }
 
-        @OptIn(MiraiExperimentalApi::class)
         @Handler
         suspend fun CommandSender.handle() {
             sendAnsiMessage {
@@ -228,7 +226,7 @@ object BuiltInCommands {
             }
         }
 
-        private fun AnsiMessageBuilder.renderMemoryUsage(usage: MUsage) = arrayOf(
+        private fun renderMemoryUsage(usage: MUsage) = arrayOf(
             renderMemoryUsageNumber(usage.committed),
             renderMemoryUsageNumber(usage.init),
             renderMemoryUsageNumber(usage.used),

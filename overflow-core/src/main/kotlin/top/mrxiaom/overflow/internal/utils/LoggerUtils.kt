@@ -36,7 +36,7 @@ private val doNothing: (priority: SimpleLogger.LogPriority, message: String?, e:
  *
  * @see PlatformLogger 查看格式信息
  */
-public class LoggerInFolder @JvmOverloads constructor(
+internal class LoggerInFolder @JvmOverloads constructor(
     requester: KClass<*>,
     identity: String,
     private val directory: File = File(identity),
@@ -82,7 +82,7 @@ public class LoggerInFolder @JvmOverloads constructor(
  * @see PlatformLogger 查看格式信息
  */
 @OptIn(MiraiInternalApi::class)
-class WithFileLogger(
+internal class WithFileLogger(
     val logger: MiraiLogger,
     file: File
 ) : MiraiLogger, PlatformLogger(logger.identity, { file.appendText(it + "\n") }, false) {

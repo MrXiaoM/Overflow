@@ -12,7 +12,7 @@ import top.mrxiaom.overflow.internal.contact.GroupWrapper
 import top.mrxiaom.overflow.internal.utils.FastImageInfo
 import top.mrxiaom.overflow.spi.FileService
 
-class AnnouncementsWrapper(
+internal class AnnouncementsWrapper(
     val impl: GroupWrapper,
     val list: List<OnlineAnnouncementWrapper>
 ) : Announcements {
@@ -75,7 +75,7 @@ class AnnouncementsWrapper(
     }
 }
 
-class OnlineAnnouncementWrapper(
+internal class OnlineAnnouncementWrapper(
     override val content: String,
     override val group: Group,
     override val senderId: Long,
@@ -87,5 +87,5 @@ class OnlineAnnouncementWrapper(
     override val sender: NormalMember? = group[senderId],
 ) : OnlineAnnouncement
 
-val AnnouncementImage.file: String
+internal val AnnouncementImage.file: String
     get() = if (url.contains("\n")) url.split("\n")[1] else url

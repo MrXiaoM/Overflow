@@ -42,7 +42,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
         return ConsoleCommandOwner.permissionId(name)
     }
 
-    fun net.mamoe.mirai.console.internal.extension.AbstractConcurrentComponentStorage.contributePostStartupExtension(
+    private fun net.mamoe.mirai.console.internal.extension.AbstractConcurrentComponentStorage.contributePostStartupExtension(
         instance: PostStartupExtension
     ): Unit = contribute(PostStartupExtension, this@OverflowCoreAsPlugin, lazyInstance = { instance })
 
@@ -134,7 +134,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     }
 
     @Suppress("DEPRECATION_ERROR")
-    fun onPostStartup() {
+    private fun onPostStartup() {
         net.mamoe.mirai.internal.spi.EncryptService.factory?.also {
             Overflow.logger.apply {
                 warning("-------------------------------------------")

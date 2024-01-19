@@ -40,7 +40,7 @@ internal class WrappedImageProtocol : InternalImageProtocol {
 }
 @Serializable
 @MiraiExperimentalApi
-data class WrappedImage(
+internal data class WrappedImage(
     val url: String,
     override val imageType: ImageType,
     override val size: Long,

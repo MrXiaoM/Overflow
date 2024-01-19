@@ -17,7 +17,7 @@ import top.mrxiaom.overflow.internal.contact.MemberWrapper
 import top.mrxiaom.overflow.internal.utils.httpGet
 
 @OptIn(MiraiInternalApi::class)
-class MemberActiveWrapper(
+internal class MemberActiveWrapper(
     val member: MemberWrapper
 ) : MemberActive {
     val honorsInternal: HashSet<GroupHonorType> = hashSetOf()

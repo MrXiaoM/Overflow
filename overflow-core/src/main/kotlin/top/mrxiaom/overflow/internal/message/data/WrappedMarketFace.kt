@@ -1,10 +1,11 @@
 package top.mrxiaom.overflow.internal.message.data
 
+import kotlinx.serialization.SerialName
 import net.mamoe.mirai.message.data.MarketFace
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 
 @MiraiExperimentalApi
-class WrappedMarketFace(
+internal data class WrappedMarketFace(
     val emojiId: String,
     override val name: String,
     override val id: Int = 0

@@ -5,22 +5,21 @@ import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evole.onebot.sdk.event.request.FriendAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
-import net.mamoe.mirai.Bot
-import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.contact.remarkOrNick
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.FriendMessageEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.event.events.StrangerMessageEvent
-import net.mamoe.mirai.message.data.MessageChain
-import net.mamoe.mirai.message.data.OnlineMessageSource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
-import top.mrxiaom.overflow.internal.utils.*
+import top.mrxiaom.overflow.internal.utils.queryProfile
+import top.mrxiaom.overflow.internal.utils.wrapAsFriend
+import top.mrxiaom.overflow.internal.utils.wrapAsStranger
 
-fun EventBus.addFriendListeners(bot: BotWrapper) {
+internal fun EventBus.addFriendListeners(bot: BotWrapper) {
     listOf(
         FriendMessageListener(bot),
         FriendAddRequestListener(bot),

@@ -25,7 +25,7 @@ import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
-class FriendWrapper(
+internal class FriendWrapper(
     val botWrapper: BotWrapper,
     internal var impl: FriendInfoResp,
 ) : Friend {

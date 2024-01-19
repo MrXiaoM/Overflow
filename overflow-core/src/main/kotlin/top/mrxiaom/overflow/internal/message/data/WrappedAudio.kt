@@ -7,7 +7,7 @@ import top.mrxiaom.overflow.internal.utils.base64Length
 import top.mrxiaom.overflow.internal.utils.lengthToString
 
 @Serializable
-data class WrappedAudio(
+internal data class WrappedAudio(
     override val urlForDownload: String,
     override val length: Long,
 ): OnlineAudio, OfflineAudio {

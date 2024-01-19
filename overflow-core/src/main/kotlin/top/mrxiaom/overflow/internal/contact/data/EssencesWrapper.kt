@@ -13,7 +13,7 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
 import top.mrxiaom.overflow.internal.utils.shareDigest
 
-class EssencesWrapper(
+internal class EssencesWrapper(
     val impl: GroupWrapper,
     private var list: List<EssenceMessageRecord>
 ) : Essences {
@@ -52,7 +52,7 @@ class EssencesWrapper(
 
     companion object {
         @OptIn(MiraiInternalApi::class)
-        suspend fun GroupWrapper.fetchEssencesList(page: Int = 0): List<EssenceMessageRecord> {
+        internal suspend fun GroupWrapper.fetchEssencesList(page: Int = 0): List<EssenceMessageRecord> {
             return botWrapper.impl.getEssenceMsgList(id, page).data.map {
                 EssenceMessageRecord(
                     this, queryMember(it.senderId), it.senderId, it.senderNick, it.senderTime.toInt(),
@@ -71,7 +71,7 @@ class EssencesWrapper(
                 }
             }
         }
-        suspend fun GroupWrapper.fetchEssences(): EssencesWrapper {
+        internal suspend fun GroupWrapper.fetchEssences(): EssencesWrapper {
             return EssencesWrapper(this, fetchEssencesList())
         }
     }

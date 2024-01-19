@@ -13,7 +13,7 @@ import java.util.*
 private fun currentTime() = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())
 
 @Serializable
-data class UnknownMessage(
+internal data class UnknownMessage(
     val type: String,
     val data: JsonObject
 ) : MessageContent {

@@ -4,15 +4,15 @@ import net.mamoe.mirai.utils.ExternalResource
 import java.io.*
 import java.util.*
 
-fun ExternalResource.toBase64File(): String {
+internal fun ExternalResource.toBase64File(): String {
     return inputStream().use {
         "base64://" + Base64.getEncoder().encodeToString(it.readBytes())
     }
 }
-fun base64Length(s: String): Long {
+internal fun base64Length(s: String): Long {
     return s.length.toLong() - (s.length.toLong() / 8L) * 2L
 }
-fun lengthToString(len: Long): String {
+internal fun lengthToString(len: Long): String {
     var value = len.toDouble()
     var unit = "bytes"
     for (u in arrayOf("KB", "MB")) {
@@ -25,10 +25,10 @@ fun lengthToString(len: Long): String {
 /**
  * 快速获取图片的大小
  *
- * @see https://www.cnblogs.com/xiaona/p/13869504.html
+ * [cnblogs](https://www.cnblogs.com/xiaona/p/13869504.html)
  * @author Mr.Er
  */
-class FastImageInfo private constructor(
+internal class FastImageInfo private constructor(
     val height: Int,
     val width: Int,
     val mimeType: String

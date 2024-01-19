@@ -10,7 +10,7 @@ import net.mamoe.mirai.message.data.OfflineMessageSource
 import net.mamoe.mirai.message.data.OnlineMessageSource
 import net.mamoe.mirai.utils.MiraiInternalApi
 
-class OfflineMessageSourceImpl(
+internal class OfflineMessageSourceImpl(
     override val botId: Long,
     override val fromId: Long,
     override val ids: IntArray,
@@ -22,8 +22,8 @@ class OfflineMessageSourceImpl(
     override val kind: MessageSourceKind
 ) : OfflineMessageSource()
 
-object OutgoingSource {
-    fun group(
+internal object OutgoingSource {
+    internal fun group(
         bot: Bot,
         ids: IntArray,
         internalIds: IntArray,
@@ -44,7 +44,7 @@ object OutgoingSource {
             override val time: Int = time
         }
     }
-    fun friend(
+    internal fun friend(
         bot: Bot,
         ids: IntArray,
         internalIds: IntArray,
@@ -65,7 +65,7 @@ object OutgoingSource {
             override val time: Int = time
         }
     }
-    fun temp(
+    internal fun temp(
         bot: Bot,
         ids: IntArray,
         internalIds: IntArray,
@@ -86,7 +86,7 @@ object OutgoingSource {
             override val time: Int = time
         }
     }
-    fun stranger(
+    internal fun stranger(
         bot: Bot,
         ids: IntArray,
         internalIds: IntArray,
@@ -113,8 +113,8 @@ object OutgoingSource {
     }
 }
 
-object IncomingSource {
-    fun group(
+internal object IncomingSource {
+    internal fun group(
         bot: Bot,
         ids: IntArray,
         internalIds: IntArray,
@@ -133,7 +133,7 @@ object IncomingSource {
             override val time: Int = time
         }
     }
-    fun friend(
+    internal fun friend(
         bot: Bot,
         ids: IntArray,
         internalIds: IntArray,
@@ -156,7 +156,7 @@ object IncomingSource {
             override val time: Int = time
         }
     }
-    fun temp(
+    internal fun temp(
         bot: Bot,
         ids: IntArray,
         internalIds: IntArray,
@@ -179,7 +179,7 @@ object IncomingSource {
             override val time: Int = time
         }
     }
-    fun stranger(
+    internal fun stranger(
         bot: Bot,
         ids: IntArray,
         internalIds: IntArray,

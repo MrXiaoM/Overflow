@@ -2,7 +2,7 @@ package top.mrxiaom.overflow.internal.data
 
 import net.mamoe.mirai.data.UserProfile
 
-class UserProfileImpl(
+internal class UserProfileImpl(
     override val age: Int,
     override val email: String,
     override val friendGroupId: Int,

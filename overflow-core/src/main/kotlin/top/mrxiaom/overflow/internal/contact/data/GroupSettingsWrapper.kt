@@ -7,7 +7,7 @@ import net.mamoe.mirai.contact.checkBotPermission
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
 
-class GroupSettingsWrapper(
+internal class GroupSettingsWrapper(
     val group: GroupWrapper
 ) : GroupSettings {
     @Deprecated(

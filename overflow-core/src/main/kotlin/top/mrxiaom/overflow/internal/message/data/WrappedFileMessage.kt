@@ -6,7 +6,7 @@ import net.mamoe.mirai.contact.file.AbsoluteFile
 import net.mamoe.mirai.message.data.FileMessage
 
 @Serializable
-data class WrappedFileMessage(
+internal data class WrappedFileMessage(
     override val id: String,
     override val internalId: Int,
     override val name: String,

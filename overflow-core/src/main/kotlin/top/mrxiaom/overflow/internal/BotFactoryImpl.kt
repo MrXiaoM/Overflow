@@ -7,7 +7,7 @@ import net.mamoe.mirai.auth.BotAuthorization
 import net.mamoe.mirai.utils.BotConfiguration
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 
-object BotFactoryImpl : BotFactory {
+internal object BotFactoryImpl : BotFactory {
     internal var internalBot: cn.evolvefield.onebot.client.core.Bot? = null
     val bot: cn.evolvefield.onebot.client.core.Bot
         get() = internalBot!!

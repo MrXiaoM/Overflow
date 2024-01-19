@@ -42,7 +42,7 @@ import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)
-class GroupWrapper(
+internal class GroupWrapper(
     val botWrapper: BotWrapper,
     internal var impl: GroupInfoResp
 ) : Group, RemoteGroup, Updatable {

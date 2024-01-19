@@ -11,7 +11,7 @@ import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
-class OtherClientWrapper(
+internal class OtherClientWrapper(
     val botWrapper: BotWrapper,
     override var info: OtherClientInfo
 ) : OtherClient {

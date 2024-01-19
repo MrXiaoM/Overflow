@@ -26,7 +26,7 @@ import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
-class StrangerWrapper(
+internal class StrangerWrapper(
     val botWrapper: BotWrapper,
     internal var impl: StrangerInfoResp,
 ) : Stranger {

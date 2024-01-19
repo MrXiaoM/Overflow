@@ -32,7 +32,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(MiraiInternalApi::class, LowLevelApi::class)
-class BotWrapper private constructor(
+internal class BotWrapper private constructor(
     implBot: Bot,
     defLoginInfo: LoginInfoResp,
     botConfiguration: BotConfiguration
