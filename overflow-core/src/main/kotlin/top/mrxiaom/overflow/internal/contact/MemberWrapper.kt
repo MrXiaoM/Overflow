@@ -17,6 +17,7 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.check
 import top.mrxiaom.overflow.internal.contact.data.MemberActiveWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
@@ -68,12 +69,14 @@ class MemberWrapper(
                 botWrapper.impl.setGroupCard(impl.groupId, id, value)
             }
         }
-    override val nick: String = impl.nickname
-    override val permission: MemberPermission = when(impl.role) {
-        "owner" -> MemberPermission.OWNER
-        "admin" -> MemberPermission.ADMINISTRATOR
-        else -> MemberPermission.MEMBER
-    }
+    override val nick: String
+        get() = impl.nickname
+    override val permission: MemberPermission
+        get() = when(impl.role) {
+            "owner" -> MemberPermission.OWNER
+            "admin" -> MemberPermission.ADMINISTRATOR
+            else -> MemberPermission.MEMBER
+        }
     override val remark: String
         get() = botWrapper.friends[id]?.remark ?: ""
     override var specialTitle: String
@@ -84,15 +87,44 @@ class MemberWrapper(
             }
         }
     override suspend fun kick(message: String, block: Boolean) {
-        botWrapper.impl.setGroupKick(impl.groupId, id, block)
+        checkBotPermissionHigherThanThis("移出本群")
+        check(group.members[this.id] != null) {
+            "群成员 ${this.id} 已经被踢出群 ${group.id} 了."
+        }
+        if (botWrapper.impl.setGroupKick(impl.groupId, id, block)
+            .check("将 $id 移出群聊 ${group.id}")) {
+            groupWrapper.members.remove(id)
+        }
     }
 
     override suspend fun modifyAdmin(operation: Boolean) {
-        botWrapper.impl.setGroupAdmin(impl.groupId, id, operation)
+        checkBotPermissionHighest("设置管理员")
+        if (botWrapper.impl.setGroupAdmin(impl.groupId, id, operation)
+            .check("设置 $id 在群聊 ${group.id} 的管理员状态为 $operation")) {
+            impl.role = if (operation) "admin" else "member"
+        }
     }
 
     override suspend fun mute(durationSeconds: Int) {
-        botWrapper.impl.setGroupBan(group.id, id, durationSeconds)
+        check(this.id != bot.id) {
+            "机器人不能禁言自己."
+        }
+        require(durationSeconds > 0) {
+            "durationSeconds 必须要大于0."
+        }
+        checkBotPermissionHigherThanThis("禁言")
+        if (botWrapper.impl.setGroupBan(group.id, id, durationSeconds)
+            .check("禁言群成员 $id")) {
+            groupWrapper.updateMember(id)
+        }
+    }
+
+    override suspend fun unmute() {
+        checkBotPermissionHigherThanThis("解除禁言")
+        if (botWrapper.impl.setGroupBan(group.id, id, 0)
+            .check("解除禁言群成员 $id")) {
+            groupWrapper.updateMember(id)
+        }
     }
 
     override fun nudge(): MemberNudge {
@@ -140,10 +172,6 @@ class MemberWrapper(
         return receipt ?: throw throwable!!
     }
 
-    override suspend fun unmute() {
-        mute(0)
-    }
-
     override suspend fun uploadImage(resource: ExternalResource): Image {
         return OnebotMessages.imageFromFile(FileService.instance!!.upload(resource))
     }
@@ -158,3 +186,27 @@ class MemberWrapper(
 
     override fun toString(): String = "NormalMember($id)"
 }
+
+internal fun Member.checkBotPermissionHighest(operationName: String) {
+    check(group.botPermission == MemberPermission.OWNER) {
+        throw PermissionDeniedException(
+            "对群成员 $id 的操作 `$operationName` 需要 群主 权限, 但机器人在群 ${group.id} 内仅有 ${group.botPermission.display} 权限.",
+        )
+    }
+}
+
+internal fun Member.checkBotPermissionHigherThanThis(operationName: String) {
+    check(group.botPermission > this.permission) {
+        throw PermissionDeniedException(
+            "对群 ${group.id} 的群成员 $id 的操作 `$operationName` 需要机器人比该成员拥有更高的权限, 但目前 " +
+                    "${group.botPermission.display} < ${this.permission.display}.",
+        )
+    }
+}
+
+internal val MemberPermission.display: String
+    get() = when(this) {
+        MemberPermission.OWNER -> "群主"
+        MemberPermission.ADMINISTRATOR -> "管理员"
+        MemberPermission.MEMBER -> "群员"
+    }
