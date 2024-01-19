@@ -27,14 +27,14 @@
 | 引用回复      | QuoteReply        | quote   | ✅   | ✅   |
 | 小程序       | LightApp          | json    | ✅   | ✅   |
 | XML消息     | ServiceMessage    | xml     | ✅   | ✅   |
-| 转发消息      | ForwardMessage    | forward | ❔   | ❔   |
+| 转发消息      | ForwardMessage    | forward | ✅   | ✅   |
 | 文件消息      | FileMessage       | file    | *✅* | -   |
 
 ## 不支持消息相关说明
 * 猜拳 类型无法获取其数值（石头、剪刀、布），接收消息没有意义
 * 骰子 同上，当连接实例为 OpenShamrock 时，将会使用 new_dice 消息类型收发消息。
 * 音乐分享 返回的消息有可能没有音乐链接，与 mirai 相差较大，目前仅支持网易云和QQ音乐
-* 转发消息 无法使用转发消息ID从Shamrock正常下载转发消息，暂未测试
+* ~~转发消息 无法使用转发消息ID从Shamrock正常下载转发消息，暂未测试~~
 * 文件消息 在 mirai 的定义中是只接收不发送。目前群文件支持暂未完成，接收的意义不大
 
 ## 资源相关消息说明
@@ -73,6 +73,7 @@
 | 机器人被禁言           | BotMuteEvent                    | notice -> group_ban -> ban      | ✅    |
 | 群员被解除禁言          | MemberUnmuteEvent               | notice -> group_ban -> lift_ban | ✅    |
 | 机器人被解除禁言         | BotUnmuteEvent                  | notice -> group_ban -> lift_ban | ✅    |
+| 群群员禁言状态更改        | GroupAllMuteEvent               | notice -> group_ban             | ✅    |
 | *Coming soon...* | -                               | -                               | ❔    |
 
 实现事件说明如下
