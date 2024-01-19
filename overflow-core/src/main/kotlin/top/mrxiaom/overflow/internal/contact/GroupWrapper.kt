@@ -78,8 +78,8 @@ internal class GroupWrapper(
     @JvmBlockingBridge
     override suspend fun updateGroupMemberList(): ContactList<MemberWrapper> {
         return (membersInternal ?: ContactList()).apply {
-            val data = botWrapper.impl.getGroupMemberList(id).data ?: return@apply
-            update(data.map {
+            val data = botWrapper.impl.getGroupMemberList(id).data
+            update(data?.map {
                 MemberWrapper(botWrapper, this@GroupWrapper, it)
             }) { setImpl(it.impl) }
             membersInternal = this

@@ -49,10 +49,10 @@ internal class BotWrapper private constructor(
         loginInfo = impl.getLoginInfo().data
     }
     suspend fun updateContacts() {
-        friendsInternal.update(impl.getFriendList().data.map {
+        friendsInternal.update(impl.getFriendList().data?.map {
             FriendWrapper(this, it)
         }) { impl = it.impl }
-        groupsInternal.update(impl.getGroupList().data.map {
+        groupsInternal.update(impl.getGroupList().data?.map {
             GroupWrapper(this, it)
         }) { impl = it.impl }
     }

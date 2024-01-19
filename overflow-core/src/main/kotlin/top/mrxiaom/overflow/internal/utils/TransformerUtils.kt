@@ -22,9 +22,10 @@ import top.mrxiaom.overflow.internal.contact.data.FolderWrapper
  * @param updater this 是旧的，it 是新的，应当把新的内容放进旧的
  */
 internal inline fun <reified T : Contact> ContactList<T>.update(
-    list: List<T>,
+    list: List<T>?,
     updater: T.(T) -> Unit
 ) {
+    if (list == null) return
     // 删除旧的
     delegate.removeIf { old -> list.none { old.id == it.id } }
     // 更新旧的
