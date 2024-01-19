@@ -162,8 +162,23 @@ internal class GroupBanNoticeListener(
             else -> return
         }
         val group = bot.group(e.groupId)
+        val operator = group.queryMember(e.operatorId)
+        if (e.userId == 0L && e.duration == -1L) {
+            if (operator == null && e.operatorId != bot.id) {
+                throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
+            }
+            val origin = group.settings.isMuteAll
+            group.settings.muteAll = mute
+            GroupMuteAllEvent(
+                origin = origin,
+                new = mute,
+                group = group,
+                operator = operator
+            ).broadcast()
+            return
+        }
         if (e.userId == bot.id) {
-            val operator = group.queryMember(e.operatorId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+            if (operator == null) throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
             if (mute) {
                 BotMuteEvent(
                     durationSeconds = e.duration.toInt(),
@@ -175,7 +190,9 @@ internal class GroupBanNoticeListener(
                 ).broadcast()
             }
         } else {
-            val operator = group.queryMember(e.operatorId)
+            if (operator == null && e.operatorId != bot.id) {
+                throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
+            }
             val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
             if (mute) {
                 MemberMuteEvent(
