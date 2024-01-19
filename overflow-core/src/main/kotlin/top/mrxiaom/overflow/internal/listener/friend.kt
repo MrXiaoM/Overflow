@@ -59,10 +59,7 @@ internal class FriendMessageListener(
                     friend, miraiMessage, messageSource.time
                 ).broadcast()
             }
-            "group" -> {
-                TODO("群临时会话")
-            }
-            "other" -> {
+            "other", "group" -> { // TODO: group 群临时会话
                 val stranger = e.privateSender.wrapAsStranger(bot)
 
                 if (stranger.id == bot.id) {
