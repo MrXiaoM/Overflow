@@ -100,7 +100,7 @@ internal object OnebotMessages {
                                 else -> put("content", single.content)
                             }
                             is ContactRecommend -> {
-                                put("type", single.type.name.lowercase())
+                                put("type", single.contactType.name.lowercase())
                                 put("id", single.id)
                             }
                             is Location -> {
