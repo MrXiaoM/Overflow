@@ -61,14 +61,20 @@ internal suspend fun BotWrapper.shareDigest(
 internal suspend fun BotWrapper.httpGet(
     url: String, cookieDomain: String,
     header: Map<String, Any> = mapOf(),
-    params: Map<String, Any> = mapOf()
+    params: Map<String, Any?> = mapOf(),
+    bknKey: String = "bkn"
 ): String {
     val credentials = impl.getCredentials(cookieDomain).data ?: throw IllegalStateException("credentials is empty")
     val cookie = credentials.cookies
     val bkn = credentials.token
     return withContext(Dispatchers.IO) {
-        val paramString = params.map { "${it.key}=${URLEncoder.encode(it.value.toString(), "UTF-8")}" }.joinToString("&")
-        val conn = URL("$url?$paramString&bkn=$bkn").openConnection() as HttpURLConnection
+        val paramString = (if (params.containsKey(bknKey)) params else params.toMutableMap().apply {
+            put(bknKey, "")
+        }).filter { it.value != null }.map {
+            val value = if (it.key == bknKey) bkn else URLEncoder.encode(it.value.toString(), "UTF-8")
+            "${it.key}=$value"
+        }.joinToString("&")
+        val conn = URL("$url?$paramString").openConnection() as HttpURLConnection
 
         conn.requestMethod = "get"
         conn.addRequestProperty("cookie", cookie)

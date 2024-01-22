@@ -1,15 +1,12 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
-import cn.evole.onebot.sdk.response.group.GroupHonorInfoResp
 import cn.evole.onebot.sdk.response.group.GroupInfoResp
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.*
-import net.mamoe.mirai.contact.active.GroupActive
 import net.mamoe.mirai.contact.announcement.Announcements
 import net.mamoe.mirai.contact.essence.Essences
 import net.mamoe.mirai.contact.file.RemoteFiles
@@ -26,12 +23,9 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.contact.RemoteGroup
 import top.mrxiaom.overflow.contact.Updatable
-import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper
+import top.mrxiaom.overflow.internal.contact.data.*
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
-import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper.Companion.fetchEssences
-import top.mrxiaom.overflow.internal.contact.data.GroupSettingsWrapper
-import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper
 import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper.Companion.fetchFiles
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
@@ -52,7 +46,7 @@ internal class GroupWrapper(
     private var announcementsInternal: AnnouncementsWrapper? = null
     private var essencesInternal: EssencesWrapper? = null
     private var remoteFilesInternal: RemoteFilesWrapper? = null
-    private var honorsInternal: GroupHonorInfoResp? = null
+    private var activeInternal: GroupActiveWrapper? = null
 
     val data: GroupInfoResp
         get() = impl
@@ -88,7 +82,7 @@ internal class GroupWrapper(
         }
     }
 
-    override val bot: Bot
+    override val bot: BotWrapper
         get() = botWrapper
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${botWrapper.id})Group/$id")
 
@@ -96,10 +90,20 @@ internal class GroupWrapper(
      * 几乎全是 http api，但是也挺多的，有空再写
      * https://github.com/mamoe/mirai/blob/dev/mirai-core/src/commonMain/kotlin/contact/active/GroupActiveProtocol.kt
      */
-    override val active: GroupActive
-        get() {
-            TODO("Not yet implemented")
+    override val active: GroupActiveWrapper by lazy {
+        runBlocking {
+            GroupActiveWrapper(
+                this@GroupWrapper
+            ).apply {
+                activeInternal = this
+                runCatching {
+                    refresh()
+                }.onFailure {
+                    bot.logger.warning(it)
+                }
+            }
         }
+    }
     override val announcements: Announcements
         get() = announcementsInternal ?: runBlocking {
             fetchAnnouncements().also {
@@ -145,11 +149,6 @@ internal class GroupWrapper(
     override val roamingMessages: RoamingMessages
         get() = throw NotImplementedError("Onebot 未提供消息漫游接口")
     override val settings: GroupSettingsWrapper = GroupSettingsWrapper(this)
-
-    internal val honors: GroupHonorInfoResp
-        get() = honorsInternal ?: runBlocking {
-            botWrapper.impl.getGroupHonorInfo(id, "all").data.also { honorsInternal = it }
-        }
 
     override fun contains(id: Long): Boolean {
         return members.contains(id)
@@ -234,7 +233,7 @@ internal class GroupWrapper(
         level = DeprecationLevel.ERROR
     ) // deprecated since 2.8.0-RC
     @DeprecatedSinceMirai(warningSince = "2.8", errorSince = "2.14")
-    public override val filesRoot: net.mamoe.mirai.utils.RemoteFile
+    override val filesRoot: net.mamoe.mirai.utils.RemoteFile
         get() = throw IllegalStateException("Deprecated")
 
     @Suppress("DEPRECATION_ERROR")
