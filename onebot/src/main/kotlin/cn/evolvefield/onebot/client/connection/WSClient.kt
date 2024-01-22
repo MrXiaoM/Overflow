@@ -93,6 +93,7 @@ class WSClient(
                     logger.warn("等待 ${String.format("%.1f", retryWaitMills / 1000.0F)} 秒后重连 (第 $retryCount/$retryTimes 次")
                     delay(retryWaitMills)
                 } else {
+                    retryCount = 0
                     logger.warn("重连次数耗尽... 休息 ${String.format("%.1f", retryRestMills / 1000.0F)} 秒后重试")
                     delay(retryRestMills)
                 }
