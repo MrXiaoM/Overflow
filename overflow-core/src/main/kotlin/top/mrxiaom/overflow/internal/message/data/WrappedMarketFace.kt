@@ -1,6 +1,5 @@
 package top.mrxiaom.overflow.internal.message.data
 
-import kotlinx.serialization.SerialName
 import net.mamoe.mirai.message.data.MarketFace
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 

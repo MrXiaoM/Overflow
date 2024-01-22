@@ -37,7 +37,9 @@ import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
-import top.mrxiaom.overflow.internal.utils.*
+import top.mrxiaom.overflow.internal.utils.safeMessageIds
+import top.mrxiaom.overflow.internal.utils.update
+import top.mrxiaom.overflow.internal.utils.wrapAsMember
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 

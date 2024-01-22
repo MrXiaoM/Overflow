@@ -95,7 +95,7 @@ internal class FriendAddRequestListener(
         NewFriendRequestEvent(
             bot = bot,
             eventId = Overflow.instance.putNewFriendRequestFlag(e.flag),
-            message = e.comment,
+            message = e.comment ?: "",
             fromId = e.userId,
             fromGroupId = 0, // TODO: 获取来自哪个群
             fromNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: ""

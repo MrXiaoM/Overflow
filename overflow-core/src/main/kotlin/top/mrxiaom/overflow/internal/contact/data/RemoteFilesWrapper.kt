@@ -1,7 +1,6 @@
 package top.mrxiaom.overflow.internal.contact.data
 
 import kotlinx.coroutines.flow.Flow
-import net.mamoe.mirai.contact.FileSupported
 import net.mamoe.mirai.contact.file.AbsoluteFile
 import net.mamoe.mirai.contact.file.AbsoluteFileFolder
 import net.mamoe.mirai.contact.file.AbsoluteFolder

@@ -5,7 +5,8 @@ import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import cn.evolvefield.onebot.client.handler.EventBus
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.*
@@ -34,7 +35,8 @@ import top.mrxiaom.overflow.internal.contact.StrangerWrapper
 import top.mrxiaom.overflow.internal.data.UserProfileImpl
 import top.mrxiaom.overflow.internal.data.asMirai
 import top.mrxiaom.overflow.internal.data.asOnebot
-import top.mrxiaom.overflow.internal.listener.*
+import top.mrxiaom.overflow.internal.listener.addFriendListeners
+import top.mrxiaom.overflow.internal.listener.addGroupListeners
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage

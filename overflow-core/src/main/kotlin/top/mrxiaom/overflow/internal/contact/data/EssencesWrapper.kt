@@ -8,7 +8,10 @@ import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.checkBotPermission
 import net.mamoe.mirai.contact.essence.EssenceMessageRecord
 import net.mamoe.mirai.contact.essence.Essences
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.MessageSource
+import net.mamoe.mirai.message.data.MessageSourceBuilder
+import net.mamoe.mirai.message.data.MessageSourceKind
+import net.mamoe.mirai.message.data.messageChainOf
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
 import top.mrxiaom.overflow.internal.utils.shareDigest
