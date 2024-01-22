@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.contact.announcement.Announcements
 import net.mamoe.mirai.contact.roaming.RoamingMessages
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.EventCancelledException
@@ -45,6 +46,10 @@ internal class GroupWrapper(
         get() = impl
     override suspend fun queryUpdate() {
         impl = botWrapper.impl.getGroupInfo(impl.groupId, false).data
+    }
+
+    override suspend fun updateAnnouncements(): Announcements {
+        return announcements.also { it.update() }
     }
     internal suspend fun updateMember(userId: Long): MemberWrapper? {
         return botWrapper.impl.getGroupMemberInfo(id, userId, false).data?.run { updateMember(this) }

@@ -14,7 +14,7 @@ import top.mrxiaom.overflow.spi.FileService
 
 internal class AnnouncementsWrapper(
     val impl: GroupWrapper,
-    val list: List<OnlineAnnouncementWrapper>
+    internal var list: List<OnlineAnnouncementWrapper>
 ) : Announcements {
     override fun asFlow(): Flow<OnlineAnnouncement> = list.asFlow()
 
@@ -51,6 +51,10 @@ internal class AnnouncementsWrapper(
     override suspend fun uploadImage(resource: ExternalResource): AnnouncementImage {
         val size = FastImageInfo(resource.inputStream())
         return AnnouncementImage.create("\n${FileService.instance!!.upload(resource)}\n", size?.height ?: 0, size?.width ?: 0)
+    }
+
+    suspend fun update() {
+        list = impl.fetchAnnouncements().list
     }
 
     companion object {
