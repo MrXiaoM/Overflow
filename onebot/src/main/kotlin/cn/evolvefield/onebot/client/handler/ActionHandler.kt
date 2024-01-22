@@ -25,7 +25,7 @@ class ActionHandler(
     /**
      * 用于标识请求，可以是任何类型的数据，OneBot 将会在调用结果中原样返回
      */
-    private var echo = 0
+    private var echo = 0L
 
     /**
      * 处理响应结果
@@ -34,12 +34,8 @@ class ActionHandler(
      */
     fun onReceiveActionResp(respJson: JsonsObject) {
         val echo = respJson.optString("echo")
-        val actionSendUtils = apiCallbackMap[echo]
-        if (actionSendUtils != null) {
-            // 唤醒挂起的协程
-            actionSendUtils.onCallback(respJson)
-            apiCallbackMap.remove(echo)
-        }
+        // 唤醒挂起的协程
+        apiCallbackMap.remove(echo)?.onCallback(respJson)
     }
 
     /**
