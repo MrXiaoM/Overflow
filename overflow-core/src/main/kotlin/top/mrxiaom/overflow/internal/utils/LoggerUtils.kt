@@ -93,9 +93,9 @@ internal class WithFileLogger(
     public constructor(logger: MiraiLogger) : this(logger, File("${logger.identity}-${getCurrentDate()}.log"))
 
     init {
+        file.createNewFile()
         require(file.isFile) { "Log file must be a file: $file" }
         require(file.canWrite()) { "Log file must be write: $file" }
-        file.createNewFile()
     }
 
     override fun debug0(message: String?) {
