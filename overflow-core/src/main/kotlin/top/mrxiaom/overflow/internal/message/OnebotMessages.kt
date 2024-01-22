@@ -267,7 +267,7 @@ internal object OnebotMessages {
                         add(Location(lat, lon, title, content))
                     }
 
-                    else -> add(UnknownMessage(type, Json.encodeToString(data)))
+                    else -> add(UnknownMessage(type, Json.encodeToString(data)).printLog())
                 }
             }
         }

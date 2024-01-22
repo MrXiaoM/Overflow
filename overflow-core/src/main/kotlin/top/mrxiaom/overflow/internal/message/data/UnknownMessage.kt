@@ -19,17 +19,17 @@ private fun currentTime() = SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date(
 @Serializable
 @SerialName(UnknownMessage.SERIAL_NAME)
 internal data class UnknownMessage(
-    val type: String,
+    val msgType: String,
     val data: String
 ) : MessageContent {
-    init {
+    fun printLog(): UnknownMessage = apply {
         val logFile = File("logs/unknown_messages.log")
         logFile.createFileIfNotExists()
         logFile.appendText("${currentTime()} I/UnknownMessage: ${contentToString()}\n")
     }
 
     override fun contentToString(): String {
-        return "[overflow,unknown:$type,$data}]"
+        return "[overflow,unknown:$msgType,$data}]"
     }
 
     override fun toString(): String = contentToString()
