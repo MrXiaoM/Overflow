@@ -2,7 +2,6 @@ package cn.evolvefield.onebot.client.handler
 
 import cn.evole.onebot.sdk.event.Event
 import cn.evole.onebot.sdk.util.json.GsonUtil
-import cn.evolvefield.onebot.client.listener.EnableEventListener
 import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.client.listener.message
 import cn.evolvefield.onebot.client.util.ListenerUtils
@@ -70,11 +69,6 @@ class EventBus {
                         it.name == "onMessage" && it.parameterTypes.any { par -> messageType == par }
                     }) continue  //不支持则跳过
 
-                if (eventListener is EnableEventListener<*>) {
-                    if (!eventListener.enable()) { //检测是否开启该插件
-                        continue
-                    }
-                }
                 eventListeners.add(eventListener) //开启后添加入当前类型的插件
             } catch (e: Exception) {
                 log.error(e.localizedMessage)
