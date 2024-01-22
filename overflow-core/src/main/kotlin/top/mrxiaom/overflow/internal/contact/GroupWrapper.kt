@@ -7,9 +7,6 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.contact.*
-import net.mamoe.mirai.contact.announcement.Announcements
-import net.mamoe.mirai.contact.essence.Essences
-import net.mamoe.mirai.contact.file.RemoteFiles
 import net.mamoe.mirai.contact.roaming.RoamingMessages
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.EventCancelledException
@@ -43,18 +40,11 @@ internal class GroupWrapper(
     internal var impl: GroupInfoResp
 ) : Group, RemoteGroup, Updatable {
     private var membersInternal: ContactList<MemberWrapper>? = null
-    private var announcementsInternal: AnnouncementsWrapper? = null
-    private var essencesInternal: EssencesWrapper? = null
-    private var remoteFilesInternal: RemoteFilesWrapper? = null
-    private var activeInternal: GroupActiveWrapper? = null
 
     val data: GroupInfoResp
         get() = impl
     override suspend fun queryUpdate() {
         impl = botWrapper.impl.getGroupInfo(impl.groupId, false).data
-    }
-    suspend fun updateAnnouncements() {
-        announcementsInternal = fetchAnnouncements()
     }
     internal suspend fun updateMember(userId: Long): MemberWrapper? {
         return botWrapper.impl.getGroupMemberInfo(id, userId, false).data?.run { updateMember(this) }
@@ -95,7 +85,6 @@ internal class GroupWrapper(
             GroupActiveWrapper(
                 this@GroupWrapper
             ).apply {
-                activeInternal = this
                 runCatching {
                     refresh()
                 }.onFailure {
@@ -104,24 +93,15 @@ internal class GroupWrapper(
             }
         }
     }
-    override val announcements: Announcements
-        get() = announcementsInternal ?: runBlocking {
-            fetchAnnouncements().also {
-                announcementsInternal = it
-            }
-        }
-    override val essences: Essences
-        get() = essencesInternal ?: runBlocking {
-            fetchEssences().also {
-                essencesInternal = it
-            }
-        }
-    override val files: RemoteFiles
-        get() = remoteFilesInternal ?: runBlocking {
-            fetchFiles().also {
-                remoteFilesInternal = it
-            }
-        }
+    override val announcements: AnnouncementsWrapper by lazy {
+        runBlocking { fetchAnnouncements() }
+    }
+    override val essences: EssencesWrapper by lazy {
+        runBlocking { fetchEssences() }
+    }
+    override val files: RemoteFilesWrapper by lazy {
+        runBlocking { fetchFiles() }
+    }
     override val id: Long
         get() = impl.groupId
     override var name: String
