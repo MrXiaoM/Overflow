@@ -26,7 +26,7 @@ public class RequestEvent extends Event {
     @SerializedName( "user_id")
     public long userId;
 
-    @SerializedName( "comment")
+    @SerializedName(value = "comment", alternate = { "message" })
     public String comment;
 
     @SerializedName( "flag")

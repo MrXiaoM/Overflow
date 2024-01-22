@@ -111,11 +111,11 @@ internal class GroupAddRequestListener(
 ): EventListener<GroupAddRequestEvent> {
     override suspend fun onMessage(e: GroupAddRequestEvent) {
         when (e.subType) {
-            "add" -> {
+            "add" -> { // 某人申请入群
                 MemberJoinRequestEvent(
                     bot = bot,
                     eventId = Overflow.instance.putMemberJoinRequestFlag(e.flag),
-                    message = e.comment,
+                    message = e.comment ?: "",
                     fromId = e.userId,
                     groupId = e.groupId,
                     groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),
@@ -123,7 +123,7 @@ internal class GroupAddRequestListener(
                     invitorId = null // TODO: 获取邀请者
                 ).broadcast()
             }
-            "invite" -> {
+            "invite" -> { // 某人邀请机器人入群
                 BotInvitedJoinGroupRequestEvent(
                     bot = bot,
                     eventId = Overflow.instance.putInventedJoinGroupRequestFlag(e.flag),
