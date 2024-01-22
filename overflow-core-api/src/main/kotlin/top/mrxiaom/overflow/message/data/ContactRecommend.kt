@@ -5,9 +5,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.message.code.CodableMessage
 import net.mamoe.mirai.message.code.internal.appendStringAsMiraiCode
-import net.mamoe.mirai.message.data.MessageContent
-import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
+import net.mamoe.mirai.utils.safeCast
 
 /**
  * 推荐联系人
@@ -20,7 +20,7 @@ public data class ContactRecommend(
      */
     public val type: ContactType,
     public val id: Long
-) : MessageContent, CodableMessage {
+) : MessageContent, ConstrainSingle, CodableMessage {
     private val _contentValue: String by lazy(LazyThreadSafetyMode.NONE) {
         val typeString = when(type) {
             ContactType.Group -> "群聊"
@@ -50,7 +50,10 @@ public data class ContactRecommend(
          */
         Private
     }
-    public companion object {
+
+    override val key: MessageKey<ContactRecommend> get() = Key
+    public companion object Key :
+        AbstractPolymorphicMessageKey<MessageContent, ContactRecommend>(MessageContent, { it.safeCast() }) {
         public const val SERIAL_NAME: String = "Contact"
     }
 }

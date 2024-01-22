@@ -30,6 +30,10 @@ internal object OnebotMessages {
         registerSerializer(WrappedVideo::class, WrappedVideo.serializer())
         registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
         registerSerializer(UnknownMessage::class, UnknownMessage.serializer())
+        registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
+        registerSerializer(WrappedMarketFace::class, WrappedMarketFace.serializer())
+        registerSerializer(ContactRecommend::class, ContactRecommend.serializer())
+        registerSerializer(Location::class, Location.serializer())
     }
 
     /**
@@ -263,7 +267,7 @@ internal object OnebotMessages {
                         add(Location(lat, lon, title, content))
                     }
 
-                    else -> add(UnknownMessage(type, data))
+                    else -> add(UnknownMessage(type, Json.encodeToString(data)))
                 }
             }
         }

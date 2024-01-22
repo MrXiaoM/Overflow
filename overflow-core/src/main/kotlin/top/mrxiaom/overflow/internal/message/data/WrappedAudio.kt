@@ -1,5 +1,6 @@
 package top.mrxiaom.overflow.internal.message.data
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.safeCast
@@ -7,15 +8,11 @@ import top.mrxiaom.overflow.internal.utils.base64Length
 import top.mrxiaom.overflow.internal.utils.lengthToString
 
 @Serializable
+@SerialName(WrappedAudio.SERIAL_NAME)
 internal data class WrappedAudio(
     override val urlForDownload: String,
     override val length: Long,
 ): OnlineAudio, OfflineAudio {
-    public companion object Key :
-        AbstractPolymorphicMessageKey<Audio, WrappedAudio>(Audio, { it.safeCast() }) {
-        public const val SERIAL_NAME: String = "WrappedAudio"
-    }
-
     private val _stringValue: String? by lazy(LazyThreadSafetyMode.NONE) {
         val fileString = if (file.startsWith("base64://") && file.length > 60) {
             val s = file.substring(9)
@@ -35,4 +32,10 @@ internal data class WrappedAudio(
     val file: String = urlForDownload
 
     override fun toString(): String = _stringValue!!
+
+    override val key: MessageKey<WrappedAudio> get() = Key
+    public companion object Key :
+        AbstractPolymorphicMessageKey<Audio, WrappedAudio>(Audio, { it.safeCast() }) {
+        public const val SERIAL_NAME: String = "WrappedAudio"
+    }
 }

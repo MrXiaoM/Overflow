@@ -3,7 +3,11 @@ package top.mrxiaom.overflow.internal.message.data
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.contact.FileSupported
 import net.mamoe.mirai.contact.file.AbsoluteFile
+import net.mamoe.mirai.message.data.AbstractPolymorphicMessageKey
 import net.mamoe.mirai.message.data.FileMessage
+import net.mamoe.mirai.message.data.MessageContent
+import net.mamoe.mirai.message.data.MessageKey
+import net.mamoe.mirai.utils.safeCast
 
 @Serializable
 internal data class WrappedFileMessage(

@@ -1,13 +1,16 @@
 package top.mrxiaom.overflow.internal.message.data
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.message.data.AbstractPolymorphicMessageKey
+import net.mamoe.mirai.message.data.MessageKey
 import net.mamoe.mirai.message.data.OnlineShortVideo
 import net.mamoe.mirai.message.data.ShortVideo
 import net.mamoe.mirai.utils.safeCast
 import top.mrxiaom.overflow.internal.utils.base64Length
 
 @Serializable
+@SerialName(WrappedVideo.SERIAL_NAME)
 internal data class WrappedVideo(
     val file: String
 ) : OnlineShortVideo {
@@ -27,6 +30,7 @@ internal data class WrappedVideo(
 
     override fun toString(): String = "[overflow:video,file=$filename]"
 
+    override val key: MessageKey<WrappedAudio> get() = WrappedAudio
     public companion object Key :
         AbstractPolymorphicMessageKey<ShortVideo, WrappedVideo>(ShortVideo, { it.safeCast() }) {
         public const val SERIAL_NAME: String = "WrappedVideo"

@@ -5,9 +5,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.message.code.CodableMessage
 import net.mamoe.mirai.message.code.internal.appendStringAsMiraiCode
-import net.mamoe.mirai.message.data.MessageContent
-import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
+import net.mamoe.mirai.utils.safeCast
 
 /**
  * Markdown消息. 用于官方 Bot
@@ -21,7 +21,7 @@ public data class Markdown(
      * Markdown 内容
      */
     public val content: String
-) : MessageContent, CodableMessage {
+) : MessageContent, ConstrainSingle, CodableMessage {
     public override fun toString(): String = "[overflow:markdown,$content]"
     public override fun contentToString(): String = content
 
@@ -30,7 +30,9 @@ public data class Markdown(
         builder.append("[mirai:markdown:").appendStringAsMiraiCode(content).append("]")
     }
 
-    public companion object {
+    override val key: MessageKey<Markdown> get() = Key
+    public companion object Key :
+        AbstractPolymorphicMessageKey<MessageContent, Markdown>(MessageContent, { it.safeCast() }) {
         public const val SERIAL_NAME: String = "Markdown"
     }
 }

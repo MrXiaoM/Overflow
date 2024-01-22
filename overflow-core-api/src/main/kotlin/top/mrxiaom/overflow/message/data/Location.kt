@@ -5,9 +5,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.message.code.CodableMessage
 import net.mamoe.mirai.message.code.internal.appendStringAsMiraiCode
-import net.mamoe.mirai.message.data.MessageContent
-import net.mamoe.mirai.message.data.PlainText
+import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
+import net.mamoe.mirai.utils.safeCast
 
 /**
  * 定位分享
@@ -32,7 +32,7 @@ public data class Location(
      * 定位消息内容 (可能为空)，通常为详细地址
      */
     public val content: String = ""
-) : MessageContent, CodableMessage {
+) : MessageContent, ConstrainSingle, CodableMessage {
     private val _contentValue: String by lazy(LazyThreadSafetyMode.NONE) {
         "[位置]$title $content(经度:$lon 纬度:$lat)"
     }
@@ -47,7 +47,9 @@ public data class Location(
             .append(content).append("]")
     }
 
-    public companion object {
+    override val key: MessageKey<Location> get() = Key
+    public companion object Key :
+        AbstractPolymorphicMessageKey<MessageContent, Location>(MessageContent, { it.safeCast() }) {
         public const val SERIAL_NAME: String = "Location"
     }
 }
