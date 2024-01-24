@@ -17,9 +17,6 @@ import top.mrxiaom.overflow.message.data.Markdown
 
 /**
  * Json 数组消息 (Onebot) 与 [MessageChain] (mirai) 的序列化与反序列化
- *
- * ## 反序列化未完成项
- * - 音乐分享 (music/[MusicShare])
  */
 internal object OnebotMessages {
     internal var appName = "onebot"
@@ -37,7 +34,6 @@ internal object OnebotMessages {
         registerSerializer(MusicShare::class, MusicShare.serializer())
         registerSerializer(PlainText::class, PlainText.serializer())
         registerSerializer(PokeMessage::class, PokeMessage.serializer())
-        registerSerializer(PttMessage::class, PttMessage.serializer())
         registerSerializer(QuoteReply::class, QuoteReply.serializer())
         registerSerializer(RockPaperScissors::class, RockPaperScissors.serializer())
         registerSerializer(SimpleServiceMessage::class, SimpleServiceMessage.serializer())
