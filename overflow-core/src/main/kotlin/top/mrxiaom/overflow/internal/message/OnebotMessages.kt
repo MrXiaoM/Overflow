@@ -24,7 +24,6 @@ internal object OnebotMessages {
     @OptIn(MiraiExperimentalApi::class)
     internal fun registerSerializers() = MessageSerializers.apply {
         registerSerializer(At::class, At.serializer())
-        registerSerializer(CustomMessage::class, CustomMessage.serializer())
         registerSerializer(Dice::class, Dice.serializer())
         registerSerializer(Face::class, Face.serializer())
         registerSerializer(FlashImage::class, FlashImage.serializer())
