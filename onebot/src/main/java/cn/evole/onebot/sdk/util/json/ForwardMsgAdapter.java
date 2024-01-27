@@ -31,7 +31,7 @@ public class ForwardMsgAdapter implements JsonDeserializer<ForwardMsgResp> {
             ForwardMsgResp.Sender sender = gson.fromJson(obj.optJSONObject("anonymous"), ForwardMsgResp.Sender.class);
             String message;
             if (obj.has("content")) {
-                message = gson.toJson(obj.getJsonElement("content")); // try to support Lagrange.OneBot
+                message = gson.toJson(obj.getJsonElement("content"));
             } else {
                 message = gson.toJson(obj.getJsonElement("message"));
             }
