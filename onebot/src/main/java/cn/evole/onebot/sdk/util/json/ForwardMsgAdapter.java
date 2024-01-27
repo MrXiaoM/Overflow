@@ -29,7 +29,12 @@ public class ForwardMsgAdapter implements JsonDeserializer<ForwardMsgResp> {
             int messageId = obj.optInt("message_id");
             int realId = obj.optInt("real_id");
             ForwardMsgResp.Sender sender = gson.fromJson(obj.optJSONObject("anonymous"), ForwardMsgResp.Sender.class);
-            String message = gson.toJson(obj.getJsonElement("message"));
+            String message;
+            if (obj.has("content")) {
+                message = gson.toJson(obj.getJsonElement("content")); // try to support Lagrange.OneBot
+            } else {
+                message = gson.toJson(obj.getJsonElement("message"));
+            }
             long peerId = obj.optLong("peer_id");
             long targetId = obj.optLong("target_id");
             nodes.add(new ForwardMsgResp.Node(time, messageType, messageId, realId, peerId, targetId, sender, message));
