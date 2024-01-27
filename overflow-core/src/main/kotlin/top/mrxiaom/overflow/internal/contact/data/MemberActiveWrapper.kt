@@ -13,22 +13,22 @@ internal class MemberActiveWrapper(
     internal val honorsInternal: HashSet<GroupHonorType> = hashSetOf()
     override val honors: Set<GroupHonorType>
         get() {
-            member.groupWrapper.active
+            member.group.active
             return honorsInternal
         }
     override val point: Int
         get() {
-            member.groupWrapper.active
+            member.group.active
             return pointInternal
         }
     override val rank: Int
         get() {
-            member.groupWrapper.active
+            member.group.active
             return rankInternal
         }
     override val temperature: Int
         get() = member.impl.level
     override suspend fun queryMedal(): MemberMedalInfo {
-        return member.groupWrapper.active.queryMemberMedal(uid = member.id)
+        return member.group.active.queryMemberMedal(uid = member.id)
     }
 }

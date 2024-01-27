@@ -20,7 +20,7 @@ internal class RemoteFilesWrapper(
 ) : RemoteFiles {
     companion object {
         internal suspend fun GroupWrapper.fetchFiles(): RemoteFilesWrapper {
-            val data = botWrapper.impl.getGroupRootFiles(id).data
+            val data = bot.impl.getGroupRootFiles(id).data
 
             val root = FolderWrapper(
                 this, null, "/", "/", 0, 0, 0, data.files.size
@@ -42,7 +42,7 @@ internal class FolderWrapper(
     override val uploaderId: Long,
     override var contentsCount: Int,
 ) : AbsoluteFolder {
-    internal val impl = contact.botWrapper.impl
+    internal val impl = contact.bot.impl
     internal val folders: MutableList<FolderWrapper> = mutableListOf()
     internal val files: MutableList<FileWrapper> = mutableListOf()
 
@@ -183,7 +183,7 @@ internal class FileWrapper(
     override val uploaderId: Long,
     val busid: Int,
 ) : AbsoluteFile {
-    internal val impl = contact.botWrapper.impl
+    internal val impl = contact.bot.impl
     override val isFile: Boolean = true
     override val isFolder: Boolean = false
 

@@ -35,7 +35,7 @@ internal class AnnouncementsWrapper(
     }
 
     override suspend fun publish(announcement: Announcement): OnlineAnnouncement {
-        impl.botWrapper.impl.sendGroupNotice(
+        impl.bot.impl.sendGroupNotice(
             impl.id,
             announcement.content,
             announcement.parameters.image?.file
@@ -59,7 +59,7 @@ internal class AnnouncementsWrapper(
 
     companion object {
         suspend fun GroupWrapper.fetchAnnouncements(): AnnouncementsWrapper {
-            val list = botWrapper.impl.getGroupNotice(id).data?.map {
+            val list = bot.impl.getGroupNotice(id).data?.map {
                 OnlineAnnouncementWrapper(
                     content = it.message.text,
                     group = this,

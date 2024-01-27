@@ -37,7 +37,7 @@ import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)
 internal class GroupWrapper(
-    val botWrapper: BotWrapper,
+    override val bot: BotWrapper,
     internal var impl: GroupInfoResp
 ) : Group, RemoteGroup, Updatable {
     private var membersInternal: ContactList<MemberWrapper>? = null
@@ -45,41 +45,39 @@ internal class GroupWrapper(
     val data: GroupInfoResp
         get() = impl
     override suspend fun queryUpdate() {
-        impl = botWrapper.impl.getGroupInfo(impl.groupId, false).data
+        impl = bot.impl.getGroupInfo(impl.groupId, false).data
     }
 
     override suspend fun updateAnnouncements(): Announcements {
         return announcements.also { it.update() }
     }
     internal suspend fun updateMember(userId: Long): MemberWrapper? {
-        return botWrapper.impl.getGroupMemberInfo(id, userId, false).data?.run { updateMember(this) }
+        return bot.impl.getGroupMemberInfo(id, userId, false).data?.run { updateMember(this) }
     }
     internal fun updateMember(member: GroupMemberInfoResp): MemberWrapper {
-        return (members[member.userId] ?: MemberWrapper(botWrapper, this, member).also { members.delegate.add(it) }).apply {
+        return (members[member.userId] ?: MemberWrapper(this, member).also { members.delegate.add(it) }).apply {
             impl = member
         }
     }
 
     internal suspend fun queryMember(userId: Long): MemberWrapper? {
         if (userId == bot.id) return botAsMember
-        return members[userId] ?: botWrapper.impl
+        return members[userId] ?: bot.impl
             .getGroupMemberInfo(id, userId, false).data?.wrapAsMember(this)
     }
 
     @JvmBlockingBridge
     override suspend fun updateGroupMemberList(): ContactList<MemberWrapper> {
         return (membersInternal ?: ContactList()).apply {
-            val data = botWrapper.impl.getGroupMemberList(id).data
+            val data = bot.impl.getGroupMemberList(id).data
             update(data?.map {
-                MemberWrapper(botWrapper, this@GroupWrapper, it)
+                MemberWrapper(this@GroupWrapper, it)
             }) { setImpl(it.impl) }
             membersInternal = this
         }
     }
 
-    override val bot: BotWrapper
-        get() = botWrapper
-    override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${botWrapper.id})Group/$id")
+    override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})Group/$id")
 
     /**
      * 几乎全是 http api，但是也挺多的，有空再写
@@ -114,7 +112,7 @@ internal class GroupWrapper(
         set(value) {
             checkBotPermission(MemberPermission.ADMINISTRATOR)
             runBlocking {
-                botWrapper.impl.setGroupName(id, value)
+                bot.impl.setGroupName(id, value)
                 impl.groupName = value
             }
         }
@@ -124,8 +122,8 @@ internal class GroupWrapper(
         }
     override val botAsMember: MemberWrapper
         get() = members.firstOrNull { it.id == bot.id } ?: runBlocking {
-            val data = botWrapper.impl.getGroupMemberInfo(id, bot.id, false).data
-            MemberWrapper(botWrapper, this@GroupWrapper, data ?: GroupMemberInfoResp(
+            val data = bot.impl.getGroupMemberInfo(id, bot.id, false).data
+            MemberWrapper(this@GroupWrapper, data ?: GroupMemberInfoResp(
                 id, bot.id, bot.nick, "", "", 0, "", 0, 0, 0, "member", false, "", 0, true, 0
             ))
         }
@@ -147,7 +145,7 @@ internal class GroupWrapper(
         if (botAsMember.isOwner()) {
             throw IllegalStateException("机器人是群主，无法退群")
         }
-        botWrapper.impl.setGroupLeave(id, false)
+        bot.impl.setGroupLeave(id, false)
         return true
     }
 
@@ -161,11 +159,11 @@ internal class GroupWrapper(
             val forward = messageChain.findForwardMessage()
             val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-                val response = botWrapper.impl.sendGroupForwardMsg(id, nodes)
+                val response = bot.impl.sendGroupForwardMsg(id, nodes)
                 response.data.safeMessageIds
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(messageChain)
-                val response = botWrapper.impl.sendGroupMsg(id, msg, false)
+                val response = bot.impl.sendGroupMsg(id, msg, false)
                 response.data.safeMessageIds
             }
 
@@ -189,7 +187,7 @@ internal class GroupWrapper(
 
     override suspend fun setEssenceMessage(source: MessageSource): Boolean {
         checkBotPermission(MemberPermission.ADMINISTRATOR)
-        botWrapper.impl.setEssenceMsg(source.ids[0])
+        bot.impl.setEssenceMsg(source.ids[0])
         return true
     }
 

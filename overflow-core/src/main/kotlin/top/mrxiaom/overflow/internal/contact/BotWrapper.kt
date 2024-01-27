@@ -33,13 +33,12 @@ import kotlin.coroutines.cancellation.CancellationException
 
 @OptIn(MiraiInternalApi::class, LowLevelApi::class)
 internal class BotWrapper private constructor(
-    implBot: Bot,
+    private var implBot: Bot,
     defLoginInfo: LoginInfoResp,
-    botConfiguration: BotConfiguration
+    override val configuration: BotConfiguration
 ) : net.mamoe.mirai.Bot, RemoteBot, Updatable, CoroutineScope {
-    private var implInternal = implBot
     val impl: Bot
-        get() = implInternal
+        get() = implBot
     private var loginInfo: LoginInfoResp = defLoginInfo
     private var friendsInternal: ContactList<FriendWrapper> = ContactList()
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
@@ -95,7 +94,6 @@ internal class BotWrapper private constructor(
     }
 
     override val id: Long = loginInfo.userId
-    override val configuration: BotConfiguration = botConfiguration
     override val logger: MiraiLogger = configuration.botLoggerSupplier(this)
     internal val networkLogger: MiraiLogger by lazy { configuration.networkLoggerSupplier(this) }
     override val coroutineContext: CoroutineContext =
@@ -183,7 +181,7 @@ internal class BotWrapper private constructor(
         suspend fun wrap(impl: Bot, botConfiguration: BotConfiguration? = null): BotWrapper {
             val loginInfo = impl.getLoginInfo().data // also refresh bot id
             return (net.mamoe.mirai.Bot.getInstanceOrNull(impl.id) as? BotWrapper)?.apply {
-                implInternal = impl
+                implBot = impl
             } ?:
             BotWrapper(impl, loginInfo, botConfiguration ?: BotConfiguration {
                 workingDir = File("bots/${impl.id}")

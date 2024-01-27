@@ -25,7 +25,7 @@ internal class GroupSettingsWrapper(
     override var isAnonymousChatEnabled: Boolean
         get() = false // TODO: Not yet implemented
         set(value) = runBlocking {
-            group.botWrapper.impl.setGroupAnonymous(group.id, value)
+            group.bot.impl.setGroupAnonymous(group.id, value)
         }
 
     @MiraiExperimentalApi
@@ -38,6 +38,6 @@ internal class GroupSettingsWrapper(
         set(value) = runBlocking {
             group.checkBotPermission(MemberPermission.ADMINISTRATOR)
             muteAll = value
-            group.botWrapper.impl.setGroupWholeBan(group.id, value)
+            group.bot.impl.setGroupWholeBan(group.id, value)
         }
 }

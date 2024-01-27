@@ -9,6 +9,7 @@ import cn.evole.onebot.sdk.event.notice.group.GroupTitleChangeNoticeEvent
 import cn.evole.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
+import net.mamoe.mirai.contact.AnonymousMember
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.*

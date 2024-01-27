@@ -31,19 +31,19 @@ import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)
 internal class MemberWrapper(
-    val botWrapper: BotWrapper,
-    val groupWrapper: GroupWrapper,
+    override val group: GroupWrapper,
     internal var impl: GroupMemberInfoResp
 ) : NormalMember, Updatable {
+    override val bot: BotWrapper = group.bot
     val data: GroupMemberInfoResp
         get() = impl
     override suspend fun queryUpdate() {
-        setImpl(botWrapper.impl.getGroupMemberInfo(impl.groupId, impl.userId, false).data)
+        setImpl(bot.impl.getGroupMemberInfo(impl.groupId, impl.userId, false).data)
     }
     
     fun setImpl(impl: GroupMemberInfoResp) {
         if (impl.card != impl.card) {
-            botWrapper.eventDispatcher.broadcastAsync(
+            bot.eventDispatcher.broadcastAsync(
                 MemberCardChangeEvent(this.impl.card, impl.card, this)
             )
         }
@@ -51,8 +51,6 @@ internal class MemberWrapper(
     }
 
     override val active: MemberActiveWrapper = MemberActiveWrapper(this)
-    override val bot: Bot = botWrapper
-    override val group: Group = groupWrapper
     override val id: Long = impl.userId
     override val joinTimestamp: Int
         get() = impl.joinTime
@@ -69,7 +67,7 @@ internal class MemberWrapper(
                 group.checkBotPermission(MemberPermission.ADMINISTRATOR)
             }
             Overflow.instance.launch {
-                botWrapper.impl.setGroupCard(impl.groupId, id, value)
+                bot.impl.setGroupCard(impl.groupId, id, value)
             }
         }
     override val nick: String
@@ -81,12 +79,12 @@ internal class MemberWrapper(
             else -> MemberPermission.MEMBER
         }
     override val remark: String
-        get() = botWrapper.friends[id]?.remark ?: ""
+        get() = bot.friends[id]?.remark ?: ""
     override var specialTitle: String
         get() = impl.title
         set(value) {
             Overflow.instance.launch {
-                botWrapper.impl.setGroupSpecialTitle(impl.groupId, id, value, -1)
+                bot.impl.setGroupSpecialTitle(impl.groupId, id, value, -1)
             }
         }
     override suspend fun kick(message: String, block: Boolean) {
@@ -94,15 +92,15 @@ internal class MemberWrapper(
         check(group.members[this.id] != null) {
             "群成员 ${this.id} 已经被踢出群 ${group.id} 了."
         }
-        if (botWrapper.impl.setGroupKick(impl.groupId, id, block)
+        if (bot.impl.setGroupKick(impl.groupId, id, block)
             .check("将 $id 移出群聊 ${group.id}")) {
-            groupWrapper.members.remove(id)
+            group.members.remove(id)
         }
     }
 
     override suspend fun modifyAdmin(operation: Boolean) {
         checkBotPermissionHighest("设置管理员")
-        if (botWrapper.impl.setGroupAdmin(impl.groupId, id, operation)
+        if (bot.impl.setGroupAdmin(impl.groupId, id, operation)
             .check("设置 $id 在群聊 ${group.id} 的管理员状态为 $operation")) {
             impl.role = if (operation) "admin" else "member"
         }
@@ -116,17 +114,17 @@ internal class MemberWrapper(
             "durationSeconds 必须要大于0."
         }
         checkBotPermissionHigherThanThis("禁言")
-        if (botWrapper.impl.setGroupBan(group.id, id, durationSeconds)
+        if (bot.impl.setGroupBan(group.id, id, durationSeconds)
             .check("禁言群成员 $id")) {
-            groupWrapper.updateMember(id)
+            group.updateMember(id)
         }
     }
 
     override suspend fun unmute() {
         checkBotPermissionHigherThanThis("解除禁言")
-        if (botWrapper.impl.setGroupBan(group.id, id, 0)
+        if (bot.impl.setGroupBan(group.id, id, 0)
             .check("解除禁言群成员 $id")) {
-            groupWrapper.updateMember(id)
+            group.updateMember(id)
         }
     }
 
@@ -149,11 +147,11 @@ internal class MemberWrapper(
             val forward = message.findForwardMessage()
             val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-                val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
+                val response = bot.impl.sendPrivateForwardMsg(id, nodes)
                 response.data.safeMessageIds
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(message)
-                val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
+                val response = bot.impl.sendPrivateMsg(id, msg, false)
                 response.data.safeMessageIds
             }
             OutgoingSource.temp(

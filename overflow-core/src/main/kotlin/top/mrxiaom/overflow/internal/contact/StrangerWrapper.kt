@@ -27,11 +27,9 @@ import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
 internal class StrangerWrapper(
-    val botWrapper: BotWrapper,
+    override val bot: BotWrapper,
     internal var impl: StrangerInfoResp,
 ) : Stranger {
-
-    override val bot: Bot = botWrapper
     override val id: Long = impl.userId
     override val nick: String = impl.nickname
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})Stranger/$id")
@@ -56,11 +54,11 @@ internal class StrangerWrapper(
             val forward = message.findForwardMessage()
             val messageIds = if (forward != null) {
                 val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-                val response = botWrapper.impl.sendPrivateForwardMsg(id, nodes)
+                val response = bot.impl.sendPrivateForwardMsg(id, nodes)
                 response.data.safeMessageIds
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(message)
-                val response = botWrapper.impl.sendPrivateMsg(id, msg, false)
+                val response = bot.impl.sendPrivateMsg(id, msg, false)
                 response.data.safeMessageIds
             }
 

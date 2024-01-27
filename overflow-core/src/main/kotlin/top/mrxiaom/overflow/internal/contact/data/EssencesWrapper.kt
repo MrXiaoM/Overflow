@@ -40,11 +40,11 @@ internal class EssencesWrapper(
 
     override suspend fun remove(source: MessageSource) {
         impl.checkBotPermission(MemberPermission.ADMINISTRATOR)
-        impl.botWrapper.impl.deleteEssenceMsg(source.ids[0])
+        impl.bot.impl.deleteEssenceMsg(source.ids[0])
     }
 
     override suspend fun share(source: MessageSource): String {
-        val shareKey = impl.botWrapper.shareDigest(
+        val shareKey = impl.bot.shareDigest(
             groupCode = impl.id,
             msgSeq = source.ids.first().toLong().and(0xFFFF_FFFF),
             msgRandom = source.internalIds.first().toLong().and(0xFFFF_FFFF),
@@ -56,7 +56,7 @@ internal class EssencesWrapper(
     companion object {
         @OptIn(MiraiInternalApi::class)
         internal suspend fun GroupWrapper.fetchEssencesList(page: Int = 0): List<EssenceMessageRecord> {
-            return botWrapper.impl.getEssenceMsgList(id, page).data.map {
+            return bot.impl.getEssenceMsgList(id, page).data.map {
                 EssenceMessageRecord(
                     this, queryMember(it.senderId), it.senderId, it.senderNick, it.senderTime.toInt(),
                     queryMember(it.operatorId), it.operatorId, it.operatorNick, it.operatorTime.toInt()
@@ -68,7 +68,7 @@ internal class EssencesWrapper(
                         target(this@fetchEssencesList)
                         sender(it.senderId)
                         if (parse) {
-                            botWrapper.getMsg(it.messageId)?.also { msg -> messageChainOf(msg) }
+                            bot.getMsg(it.messageId)?.also { msg -> messageChainOf(msg) }
                         }
                     }.build(bot.id, MessageSourceKind.GROUP)
                 }

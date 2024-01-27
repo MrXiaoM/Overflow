@@ -12,13 +12,10 @@ import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
 internal class OtherClientWrapper(
-    val botWrapper: BotWrapper,
+    override val bot: BotWrapper,
     override var info: OtherClientInfo
 ) : OtherClient {
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})OtherClient/${info.deviceKind}")
-
-    override val bot: Bot
-        get() = botWrapper
 
     override suspend fun uploadShortVideo(
         thumbnail: ExternalResource,
