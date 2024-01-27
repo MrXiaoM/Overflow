@@ -114,14 +114,15 @@ internal class GroupMessageRecallListener(
 ): EventListener<GroupMsgDeleteNoticeEvent> {
     override suspend fun onMessage(e: GroupMsgDeleteNoticeEvent) {
         val group = bot.group(e.groupId)
-        val operator = group.members[e.operatorId]
+        val operator = group.queryMember(e.operatorId)
+        val target = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
         bot.eventDispatcher.broadcastAsync(MessageRecallEvent.GroupRecall(bot,
-            bot.id, // TODO: Onebot 无法获取被撤回消息的发送者
+            target.id,
             intArrayOf(e.msgId.toInt()),
             intArrayOf(e.msgId.toInt()),
             (e.time / 1000).toInt(),
             operator, group,
-            group.botAsMember // TODO: Onebot 无法获取被撤回消息的发送者
+            target
         ))
     }
 }
