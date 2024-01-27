@@ -9,9 +9,7 @@ import cn.evole.onebot.sdk.event.notice.group.GroupTitleChangeNoticeEvent
 import cn.evole.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
-import net.mamoe.mirai.contact.AnonymousMember
 import net.mamoe.mirai.contact.nameCardOrNick
-import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
@@ -102,8 +100,8 @@ internal class GroupNotifyListener(
         val group = bot.group(e.groupId)
         when (e.subType) {
             "poke" -> {
-                val operator = group.members[e.operatorId] ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取操作者")
-                val target = group.members[e.targetId] ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取目标")
+                val operator = group.queryMember(e.operatorId) ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取操作者")
+                val target = group.queryMember(e.targetId) ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取目标")
                 // TODO: 戳一戳无法获取被戳一方的动作、后缀信息
                 bot.eventDispatcher.broadcastAsync(NudgeEvent(operator, target, group, "拍了拍", ""))
             }
