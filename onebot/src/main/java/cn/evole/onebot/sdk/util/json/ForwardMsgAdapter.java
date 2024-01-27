@@ -14,7 +14,12 @@ public class ForwardMsgAdapter implements JsonDeserializer<ForwardMsgResp> {
     public ForwardMsgResp deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
         List<ForwardMsgResp.Node> nodes = new ArrayList<>();
         JsonObject jsonObj = json.getAsJsonObject();
-        JsonArray messagesArray = jsonObj.get("messages").getAsJsonArray();
+        JsonArray messagesArray;
+        try {
+            messagesArray = jsonObj.get("messages").getAsJsonArray();
+        } catch (NullPointerException ignored) {
+            messagesArray = jsonObj.get("message").getAsJsonArray();
+        }
         for (JsonElement jsonElement : messagesArray) {
             JsonsObject obj = new JsonsObject(jsonElement.getAsJsonObject());
             int time = obj.optInt("time");
