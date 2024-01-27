@@ -62,8 +62,9 @@
 | 好友消息             | FriendMessageEvent              | message -> private -> friend    | ✅    |
 | 群临时会话消息          | GroupTempMessageEvent           | message -> private -> group     | ❌    |
 | 陌生人消息            | StrangerMessageEvent            | message -> private -> other     | ✅    |
-| 群戳一戳             | NudgeEvent                      | notify -> poke                  | *✅*  |
-| 群撤回消息            | MessageRecallEvent.GroupEvent   | group_recall                    | *✅*  |
+| 群戳一戳             | NudgeEvent                      | notice -> notify -> poke        | *✅*  |
+| 群撤回消息            | MessageRecallEvent.GroupRecall  | notice -> group_recall          | ✅    |
+| 好友撤回消息           | MessageRecallEvent.FriendRecall | notice -> friend_recall         | ✅    |
 | 群名片更改            | MemberCardChangeEvent           | -                               | ✅    |
 | 加群验证消息           | MemberJoinRequestEvent          | request -> group -> add         | ✅    |
 | 被邀请加群            | BotInvitedJoinGroupRequestEvent | request -> group -> invite      | ✅    |

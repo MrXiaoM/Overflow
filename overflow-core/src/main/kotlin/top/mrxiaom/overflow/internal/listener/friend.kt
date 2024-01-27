@@ -2,12 +2,13 @@
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
+import cn.evole.onebot.sdk.event.notice.friend.PrivateMsgDeleteNoticeEvent
 import cn.evole.onebot.sdk.event.request.FriendAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.contact.remarkOrNick
-import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.FriendMessageEvent
+import net.mamoe.mirai.event.events.MessageRecallEvent
 import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.event.events.StrangerMessageEvent
 import net.mamoe.mirai.utils.MiraiInternalApi
@@ -23,7 +24,7 @@ internal fun EventBus.addFriendListeners(bot: BotWrapper) {
     listOf(
         FriendMessageListener(bot),
         FriendAddRequestListener(bot),
-
+        FriendMessageRecallListener(bot),
     ).forEach(::addListener)
 }
 
@@ -99,6 +100,23 @@ internal class FriendAddRequestListener(
             fromId = e.userId,
             fromGroupId = 0, // TODO: 获取来自哪个群
             fromNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: ""
+        ))
+    }
+}
+
+internal class FriendMessageRecallListener(
+    val bot: BotWrapper
+): EventListener<PrivateMsgDeleteNoticeEvent> {
+    override suspend fun onMessage(e: PrivateMsgDeleteNoticeEvent) {
+        val operatorId = e.operatorId.takeIf { it > 0 } ?: e.userId
+        val friend = bot.getFriend(e.userId) ?: throw IllegalStateException("无法找到好友 ${e.userId}")
+        bot.eventDispatcher.broadcastAsync(
+            MessageRecallEvent.FriendRecall(bot,
+            intArrayOf(e.msgId.toInt()),
+            intArrayOf(e.msgId.toInt()),
+            (e.time / 1000).toInt(),
+            operatorId,
+            friend
         ))
     }
 }

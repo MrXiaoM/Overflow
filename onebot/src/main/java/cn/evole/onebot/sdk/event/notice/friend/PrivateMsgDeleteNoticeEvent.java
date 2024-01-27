@@ -20,6 +20,9 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 public class PrivateMsgDeleteNoticeEvent extends NoticeEvent {
 
+    @SerializedName( "operator_id")
+    public long operatorId;
+
     @SerializedName("message_id")
     public long msgId;
 
