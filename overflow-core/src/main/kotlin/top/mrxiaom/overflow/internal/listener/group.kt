@@ -58,9 +58,9 @@ internal class GroupMessageListener(
                     // TODO: 过滤自己发送的消息
                 } else {
                     bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
-                    GroupMessageEvent(
+                    bot.eventDispatcher.broadcastAsync(GroupMessageEvent(
                         member.nameCardOrNick, member.permission, member, miraiMessage, messageSource.time
-                    ).broadcast()
+                    ))
                 }
             }
             "anonymous" -> {
@@ -83,7 +83,7 @@ internal class GroupNotifyListener(
                 val operator = group.members[e.operatorId] ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取操作者")
                 val target = group.members[e.targetId] ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取目标")
                 // TODO: 戳一戳无法获取被戳一方的动作、后缀信息
-                NudgeEvent(operator, target, group, "拍了拍", "").broadcast()
+                bot.eventDispatcher.broadcastAsync(NudgeEvent(operator, target, group, "拍了拍", ""))
             }
         }
     }
@@ -95,14 +95,14 @@ internal class GroupMessageRecallListener(
     override suspend fun onMessage(e: GroupMsgDeleteNoticeEvent) {
         val group = bot.group(e.groupId)
         val operator = group.members[e.operatorId]
-        MessageRecallEvent.GroupRecall(bot,
+        bot.eventDispatcher.broadcastAsync(MessageRecallEvent.GroupRecall(bot,
             bot.id, // TODO: Onebot 无法获取被撤回消息的发送者
             intArrayOf(e.msgId.toInt()),
             intArrayOf(e.msgId.toInt()),
             (e.time / 1000).toInt(),
             operator, group,
             group.botAsMember // TODO: Onebot 无法获取被撤回消息的发送者
-        ).broadcast()
+        ))
     }
 }
 
@@ -112,7 +112,7 @@ internal class GroupAddRequestListener(
     override suspend fun onMessage(e: GroupAddRequestEvent) {
         when (e.subType) {
             "add" -> { // 某人申请入群
-                MemberJoinRequestEvent(
+                bot.eventDispatcher.broadcastAsync(MemberJoinRequestEvent(
                     bot = bot,
                     eventId = Overflow.instance.putMemberJoinRequestFlag(e.flag),
                     message = e.comment ?: "",
@@ -121,17 +121,17 @@ internal class GroupAddRequestListener(
                     groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),
                     fromNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: "",
                     invitorId = null // TODO: 获取邀请者
-                ).broadcast()
+                ))
             }
             "invite" -> { // 某人邀请机器人入群
-                BotInvitedJoinGroupRequestEvent(
+                bot.eventDispatcher.broadcastAsync(BotInvitedJoinGroupRequestEvent(
                     bot = bot,
                     eventId = Overflow.instance.putInventedJoinGroupRequestFlag(e.flag),
                     invitorId = e.userId,
                     groupId = e.groupId,
                     groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),
                     invitorNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: ""
-                ).broadcast()
+                ))
             }
         }
     }
@@ -169,25 +169,25 @@ internal class GroupBanNoticeListener(
             }
             val origin = group.settings.isMuteAll
             group.settings.muteAll = mute
-            GroupMuteAllEvent(
+            bot.eventDispatcher.broadcastAsync(GroupMuteAllEvent(
                 origin = origin,
                 new = mute,
                 group = group,
                 operator = operator
-            ).broadcast()
+            ))
             return
         }
         if (e.userId == bot.id) {
             if (operator == null) throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
             if (mute) {
-                BotMuteEvent(
+                bot.eventDispatcher.broadcastAsync(BotMuteEvent(
                     durationSeconds = e.duration.toInt(),
                     operator = operator
-                ).broadcast()
+                ))
             } else {
-                BotUnmuteEvent(
+                bot.eventDispatcher.broadcastAsync(BotUnmuteEvent(
                     operator = operator
-                ).broadcast()
+                ))
             }
         } else {
             if (operator == null && e.operatorId != bot.id) {
@@ -195,16 +195,16 @@ internal class GroupBanNoticeListener(
             }
             val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
             if (mute) {
-                MemberMuteEvent(
+                bot.eventDispatcher.broadcastAsync(MemberMuteEvent(
                     member = member,
                     durationSeconds = e.duration.toInt(),
                     operator = operator
-                ).broadcast()
+                ))
             } else {
-                MemberUnmuteEvent(
+                bot.eventDispatcher.broadcastAsync(MemberUnmuteEvent(
                     member = member,
                     operator = operator
-                ).broadcast()
+                ))
             }
         }
     }

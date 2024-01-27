@@ -54,9 +54,9 @@ internal class FriendMessageListener(
                 )
                 miraiMessage = messageSource.plus(miraiMessage)
                 bot.logger.verbose("${friend.remarkOrNick}(${friend.id}) -> $messageString")
-                FriendMessageEvent(
+                bot.eventDispatcher.broadcastAsync(FriendMessageEvent(
                     friend, miraiMessage, messageSource.time
-                ).broadcast()
+                ))
             }
             "other", "group" -> { // TODO: group 群临时会话
                 val stranger = e.privateSender.wrapAsStranger(bot)
@@ -80,9 +80,9 @@ internal class FriendMessageListener(
                 )
                 miraiMessage = messageSource.plus(miraiMessage)
                 bot.logger.verbose("${stranger.remarkOrNick}(${stranger.id}) -> $messageString")
-                StrangerMessageEvent(
+                bot.eventDispatcher.broadcastAsync(StrangerMessageEvent(
                     stranger, miraiMessage, messageSource.time
-                ).broadcast()
+                ))
             }
         }
     }
@@ -92,13 +92,13 @@ internal class FriendAddRequestListener(
     val bot: BotWrapper
 ): EventListener<FriendAddRequestEvent> {
     override suspend fun onMessage(e: FriendAddRequestEvent) {
-        NewFriendRequestEvent(
+        bot.eventDispatcher.broadcastAsync(NewFriendRequestEvent(
             bot = bot,
             eventId = Overflow.instance.putNewFriendRequestFlag(e.flag),
             message = e.comment ?: "",
             fromId = e.userId,
             fromGroupId = 0, // TODO: 获取来自哪个群
             fromNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: ""
-        ).broadcast()
+        ))
     }
 }
