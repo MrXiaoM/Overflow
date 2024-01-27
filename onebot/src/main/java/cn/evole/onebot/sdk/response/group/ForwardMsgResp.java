@@ -39,6 +39,7 @@ public class ForwardMsgResp {
      * 消息发送者
      */
     @Data
+    @AllArgsConstructor
     public static class Sender {
         @SerializedName("user_id")
         public long userId;

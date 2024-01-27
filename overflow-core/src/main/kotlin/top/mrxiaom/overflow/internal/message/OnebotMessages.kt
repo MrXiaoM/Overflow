@@ -1,5 +1,6 @@
 package top.mrxiaom.overflow.internal.message
 
+import cn.evole.onebot.sdk.Data
 import com.google.gson.JsonParser
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
@@ -20,6 +21,10 @@ import top.mrxiaom.overflow.message.data.Markdown
  */
 internal object OnebotMessages {
     internal var appName = "onebot"
+        set(value) {
+            field = value
+            Data.appName = value
+        }
     internal var appVersion = "Unknown"
     @OptIn(MiraiExperimentalApi::class)
     internal fun registerSerializers() = MessageSerializers.apply {
@@ -133,13 +138,32 @@ internal object OnebotMessages {
      */
     internal fun serializeForwardNodes(nodeList: List<ForwardMessage.Node>): List<Map<String, Any>> {
         return nodeList.map {
-            mutableMapOf(
-                "type" to "node",
-                "data" to mutableMapOf(
-                    "name" to it.senderName,
-                    "content" to JsonParser.parseString(serializeToOneBotJson(it.messageChain))
+            val message = JsonParser.parseString(serializeToOneBotJson(it.messageChain))
+            when (appName.lowercase()) {
+                "shamrock" -> mutableMapOf(
+                    "type" to "node",
+                    "data" to mutableMapOf(
+                        "name" to it.senderName,
+                        "content" to message
+                    )
                 )
-            )
+                "go-cqhttp" -> mutableMapOf(
+                    "content" to message,
+                    "sender" to mutableMapOf(
+                        "user_id" to it.senderId,
+                        "nickname" to it.senderName,
+                    ),
+                    "time" to it.time
+                )
+                else -> mutableMapOf(
+                    "type" to "node",
+                    "data" to mutableMapOf(
+                        "user_id" to it.senderId,
+                        "nickname" to it.senderName,
+                        "content" to message
+                    )
+                )
+            }
         }
     }
 
