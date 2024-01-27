@@ -65,7 +65,28 @@ internal class GroupMessageListener(
                 }
             }
             "anonymous" -> {
-                TODO("匿名消息")
+                val group = bot.group(e.groupId)
+                val member = e.anonymous.wrapAsMember(group)
+
+                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
+                val messageString = miraiMessage.toString()
+                val messageSource = IncomingSource.group(
+                    bot = bot,
+                    ids = intArrayOf(e.messageId),
+                    internalIds = intArrayOf(e.messageId),
+                    isOriginalMessageInitialized = true,
+                    originalMessage = miraiMessage,
+                    sender = member,
+                    time = (e.time / 1000).toInt()
+                )
+                miraiMessage = messageSource.plus(miraiMessage)
+
+                bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCard}(${member.anonymousId}) -> $messageString")
+                bot.eventDispatcher.broadcastAsync(
+                    GroupMessageEvent(
+                        member.nameCardOrNick, member.permission, member, miraiMessage, messageSource.time
+                    )
+                )
             }
             "notice" -> {
                 TODO("系统提示，如 管理员已禁止群内匿名聊天")

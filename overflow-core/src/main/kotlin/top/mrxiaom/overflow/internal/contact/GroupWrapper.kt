@@ -1,6 +1,7 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
+import cn.evole.onebot.sdk.entity.Anonymous
 import cn.evole.onebot.sdk.response.group.GroupInfoResp
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
@@ -41,6 +42,7 @@ internal class GroupWrapper(
     internal var impl: GroupInfoResp
 ) : Group, RemoteGroup, Updatable {
     private var membersInternal: ContactList<MemberWrapper>? = null
+    private var anonymousInternal: HashMap<String, AnonymousMemberWrapper> = hashMapOf()
 
     val data: GroupInfoResp
         get() = impl
@@ -56,6 +58,11 @@ internal class GroupWrapper(
     }
     internal fun updateMember(member: GroupMemberInfoResp): MemberWrapper {
         return (members[member.userId] ?: MemberWrapper(this, member).also { members.delegate.add(it) }).apply {
+            impl = member
+        }
+    }
+    internal fun updateAnonymous(member: Anonymous): AnonymousMemberWrapper {
+        return (anonymousInternal[member.flag] ?: AnonymousMemberWrapper(this, member).also { anonymousInternal[member.flag] = it }).apply {
             impl = member
         }
     }

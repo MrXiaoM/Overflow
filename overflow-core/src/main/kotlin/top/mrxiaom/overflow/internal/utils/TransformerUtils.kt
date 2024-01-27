@@ -1,6 +1,7 @@
 @file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.utils
 
+import cn.evole.onebot.sdk.entity.Anonymous
 import cn.evole.onebot.sdk.entity.MsgId
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
@@ -51,6 +52,10 @@ internal fun GroupMessageEvent.GroupSender.wrapAsMember(group: Group): MemberWra
         it.role = role ?: "member"
         it.title = title ?: ""
     }.wrapAsMember(group)
+}
+
+internal fun Anonymous.wrapAsMember(group: Group): AnonymousMemberWrapper {
+    return (group as GroupWrapper).updateAnonymous(this)
 }
 
 internal suspend fun BotWrapper.group(groupId: Long): GroupWrapper {

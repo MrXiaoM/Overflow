@@ -1,11 +1,13 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
+import cn.evole.onebot.sdk.entity.Anonymous
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.*
+import net.mamoe.mirai.contact.active.MemberActive
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.EventCancelledException
 import net.mamoe.mirai.event.events.GroupTempMessagePostSendEvent
@@ -20,6 +22,7 @@ import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.check
+import top.mrxiaom.overflow.internal.contact.data.EmptyMemberActive
 import top.mrxiaom.overflow.internal.contact.data.MemberActiveWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
@@ -185,6 +188,36 @@ internal class MemberWrapper(
     }
 
     override fun toString(): String = "NormalMember($id)"
+}
+
+internal class AnonymousMemberWrapper(
+    override val group: GroupWrapper,
+    internal var impl: Anonymous
+) : AnonymousMember {
+    override val bot: BotWrapper = group.bot
+    override val anonymousId: String get() = impl.flag
+    override val active: MemberActive = EmptyMemberActive
+    override val nameCard: String get() = impl.name
+    override val permission: MemberPermission = MemberPermission.MEMBER
+    override val specialTitle: String get() = ""
+
+    override val id: Long get() = impl.id
+    override val remark: String get() = ""
+    override val nick: String get() = impl.name
+    override val coroutineContext: CoroutineContext = CoroutineName("((Bot/${bot.id})Group/${group.id})Anonymous/$id")
+
+    override suspend fun mute(durationSeconds: Int) {
+        checkBotPermissionHigherThanThis("禁言")
+
+        if (bot.impl.setGroupAnonymousBan(group.id, anonymousId, durationSeconds)
+                .check("禁言群成员 $id")) {
+            group.updateMember(id)
+        }
+    }
+
+    override fun toString(): String = "AnonymousMember($nameCard, $anonymousId)"
+    override suspend fun uploadShortVideo(thumbnail: ExternalResource, video: ExternalResource, fileName: String?): ShortVideo =
+        throw UnsupportedOperationException("Cannot upload short video to AnonymousMember")
 }
 
 internal fun Member.checkBotPermissionHighest(operationName: String) {
