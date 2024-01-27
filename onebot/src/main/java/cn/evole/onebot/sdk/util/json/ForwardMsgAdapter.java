@@ -22,7 +22,7 @@ public class ForwardMsgAdapter implements JsonDeserializer<ForwardMsgResp> {
         for (JsonElement jsonElement : messagesArray.getAsJsonArray()) {
             JsonsObject obj = new JsonsObject(jsonElement.getAsJsonObject());
             if (obj.has("data")) {
-                obj = new JsonsObject(obj.getJsonElement("data").getAsJsonObject());
+                obj = new JsonsObject(jsonElement.getAsJsonObject().get("data").getAsJsonObject());
             }
             int time = obj.optInt("time");
             String messageType = obj.optString("message_type");
@@ -31,9 +31,9 @@ public class ForwardMsgAdapter implements JsonDeserializer<ForwardMsgResp> {
             ForwardMsgResp.Sender sender = gson.fromJson(obj.optJSONObject("anonymous"), ForwardMsgResp.Sender.class);
             String message;
             if (obj.has("content")) {
-                message = gson.toJson(obj.getJsonElement("content"));
+                message = gson.toJson(obj.optJSONArray("content"));
             } else {
-                message = gson.toJson(obj.getJsonElement("message"));
+                message = gson.toJson(obj.optJSONArray("message"));
             }
             long peerId = obj.optLong("peer_id");
             long targetId = obj.optLong("target_id");
