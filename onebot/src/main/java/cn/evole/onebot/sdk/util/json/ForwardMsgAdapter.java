@@ -21,6 +21,9 @@ public class ForwardMsgAdapter implements JsonDeserializer<ForwardMsgResp> {
         }
         for (JsonElement jsonElement : messagesArray.getAsJsonArray()) {
             JsonsObject obj = new JsonsObject(jsonElement.getAsJsonObject());
+            if (obj.has("data")) {
+                obj = new JsonsObject(obj.getJsonElement("data").getAsJsonObject());
+            }
             int time = obj.optInt("time");
             String messageType = obj.optString("message_type");
             int messageId = obj.optInt("message_id");
