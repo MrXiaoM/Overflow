@@ -7,7 +7,7 @@
 | 模块                | 说明              |
 |-------------------|-----------------|
 | onebot            | Onebot SDK 和客户端 |
-| overflow-api      | overflow 核心 api |
+| overflow-core-api | overflow 核心 api |
 | overflow-core     | overflow 核心实现   |
 | overflow-core-all | 上述模块的集合，用于生产环境  |
 
@@ -30,7 +30,7 @@ Overflow 使用 JDK 1.8 编译，在以下环境可以正常编译。
 ```shell
 ./gradlew shadowJar
 ```
-用于生成环境的包将会出现在 `overflow-core-all/build/libs/*-all.jar`
+用于生产环境的包将会出现在 `overflow-core-all/build/libs/*-all.jar`
 
 ## 调试
 

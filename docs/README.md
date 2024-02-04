@@ -10,6 +10,12 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 将 `mirai-core` 实现删除，替换为 `overflow` 即可。
 
+## 安装操作视频
+
+欢迎补充任何视频平台上的 Overflow 部署教程视频，提交格式为 `视频简略标题 (视频平台/视频作者)`
+
++ [2024 手把手教你配置QQ机器人 (哔哩哔哩/人间工作)](https://www.bilibili.com/video/BV17m41197tQ/)
+
 ## 安装方法
 
 + **方法一：** [官网一键打包整合包](https://mirai.mrxiaom.top/#get-started) (最简单，需要在PC浏览器访问)
