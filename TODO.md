@@ -15,3 +15,4 @@
 - [x] 解决登录后 mirai-console 被阻塞导致无法关闭的问题
 - [x] 接口与实现分离，新建 `overflow-core-api` 模块
 - [x] 反向 WebSocket 支持
+- [x] 主动兼容 [cssxsh](https://github.com/search?q=user%3Acssxsh+internal+language%3AKotlin&type=code&l=Kotlin) 的所有插件中使用的 mirai-core 内部方法

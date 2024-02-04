@@ -11,6 +11,7 @@ import net.mamoe.mirai.contact.friendgroup.FriendGroups
 import net.mamoe.mirai.event.EventChannel
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.BotEvent
+import net.mamoe.mirai.internal.QQAndroidBot
 import net.mamoe.mirai.internal.network.components.EventDispatcher
 import net.mamoe.mirai.internal.network.components.EventDispatcherImpl
 import net.mamoe.mirai.message.data.MessageChain
@@ -36,9 +37,10 @@ internal class BotWrapper private constructor(
     private var implBot: Bot,
     defLoginInfo: LoginInfoResp,
     override val configuration: BotConfiguration
-) : net.mamoe.mirai.Bot, RemoteBot, Updatable, CoroutineScope {
+) : QQAndroidBot(), RemoteBot, Updatable, CoroutineScope {
     val impl: Bot
         get() = implBot
+    override val implGetter: () -> Bot = { impl }
     private var loginInfo: LoginInfoResp = defLoginInfo
     private var friendsInternal: ContactList<FriendWrapper> = ContactList()
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
@@ -92,7 +94,6 @@ internal class BotWrapper private constructor(
         if (data.message == null) return null
         return OnebotMessages.deserializeFromOneBot(bot, data.message)
     }
-
     override val id: Long = loginInfo.userId
     override val logger: MiraiLogger = configuration.botLoggerSupplier(this)
     internal val networkLogger: MiraiLogger by lazy { configuration.networkLoggerSupplier(this) }

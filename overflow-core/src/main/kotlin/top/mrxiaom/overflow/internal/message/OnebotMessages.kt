@@ -6,6 +6,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.Mirai
+import net.mamoe.mirai.internal.message.data.MarketFaceImpl
+import net.mamoe.mirai.internal.network.protocol.data.proto.ImMsgBody
 import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
@@ -49,7 +51,7 @@ internal object OnebotMessages {
         registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
         registerSerializer(UnknownMessage::class, UnknownMessage.serializer())
         registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
-        registerSerializer(WrappedMarketFace::class, WrappedMarketFace.serializer())
+        registerSerializer(MarketFaceImpl::class, MarketFaceImpl.serializer())
         registerSerializer(ContactRecommend::class, ContactRecommend.serializer())
         registerSerializer(Location::class, Location.serializer())
     }
@@ -247,7 +249,9 @@ internal object OnebotMessages {
                             add(raw.render(ForwardMessage.DisplayStrategy))
                         }
                     }
-                    "mface" -> add(WrappedMarketFace(data["id"].string, "[商城表情]")) // TODO 根据 emojiId 获取 name
+                    "mface" -> add(MarketFaceImpl(ImMsgBody.MarketFace( // TODO 根据 emojiId 获取 name
+                        faceId = data["id"].string.encodeToByteArray()
+                    )))
                     "xml" -> add(SimpleServiceMessage(60, data["data"].string))
                     "json" -> add(LightApp(data["data"].string))
 
