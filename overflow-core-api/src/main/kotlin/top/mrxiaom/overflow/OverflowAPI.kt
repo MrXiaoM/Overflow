@@ -7,6 +7,7 @@ import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 
 interface OverflowAPI {
+    val botStarter: IBotStarter
     /**
      * 以 Onebot 格式新建图片消息
      *

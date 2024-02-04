@@ -26,8 +26,11 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import top.mrxiaom.overflow.BotBuilder
 import top.mrxiaom.overflow.BuildConstants
+import top.mrxiaom.overflow.IBotStarter
 import top.mrxiaom.overflow.OverflowAPI
+import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
@@ -141,7 +144,29 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     @JvmOverloads
     @JvmBlockingBridge
-    suspend fun start(printInfo: Boolean = false, logger: Logger = LoggerFactory.getLogger("Onebot")): Boolean {
+    suspend fun start(
+        printInfo: Boolean = false,
+        logger: Logger = LoggerFactory.getLogger("Onebot")
+    ): Boolean {
+        return start0(
+            printInfo = printInfo,
+            logger = logger
+        ) != null
+    }
+
+    private suspend fun start0(
+        botConfig: BotConfig = BotConfig(
+            url = config.wsHost,
+            reversedPort = config.reversedWSPort,
+            token = config.token,
+            isAccessToken = config.token.isNotBlank(),
+            retryTimes = config.retryTimes,
+            retryWaitMills = config.retryWaitMills,
+            retryRestMills = config.retryRestMills,
+        ),
+        printInfo: Boolean = false,
+        logger: Logger = LoggerFactory.getLogger("Onebot")
+    ): Bot? {
         val reversed = config.reversedWSPort in 1..65535
         if (printInfo) {
             logger.info("Overflow v$version 正在运行")
@@ -152,17 +177,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             }
         }
 
-        val service = ConnectFactory.create(
-            BotConfig(
-                url = config.wsHost,
-                reversedPort = config.reversedWSPort,
-                token = config.token,
-                isAccessToken = config.token.isNotBlank(),
-                retryTimes = config.retryTimes,
-                retryWaitMills = config.retryWaitMills,
-                retryRestMills = config.retryRestMills,
-            ), logger
-        )
+        val service = ConnectFactory.create(botConfig, logger)
         val dispatchers: EventBus
         val botImpl: cn.evolvefield.onebot.client.core.Bot
         if (reversed) {
@@ -172,7 +187,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                     logger.error("未连接到 Onebot")
                     if (!isNotExit) exitProcess(1)
                 }
-                return false
+                return null
             }
             dispatchers = ws.first.createEventBus()
             botImpl = ws.second
@@ -184,7 +199,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                     if (!isNotExit) exitProcess(1)
 
                 }
-                return false
+                return null
             }
             dispatchers = ws.createEventBus()
             botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
@@ -198,7 +213,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 logger.error("未连接到 Onebot")
                 if (!isNotExit) exitProcess(1)
             }
-            return false
+            return null
         }
         if (printInfo) {
             logger.info("服务端版本信息\n${versionInfo.toPrettyString()}")
@@ -208,10 +223,36 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         dispatchers.addGroupListeners(bot)
         dispatchers.addFriendListeners(bot)
         
-        BotOnlineEvent(bot).broadcast()
-        return true
+        return bot.also { it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot)) }
     }
 
+    override val botStarter: IBotStarter = object : IBotStarter {
+        override suspend fun start(
+            url: String,
+            reversedPort: Int,
+            token: String,
+            retryTimes: Int,
+            retryWaitMills: Long,
+            retryRestMills: Long,
+            printInfo: Boolean,
+            logger: Logger?
+        ): Bot? {
+            val botConfig = BotConfig(
+                url = url,
+                reversedPort = reversedPort,
+                token = token,
+                isAccessToken = token.isNotBlank(),
+                retryTimes = retryTimes,
+                retryWaitMills = retryWaitMills,
+                retryRestMills = retryRestMills,
+            )
+            return if (logger != null) {
+                start0(botConfig, printInfo, logger)
+            } else {
+                start0(botConfig, printInfo)
+            }
+        }
+    }
     override fun imageFromFile(file: String): Image = OnebotMessages.imageFromFile(file)
     override fun audioFromFile(file: String): Audio = OnebotMessages.audioFromFile(file)
     override fun videoFromFile(file: String): ShortVideo = OnebotMessages.videoFromFile(file)

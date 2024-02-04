@@ -63,6 +63,22 @@ dependencies {
 </dependency>
 ```
 
+连接到 Onebot
+
+```kotlin
+// 正向 WebSocket
+val bot1 = BotBuilder.positive("ws://127.0.0.1:5800")
+    .token("114514")
+    .connect()
+// 反向 WebSocket
+val bot2 = BotBuilder.reversed(5700)
+    .token("114514")
+    .connect()
+// connect() 返回值为 null 时登录失败
+```
+
+当前未编写多 Bot 支持，**请勿**在生产环境中连接多个实例。
+
 # 向 Onebot 发送自定义 action
 
 预设的 action 类型列表另请参见 [ActionPathEnum.java](/onebot/src/main/java/cn/evole/onebot/sdk/enums/ActionPathEnum.java) (以下应当填写的是字符串 path 的值)
