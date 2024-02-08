@@ -40,6 +40,7 @@ import top.mrxiaom.overflow.internal.data.asMirai
 import top.mrxiaom.overflow.internal.data.asOnebot
 import top.mrxiaom.overflow.internal.listener.addFriendListeners
 import top.mrxiaom.overflow.internal.listener.addGroupListeners
+import top.mrxiaom.overflow.internal.listener.addGuildListeners
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
@@ -222,6 +223,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
         dispatchers.addGroupListeners(bot)
         dispatchers.addFriendListeners(bot)
+        dispatchers.addGuildListeners(bot)
         
         return bot.also { it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot)) }
     }

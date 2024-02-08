@@ -67,7 +67,7 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
         String guildId = obj.optString("guild_id");
         String channelId = obj.optString("channel_id");
         String selfTinyId = obj.optString("self_tiny_id");
-        GuildMessageEvent.Sender sender = gson.fromJson(obj.get().get("sender"), GuildMessageEvent.Sender.class);
+        GuildMessageEvent.GuildSender sender = gson.fromJson(obj.get().get("sender"), GuildMessageEvent.GuildSender.class);
         return new GuildMessageEvent(messageId, subType, guildId, channelId, selfTinyId, sender);
     }
 }

@@ -26,13 +26,13 @@ public class GuildMessageEvent extends MessageEvent {
     public String guildId;
     public String channelId;
     public String selfTinyId;
-    public Sender sender;
+    public GuildSender sender;
 
     /**
      * Sender Info
      */
     @Data
-    public static class Sender {
+    public static class GuildSender {
 
         @SerializedName( "user_id")
         public long userId;
@@ -42,6 +42,18 @@ public class GuildMessageEvent extends MessageEvent {
 
         @SerializedName( "nickname")
         public String nickname;
+
+        @SerializedName( "card")
+        public String card;
+
+        @SerializedName( "level")
+        public String level;
+
+        @SerializedName( "role")
+        public String role;
+
+        @SerializedName( "title")
+        public String title;
 
     }
 

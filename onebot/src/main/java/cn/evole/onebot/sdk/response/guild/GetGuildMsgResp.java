@@ -27,7 +27,7 @@ public class GetGuildMsgResp {
     public String messageSource;
 
     @SerializedName("sender")
-    private GuildMessageEvent.Sender sender;
+    private GuildMessageEvent.GuildSender sender;
 
     @SerializedName("time")
     public long time;
