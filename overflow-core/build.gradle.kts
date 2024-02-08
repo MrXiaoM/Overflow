@@ -24,10 +24,10 @@ buildConfig {
     className("BuildConstants")
     packageName("${project.group}.${rootProject.name.toLowerCase()}")
     useKotlinOutput()
-
     buildConfigField("String", "VERSION", "\"${project.version}\"")
     buildConfigField("String", "MIRAI_VERSION", "\"$miraiVersion\"")
     buildConfigField("String", "COMMIT_HASH", "\"$commitHash\"")
+    buildConfigField("java.time.Instant", "BUILD_TIME", "java.time.Instant.ofEpochSecond(${System.currentTimeMillis() / 1000L}L)")
 }
 
 dependencies {

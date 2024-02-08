@@ -104,13 +104,19 @@ internal object BuiltInCommands {
                 val buildDateFormatted =
                     MiraiConsoleBuildConstants.buildDate.atZone(ZoneId.systemDefault())
                         .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                val overflowBuildDateFormatted =
+                    BuildConstants.BUILD_TIME.atZone(ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+
                 append("正在运行 MiraiConsole v")
                 gold().append(MiraiConsoleBuildConstants.versionConst)
                 reset().append(", 构建于 ")
                 lightBlue().append(buildDateFormatted).reset().append(".\n")
                 append("正在运行 Overflow v")
                 gold().append(BuildConstants.VERSION)
-                reset().append(".\n")
+                reset().append(", 构建于 ")
+                lightBlue().append(overflowBuildDateFormatted).reset().append(".\n")
+                
                 append(MiraiConsoleImplementation.getInstance().frontEndDescription.render()).append("\n")
                 append("启动时间: ").green().append(dateTime(Overflow.instance.startupTime)).reset().append(", 已运行 ").green().append(time(System.currentTimeMillis() - Overflow.instance.startupTime)).reset().append(".\n\n")
 
