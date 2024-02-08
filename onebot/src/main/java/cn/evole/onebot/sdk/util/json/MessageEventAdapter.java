@@ -23,47 +23,51 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
         int font = obj.get("font").getAsInt();
         switch (messageType) {
             case "group": {
-                int messageId = obj.get("message_id").getAsInt();
-                String subType = obj.get("sub_type").getAsString();
-                long groupId = obj.get("group_id").getAsLong();
-                Anonymous anonymous = gson.fromJson(obj.get("anonymous"), Anonymous.class);
-                GroupMessageEvent.GroupSender sender = gson.fromJson(obj.get("sender"), GroupMessageEvent.GroupSender.class);
-                e = new GroupMessageEvent(messageId, subType, groupId, anonymous, sender);
-                e.setMessageType(messageType);
-                e.setUserId(userId);
-                e.setMessage(message);
-                e.setRawMessage(rawMessage);
-                e.setFont(font);
+                e = groupMessageEvent(new JsonsObject(obj));
                 break;
             }
             case "private": {
-                int messageId = obj.get("message_id").getAsInt();
-                String subType = obj.get("sub_type").getAsString();
-                PrivateMessageEvent.PrivateSender sender = gson.fromJson(obj.get("sender"), PrivateMessageEvent.PrivateSender.class);
-                e = new PrivateMessageEvent(messageId, subType, sender);
-                e.setMessageType(messageType);
-                e.setUserId(userId);
-                e.setMessage(message);
-                e.setRawMessage(rawMessage);
-                e.setFont(font);
+                e = privateMessageEvent(new JsonsObject(obj));
                 break;
             }
             case "guild": {
-                String messageId = obj.get("message_id").getAsString();
-                String subType = obj.get("sub_type").getAsString();
-                String guildId = obj.get("guild_id").getAsString();
-                String channelId = obj.get("channel_id").getAsString();
-                String selfTinyId = obj.get("self_tiny_id").getAsString();
-                GuildMessageEvent.Sender sender = gson.fromJson(obj.get("sender"), GuildMessageEvent.Sender.class);
-                e = new GuildMessageEvent(messageId, subType, guildId, channelId, selfTinyId, sender);
-                e.setMessageType(messageType);
-                e.setUserId(userId);
-                e.setMessage(message);
-                e.setRawMessage(rawMessage);
-                e.setFont(font);
+                e = guildMessageEvent(new JsonsObject(obj));
                 break;
             }
         }
+        if (e != null){
+            e.setMessageType(messageType);
+            e.setUserId(userId);
+            e.setMessage(message);
+            e.setRawMessage(rawMessage);
+            e.setFont(font);
+        }
         return e;
+    }
+
+    private MessageEvent groupMessageEvent(JsonsObject obj) {
+        int messageId = obj.optInt("message_id");
+        String subType = obj.optString("sub_type");
+        long groupId = obj.optLong("group_id");
+        Anonymous anonymous = gson.fromJson(obj.get().get("anonymous"), Anonymous.class);
+        GroupMessageEvent.GroupSender sender = gson.fromJson(obj.get().get("sender"), GroupMessageEvent.GroupSender.class);
+        return new GroupMessageEvent(messageId, subType, groupId, anonymous, sender);
+    }
+
+    private MessageEvent privateMessageEvent(JsonsObject obj) {
+        int messageId = obj.optInt("message_id");
+        String subType = obj.optString("sub_type");
+        PrivateMessageEvent.PrivateSender sender = gson.fromJson(obj.get().get("sender"), PrivateMessageEvent.PrivateSender.class);
+        return new PrivateMessageEvent(messageId, subType, sender);
+    }
+
+    private MessageEvent guildMessageEvent(JsonsObject obj) {
+        String messageId = obj.optString("message_id");
+        String subType = obj.optString("sub_type");
+        String guildId = obj.optString("guild_id");
+        String channelId = obj.optString("channel_id");
+        String selfTinyId = obj.optString("self_tiny_id");
+        GuildMessageEvent.Sender sender = gson.fromJson(obj.get().get("sender"), GuildMessageEvent.Sender.class);
+        return new GuildMessageEvent(messageId, subType, guildId, channelId, selfTinyId, sender);
     }
 }
