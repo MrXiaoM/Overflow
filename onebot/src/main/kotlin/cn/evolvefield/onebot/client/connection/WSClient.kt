@@ -83,22 +83,28 @@ class WSClient(
             if (ActionSendUtils.mutex.isLocked) ActionSendUtils.mutex.unlock()
         }
         if (code != CloseFrame.NORMAL) { // TODO: 测试确认异常关闭码
-            if (retryTimes < 1) {
+            if (retryTimes < 1 || retryWaitMills < 0) {
+                logger.warn("连接失败，未开启自动重连，放弃连接")
                 connectDef.complete(false)
                 return
             }
             scope.launch {
                 if (retryCount < retryTimes) {
                     retryCount++
-                    logger.warn("等待 ${String.format("%.1f", retryWaitMills / 1000.0F)} 秒后重连 (第 $retryCount/$retryTimes 次")
+                    logger.warn("等待 ${String.format("%.1f", retryWaitMills / 1000.0F)} 秒后重连 (第 $retryCount/$retryTimes 次)")
                     delay(retryWaitMills)
                 } else {
                     retryCount = 0
+                    if (retryRestMills < 0) {
+                        logger.warn("重连次数耗尽... 放弃重试")
+                        return@launch
+                    }
                     logger.warn("重连次数耗尽... 休息 ${String.format("%.1f", retryRestMills / 1000.0F)} 秒后重试")
                     delay(retryRestMills)
                 }
                 logger.info("正在重连...")
                 if (reconnectBlocking()) {
+                    retryCount = 0
                     connectDef.complete(true)
                 }
             }

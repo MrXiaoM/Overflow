@@ -28,6 +28,8 @@ public class BotBuilder private constructor(
 
     /**
      * 设置尝试重连次数，设为 -1 时禁用自动重连
+     *
+     * 仅主动 WebSocket 可自动重连
      */
     public fun retryTimes(retryTimes: Int): BotBuilder = apply {
         this.retryTimes = retryTimes
@@ -35,6 +37,8 @@ public class BotBuilder private constructor(
 
     /**
      * 设置重连等待间隔时间
+     *
+     * 仅主动 WebSocket 可自动重连
      */
     public fun retryWaitMills(retryWaitMills: Long): BotBuilder = apply {
         this.retryWaitMills = retryWaitMills
@@ -42,6 +46,8 @@ public class BotBuilder private constructor(
 
     /**
      * 设置重连休息时间
+     *
+     * 仅主动 WebSocket 可自动重连
      *
      * 重连次数耗尽后，会进入休息状态，休息结束后重置重连次数，再次尝试重连
      *
@@ -55,6 +61,8 @@ public class BotBuilder private constructor(
      * 禁止打印连接时额外状态信息
      *
      * 如 Overflow 版本、连接地址、Onebot 协议端版本等
+     *
+     * 如果需要禁止打印连接成功与失败情况的日志，请使用 [overrideLogger] 覆写日志记录器
      */
     public fun noPrintInfo(): BotBuilder = apply {
         this.printInfo = false
