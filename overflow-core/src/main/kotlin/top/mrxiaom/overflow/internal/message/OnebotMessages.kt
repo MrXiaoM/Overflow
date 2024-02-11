@@ -256,7 +256,7 @@ internal object OnebotMessages {
                     "json" -> add(LightApp(data["data"].string))
 
                     "reply" -> {
-                        val id = data["id"].int
+                        val id = data["id"].string.toInt()
                         val msgData = bot.asOnebot.impl.getMsg(id).data
                         val msgSource = MessageSourceBuilder()
                             .id(id)
