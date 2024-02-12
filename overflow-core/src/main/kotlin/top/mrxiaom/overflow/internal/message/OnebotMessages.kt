@@ -72,6 +72,8 @@ internal object OnebotMessages {
     internal fun serializeToOneBotJsonArray(message: Message): JsonArray {
         val messageChain = (message as? MessageChain) ?: listOf(message)
         return buildJsonArray {
+            val app = appName.lowercase()
+
             for (single in messageChain) {
                 addJsonObject {
                     put("type", single.messageType)
@@ -111,11 +113,15 @@ internal object OnebotMessages {
                                     }
                                 }
                             }
-                            is QuoteReply -> put("id", single.source.ids[0]) // 忽略分片消息情况
+                            is QuoteReply -> when { // 忽略分片消息情况
+                                // TODO: 待定，Lagrange.Core 中的 reply id 类型较混乱，写入的时候 uint.ToString()，读取的时候 (uint)int.Parse()
+                                app.contains("lagrange") -> put("id", single.source.ids[0].toUInt().toString())
+                                else -> put("id", single.source.ids[0].toString())
+                            }
                             // is ForwardMessage -> put("id", single.id) // 转发消息有单独的发送方法
                             is LightApp -> put("data", single.content)
                             is ServiceMessage -> put("data", single.content)
-                            is Markdown -> when (appName.lowercase()) { // 其它实现可能有其它格式，预留判断
+                            is Markdown -> when (app) { // 其它实现可能有其它格式，预留判断
                                 "shamrock" -> put("content", single.content)
                                 else -> put("content", single.content)
                             }
@@ -193,6 +199,7 @@ internal object OnebotMessages {
         return buildMessageChain {
             if (source != null) add(source)
 
+            val app = appName.lowercase()
             for (o in json) {
                 val obj = o.jsonObject
                 val type = obj["type"].string
@@ -256,7 +263,10 @@ internal object OnebotMessages {
                     "json" -> add(LightApp(data["data"].string))
 
                     "reply" -> {
-                        val id = data["id"].string.toInt()
+                        val id = when {
+                            app.contains("lagrange") -> data["id"].string.toUInt().toInt()
+                            else -> data["id"].string.toInt()
+                        }
                         val msgData = bot.asOnebot.impl.getMsg(id).data
                         val msgSource = MessageSourceBuilder()
                             .id(id)
@@ -283,7 +293,7 @@ internal object OnebotMessages {
                         add(WrappedFileMessage(id, 0, name, size, url))
                     }
 
-                    "markdown" -> when (appName.lowercase()) { // 其它实现可能有其它格式，预留判断
+                    "markdown" -> when (app) { // 其它实现可能有其它格式，预留判断
                         "shamrock" -> add(Markdown(data["content"].string))
                         else -> add(Markdown(data["content"].string))
                     }
