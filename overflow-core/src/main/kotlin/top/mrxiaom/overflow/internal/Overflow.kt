@@ -187,7 +187,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             if (ws == null) {
                 if (printInfo) {
                     logger.error("未连接到 Onebot")
-                    if (!isNotExit) exitProcess(1)
+                    if (miraiConsole && !isNotExit) exitProcess(1)
                 }
                 return null
             }
@@ -198,7 +198,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             if (ws == null) {
                 if (printInfo) {
                     logger.error("未连接到 Onebot")
-                    if (!isNotExit) exitProcess(1)
+                    if (miraiConsole && !isNotExit) exitProcess(1)
 
                 }
                 return null
@@ -213,7 +213,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         if (!botImpl.channel.isOpen) {
             if (printInfo) {
                 logger.error("未连接到 Onebot")
-                if (!isNotExit) exitProcess(1)
+                if (miraiConsole && !isNotExit) exitProcess(1)
             }
             return null
         }
