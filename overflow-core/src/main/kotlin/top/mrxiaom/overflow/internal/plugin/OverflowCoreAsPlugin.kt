@@ -54,7 +54,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
         }
 
         OnebotMessages.registerSerializers()
-        Overflow.instance.start(true, oneBotLogger)
+        Overflow.instance.startWithConfig(true, oneBotLogger)
 
         // No AutoLogin
         val dataScope: MiraiConsoleImplementation.ConsoleDataScope = net.mamoe.mirai.console.internal.data.builtins.DataScope
@@ -86,7 +86,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             @SubCommand
             @Description("重新连接 Onebot")
             suspend fun CommandSender.reconnect() {
-                if (Bot.instances.isEmpty()) Overflow.instance.start(true, oneBotLogger)
+                if (Bot.instances.isEmpty()) Overflow.instance.startWithConfig(true, oneBotLogger)
                 else Bot.instances.forEach {
                     // TODO: WebSocketServer
                     (it.asOnebot.impl.channel as? WebSocketClient)?.reconnectBlocking()

@@ -145,36 +145,37 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     @JvmOverloads
     @JvmBlockingBridge
-    suspend fun start(
+    suspend fun startWithConfig(
         printInfo: Boolean = false,
         logger: Logger = LoggerFactory.getLogger("Onebot")
     ): Boolean {
         return start0(
+            BotConfig(
+                url = config.wsHost,
+                reversedPort = config.reversedWSPort,
+                token = config.token,
+                isAccessToken = config.token.isNotBlank(),
+                retryTimes = config.retryTimes,
+                retryWaitMills = config.retryWaitMills,
+                retryRestMills = config.retryRestMills,
+            ),
             printInfo = printInfo,
             logger = logger
         ) != null
     }
 
     private suspend fun start0(
-        botConfig: BotConfig = BotConfig(
-            url = config.wsHost,
-            reversedPort = config.reversedWSPort,
-            token = config.token,
-            isAccessToken = config.token.isNotBlank(),
-            retryTimes = config.retryTimes,
-            retryWaitMills = config.retryWaitMills,
-            retryRestMills = config.retryRestMills,
-        ),
+        botConfig: BotConfig,
         printInfo: Boolean = false,
         logger: Logger = LoggerFactory.getLogger("Onebot")
     ): Bot? {
-        val reversed = config.reversedWSPort in 1..65535
+        val reversed = botConfig.reversedPort in 1..65535
         if (printInfo) {
             logger.info("Overflow v$version 正在运行")
             if (reversed) {
-                logger.info("在端口 ${config.reversedWSPort} 开启反向 WebSocket 服务端")
+                logger.info("在端口 ${botConfig.reversedPort} 开启反向 WebSocket 服务端")
             } else {
-                logger.info("连接到 WebSocket: ${config.wsHost}")
+                logger.info("连接到 WebSocket: ${botConfig.url}")
             }
         }
 
