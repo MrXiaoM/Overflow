@@ -156,10 +156,11 @@ internal object OnebotMessages {
                     )
                 )
                 "go-cqhttp" -> mutableMapOf(
-                    "content" to message,
-                    "sender" to mutableMapOf(
-                        "user_id" to it.senderId,
-                        "nickname" to it.senderName,
+                    "type" to "node",
+                    "data" to mutableMapOf(
+                        "name" to it.senderName,
+                        "uin" to it.senderId,
+                        "content" to message,
                     ),
                     "time" to it.time
                 )

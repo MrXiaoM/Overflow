@@ -1,5 +1,5 @@
 name: Bug 报告
-description: 提交一个 bug
+description: 提交一个 bug (若反馈漏洞不选择该模板，Issue 将被关闭)
 labels:
   - "question"
 
