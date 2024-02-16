@@ -60,6 +60,7 @@ class ActionHandler(
             actionSendUtils.send(reqJson)
         } catch (e: Exception) {
             logger.warn("Request failed: [${action.path}, echo=$echo] ${e.message}")
+            logger.trace("Stacktrace: ", e)
             if (e is ActionFailedException) e.json
             else JsonsObject(JsonObject().apply {
                 addProperty("status", "failed")

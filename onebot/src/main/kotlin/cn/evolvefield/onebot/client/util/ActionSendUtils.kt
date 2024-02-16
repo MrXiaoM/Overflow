@@ -31,7 +31,7 @@ class ActionSendUtils(
      * @param req Request json data
      * @return Response json data
      */
-    @Throws(TimeoutCancellationException::class)
+    @Throws(TimeoutCancellationException::class, ActionFailedException::class)
     suspend fun send(req: JsonObject): JsonsObject {
         val resp = mutex.withLock {
             kotlin.runCatching {
@@ -43,7 +43,7 @@ class ActionSendUtils(
             }.onFailure { resp.cancel() }.getOrThrow()
         }
         if (resp.optString("status") == "failed") {
-            val ret = resp.optInt("retcode").takeIf { it == 0 }?.run { ", retcode=$this" } ?: ""
+            val ret = resp.optInt("retcode").takeIf { it != 0 }?.run { ", retCode=$this" } ?: ""
             throw ActionFailedException("${resp.optString("message")}$ret", resp)
         }
         return resp
