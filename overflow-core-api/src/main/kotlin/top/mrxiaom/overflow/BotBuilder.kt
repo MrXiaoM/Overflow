@@ -14,7 +14,7 @@ public class BotBuilder private constructor(
     private var retryTimes: Int = 5,
     private var retryWaitMills: Long = 5000L,
     private var retryRestMills: Long = 60000L,
-    private var printInfo: Boolean = false,
+    private var printInfo: Boolean = true,
     private var logger: Logger? = null
 ) {
     /**
