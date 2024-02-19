@@ -14,9 +14,7 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.data.*
-import top.mrxiaom.overflow.message.data.ContactRecommend
-import top.mrxiaom.overflow.message.data.Location
-import top.mrxiaom.overflow.message.data.Markdown
+import top.mrxiaom.overflow.message.data.*
 
 /**
  * Json 数组消息 (Onebot) 与 [MessageChain] (mirai) 的序列化与反序列化
@@ -54,6 +52,8 @@ internal object OnebotMessages {
         registerSerializer(MarketFaceImpl::class, MarketFaceImpl.serializer())
         registerSerializer(ContactRecommend::class, ContactRecommend.serializer())
         registerSerializer(Location::class, Location.serializer())
+        registerSerializer(Markdown::class, Markdown.serializer())
+        registerSerializer(InlineKeyboard::class, InlineKeyboard.serializer())
     }
 
     /**
@@ -134,6 +134,37 @@ internal object OnebotMessages {
                                 put("lon", single.lon)
                                 if (single.title.isNotEmpty()) put("title", single.title)
                                 if (single.content.isNotEmpty()) put("content", single.content)
+                            }
+                            is InlineKeyboard -> { // OpenShamrock
+                                put("bot_appid", single.botAppId)
+                                putJsonArray("rows") {
+                                    single.rows.forEach {  row ->
+                                        add(buildJsonObject row@{
+                                            putJsonArray("buttons") {
+                                                row.buttons.forEach { button ->
+                                                    add(buildJsonObject {
+                                                        put("id", button.id)
+                                                        put("label", button.label)
+                                                        put("visited_label", button.visitedLabel)
+                                                        put("style", button.style)
+                                                        put("type", button.type)
+                                                        put("click_limit", button.clickLimit)
+                                                        put("unsupport_tips", button.unsupportTips)
+                                                        put("data", button.data)
+                                                        put("at_bot_show_channel_list", button.atBotShowChannelList)
+                                                        put("permission_type", button.permissionType)
+                                                        putJsonArray("specify_role_ids") {
+                                                            button.specifyRoleIds.forEach { add(it) }
+                                                        }
+                                                        putJsonArray("specify_tinyids") {
+                                                            button.specifyTinyIds.forEach { add(it) }
+                                                        }
+                                                    })
+                                                }
+                                            }
+                                        })
+                                    }
+                                }
                             }
                         }
                     }
@@ -319,6 +350,33 @@ internal object OnebotMessages {
                         add(Location(lat, lon, title, content))
                     }
 
+                    "inline_keyboard" -> { // OpenShamrock
+                        val botAppId = data["bot_appid"].long
+                        val rows = data["rows"]!!.jsonArray.map { e1 ->
+                            val obj1 = e1.jsonObject
+                            InlineKeyboardRow(
+                                buttons = obj1["buttons"]!!.jsonArray.map { e2 ->
+                                    val button = e2.jsonObject
+                                    InlineKeyboardButton(
+                                        id = button["id"].string,
+                                        label = button["label"].string,
+                                        visitedLabel = button["visited_label"].string,
+                                        style = button["style"].int,
+                                        type = button["type"].int,
+                                        clickLimit = button["click_limit"].int,
+                                        unsupportTips = button["unsupport_tips"].string,
+                                        data = button["data"].string,
+                                        atBotShowChannelList = button["at_bot_show_channel_list"].boolean,
+                                        permissionType = button["permission_type"].int,
+                                        specifyRoleIds = button["specify_role_ids"]!!.jsonArray.map { it.string },
+                                        specifyTinyIds = button["specify_tinyids"]!!.jsonArray.map { it.string }
+                                    )
+                                }
+                            )
+                        }
+                        add(InlineKeyboard(botAppId, rows))
+                    }
+
                     else -> add(UnknownMessage(type, Json.encodeToString(data)).printLog())
                 }
             }
@@ -355,6 +413,7 @@ internal object OnebotMessages {
             is Markdown -> "markdown"
             is ContactRecommend -> "contact"
             is Location -> "location"
+            is InlineKeyboard -> "inline_keyboard"
             else -> "text"
         }
     internal fun imageFromFile(file: String): Image = Image.fromId(file)
@@ -375,6 +434,8 @@ internal object OnebotMessages {
         get() = this?.jsonPrimitive?.intOrNull ?: throw IllegalStateException()
     internal val JsonElement?.long
         get() = this?.jsonPrimitive?.longOrNull ?: throw IllegalStateException()
+    internal val JsonElement?.boolean
+        get() = this?.jsonPrimitive?.booleanOrNull ?: throw IllegalStateException()
 
     internal fun Message.findForwardMessage(): ForwardMessage? {
         return when(this){
