@@ -22,7 +22,13 @@ jobs:
           java-version: 8
       - name: Get short SHA
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        # 检查是否存在 secrets，避免未设置 secrets 时运行发布
+      - name: Check Secrets
+        run: echo "SECRETS_LENGTH=$(expr length "$SECRETS_TO_CHECK")" >> $GITHUB_ENV
+        env:
+            SECRETS_TO_CHECK: ${{ secrets.SIGNING_PRIVATE_KEY }}
       - name: Publish Package
+        if: ${{ env.SECRETS_LENGTH > 0 }}
         uses: gradle/gradle-build-action@v2
         with:
           arguments: publishMavenPublicationToSonatypeRepository closeAndReleaseSonatypeStagingRepository
