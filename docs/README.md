@@ -37,6 +37,8 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 + [LagrangeDev/Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core) QQNT 协议库
 + [cnlimiter/onebot-mirai](https://github.com/cnlimiter/onebot-mirai) mirai 转 Onebot，相当于可以实现 mirai 接龙
 
+**额外配置**: Overflow 不支持 CQ 码，请使用`数组格式 (array)`消息。
+
 部署完成后，选择一种连接方式进行下一步操作。
 
 ## 连接
