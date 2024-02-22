@@ -15,6 +15,7 @@ import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.systemProp
+import top.mrxiaom.overflow.internal.message.OnebotMessages
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -68,7 +69,8 @@ internal class SafeListener<in E : Event> internal constructor(
                 val message =
                     "An exception occurred when processing event. " +
                             "Subscriber scope: '$subscriberName'. " +
-                            "Broadcaster scope: '$broadcasterName'"
+                            "Broadcaster scope: '$broadcasterName'. " +
+                            "Onebot implementation: '${OnebotMessages.appName} v${OnebotMessages.appVersion}'"
                 logger.warning(message, e)
 
             } else {
