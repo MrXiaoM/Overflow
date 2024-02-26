@@ -8,18 +8,18 @@ import net.mamoe.mirai.contact.MemberPermission
 import top.mrxiaom.overflow.event.LegacyGuildMessageEvent
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.utils.bot
 
-internal fun EventBus.addGuildListeners(bot: BotWrapper) {
+internal fun EventBus.addGuildListeners() {
     listOf(
-        GuildMessageListener(bot),
+        GuildMessageListener(),
 
-        ).forEach(::addListener)
+    ).forEach(::addListener)
 }
 
-internal class GuildMessageListener(
-    val bot: BotWrapper
-) : EventListener<GuildMessageEvent> {
+internal class GuildMessageListener : EventListener<GuildMessageEvent> {
     override suspend fun onMessage(e: GuildMessageEvent) {
+        val bot = e.bot ?: return
         when (e.subType) {
             "channel" -> {
                 val miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)

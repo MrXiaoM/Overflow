@@ -1,16 +1,9 @@
 package cn.evolvefield.onebot.client.connection
 
-import cn.evole.onebot.sdk.util.json.JsonsObject
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
-import cn.evolvefield.onebot.client.handler.EventBus
-import cn.evolvefield.onebot.client.util.ActionSendUtils
-import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import org.java_websocket.WebSocket
 import org.java_websocket.framing.CloseFrame
 import org.java_websocket.handshake.ClientHandshake
@@ -25,19 +18,14 @@ import java.net.InetSocketAddress
  * Description:
  */
 class WSServer(
-    private val scope: CoroutineScope,
+    override val scope: CoroutineScope,
     address: InetSocketAddress,
-    private val logger: Logger,
-    private val actionHandler: ActionHandler,
+    override val logger: Logger,
+    override val actionHandler: ActionHandler,
     private val token: String
-) : WebSocketServer(address) {
-    private var eventBus: EventBus? = null
+) : WebSocketServer(address), IAdapter {
     private var bot: Bot? = null
     val def = CompletableDeferred<Bot>()
-
-    fun createEventBus(): EventBus {
-        return if (eventBus != null) eventBus!! else EventBus().also { eventBus = it }
-    }
 
     override fun onStart() {
         logger.info("▌ 反向 WebSocket 服务端已在 $address 启动")
@@ -76,25 +64,7 @@ class WSServer(
         }).conn = conn
     }
 
-    override fun onMessage(conn: WebSocket, message: String) {
-        try {
-            val jsonObject = JsonsObject(message)
-            if (HEART_BEAT != jsonObject.optString(META_EVENT)) { //过滤心跳
-                logger.debug("Client received <-- {}", jsonObject.toString())
-                if (jsonObject.has(API_RESULT_KEY)) {
-                    actionHandler.onReceiveActionResp(jsonObject) //请求执行
-                } else {
-                    scope.launch {
-                        mutex.withLock {
-                            eventBus?.onReceive(message)
-                        }
-                    }
-                }
-            }
-        } catch (e: JsonSyntaxException) {
-            logger.error("Json语法错误: {}", message)
-        }
-    }
+    override fun onMessage(conn: WebSocket, message: String) = onReceiveMessage(message)
 
     override fun onClose(conn: WebSocket, code: Int, reason: String, remote: Boolean) {
         logger.info(
@@ -102,10 +72,7 @@ class WSServer(
             reason.ifEmpty { "未知原因" },
             CloseCode.valueOf(code) ?: code
         )
-        runCatching {
-            if (mutex.isLocked) mutex.unlock()
-            if (ActionSendUtils.mutex.isLocked) ActionSendUtils.mutex.unlock()
-        }
+        unlockMutex()
     }
 
     override fun onError(conn: WebSocket, ex: Exception) {
@@ -113,11 +80,6 @@ class WSServer(
     }
 
     companion object {
-        private const val META_EVENT = "meta_event_type"
-        private const val API_RESULT_KEY = "echo"
-        private const val HEART_BEAT = "heartbeat"
-
-        val mutex = Mutex()
         suspend fun createAndWaitConnect(scope: CoroutineScope, address: InetSocketAddress, logger: Logger, actionHandler: ActionHandler, token: String): Pair<WSServer, Bot> {
             val ws = WSServer(scope, address, logger, actionHandler, token)
             ws.start()

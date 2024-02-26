@@ -15,21 +15,20 @@ import java.util.concurrent.ConcurrentHashMap
  * Description:
  */
 @Suppress("unused")
-class EventBus {
-
+object EventBus {
+    private val log = LoggerFactory.getLogger(EventBus::class.java)
     //存储监听器对象
-    private val eventlistenerlist: MutableList<EventListener<out Event>> = ArrayList()
-
+    private val listeners: MutableList<EventListener<out Event>> = ArrayList()
     //缓存类型与监听器的关系
     private val cache: MutableMap<Class<out Event>, List<EventListener<out Event>>> = ConcurrentHashMap()
 
     fun addListener(listener: EventListener<out Event>) {
-        eventlistenerlist.add(listener)
+        listeners.add(listener)
     }
 
     fun stop() {
         cache.clear()
-        eventlistenerlist.clear()
+        listeners.clear()
     }
 
     /**
@@ -63,7 +62,7 @@ class EventBus {
      */
     private fun getMethod(messageType: Class<out Event>): List<EventListener<out Event>> {
         val eventListeners: MutableList<EventListener<out Event>> = ArrayList()
-        for (eventListener in eventlistenerlist) {
+        for (eventListener in listeners) {
             try {
                 if (eventListener.javaClass.declaredMethods.none {
                         it.name == "onMessage" && it.parameterTypes.any { par -> messageType == par }
@@ -78,16 +77,12 @@ class EventBus {
     }
 
     val listenerList: List<EventListener<out Event>>
-        get() = eventlistenerlist
+        get() = listeners
 
     /**
      * 清除类型缓存
      */
     fun cleanCache() {
         cache.clear()
-    }
-
-    companion object {
-        private val log = LoggerFactory.getLogger(EventBus::class.java)
     }
 }

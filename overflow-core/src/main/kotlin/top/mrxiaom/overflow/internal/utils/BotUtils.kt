@@ -1,5 +1,6 @@
 package top.mrxiaom.overflow.internal.utils
 
+import cn.evole.onebot.sdk.event.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer
@@ -8,11 +9,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.utils.CheckableResponseA
 import net.mamoe.mirai.utils.JsonStruct
 import net.mamoe.mirai.utils.loadAs
 import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import java.net.HttpURLConnection
 import java.net.URL
@@ -96,3 +99,6 @@ internal suspend inline fun <reified T : Any> BotWrapper.queryProfile(
         Overflow.logger.warning("获取用户 $targetId 的资料卡时出现一个异常", it)
     }.getOrNull()
 }
+
+internal val Event.bot: BotWrapper?
+    get() = Bot.getInstanceOrNull(selfId)?.asOnebot

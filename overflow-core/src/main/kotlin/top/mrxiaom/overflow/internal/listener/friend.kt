@@ -13,25 +13,25 @@ import net.mamoe.mirai.event.events.NewFriendRequestEvent
 import net.mamoe.mirai.event.events.StrangerMessageEvent
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
-import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
+import top.mrxiaom.overflow.internal.utils.bot
 import top.mrxiaom.overflow.internal.utils.queryProfile
 import top.mrxiaom.overflow.internal.utils.wrapAsFriend
 import top.mrxiaom.overflow.internal.utils.wrapAsStranger
 
-internal fun EventBus.addFriendListeners(bot: BotWrapper) {
+internal fun EventBus.addFriendListeners() {
     listOf(
-        FriendMessageListener(bot),
-        FriendAddRequestListener(bot),
-        FriendMessageRecallListener(bot),
+        FriendMessageListener(),
+        FriendAddRequestListener(),
+        FriendMessageRecallListener(),
+
     ).forEach(::addListener)
 }
 
-internal class FriendMessageListener(
-    val bot: BotWrapper
-) : EventListener<PrivateMessageEvent> {
+internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
     override suspend fun onMessage(e: PrivateMessageEvent) {
+        val bot = e.bot ?: return
         when (e.subType) {
             "friend" -> {
                 val friend = e.privateSender.wrapAsFriend(bot)
@@ -89,10 +89,9 @@ internal class FriendMessageListener(
     }
 }
 
-internal class FriendAddRequestListener(
-    val bot: BotWrapper
-): EventListener<FriendAddRequestEvent> {
+internal class FriendAddRequestListener : EventListener<FriendAddRequestEvent> {
     override suspend fun onMessage(e: FriendAddRequestEvent) {
+        val bot = e.bot ?: return
         bot.eventDispatcher.broadcastAsync(NewFriendRequestEvent(
             bot = bot,
             eventId = Overflow.instance.putNewFriendRequestFlag(e.flag),
@@ -104,10 +103,9 @@ internal class FriendAddRequestListener(
     }
 }
 
-internal class FriendMessageRecallListener(
-    val bot: BotWrapper
-): EventListener<PrivateMsgDeleteNoticeEvent> {
+internal class FriendMessageRecallListener : EventListener<PrivateMsgDeleteNoticeEvent> {
     override suspend fun onMessage(e: PrivateMsgDeleteNoticeEvent) {
+        val bot = e.bot ?: return
         val operatorId = e.operatorId.takeIf { it > 0 } ?: e.userId
         val friend = bot.getFriend(e.userId) ?: throw IllegalStateException("无法找到好友 ${e.userId}")
         bot.eventDispatcher.broadcastAsync(

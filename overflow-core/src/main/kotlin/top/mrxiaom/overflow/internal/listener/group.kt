@@ -13,29 +13,28 @@ import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
-import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
+import top.mrxiaom.overflow.internal.utils.bot
 import top.mrxiaom.overflow.internal.utils.group
 import top.mrxiaom.overflow.internal.utils.queryProfile
 import top.mrxiaom.overflow.internal.utils.wrapAsMember
 
-internal fun EventBus.addGroupListeners(bot: BotWrapper) {
+internal fun EventBus.addGroupListeners() {
     listOf(
-        GroupMessageListener(bot),
-        GroupNotifyListener(bot),
-        GroupMessageRecallListener(bot),
-        GroupAddRequestListener(bot),
-        GroupTitleChangeNoticeListener(bot),
-        GroupBanNoticeListener(bot),
+        GroupMessageListener(),
+        GroupNotifyListener(),
+        GroupMessageRecallListener(),
+        GroupAddRequestListener(),
+        GroupTitleChangeNoticeListener(),
+        GroupBanNoticeListener(),
 
     ).forEach(::addListener)
 }
 
-internal class GroupMessageListener(
-    val bot: BotWrapper
-) : EventListener<GroupMessageEvent> {
+internal class GroupMessageListener : EventListener<GroupMessageEvent> {
     override suspend fun onMessage(e: GroupMessageEvent) {
+        val bot = e.bot ?: return
         when(e.subType) {
             "normal" -> {
                 val group = bot.group(e.groupId)
@@ -93,10 +92,9 @@ internal class GroupMessageListener(
     }
 }
 
-internal class GroupNotifyListener(
-    val bot: BotWrapper
-) : EventListener<GroupNotifyNoticeEvent> {
+internal class GroupNotifyListener : EventListener<GroupNotifyNoticeEvent> {
     override suspend fun onMessage(e: GroupNotifyNoticeEvent) {
+        val bot = e.bot ?: return
         val group = bot.group(e.groupId)
         when (e.subType) {
             "poke" -> {
@@ -109,10 +107,9 @@ internal class GroupNotifyListener(
     }
 }
 
-internal class GroupMessageRecallListener(
-    val bot: BotWrapper
-): EventListener<GroupMsgDeleteNoticeEvent> {
+internal class GroupMessageRecallListener : EventListener<GroupMsgDeleteNoticeEvent> {
     override suspend fun onMessage(e: GroupMsgDeleteNoticeEvent) {
+        val bot = e.bot ?: return
         val group = bot.group(e.groupId)
         val operator = group.queryMember(e.operatorId)
         val target = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
@@ -127,10 +124,9 @@ internal class GroupMessageRecallListener(
     }
 }
 
-internal class GroupAddRequestListener(
-    val bot: BotWrapper
-): EventListener<GroupAddRequestEvent> {
+internal class GroupAddRequestListener : EventListener<GroupAddRequestEvent> {
     override suspend fun onMessage(e: GroupAddRequestEvent) {
+        val bot = e.bot ?: return
         when (e.subType) {
             "add" -> { // 某人申请入群
                 bot.eventDispatcher.broadcastAsync(MemberJoinRequestEvent(
@@ -158,10 +154,9 @@ internal class GroupAddRequestListener(
     }
 }
 
-internal class GroupTitleChangeNoticeListener(
-    val bot: BotWrapper
-): EventListener<GroupTitleChangeNoticeEvent> {
+internal class GroupTitleChangeNoticeListener : EventListener<GroupTitleChangeNoticeEvent> {
     override suspend fun onMessage(e: GroupTitleChangeNoticeEvent) {
+        val bot = e.bot ?: return
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
         MemberSpecialTitleChangeEvent(
@@ -173,10 +168,9 @@ internal class GroupTitleChangeNoticeListener(
     }
 }
 
-internal class GroupBanNoticeListener(
-    val bot: BotWrapper
-): EventListener<GroupBanNoticeEvent> {
+internal class GroupBanNoticeListener : EventListener<GroupBanNoticeEvent> {
     override suspend fun onMessage(e: GroupBanNoticeEvent) {
+        val bot = e.bot ?: return
         val mute = when(e.subType) {
             "ban" -> true
             "lift_ban" -> false
@@ -229,5 +223,4 @@ internal class GroupBanNoticeListener(
             }
         }
     }
-
 }

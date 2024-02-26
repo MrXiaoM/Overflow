@@ -64,9 +64,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override val BotFactory: BotFactory
         get() = BotFactoryImpl
     override var FileCacheStrategy: FileCacheStrategy = net.mamoe.mirai.utils.FileCacheStrategy.PlatformDefault
-    internal val newFriendRequestFlagMap = mutableMapOf<Long, String>()
-    internal val newMemberJoinRequestFlagMap = mutableMapOf<Long, String>()
-    internal val newInviteJoinGroupRequestFlagMap = mutableMapOf<Long, String>()
+    private val newFriendRequestFlagMap = mutableMapOf<Long, String>()
+    private val newMemberJoinRequestFlagMap = mutableMapOf<Long, String>()
+    private val newInviteJoinGroupRequestFlagMap = mutableMapOf<Long, String>()
     private var miraiConsoleFlag: Boolean = false
     val startupTime = System.currentTimeMillis()
     val miraiConsole: Boolean
@@ -132,6 +132,11 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             injectMiraiConsole()
         } catch (ignored: ClassNotFoundException) {
         }
+        EventBus.apply {
+            addGroupListeners()
+            addFriendListeners()
+            addGuildListeners()
+        }
     }
 
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
@@ -180,7 +185,6 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
 
         val service = ConnectFactory.create(botConfig, logger)
-        val dispatchers: EventBus
         val botImpl: cn.evolvefield.onebot.client.core.Bot
         if (reversed) {
             val ws = service.createWebsocketServerAndWaitConnect(this)
@@ -191,7 +195,6 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 }
                 return null
             }
-            dispatchers = ws.first.createEventBus()
             botImpl = ws.second
         } else {
             val ws = service.createWebsocketClient(this)
@@ -203,7 +206,6 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 }
                 return null
             }
-            dispatchers = ws.createEventBus()
             botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
         }
         val versionInfo = botImpl.getVersionInfo()
@@ -222,11 +224,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
         val bot = botImpl.wrap()
 
-        dispatchers.addGroupListeners(bot)
-        dispatchers.addFriendListeners(bot)
-        dispatchers.addGuildListeners(bot)
-        
-        return bot.also { it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot)) }
+        return bot.also {
+            it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot))
+        }
     }
 
     override val botStarter: IBotStarter = object : IBotStarter {
