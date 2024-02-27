@@ -20,13 +20,13 @@ import top.mrxiaom.overflow.internal.utils.queryProfile
 import top.mrxiaom.overflow.internal.utils.wrapAsFriend
 import top.mrxiaom.overflow.internal.utils.wrapAsStranger
 
-internal fun EventBus.addFriendListeners() {
+internal fun addFriendListeners() {
     listOf(
         FriendMessageListener(),
         FriendAddRequestListener(),
         FriendMessageRecallListener(),
 
-    ).forEach(::addListener)
+    ).forEach(EventBus::addListener)
 }
 
 internal class FriendMessageListener : EventListener<PrivateMessageEvent> {

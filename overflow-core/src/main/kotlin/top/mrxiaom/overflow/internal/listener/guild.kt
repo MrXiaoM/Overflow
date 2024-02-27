@@ -10,11 +10,11 @@ import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.utils.bot
 
-internal fun EventBus.addGuildListeners() {
+internal fun addGuildListeners() {
     listOf(
         GuildMessageListener(),
 
-    ).forEach(::addListener)
+    ).forEach(EventBus::addListener)
 }
 
 internal class GuildMessageListener : EventListener<GuildMessageEvent> {

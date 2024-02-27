@@ -20,6 +20,7 @@ import top.mrxiaom.overflow.internal.contact.BotWrapper
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
+import kotlin.reflect.jvm.jvmName
 
 
 internal val defaultJson: Json = Json {
@@ -101,4 +102,10 @@ internal suspend inline fun <reified T : Any> BotWrapper.queryProfile(
 }
 
 internal val Event.bot: BotWrapper?
-    get() = Bot.getInstanceOrNull(selfId)?.asOnebot
+    get() {
+        val botWrapper = Bot.getInstanceOrNull(selfId)?.asOnebot
+        if (botWrapper == null) {
+            Overflow.logger.warning("接收到的 ${this::class.jvmName} 事件中，selfId = $selfId，无法从已登录的机器人列表中找到该机器人。")
+        }
+        return botWrapper
+    }

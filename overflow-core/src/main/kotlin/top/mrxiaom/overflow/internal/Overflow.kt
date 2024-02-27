@@ -120,6 +120,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     init {
         _instance = this
+        addGroupListeners()
+        addFriendListeners()
+        addGuildListeners()
+
         // 暂定禁止 mirai-console 的终端用户须知，它可能已不适用于 Overflow
         try {
             Class.forName("net.mamoe.mirai.console.enduserreadme.EndUserReadme")
@@ -131,11 +135,6 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             miraiConsoleFlag = true
             injectMiraiConsole()
         } catch (ignored: ClassNotFoundException) {
-        }
-        EventBus.apply {
-            addGroupListeners()
-            addFriendListeners()
-            addGuildListeners()
         }
     }
 
@@ -189,21 +188,16 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         if (reversed) {
             val ws = service.createWebsocketServerAndWaitConnect(this)
             if (ws == null) {
-                if (printInfo) {
-                    logger.error("未连接到 Onebot")
-                    if (miraiConsole && !isNotExit) exitProcess(1)
-                }
+                if (printInfo) logger.error("未连接到 Onebot")
+                if (miraiConsole && !isNotExit) exitProcess(1)
                 return null
             }
             botImpl = ws.second
         } else {
             val ws = service.createWebsocketClient(this)
             if (ws == null) {
-                if (printInfo) {
-                    logger.error("未连接到 Onebot")
-                    if (miraiConsole && !isNotExit) exitProcess(1)
-
-                }
+                if (printInfo) logger.error("未连接到 Onebot")
+                if (miraiConsole && !isNotExit) exitProcess(1)
                 return null
             }
             botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }

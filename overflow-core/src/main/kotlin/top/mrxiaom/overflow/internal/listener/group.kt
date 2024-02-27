@@ -20,7 +20,7 @@ import top.mrxiaom.overflow.internal.utils.group
 import top.mrxiaom.overflow.internal.utils.queryProfile
 import top.mrxiaom.overflow.internal.utils.wrapAsMember
 
-internal fun EventBus.addGroupListeners() {
+internal fun addGroupListeners() {
     listOf(
         GroupMessageListener(),
         GroupNotifyListener(),
@@ -29,7 +29,7 @@ internal fun EventBus.addGroupListeners() {
         GroupTitleChangeNoticeListener(),
         GroupBanNoticeListener(),
 
-    ).forEach(::addListener)
+    ).forEach(EventBus::addListener)
 }
 
 internal class GroupMessageListener : EventListener<GroupMessageEvent> {
