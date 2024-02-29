@@ -3,6 +3,7 @@
 
 package top.mrxiaom.overflow.internal.plugin
 
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleImplementation
@@ -20,6 +21,7 @@ import net.mamoe.mirai.console.plugin.version
 import net.mamoe.mirai.console.util.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import top.mrxiaom.overflow.BuildConstants
+import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import java.lang.management.ManagementFactory
@@ -135,10 +137,15 @@ internal object BuiltInCommands {
                     }
                 )
                 reset().append("\n")
-                append("Onebot 实现信息: ")
-                green().append(OnebotMessages.appName).reset().append(" v")
-                gold().append(OnebotMessages.appVersion).reset().append(".\n\n")
-
+                append("Onebot 实现信息: \n")
+                Bot.instances.map { it.asRemoteBot }.map {
+                    reset().append("  - ").lightBlue().append((it as Bot).id).reset().append(": ")
+                    green().append(it.appName).reset().append(" v")
+                    gold().append(it.appVersion).reset().append(".\n")
+                }.takeIf { it.isNotEmpty() } ?: run {
+                    lightRed().append("  (未登录)").reset().append("\n")
+                }
+                append("\n")
                 append("插件列表 (${MiraiConsole.pluginManagerImpl.resolvedPlugins.size - 2}): ")
 
                 val resolvedPlugins = MiraiConsole.pluginManagerImpl.resolvedPlugins.asSequence()

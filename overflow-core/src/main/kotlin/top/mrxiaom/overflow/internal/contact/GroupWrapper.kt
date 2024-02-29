@@ -20,6 +20,7 @@ import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
+import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.contact.RemoteGroup
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.contact.data.*
@@ -167,7 +168,7 @@ internal class GroupWrapper(
             val messageIds = if (forward != null) {
                 OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
             } else {
-                val msg = OnebotMessages.serializeToOneBotJson(messageChain)
+                val msg = Overflow.serializeMessage(bot, messageChain)
                 val response = bot.impl.sendGroupMsg(id, msg, false)
                 response.data.safeMessageIds
             }

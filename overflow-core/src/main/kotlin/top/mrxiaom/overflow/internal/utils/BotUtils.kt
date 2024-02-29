@@ -14,6 +14,7 @@ import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.utils.CheckableResponseA
 import net.mamoe.mirai.utils.JsonStruct
 import net.mamoe.mirai.utils.loadAs
+import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.contact.BotWrapper
@@ -97,7 +98,7 @@ internal suspend inline fun <reified T : Any> BotWrapper.queryProfile(
     return runCatching {
         Overflow.instance.queryProfile(this, targetId).block()
     }.onFailure {
-        Overflow.logger.warning("获取用户 $targetId 的资料卡时出现一个异常", it)
+        OverflowAPI.logger.warning("获取用户 $targetId 的资料卡时出现一个异常", it)
     }.getOrNull()
 }
 
@@ -105,7 +106,7 @@ internal val Event.bot: BotWrapper?
     get() {
         val botWrapper = Bot.getInstanceOrNull(selfId)?.asOnebot
         if (botWrapper == null) {
-            Overflow.logger.warning("接收到的 ${this::class.jvmName} 事件中，selfId = $selfId，无法从已登录的机器人列表中找到该机器人。")
+            OverflowAPI.logger.warning("接收到的 ${this::class.jvmName} 事件中，selfId = $selfId，无法从已登录的机器人列表中找到该机器人。")
         }
         return botWrapper
     }

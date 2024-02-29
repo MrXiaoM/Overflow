@@ -20,6 +20,8 @@ import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.utils.weeksToMillis
 import org.java_websocket.client.WebSocketClient
+import top.mrxiaom.overflow.OverflowAPI
+import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.OnebotMessages
@@ -66,7 +68,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 val backup = File(configFolder, "Console/AutoLogin.yml.overflow.${System.currentTimeMillis()}.old")
                 file.copyTo(backup)
                 accounts.clear()
-                Overflow.logger.warning("由于 mirai 端不再需要处理登录，Overflow 已清空自动登录配置，旧配置已备份到 ${backup.name}")
+                OverflowAPI.logger.warning("由于 mirai 端不再需要处理登录，Overflow 已清空自动登录配置，旧配置已备份到 ${backup.name}")
             }
         }
         val unregisterCommands = arrayOf("login", "autoLogin", "status")
@@ -83,6 +85,22 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             primaryName = "overflow",
             secondaryNames = arrayOf(),
         ) {
+
+            @SubCommand
+            @Description("查看在线 Bot 列表")
+            suspend fun CommandSender.bots() {
+                sendMessage(Bot.instances.joinToString { it.id.toString() })
+            }
+            @SubCommand
+            @Description("查看 Bot")
+            suspend fun CommandSender.bot(id: Long) {
+                val bot = Bot.findInstance(id)
+                if (bot == null) {
+                    sendMessage("bot 不存在")
+                    return
+                }
+                sendMessage("id=${bot.id}, nick=${bot.nick}")
+            }
             @SubCommand
             @Description("重新连接 Onebot")
             suspend fun CommandSender.reconnect() {
@@ -106,7 +124,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                     sendMessage("找不到群 $groupId")
                 }
                 // TODO: 用更简洁的方法反序列化消息
-                val messageChain = OnebotMessages.deserializeFromOneBot(bot, message.joinToString(" "))
+                val messageChain = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, message.joinToString(" "))
                 group.sendMessage(messageChain)
                 sendMessage("消息发送成功")
             }
@@ -123,7 +141,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                     sendMessage("找不到好友 $friendId")
                 }
                 // TODO: 用更简洁的方法反序列化消息
-                val messageChain = OnebotMessages.deserializeFromOneBot(bot, message.joinToString(" "))
+                val messageChain = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, message.joinToString(" "))
                 friend.sendMessage(messageChain)
                 sendMessage("消息发送成功")
             }
@@ -134,7 +152,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     @Suppress("DEPRECATION_ERROR")
     private fun onPostStartup() {
         net.mamoe.mirai.internal.spi.EncryptService.factory?.also {
-            Overflow.logger.apply {
+            OverflowAPI.logger.apply {
                 warning("-------------------------------------------")
                 warning("你的 mirai-console 中已安装签名服务!")
                 warning("这在 overflow 中是不必要的，请移除签名服务相关插件")

@@ -15,6 +15,8 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
+import top.mrxiaom.overflow.Overflow
+import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
@@ -36,7 +38,7 @@ internal class FriendWrapper(
     override var remark: String
         get() = impl.remark
         set(_) {
-            Overflow.logger.warning("Onebot 未提供修改好友备注接口 ($id)")
+            OverflowAPI.logger.warning("Onebot 未提供修改好友备注接口 ($id)")
         }
     override val roamingMessages: RoamingMessages
         get() = throw NotImplementedError("Onebot 未提供消息漫游接口")
@@ -57,7 +59,7 @@ internal class FriendWrapper(
             val messageIds = if (forward != null) {
                 OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
             } else {
-                val msg = OnebotMessages.serializeToOneBotJson(messageChain)
+                val msg = Overflow.serializeMessage(bot, messageChain)
                 val response = bot.impl.sendPrivateMsg(id, msg, false)
                 response.data.safeMessageIds
             }

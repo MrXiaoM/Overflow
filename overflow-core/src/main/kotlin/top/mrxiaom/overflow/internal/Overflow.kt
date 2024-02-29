@@ -30,7 +30,9 @@ import top.mrxiaom.overflow.BotBuilder
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.IBotStarter
 import top.mrxiaom.overflow.OverflowAPI
+import top.mrxiaom.overflow.OverflowAPI.Companion.logger
 import top.mrxiaom.overflow.contact.RemoteBot
+import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
@@ -50,11 +52,13 @@ import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
 
+internal val OverflowAPI.scope: CoroutineScope
+    get() = this as Overflow
 internal val Bot.asOnebot: BotWrapper
     get() = this as? BotWrapper ?: throw IllegalStateException("Bot 非 Overflow 实现")
 internal fun ActionRaw.check(failMsg: String): Boolean {
     if (retCode != 0) {
-        Overflow.logger.warning("$failMsg, status=$status, retCode=$retCode, echo=$echo")
+        logger.warning("$failMsg, status=$status, retCode=$retCode, echo=$echo")
     }
     return retCode == 0
 }
@@ -100,7 +104,6 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     companion object {
         private lateinit var _instance: Overflow
-        val logger = MiraiLogger.Factory.create(Overflow::class, "溢出核心")
         @JvmStatic
         fun setup() {
             @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
@@ -200,12 +203,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 if (miraiConsole && !isNotExit) exitProcess(1)
                 return null
             }
-            botImpl = ws.createBot().also { BotFactoryImpl.internalBot = it }
+            botImpl = ws.createBot()
         }
-        val versionInfo = botImpl.getVersionInfo()
-        val data = versionInfo.optJSONObject("data")
-        OnebotMessages.appName = (data.get("app_name")?.asString ?: "onebot").trim()
-        OnebotMessages.appVersion = (data.get("app_version")?.asString ?: "Unknown").trim()
         if (!botImpl.channel.isOpen) {
             if (printInfo) {
                 logger.error("未连接到 Onebot")
@@ -213,10 +212,14 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             }
             return null
         }
+        val versionInfo = botImpl.getVersionInfo()
+        val data = versionInfo.optJSONObject("data")
+        val appName = (data.get("app_name")?.asString ?: "onebot").trim()
+        val appVersion = (data.get("app_version")?.asString ?: "Unknown").trim()
         if (printInfo) {
             logger.info("服务端版本信息\n${versionInfo.toPrettyString()}")
         }
-        val bot = botImpl.wrap()
+        val bot = botImpl.wrap(appName, appVersion)
 
         return bot.also {
             it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot))
@@ -253,11 +256,11 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override fun imageFromFile(file: String): Image = OnebotMessages.imageFromFile(file)
     override fun audioFromFile(file: String): Audio = OnebotMessages.audioFromFile(file)
     override fun videoFromFile(file: String): ShortVideo = OnebotMessages.videoFromFile(file)
-    override fun serializeMessage(message: Message): String = OnebotMessages.serializeToOneBotJson(message)
+    override fun serializeMessage(bot: RemoteBot?, message: Message): String = OnebotMessages.serializeToOneBotJson(bot, message)
     @JvmBlockingBridge
-    override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain = OnebotMessages.deserializeFromOneBot(bot, message, null)
+    override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, message, null)
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
-        if (OnebotMessages.appName == "shamrock") {
+        if (bot.asOnebot.appName == "shamrock") {
             val data = bot.asOnebot.impl.getUserInfo(targetId, false).data
                 ?: throw IllegalStateException("Can not fetch profile card.")
             val strangerInfo = bot.asOnebot.impl.getStrangerInfo(targetId, false).data
@@ -332,7 +335,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     override suspend fun downloadForwardMessage(bot: Bot, resourceId: String): List<ForwardMessage.Node> {
         return bot.asOnebot.impl.getForwardMsg(resourceId).data.message.map {
-            val msg = OnebotMessages.deserializeFromOneBot(bot, it.message)
+            val msg = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, it.message)
             ForwardMessage.Node(it.sender.userId, it.time, it.sender.nickname ?: "QQ用户", msg)
         }
     }

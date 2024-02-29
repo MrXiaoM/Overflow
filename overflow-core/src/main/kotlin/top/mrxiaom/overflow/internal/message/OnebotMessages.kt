@@ -1,6 +1,5 @@
 package top.mrxiaom.overflow.internal.message
 
-import cn.evole.onebot.sdk.Data
 import cn.evole.onebot.sdk.entity.MsgId
 import com.google.gson.JsonParser
 import kotlinx.serialization.encodeToString
@@ -15,7 +14,9 @@ import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
+import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.internal.asOnebot
+import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.data.*
 import top.mrxiaom.overflow.message.data.*
 
@@ -23,12 +24,6 @@ import top.mrxiaom.overflow.message.data.*
  * Json 数组消息 (Onebot) 与 [MessageChain] (mirai) 的序列化与反序列化
  */
 internal object OnebotMessages {
-    internal var appName = "onebot"
-        set(value) {
-            field = value
-            Data.appName = value
-        }
-    internal var appVersion = "Unknown"
     @OptIn(MiraiExperimentalApi::class)
     internal fun registerSerializers() = MessageSerializers.apply {
         registerSerializer(At::class, At.serializer())
@@ -62,24 +57,25 @@ internal object OnebotMessages {
     /**
      * @see serializeToOneBotJsonArray
      */
-    internal fun serializeToOneBotJson(message: Message): String {
-        return Json.encodeToString(serializeToOneBotJsonArray(message))
+    internal fun serializeToOneBotJson(bot: RemoteBot?, message: Message): String {
+        return Json.encodeToString(serializeToOneBotJsonArray(bot, message))
     }
 
     /**
      * 将 mirai 消息序列化为 json 数组消息
      *
+     * @param bot 机器人实例，用于获取当前 Onebot 实现名称以兼容各个实现
      * @param message mirai 消息，不支持转发消息
      */
     @OptIn(MiraiExperimentalApi::class)
-    internal fun serializeToOneBotJsonArray(message: Message): JsonArray {
+    internal fun serializeToOneBotJsonArray(bot: RemoteBot?, message: Message): JsonArray {
         val messageChain = (message as? MessageChain) ?: listOf(message)
         return buildJsonArray {
-            val app = appName.lowercase()
+            val app = (bot?.appName ?: "Onebot").lowercase()
 
             for (single in messageChain) {
                 addJsonObject {
-                    put("type", single.messageType)
+                    put("type", single.messageType(bot))
                     putJsonObject("data") {
                         when (single) {
                             is PlainText -> put("text", single.content)
@@ -178,8 +174,8 @@ internal object OnebotMessages {
 
     internal suspend fun sendForwardMessage(contact: Contact, forward: ForwardMessage): MsgId? {
         val bot = contact.bot.asOnebot
-        val nodes = serializeForwardNodes(forward.nodeList)
-        when (appName.lowercase()) {
+        val nodes = serializeForwardNodes(bot, forward.nodeList)
+        when (bot.appName.lowercase()) {
             "lagrange.onebot" -> {
                 val resId = bot.impl.sendForwardMsgLagrange(nodes).data
                 if (resId != null) {
@@ -210,11 +206,15 @@ internal object OnebotMessages {
 
     /**
      * 将转发消息节点转换为可供 Onebot 发送的列表
+     *
+     * @param bot 机器人实例，用于获取当前 Onebot 实现名称以兼容各个实现
+     * @param nodeList mirai 转发消息节点
      */
-    internal fun serializeForwardNodes(nodeList: List<ForwardMessage.Node>): List<Map<String, Any>> {
+    internal fun serializeForwardNodes(bot: RemoteBot, nodeList: List<ForwardMessage.Node>): List<Map<String, Any>> {
+        val appName = bot.appName.lowercase()
         return nodeList.map {
-            val message = JsonParser.parseString(serializeToOneBotJson(it.messageChain))
-            when (appName.lowercase()) {
+            val message = JsonParser.parseString(serializeToOneBotJson(bot, it.messageChain))
+            when (appName) {
                 "shamrock", "go-cqhttp", "lagrange.onebot" -> mutableMapOf(
                     "type" to "node",
                     "data" to mutableMapOf(
@@ -243,7 +243,7 @@ internal object OnebotMessages {
      * @param message 消息内容，应为 json 数组消息，若 json 反序列化失败，将会返回为纯文本消息作为 fallback
      * @param source 消息源
      */
-    internal suspend fun deserializeFromOneBot(bot: Bot, message: String, source: MessageSource? = null): MessageChain {
+    internal suspend fun deserializeFromOneBot(bot: RemoteBot, message: String, source: MessageSource? = null): MessageChain {
         return kotlin.runCatching { Json.parseToJsonElement(message).jsonArray }
             .map { deserializeFromOneBotJson(bot, it, source) }.getOrNull() ?: kotlin.run {
                 source?.plus(message) ?: PlainText(message).toMessageChain()
@@ -256,11 +256,11 @@ internal object OnebotMessages {
      * @see deserializeFromOneBot
      */
     @OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
-    internal suspend fun deserializeFromOneBotJson(bot: Bot, json: JsonArray, source: MessageSource? = null): MessageChain {
+    internal suspend fun deserializeFromOneBotJson(bot: RemoteBot, json: JsonArray, source: MessageSource? = null): MessageChain {
         return buildMessageChain {
             if (source != null) add(source)
 
-            val app = appName.lowercase()
+            val app = bot.appName.lowercase()
             for (o in json) {
                 val obj = o.jsonObject
                 val type = obj["type"].string
@@ -312,7 +312,7 @@ internal object OnebotMessages {
                     "forward" -> {
                         val id = data["id"].string
                         if (id.isNotEmpty()) {
-                            val nodes = Mirai.downloadForwardMessage(bot, id)
+                            val nodes = Mirai.downloadForwardMessage(bot as Bot, id)
                             val raw = RawForwardMessage(nodes)
                             add(raw.render(ForwardMessage.DisplayStrategy))
                         }
@@ -328,7 +328,7 @@ internal object OnebotMessages {
                             app.contains("lagrange") -> data["id"].string.toUInt().toInt()
                             else -> data["id"].string.toInt()
                         }
-                        val msgData = bot.asOnebot.impl.getMsg(id).data
+                        val msgData = (bot as BotWrapper).impl.getMsg(id).data
                         val msgSource = MessageSourceBuilder()
                             .id(id)
                             .internalId(id)
@@ -412,8 +412,9 @@ internal object OnebotMessages {
         }
     }
 
-    private val Message.messageType: String
-        get() = when(this) {
+    private fun Message.messageType(bot: RemoteBot?): String {
+        val appName = (bot?.appName ?: "Onebot").lowercase()
+        return when (this) {
             is PlainText -> "text"
             is Face -> "face"
             is Image -> "image"
@@ -424,11 +425,12 @@ internal object OnebotMessages {
             is AtAll -> "at"
             is RockPaperScissors -> "rps"
             is Dice -> {
-                when (appName.lowercase()) {
+                when (appName) {
                     "shamrock" -> "new_dice"
                     else -> "dice"
                 }
             }
+
             is PokeMessage -> "poke"
             //is ServiceMessage -> "share"
             // 推荐好友/推荐群 contact
@@ -445,6 +447,7 @@ internal object OnebotMessages {
             is InlineKeyboard -> "inline_keyboard"
             else -> "text"
         }
+    }
     internal fun imageFromFile(file: String): Image = Image.fromId(file)
     internal fun audioFromFile(file: String): Audio = WrappedAudio(file, 0)
     internal fun videoFromFile(file: String): ShortVideo = WrappedVideo(file)

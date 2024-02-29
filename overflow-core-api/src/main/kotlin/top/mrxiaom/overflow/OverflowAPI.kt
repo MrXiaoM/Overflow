@@ -5,7 +5,11 @@ import net.mamoe.mirai.Bot
 import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.utils.MiraiLogger
+import top.mrxiaom.overflow.contact.RemoteBot
 
+val Overflow: OverflowAPI
+    get() = OverflowAPI.get()
 interface OverflowAPI {
     val botStarter: IBotStarter
     /**
@@ -30,7 +34,17 @@ interface OverflowAPI {
     /**
      * 序列化 mirai 格式消息为 Onebot 格式 json 数组消息
      */
-    fun serializeMessage(message: Message): String
+    @Deprecated(
+        message = "Please use serializeMessage(bot, message)",
+        ReplaceWith("serializeMessage(bot, message)")
+    )
+    fun serializeMessage(message: Message): String = serializeMessage(null, message)
+
+    /**
+     * 序列化 mirai 格式消息为 Onebot 格式 json 数组消息
+     */
+    fun serializeMessage(bot: RemoteBot?, message: Message): String
+
     /**
      * 反序列化 Onebot 格式 json 数组消息为 mirai 格式消息
      */
@@ -38,6 +52,7 @@ interface OverflowAPI {
     suspend fun deserializeMessage(bot: Bot, message: String): MessageChain
 
     companion object {
+        public val logger = MiraiLogger.Factory.create(OverflowAPI::class, "Overflow")
         @JvmStatic
         fun get(): OverflowAPI = Mirai as OverflowAPI
     }

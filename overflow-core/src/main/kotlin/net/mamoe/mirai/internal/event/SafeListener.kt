@@ -15,6 +15,7 @@ import net.mamoe.mirai.event.*
 import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.systemProp
+import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import kotlin.coroutines.CoroutineContext
 
@@ -62,6 +63,8 @@ internal class SafeListener<in E : Event> internal constructor(
             val subscriberExceptionHandler = subscriberContext[CoroutineExceptionHandler]
             if (subscriberExceptionHandler == null) {
                 val logger = if (event is BotEvent) event.bot.logger else logger
+                val appName = if (event is BotEvent) event.bot.asRemoteBot.appName else "Onebot"
+                val appVersion = if (event is BotEvent) event.bot.asRemoteBot.appVersion else "Unknown"
                 val subscriberName =
                     subscriberContext[CoroutineName]?.name
                         ?: "<unnamed>" // Bot 协程域有 CoroutineName, mirai-console 也会给插件域加入.
@@ -70,7 +73,7 @@ internal class SafeListener<in E : Event> internal constructor(
                     "An exception occurred when processing event. " +
                             "Subscriber scope: '$subscriberName'. " +
                             "Broadcaster scope: '$broadcasterName'. " +
-                            "Onebot implementation: '${OnebotMessages.appName} v${OnebotMessages.appVersion}'"
+                            "Onebot implementation: '$appName v$appVersion'"
                 logger.warning(message, e)
 
             } else {

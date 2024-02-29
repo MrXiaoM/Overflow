@@ -42,7 +42,7 @@ overflow-core 附有 mirai-console 兼容，在 IMirai 实现类 [Overflow](/ove
 
 ## 兼容其它 Onebot 实现
 
-在连接成功后，Overflow 将会请求 `get_version_info`，并将 `app_name` 保存到 [OnebotMessages](/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/message/OnebotMessages.kt).appName 中，如果有原版 Onebot 标准中没有的额外接口实现，可以判断 appName 再调取该接口，以兼容尽可能多的 Onebot 实现。
+在连接成功后，Overflow 将会请求 `get_version_info`，并将 `app_name` 保存到 [RemoteBot](/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/contact/RemoteBot.kt).appName 中，如果有原版 Onebot 标准中没有的额外接口实现，可以判断 appName 再调取该接口，以兼容尽可能多的 Onebot 实现。
 
 `bot.asOnebot.impl` 即可获取当前 mirai bot 的 [Bot (Onebot)](/onebot/src/main/kotlin/cn/evolvefield/onebot/client/core/Bot.kt) 实现，在这里主动调取接口。
 

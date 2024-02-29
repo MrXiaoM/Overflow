@@ -16,7 +16,8 @@ import net.mamoe.mirai.message.data.toMessageChain
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
-import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.OverflowAPI
+import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource
@@ -35,11 +36,11 @@ internal class StrangerWrapper(
     override var remark: String
         get() = ""
         set(_) {
-            Overflow.logger.warning("Onebot 未提供修改陌生人备注接口 ($id)")
+            OverflowAPI.logger.warning("Onebot 未提供修改陌生人备注接口 ($id)")
         }
 
     override suspend fun delete() {
-        Overflow.logger.warning("Onebot 未提供删除陌生人接口 ($id)")
+        OverflowAPI.logger.warning("Onebot 未提供删除陌生人接口 ($id)")
     }
 
     @OptIn(MiraiInternalApi::class)
@@ -54,7 +55,7 @@ internal class StrangerWrapper(
             val messageIds = if (forward != null) {
                 OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
             } else {
-                val msg = OnebotMessages.serializeToOneBotJson(message)
+                val msg = Overflow.serializeMessage(bot, message)
                 val response = bot.impl.sendPrivateMsg(id, msg, false)
                 response.data.safeMessageIds
             }

@@ -41,6 +41,8 @@ internal class BotWrapper private constructor(
     val impl: Bot
         get() = implBot
     override val implGetter: () -> Bot = { impl }
+    override var appName: String = "Onebot"
+    override var appVersion: String = "Unknown"
     private var loginInfo: LoginInfoResp = defLoginInfo
     private var friendsInternal: ContactList<FriendWrapper> = ContactList()
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
@@ -179,9 +181,11 @@ internal class BotWrapper private constructor(
     override fun toString(): String = "Bot($id)"
 
     companion object {
-        suspend fun wrap(impl: Bot, botConfiguration: BotConfiguration? = null): BotWrapper {
+        internal suspend fun wrap(impl: Bot, appName: String?, appVersion: String?, botConfiguration: BotConfiguration? = null): BotWrapper {
             val loginInfo = impl.getLoginInfo().data // also refresh bot id
             return (net.mamoe.mirai.Bot.getInstanceOrNull(impl.id) as? BotWrapper)?.apply {
+                if (appName != null) this.appName = appName
+                if (appVersion != null) this.appVersion = appVersion
                 implBot = impl
             } ?:
             BotWrapper(impl, loginInfo, botConfiguration ?: BotConfiguration {
@@ -194,6 +198,8 @@ internal class BotWrapper private constructor(
                     networkLoggerSupplier = { MiraiLogger.Factory.create(net.mamoe.mirai.Bot::class, "Net.${it.id}") }
                 }
             }).apply {
+                if (appName != null) this.appName = appName
+                if (appVersion != null) this.appVersion = appVersion
                 updateContacts()
 
                 //updateOtherClients()
@@ -201,8 +207,8 @@ internal class BotWrapper private constructor(
                 net.mamoe.mirai.Bot._instances[id] = this
             }
         }
-        suspend fun Bot.wrap(): BotWrapper {
-            return wrap(this)
+        internal suspend fun Bot.wrap(appName: String?, appVersion: String?): BotWrapper {
+            return wrap(this, appName, appVersion)
         }
     }
 }

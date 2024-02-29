@@ -6,6 +6,8 @@ import net.mamoe.mirai.message.data.MessageChain
 import kotlin.jvm.Throws
 
 interface RemoteBot {
+    val appName: String
+    val appVersion: String
     /**
      * 执行自定义动作
      *

@@ -18,8 +18,8 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
+import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.contact.Updatable
-import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.check
 import top.mrxiaom.overflow.internal.contact.data.EmptyMemberActive
 import top.mrxiaom.overflow.internal.contact.data.MemberActiveWrapper
@@ -27,6 +27,7 @@ import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
+import top.mrxiaom.overflow.internal.scope
 import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
@@ -68,7 +69,7 @@ internal class MemberWrapper(
             if (id != bot.id) {
                 group.checkBotPermission(MemberPermission.ADMINISTRATOR)
             }
-            Overflow.instance.launch {
+            Overflow.scope.launch {
                 bot.impl.setGroupCard(impl.groupId, id, value)
             }
         }
@@ -85,7 +86,7 @@ internal class MemberWrapper(
     override var specialTitle: String
         get() = impl.title
         set(value) {
-            Overflow.instance.launch {
+            Overflow.scope.launch {
                 bot.impl.setGroupSpecialTitle(impl.groupId, id, value, -1)
             }
         }
@@ -150,7 +151,7 @@ internal class MemberWrapper(
             val messageIds = if (forward != null) {
                 OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
             } else {
-                val msg = OnebotMessages.serializeToOneBotJson(message)
+                val msg = Overflow.serializeMessage(bot, message)
                 val response = bot.impl.sendPrivateMsg(id, msg, false)
                 response.data.safeMessageIds
             }
