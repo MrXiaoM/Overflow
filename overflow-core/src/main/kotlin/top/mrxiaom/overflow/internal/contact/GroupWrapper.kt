@@ -165,9 +165,7 @@ internal class GroupWrapper(
         val receipt = runCatching {
             val forward = messageChain.findForwardMessage()
             val messageIds = if (forward != null) {
-                val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-                val response = bot.impl.sendGroupForwardMsg(id, nodes)
-                response.data.safeMessageIds
+                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(messageChain)
                 val response = bot.impl.sendGroupMsg(id, msg, false)

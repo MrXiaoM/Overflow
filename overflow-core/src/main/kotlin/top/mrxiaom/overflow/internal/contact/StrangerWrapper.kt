@@ -3,7 +3,6 @@ package top.mrxiaom.overflow.internal.contact
 
 import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
 import kotlinx.coroutines.CoroutineName
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Stranger
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.EventCancelledException
@@ -53,9 +52,7 @@ internal class StrangerWrapper(
         val receipt = kotlin.runCatching {
             val forward = message.findForwardMessage()
             val messageIds = if (forward != null) {
-                val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-                val response = bot.impl.sendPrivateForwardMsg(id, nodes)
-                response.data.safeMessageIds
+                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(message)
                 val response = bot.impl.sendPrivateMsg(id, msg, false)

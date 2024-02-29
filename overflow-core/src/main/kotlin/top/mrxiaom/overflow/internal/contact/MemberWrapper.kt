@@ -5,7 +5,6 @@ import cn.evole.onebot.sdk.entity.Anonymous
 import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.contact.active.MemberActive
 import net.mamoe.mirai.event.broadcast
@@ -149,9 +148,7 @@ internal class MemberWrapper(
         val receipt = runCatching {
             val forward = message.findForwardMessage()
             val messageIds = if (forward != null) {
-                val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-                val response = bot.impl.sendPrivateForwardMsg(id, nodes)
-                response.data.safeMessageIds
+                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(message)
                 val response = bot.impl.sendPrivateMsg(id, msg, false)

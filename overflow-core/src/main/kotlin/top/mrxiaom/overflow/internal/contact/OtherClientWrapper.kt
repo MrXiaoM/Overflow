@@ -2,7 +2,6 @@
 package top.mrxiaom.overflow.internal.contact
 
 import kotlinx.coroutines.CoroutineName
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.OtherClient
 import net.mamoe.mirai.contact.OtherClientInfo
 import net.mamoe.mirai.message.data.ShortVideo

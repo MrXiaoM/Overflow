@@ -1,11 +1,14 @@
 package top.mrxiaom.overflow.internal.message
 
 import cn.evole.onebot.sdk.Data
+import cn.evole.onebot.sdk.entity.MsgId
 import com.google.gson.JsonParser
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.Mirai
+import net.mamoe.mirai.contact.Contact
+import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.internal.message.data.MarketFaceImpl
 import net.mamoe.mirai.internal.network.protocol.data.proto.ImMsgBody
 import net.mamoe.mirai.message.MessageSerializers
@@ -172,6 +175,39 @@ internal object OnebotMessages {
             }
         }
     }
+
+    internal suspend fun sendForwardMessage(contact: Contact, forward: ForwardMessage): MsgId? {
+        val bot = contact.bot.asOnebot
+        val nodes = serializeForwardNodes(forward.nodeList)
+        when (appName.lowercase()) {
+            "lagrange.onebot" -> {
+                val resId = bot.impl.sendForwardMsgLagrange(nodes).data
+                if (resId != null) {
+                    val forwardMsg = Json.encodeToString(buildJsonArray {
+                        buildJsonObject {
+                            put("type", "forward")
+                            putJsonObject("data") {
+                                put("id", resId)
+                            }
+                        }
+                    })
+
+                    return when (contact) {
+                        is Group -> bot.impl.sendGroupMsg(contact.id, forwardMsg, false).data
+                        else -> bot.impl.sendPrivateMsg(contact.id, forwardMsg, false).data
+                    }
+                }
+                return null
+            }
+            else -> { // go-cqhttp, shamrock
+                return when (contact) {
+                    is Group -> bot.impl.sendGroupForwardMsg(contact.id, nodes).data
+                    else -> bot.impl.sendPrivateForwardMsg(contact.id, nodes).data
+                }
+            }
+        }
+    }
+
     /**
      * 将转发消息节点转换为可供 Onebot 发送的列表
      */
@@ -179,14 +215,7 @@ internal object OnebotMessages {
         return nodeList.map {
             val message = JsonParser.parseString(serializeToOneBotJson(it.messageChain))
             when (appName.lowercase()) {
-                "shamrock" -> mutableMapOf(
-                    "type" to "node",
-                    "data" to mutableMapOf(
-                        "name" to it.senderName,
-                        "content" to message
-                    )
-                )
-                "go-cqhttp" -> mutableMapOf(
+                "shamrock", "go-cqhttp", "lagrange.onebot" -> mutableMapOf(
                     "type" to "node",
                     "data" to mutableMapOf(
                         "name" to it.senderName,

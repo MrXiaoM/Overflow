@@ -981,9 +981,9 @@ class Bot(
      * 发送合并转发 (群)
      *
      * @param groupId 群号
-     * @param msg     自定义转发消息 (可使用 ShiroUtils.generateForwardMsg() 方法创建)
+     * @param msg     自定义转发消息
      * [参考文档](https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91)
-     * @return [ActionRaw]
+     * @return [ActionData]
      */
     suspend fun sendGroupForwardMsg(groupId: Long, msg: List<Map<String, Any>>): ActionData<MsgId> {
         val action = ActionPathEnum.SEND_GROUP_FORWARD_MSG
@@ -1208,9 +1208,9 @@ class Bot(
      * 发送合并转发 (私聊)
      *
      * @param userId 目标用户
-     * @param msg    自定义转发消息 (可使用 ShiroUtils.generateForwardMsg() 方法创建)
+     * @param msg    自定义转发消息
      * [参考文档](https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91)
-     * @return [ActionRaw]
+     * @return [ActionData]
      */
     suspend fun sendPrivateForwardMsg(userId: Long, msg: List<Map<String, Any>>): ActionData<MsgId> {
         val action = ActionPathEnum.SEND_PRIVATE_FORWARD_MSG
@@ -1225,9 +1225,9 @@ class Bot(
      * 发送合并转发
      *
      * @param event 事件
-     * @param msg   自定义转发消息 (可使用 ShiroUtils.generateForwardMsg() 方法创建)
+     * @param msg   自定义转发消息
      * [参考文档](https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91)
-     * @return [ActionRaw]
+     * @return [ActionData]
      */
     suspend fun sendForwardMsg(event: GroupMessageEvent, msg: List<Map<String, Any>>): ActionData<MsgId> {
         val action = ActionPathEnum.SEND_FORWARD_MSG
@@ -1240,6 +1240,22 @@ class Bot(
 
         val result = actionHandler.action(channel, action, params)
         return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<MsgId>>() {}.type)
+    }
+    /**
+     * 上传合并转发
+     *
+     * @param msg   自定义转发消息
+     * [参考文档](https://github.com/LagrangeDev/Lagrange.Core/blob/master/Lagrange.OneBot/Core/Operation/Message/SendForwardMessageOperation.cs)
+     * @return [ActionData] resId
+     */
+    suspend fun sendForwardMsgLagrange(msg: List<Map<String, Any>>): ActionData<String?> {
+        val action = ActionPathEnum.SEND_FORWARD_MSG
+        val params = JsonObject()
+
+        params.add("messages", msg.toJsonArray())
+
+        val result = actionHandler.action(channel, action, params)
+        return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<String?>>() {}.type)
     }
     /**
      * 获取中文分词

@@ -3,7 +3,6 @@ package top.mrxiaom.overflow.internal.contact
 
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import kotlinx.coroutines.CoroutineName
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Friend
 import net.mamoe.mirai.contact.friendgroup.FriendGroup
 import net.mamoe.mirai.contact.roaming.RoamingMessages
@@ -56,9 +55,7 @@ internal class FriendWrapper(
         val receipt = runCatching {
             val forward = messageChain.findForwardMessage()
             val messageIds = if (forward != null) {
-                val nodes = OnebotMessages.serializeForwardNodes(forward.nodeList)
-                val response = bot.impl.sendPrivateForwardMsg(id, nodes)
-                response.data.safeMessageIds
+                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
             } else {
                 val msg = OnebotMessages.serializeToOneBotJson(messageChain)
                 val response = bot.impl.sendPrivateMsg(id, msg, false)
