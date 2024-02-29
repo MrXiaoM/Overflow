@@ -16,6 +16,9 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
     public MessageEvent deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
         MessageEvent e = null;
         JsonObject obj = json.getAsJsonObject();
+        String postType = obj.get("post_type").getAsString();
+        long time = obj.get("time").getAsLong();
+        long selfId = obj.get("self_id").getAsLong();
         String messageType = obj.get("message_type").getAsString();
         long userId = obj.get("user_id").getAsLong();
         JsonElement messageElement = obj.get("message");
@@ -37,6 +40,9 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
             }
         }
         if (e != null){
+            e.setPostType(postType);
+            e.setTime(time);
+            e.setSelfId(selfId);
             e.setMessageType(messageType);
             e.setUserId(userId);
             e.setMessage(message);
