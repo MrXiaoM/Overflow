@@ -17,7 +17,6 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.OverflowAPI
-import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource
@@ -33,8 +32,7 @@ internal class FriendWrapper(
     override val id: Long = impl.userId
     override val nick: String = impl.nickname
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})Friend/$id")
-    override val friendGroup: FriendGroup
-        get() = throw NotImplementedError("Onebot 未提供好友分组接口")
+    override val friendGroup: FriendGroup = bot.friendGroups.fallbackFriendGroup
     override var remark: String
         get() = impl.remark
         set(_) {

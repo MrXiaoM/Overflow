@@ -21,6 +21,7 @@ import org.java_websocket.framing.CloseFrame
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.contact.data.FallbackFriendGroups
 import top.mrxiaom.overflow.internal.data.FriendInfoImpl
 import top.mrxiaom.overflow.internal.data.StrangerInfoImpl
 import top.mrxiaom.overflow.internal.message.OnebotMessages
@@ -142,8 +143,7 @@ internal class BotWrapper private constructor(
         Mirai.newStranger(this, StrangerInfoImpl(id, bot.nick)).cast()
     }
 
-    override val friendGroups: FriendGroups
-        get() = throw NotImplementedError("Onebot 未提供好友分组接口")
+    override val friendGroups: FallbackFriendGroups = FallbackFriendGroups(this)
 
     override val friends: ContactList<Friend>
         get() = friendsInternal
