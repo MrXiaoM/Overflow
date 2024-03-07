@@ -32,7 +32,8 @@ import org.java_websocket.WebSocket
  * Version: 1.0
  */
 /**
- * @param channel                    [WebSocket]
+ * @param conn                       [WebSocket]
+ * @param config                     [BotConfig]
  * @param actionHandler              [ActionHandler]
  */
 @Suppress("unused")

@@ -26,6 +26,7 @@ internal class GroupActiveWrapper(
     private var _temperatureTitles: Map<Int, String> = mapOf()
 
     private suspend fun getGroupLevelInfo(): GroupLevelInfo {
+        if (group.bot.noPlatform) return GroupLevelInfo(errCode = null)
         return group.bot.getRawGroupLevelInfo(groupCode = group.id).check()
     }
 
@@ -41,40 +42,50 @@ internal class GroupActiveWrapper(
 
     override suspend fun setHonorVisible(newValue: Boolean) {
         group.checkBotPermission(MemberPermission.ADMINISTRATOR)
-        group.bot.setGroupHonourFlag(groupCode = group.id, flag = newValue).check()
-        _isHonorVisible = newValue
+        if (!group.bot.noPlatform) {
+            group.bot.setGroupHonourFlag(groupCode = group.id, flag = newValue).check()
+            _isHonorVisible = newValue
+        }
     }
 
     override val rankTitles: Map<Int, String> get() = _isRankVisible
 
     override suspend fun setRankTitles(newValue: Map<Int, String>) {
         group.checkBotPermission(MemberPermission.ADMINISTRATOR)
-        group.bot.setGroupLevelInfo(groupCode = group.id, new = false, titles = newValue).check()
-        refreshRank()
+        if (!group.bot.noPlatform) {
+            group.bot.setGroupLevelInfo(groupCode = group.id, new = false, titles = newValue).check()
+            refreshRank()
+        }
     }
 
     override val isTitleVisible: Boolean get() = _isTitleVisible
 
     override suspend fun setTitleVisible(newValue: Boolean) {
         group.checkBotPermission(MemberPermission.ADMINISTRATOR)
-        group.bot.setGroupSetting(groupCode = group.id, new = false, show = newValue).check()
-        refreshRank()
+        if (!group.bot.noPlatform) {
+            group.bot.setGroupSetting(groupCode = group.id, new = false, show = newValue).check()
+            refreshRank()
+        }
     }
 
     override val temperatureTitles: Map<Int, String> get() = _temperatureTitles
 
     override suspend fun setTemperatureTitles(newValue: Map<Int, String>) {
         group.checkBotPermission(MemberPermission.ADMINISTRATOR)
-        group.bot.setGroupLevelInfo(groupCode = group.id, new = true, titles = newValue).check()
-        refreshRank()
+        if (!group.bot.noPlatform) {
+            group.bot.setGroupLevelInfo(groupCode = group.id, new = true, titles = newValue).check()
+            refreshRank()
+        }
     }
 
     override val isTemperatureVisible: Boolean get() = _isTemperatureVisible
 
     override suspend fun setTemperatureVisible(newValue: Boolean) {
         group.checkBotPermission(MemberPermission.ADMINISTRATOR)
-        group.bot.setGroupSetting(groupCode = group.id, new = true, show = newValue).check()
-        refreshRank()
+        if (!group.bot.noPlatform) {
+            group.bot.setGroupSetting(groupCode = group.id, new = true, show = newValue).check()
+            refreshRank()
+        }
     }
 
     override suspend fun refresh() {
@@ -93,6 +104,10 @@ internal class GroupActiveWrapper(
     }
 
     private suspend fun getGroupActiveData(page: Int?): GroupActiveData {
+        if (group.bot.noPlatform) return GroupActiveData(
+            errCode = 0,
+            info = GroupActiveData.ActiveInfo(isEnd = 1)
+        )
         return group.bot.getRawGroupActiveData(group.id, page).check()
     }
 
@@ -116,6 +131,10 @@ internal class GroupActiveWrapper(
     }
 
     private suspend fun getHonorInfo(type: GroupHonorType): MemberHonorList {
+        if (group.bot.noPlatform) return object : MemberHonorList {
+            override val total: Int = 0
+            override val list: List<MemberHonorInfo> = listOf()
+        }
         return when (type) {
             GroupHonorType.TALKATIVE -> group.bot.getRawTalkativeInfo(group.id)
             GroupHonorType.PERFORMER -> group.bot.getRawContinuousInfo(group.id, type.id)
@@ -183,6 +202,20 @@ internal class GroupActiveWrapper(
     }
 
     private suspend fun getMemberScoreData(): MemberScoreData {
+        if (group.bot.noPlatform) return MemberScoreData(
+            levels = listOf(),
+            mapping = listOf(),
+            self = MemberScoreData.MemberScoreInfo(
+                levelId = 0,
+                nickName = group.bot.nick,
+                role = 0,
+                score = 0,
+                uin = group.bot.id
+            ),
+            members = listOf(),
+            errorMessage = "Overflow 开启了 no_platform 模式",
+            errorCode = 0
+        )
         return group.bot.getRawMemberTitleList(group.id).check()
     }
 
@@ -202,6 +235,19 @@ internal class GroupActiveWrapper(
     }
 
     private suspend fun getMemberMedalInfo(uid: Long): MemberMedalData {
+        if (group.bot.noPlatform) {
+            val member = group.queryMember(uid)
+            return MemberMedalData(
+                avatar = "http://q.qlogo.cn/g?b=qq&nk=${uid}&s=640",
+                faceFlag = 0,
+                lastViewTs = 0,
+                list = listOf(),
+                nick = member?.nick ?: uid.toString(),
+                role = 0,
+                weared = "",
+                wearedColor = ""
+            )
+        }
         return group.bot.getRawMemberMedalInfo(group.id, uid)
     }
 

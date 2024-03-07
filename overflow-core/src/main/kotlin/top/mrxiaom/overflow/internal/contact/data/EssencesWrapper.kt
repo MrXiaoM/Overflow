@@ -35,6 +35,7 @@ internal class EssencesWrapper(
     }
 
     override suspend fun getPage(start: Int, limit: Int): List<EssenceMessageRecord> {
+        if (impl.bot.noPlatform) return listOf()
         return impl.fetchEssencesList().also { list = it }
     }
 
@@ -44,6 +45,7 @@ internal class EssencesWrapper(
     }
 
     override suspend fun share(source: MessageSource): String {
+        if (impl.bot.noPlatform) return ""
         val shareKey = impl.bot.shareDigest(
             groupCode = impl.id,
             msgSeq = source.ids.first().toLong().and(0xFFFF_FFFF),
@@ -56,6 +58,7 @@ internal class EssencesWrapper(
     companion object {
         @OptIn(MiraiInternalApi::class)
         internal suspend fun GroupWrapper.fetchEssencesList(page: Int = 0): List<EssenceMessageRecord> {
+            if (bot.noPlatform) return listOf()
             return bot.impl.getEssenceMsgList(id, page).data.map {
                 EssenceMessageRecord(
                     this, queryMember(it.senderId), it.senderId, it.senderNick, it.senderTime.toInt(),
