@@ -95,7 +95,25 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             configFile.copyTo(bak, true)
             logger.warning("读取配置文件错误，已保存旧文件到 ${bak.name}", t)
         } else {
-            logger.info("配置文件不存在，正在创建")
+            logger.info {
+                """
+                    配置文件不存在，正在创建
+                    
+                    =============================================
+                    
+                      ▌ 初次使用 Overflow，请阅读用户手册:
+                      https://github.com/MrXiaoM/Overflow/blob/main/docs/README.md
+                    
+                      ▌ 部署各 Onebot 实现并连接到 Overflow 的教程：
+                      https://wiki.mrxiaom.top/overflow
+                    
+                      ▌ 反馈漏洞/提交建议：
+                      https://github.com/MrXiaoM/Overflow/issues/new/choose
+                    
+                    =============================================
+                
+                """.trimIndent()
+            }
         }
         (config ?: Config()).apply {
             configFile.writeText(prettyJson.encodeToString(Config.serializer(), this))
