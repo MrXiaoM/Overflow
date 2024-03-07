@@ -162,6 +162,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 reversedPort = config.reversedWSPort,
                 token = config.token,
                 isAccessToken = config.token.isNotBlank(),
+                noPlatform = config.noPlatform,
                 retryTimes = config.retryTimes,
                 retryWaitMills = config.retryWaitMills,
                 retryRestMills = config.retryRestMills,
@@ -235,6 +236,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             retryWaitMills: Long,
             retryRestMills: Long,
             printInfo: Boolean,
+            noPlatform: Boolean,
             logger: Logger?
         ): Bot? {
             val botConfig = BotConfig(
@@ -242,6 +244,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 reversedPort = reversedPort,
                 token = token,
                 isAccessToken = token.isNotBlank(),
+                noPlatform = noPlatform,
                 retryTimes = retryTimes,
                 retryWaitMills = retryWaitMills,
                 retryRestMills = retryRestMills,

@@ -15,6 +15,7 @@ public class BotBuilder private constructor(
     private var retryWaitMills: Long = 5000L,
     private var retryRestMills: Long = 60000L,
     private var printInfo: Boolean = true,
+    private var noPlatform: Boolean = false,
     private var logger: Logger? = null
 ) {
     /**
@@ -69,6 +70,17 @@ public class BotBuilder private constructor(
     }
 
     /**
+     * 禁止 Overflow 调用 Tencent 的网络接口
+     *
+     * 调用这些网络接口需要通过 `get_credentials` 获取凭证，再使用凭证访问接口。
+     *
+     * 部分 Onebot 实现不支持获取账号凭证，甚至于并不从QQ实现（如 Discord、Kook 等），连接这些实例前，需要禁用网络接口调用
+     */
+    public fun noPlatform(): BotBuilder = apply {
+        this.noPlatform = true
+    }
+
+    /**
      * 覆写用于 Onebot 的日志记录器
      */
     public fun overrideLogger(logger: Logger): BotBuilder = apply {
@@ -90,6 +102,7 @@ public class BotBuilder private constructor(
             retryWaitMills = retryWaitMills,
             retryRestMills = retryRestMills,
             printInfo = printInfo,
+            noPlatform = noPlatform,
             logger = logger
         )
     }
@@ -121,6 +134,7 @@ public interface IBotStarter {
         retryWaitMills: Long,
         retryRestMills: Long,
         printInfo: Boolean,
+        noPlatform: Boolean,
         logger: Logger?
     ): Bot?
 }

@@ -35,23 +35,13 @@ class ConnectFactory private constructor(
         val builder = StringBuilder()
         val header = mutableMapOf<String, String>()
         var ws: WSClient? = null
-        if (config.miraiHttp) {
-            builder.append(config.url)
-            builder.append("/all")
-            builder.append("?verifyKey=")
-            if (config.isAccessToken) {
-                builder.append(config.token)
-            }
-            builder.append("&qq=")
-            builder.append(config.botId)
-        } else {
-            builder.append(config.url)
-            if (config.isAccessToken) {
-                builder.append("?access_token=")
-                builder.append(config.token)
-                header["Authorization"] = "Bearer ${config.token}"
-            }
+        builder.append(config.url)
+        if (config.isAccessToken) {
+            builder.append("?access_token=")
+            builder.append(config.token)
+            header["Authorization"] = "Bearer ${config.token}"
         }
+
         val url = builder.toString()
         try {
             ws = WSClient.createAndConnect(

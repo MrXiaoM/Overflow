@@ -26,9 +26,11 @@ class BotConfig(
      */
     val isAccessToken: Boolean = false,
     /**
-     * 是否开启mirai-http,否则请使用onebot-mirai
+     * 是否禁止 Overflow 通过 get_credentials 获取凭证调用网络接口
+     *
+     * 该选项无法禁止其它插件自行调用网络接口
      */
-    val miraiHttp: Boolean = false,
+    val noPlatform: Boolean = false,
     /**
      * 重连尝试次数
      */

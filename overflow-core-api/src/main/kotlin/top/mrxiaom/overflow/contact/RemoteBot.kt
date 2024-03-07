@@ -6,8 +6,21 @@ import net.mamoe.mirai.message.data.MessageChain
 import kotlin.jvm.Throws
 
 interface RemoteBot {
+    /**
+     * Onebot 实现名称
+     */
     val appName: String
+
+    /**
+     * Onebot 实现版本
+     */
     val appVersion: String
+
+    /**
+     * 配置中是否已禁止 Overflow 调用网络接口
+     */
+    val noPlatform: Boolean
+
     /**
      * 执行自定义动作
      *

@@ -44,6 +44,8 @@ internal class BotWrapper private constructor(
     override val implGetter: () -> Bot = { impl }
     override var appName: String = "Onebot"
     override var appVersion: String = "Unknown"
+    override val noPlatform: Boolean
+        get() = implBot.config.noPlatform
     private var loginInfo: LoginInfoResp = defLoginInfo
     private var friendsInternal: ContactList<FriendWrapper> = ContactList()
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()

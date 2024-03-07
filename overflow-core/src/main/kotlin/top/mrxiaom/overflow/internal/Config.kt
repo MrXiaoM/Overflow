@@ -11,6 +11,8 @@ data class Config(
     var reversedWSPort: Int = -1,
     @SerialName("token")
     var token: String = "",
+    @SerialName("no_platform")
+    val noPlatform: Boolean = false,
     @SerialName("retry_times")
     var retryTimes: Int = 5,
     @SerialName("retry_wait_mills")
