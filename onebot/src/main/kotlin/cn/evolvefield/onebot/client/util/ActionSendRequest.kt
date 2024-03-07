@@ -21,7 +21,7 @@ import org.slf4j.Logger
  * @param channel        [WebSocket]
  * @param requestTimeout Request Timeout
  */
-class ActionSendUtils(
+class ActionSendRequest(
     private val bot: Bot,
     private val logger: Logger,
     private val channel: WebSocket,

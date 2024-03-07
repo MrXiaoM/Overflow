@@ -3,7 +3,7 @@ package cn.evolvefield.onebot.client.connection
 import cn.evole.onebot.sdk.util.json.JsonsObject
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.client.handler.EventBus
-import cn.evolvefield.onebot.client.util.ActionSendUtils
+import cn.evolvefield.onebot.client.util.ActionSendRequest
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -38,7 +38,7 @@ interface IAdapter {
     fun unlockMutex() {
         runCatching {
             if (mutex.isLocked) mutex.unlock()
-            if (ActionSendUtils.mutex.isLocked) ActionSendUtils.mutex.unlock()
+            if (ActionSendRequest.mutex.isLocked) ActionSendRequest.mutex.unlock()
         }
     }
 

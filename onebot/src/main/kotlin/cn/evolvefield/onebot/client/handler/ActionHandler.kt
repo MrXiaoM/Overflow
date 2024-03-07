@@ -4,9 +4,8 @@ import cn.evole.onebot.sdk.action.ActionPath
 import cn.evole.onebot.sdk.util.json.JsonsObject
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.util.ActionFailedException
-import cn.evolvefield.onebot.client.util.ActionSendUtils
+import cn.evolvefield.onebot.client.util.ActionSendRequest
 import com.google.gson.JsonObject
-import org.java_websocket.WebSocket
 import org.slf4j.Logger
 
 /**
@@ -21,7 +20,7 @@ class ActionHandler(
     /**
      * 请求回调数据
      */
-    private val apiCallbackMap: MutableMap<String, ActionSendUtils> = HashMap()
+    private val apiCallbackMap: MutableMap<String, ActionSendRequest> = HashMap()
 
     /**
      * 用于标识请求，可以是任何类型的数据，OneBot 将会在调用结果中原样返回
@@ -34,13 +33,16 @@ class ActionHandler(
      * @param respJson 回调结果
      */
     fun onReceiveActionResp(respJson: JsonsObject) {
-        val echo = respJson.optString("echo")
-        // 唤醒挂起的协程
-        apiCallbackMap.remove(echo)?.onCallback(respJson)
+        respJson.optString("echo").takeIf(String::isNotBlank)?.also { echo ->
+            // 唤醒挂起的协程
+            apiCallbackMap.remove(echo)?.onCallback(respJson) ?: run {
+                logger.warn("收到了未知的 action 回应: $respJson")
+            }
+        }
     }
 
     /**
-     * @param channel Session
+     * @param bot     Session
      * @param action  请求路径
      * @param params  请求参数
      * @return 请求结果
@@ -54,11 +56,12 @@ class ActionHandler(
             })
         }
         val reqJson = generateReqJson(action, params)
-        val actionSendUtils = ActionSendUtils(logger, bot.channel, timeout)
-        val echo = reqJson["echo"].asString
-        apiCallbackMap[echo] = actionSendUtils
+        val request = ActionSendRequest(bot, logger, bot.channel, timeout)
+        val echo = reqJson["echo"].asString.also {
+            apiCallbackMap[it] = request
+        }
         return try {
-            actionSendUtils.send(reqJson)
+            request.send(reqJson)
         } catch (e: Exception) {
             logger.warn("Request failed: [${action.path}, echo=$echo] ${e.message}")
             logger.trace("Stacktrace: ", e)
@@ -84,6 +87,9 @@ class ActionHandler(
         json.addProperty("action", action.path)
         if (params != null) json.add("params", params)
         json.addProperty("echo", echo++)
+        if (echo >= Long.MAX_VALUE) {
+            echo = 0 // reset echo
+        }
         return json
     }
 
