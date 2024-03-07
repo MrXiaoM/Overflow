@@ -1,5 +1,6 @@
 package cn.evolvefield.onebot.client.connection
 
+import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import kotlinx.coroutines.CompletableDeferred
@@ -19,6 +20,7 @@ import java.net.InetSocketAddress
  */
 class WSServer(
     override val scope: CoroutineScope,
+    private val config: BotConfig,
     address: InetSocketAddress,
     override val logger: Logger,
     override val actionHandler: ActionHandler,
@@ -58,7 +60,7 @@ class WSServer(
             }
         }
         logger.info("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 已连接 ┈━═☆")
-        (bot ?: Bot(conn, actionHandler).also {
+        (bot ?: Bot(conn, config, actionHandler).also {
             bot = it
             def.complete(it)
         }).conn = conn
@@ -80,8 +82,8 @@ class WSServer(
     }
 
     companion object {
-        suspend fun createAndWaitConnect(scope: CoroutineScope, address: InetSocketAddress, logger: Logger, actionHandler: ActionHandler, token: String): Pair<WSServer, Bot> {
-            val ws = WSServer(scope, address, logger, actionHandler, token)
+        suspend fun createAndWaitConnect(scope: CoroutineScope, config: BotConfig, address: InetSocketAddress, logger: Logger, actionHandler: ActionHandler, token: String): Pair<WSServer, Bot> {
+            val ws = WSServer(scope, config, address, logger, actionHandler, token)
             ws.start()
             return ws to ws.def.await()
         }

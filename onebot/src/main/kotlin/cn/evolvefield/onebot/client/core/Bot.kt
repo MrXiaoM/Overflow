@@ -18,6 +18,7 @@ import cn.evole.onebot.sdk.response.guild.*
 import cn.evole.onebot.sdk.response.misc.*
 import cn.evole.onebot.sdk.util.json.GsonUtil
 import cn.evole.onebot.sdk.util.json.JsonsObject
+import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
@@ -37,6 +38,7 @@ import org.java_websocket.WebSocket
 @Suppress("unused")
 class Bot(
     internal var conn: WebSocket,
+    val config: BotConfig,
     val actionHandler: ActionHandler
 ) {
     val channel: WebSocket

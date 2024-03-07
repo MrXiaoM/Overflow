@@ -54,7 +54,17 @@ class ConnectFactory private constructor(
         }
         val url = builder.toString()
         try {
-            ws = WSClient.createAndConnect(scope, URI.create(url), logger, actionHandler, config.retryTimes, config.retryWaitMills, config.retryRestMills, header)
+            ws = WSClient.createAndConnect(
+                scope,
+                config,
+                URI.create(url),
+                logger,
+                actionHandler,
+                config.retryTimes,
+                config.retryWaitMills,
+                config.retryRestMills,
+                header
+            )
         } catch (e: Exception) {
             logger.error("▌ {} 连接错误，请检查服务端是否开启 ┈━═☆", url)
         }
@@ -66,11 +76,13 @@ class ConnectFactory private constructor(
      * @return 连接实例
      */
     @JvmOverloads
-    suspend fun createWebsocketServerAndWaitConnect(scope: CoroutineScope = CoroutineScope(CoroutineName("WSServer"))): Pair<WSServer, Bot>? {
+    suspend fun createWebsocketServerAndWaitConnect(
+        scope: CoroutineScope = CoroutineScope(CoroutineName("WSServer"))
+    ): Pair<WSServer, Bot>? {
         var pair: Pair<WSServer, Bot>? = null
         try {
             val address = InetSocketAddress(config.reversedPort)
-            pair = WSServer.createAndWaitConnect(scope, address, logger, actionHandler, config.token)
+            pair = WSServer.createAndWaitConnect(scope, config, address, logger, actionHandler, config.token)
         } catch (e: Exception) {
             logger.error("▌ 反向 WebSocket 绑定端口 {} 或连接客户端时出现错误 ┈━═☆", config.reversedPort)
             logger.error(e.stackTraceToString())

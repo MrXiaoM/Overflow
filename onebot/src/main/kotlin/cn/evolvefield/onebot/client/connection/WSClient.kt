@@ -1,5 +1,6 @@
 package cn.evolvefield.onebot.client.connection
 
+import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import kotlinx.coroutines.*
@@ -17,6 +18,7 @@ import java.net.URI
  */
 class WSClient(
     override val scope: CoroutineScope,
+    private val config: BotConfig,
     uri: URI,
     override val logger: Logger,
     override val actionHandler: ActionHandler,
@@ -28,7 +30,7 @@ class WSClient(
     private var retryCount = 0
     private val connectDef = CompletableDeferred<Boolean>()
     fun createBot(): Bot {
-        return Bot(this, actionHandler)
+        return Bot(this, config, actionHandler)
     }
 
     suspend fun connectSuspend(): Boolean {
@@ -87,8 +89,8 @@ class WSClient(
     }
 
     companion object {
-        fun createAndConnect(scope: CoroutineScope, uri: URI, logger: Logger, actionHandler: ActionHandler, retryTimes: Int, retryWaitMills: Long, retryRestMills: Long, header: Map<String, String> = mapOf()): WSClient? {
-            val ws = WSClient(scope, uri, logger, actionHandler, retryTimes, retryWaitMills, retryRestMills, header)
+        fun createAndConnect(scope: CoroutineScope, config: BotConfig, uri: URI, logger: Logger, actionHandler: ActionHandler, retryTimes: Int, retryWaitMills: Long, retryRestMills: Long, header: Map<String, String> = mapOf()): WSClient? {
+            val ws = WSClient(scope, config, uri, logger, actionHandler, retryTimes, retryWaitMills, retryRestMills, header)
             return ws.takeIf { runBlocking { ws.connectSuspend() } }
         }
     }
