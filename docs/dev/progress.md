@@ -71,7 +71,7 @@
 | 事件类型             | mirai                           | onebot                          | 是否支持 |
 |------------------|---------------------------------|---------------------------------|------|
 | 群消息              | GroupMessageEvent               | message -> group -> normal      | ✅    |
-| 群匿名消息            | GroupMessageEvent               | message -> group -> anonymous   | ❌    |
+| 群匿名消息            | GroupMessageEvent               | message -> group -> anonymous   | *✅*  |
 | 群系统提示            | -                               | message -> group -> notice      | ❌    |
 | 好友消息             | FriendMessageEvent              | message -> private -> friend    | ✅    |
 | 群临时会话消息          | GroupTempMessageEvent           | message -> private -> group     | ✅    |
