@@ -1,6 +1,7 @@
 package cn.evolvefield.onebot.client.util
 
 import cn.evole.onebot.sdk.util.json.JsonsObject
+import cn.evolvefield.onebot.client.core.Bot
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.TimeoutCancellationException
@@ -21,6 +22,7 @@ import org.slf4j.Logger
  * @param requestTimeout Request Timeout
  */
 class ActionSendUtils(
+    private val bot: Bot,
     private val logger: Logger,
     private val channel: WebSocket,
     private val requestTimeout: Long
@@ -44,7 +46,11 @@ class ActionSendUtils(
         }
         if (resp.optString("status") == "failed") {
             val ret = resp.optInt("retcode").takeIf { it != 0 }?.run { ", retCode=$this" } ?: ""
-            throw ActionFailedException("${resp.optString("message")}$ret", resp)
+            throw ActionFailedException(
+                app = "${bot.appName} v${bot.appVersion}",
+                msg = "${resp.optString("message")}$ret",
+                json = resp
+            )
         }
         return resp
         //synchronized(this) { this.wait(requestTimeout) }

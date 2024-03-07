@@ -42,6 +42,12 @@ class Bot(
     val config: BotConfig,
     val actionHandler: ActionHandler
 ) {
+    private var name: String = "Onebot"
+    private var version: String = "Unknown"
+    val appName: String
+        get() = name
+    val appVersion: String
+        get() = version
     val channel: WebSocket
         get() = conn
     private var idInternal: Long = 0
@@ -85,7 +91,7 @@ class Bot(
             params.addProperty("message", msg)
         }
         params.addProperty("auto_escape", autoEscape)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<MsgId>>() {}.type
@@ -113,7 +119,7 @@ class Bot(
             params.addProperty("message", msg)
         }
         params.addProperty("auto_escape", autoEscape)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<MsgId>>() {}.type
@@ -136,7 +142,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("guild_id", guildId)
         params.addProperty("next_token", nextToken)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GuildMemberListResp>>() {}.type
@@ -164,7 +170,7 @@ class Bot(
         }.onFailure {
             params.addProperty("message", msg)
         }
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GuildMsgId>>() {}.type
@@ -184,7 +190,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("message_id", guildMsgId)
         params.addProperty("no_cache", noCache)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GetGuildMsgResp>>() {}.type
@@ -198,7 +204,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getGuildServiceProfile(): ActionData<GuildServiceProfileResp> {
         val action = ActionPathEnum.GET_GUILD_SERVICE_PROFILE
-        val result = actionHandler.action(channel, action, null)
+        val result = actionHandler.action(this, action, null)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GuildServiceProfileResp>>() {}.type
@@ -211,7 +217,7 @@ class Bot(
      */
     suspend fun getGuildList(): ActionList<GuildListResp> {
         val action = ActionPathEnum.GET_GUILD_LIST
-        val result = actionHandler.action(channel, action, null)
+        val result = actionHandler.action(this, action, null)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionList<GuildListResp>>() {}.type
@@ -229,7 +235,7 @@ class Bot(
         val action = ActionPathEnum.GET_GUILD_META_BY_GUEST
         val params = JsonObject()
         params.addProperty("guild_id", guildId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GuildMetaByGuestResp>>() {}.type
@@ -249,7 +255,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("guild_id", guildId)
         params.addProperty("no_cache", noCache)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionList<ChannelInfoResp>>() {}.type
@@ -269,7 +275,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("guild_id", guildId)
         params.addProperty("user_id", userId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GuildMemberProfileResp>>() {}.type
@@ -287,7 +293,7 @@ class Bot(
         val action = ActionPathEnum.GET_MSG
         val params = JsonObject()
         params.addProperty("message_id", msgId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GetMsgResp>>() {}.type
@@ -320,7 +326,7 @@ class Bot(
         params.addProperty("count", count)
         params.addProperty("message_seq", messageSeq)
 
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GetHistoryMsgResp>>() {}.type
@@ -347,7 +353,7 @@ class Bot(
         params.addProperty("count", count)
         params.addProperty("message_seq", messageSeq)
 
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GetHistoryMsgResp>>() {}.type
@@ -365,7 +371,7 @@ class Bot(
         val action = ActionPathEnum.DELETE_MSG
         val params = JsonObject()
         params.addProperty("message_id", msgId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -384,7 +390,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("user_id", userId)
         params.addProperty("reject_add_request", rejectAddRequest)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -403,7 +409,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("user_id", userId)
         params.addProperty("duration", duration)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -420,7 +426,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("enable", enable)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -439,7 +445,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("user_id", userId)
         params.addProperty("enable", enable)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -456,7 +462,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("enable", enable)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -475,7 +481,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("user_id", userId)
         params.addProperty("card", card)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -492,7 +498,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("group_name", groupName)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -509,7 +515,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("is_dismiss", isDismiss)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -530,7 +536,7 @@ class Bot(
         params.addProperty("user_id", userId)
         params.addProperty("special_title", specialTitle)
         params.addProperty("duration", duration)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -549,7 +555,7 @@ class Bot(
         params.addProperty("flag", flag)
         params.addProperty("approve", approve)
         params.addProperty("remark", remark)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -570,7 +576,7 @@ class Bot(
         params.addProperty("sub_type", subType)
         params.addProperty("approve", approve)
         params.addProperty("reason", reason)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -582,7 +588,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getLoginInfo(): ActionData<LoginInfoResp> {
         val action = ActionPathEnum.GET_LOGIN_INFO
-        val result = actionHandler.action(channel, action, null)
+        val result = actionHandler.action(this, action, null)
         return GsonUtil.fromJson<ActionData<LoginInfoResp>>(
             result.toString(),
             object : TypeToken<ActionData<LoginInfoResp>>() {}.type
@@ -602,7 +608,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("user_id", userId)
         params.addProperty("no_cache", noCache)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<StrangerInfoResp>>() {}.type
@@ -617,7 +623,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getFriendList(): ActionList<FriendInfoResp> {
         val action = ActionPathEnum.GET_FRIEND_LIST
-        val result = actionHandler.action(channel, action, null)
+        val result = actionHandler.action(this, action, null)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionList<FriendInfoResp>>() {}.type
@@ -635,7 +641,7 @@ class Bot(
         val action = ActionPathEnum.DELETE_FRIEND
         val params = JsonObject()
         params.addProperty("friend_id", friendId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -652,7 +658,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("no_cache", noCache)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GroupInfoResp>>() {}.type
@@ -667,7 +673,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getGroupList(): ActionList<GroupInfoResp> {
         val action = ActionPathEnum.GET_GROUP_LIST
-        val result = actionHandler.action(channel, action, null)
+        val result = actionHandler.action(this, action, null)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionList<GroupInfoResp>>() {}.type
@@ -689,7 +695,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("user_id", userId)
         params.addProperty("no_cache", noCache)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GroupMemberInfoResp>>() {}.type
@@ -707,7 +713,7 @@ class Bot(
         val action = ActionPathEnum.GET_GROUP_MEMBER_LIST
         val params = JsonObject()
         params.addProperty("group_id", groupId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionList<GroupMemberInfoResp>>() {}.type
@@ -727,7 +733,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("type", type)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GroupHonorInfoResp>>() {}.type
@@ -742,7 +748,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun canSendImage(): ActionData<BooleanResp> {
         val action = ActionPathEnum.CAN_SEND_IMAGE
-        val result = actionHandler.action(channel, action, null)
+        val result = actionHandler.action(this, action, null)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<BooleanResp>>() {}.type
@@ -757,7 +763,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun canSendRecord(): ActionData<BooleanResp> {
         val action = ActionPathEnum.CAN_SEND_RECORD
-        val result = actionHandler.action(channel, action, null)
+        val result = actionHandler.action(this, action, null)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<BooleanResp>>() {}.type
@@ -780,7 +786,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("file", file)
         params.addProperty("cache", cache)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -796,7 +802,7 @@ class Bot(
         val action = ActionPathEnum.CHECK_URL_SAFELY
         val params = JsonObject()
         params.addProperty("url", url)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<CheckUrlSafelyResp>>() {}.type
@@ -817,7 +823,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("content", content)
         if (image != null) params.addProperty("image", image)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
     
@@ -832,7 +838,7 @@ class Bot(
         val action = ActionPathEnum.GET_GROUP_NOTICE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionList<GroupNoticeResp>>() {}.type
@@ -850,7 +856,7 @@ class Bot(
         val action = ActionPathEnum.GET_GROUP_AT_ALL_REMAIN
         val params = JsonObject()
         params.addProperty("group_id", groupId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GroupAtAllRemainResp>>() {}.type
@@ -876,7 +882,7 @@ class Bot(
         params.addProperty("file", file)
         params.addProperty("name", name)
         params.addProperty("folder", folder)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -897,7 +903,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("file", file)
         params.addProperty("name", name)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -918,7 +924,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.add("anonymous", JsonsObject(an).get())
         params.addProperty("duration", duration)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -937,7 +943,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("flag", flag)
         params.addProperty("duration", duration)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -956,7 +962,7 @@ class Bot(
         params.addProperty("url", url)
         params.addProperty("thread_count", threadCount)
         params.addProperty("headers", headers)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<DownloadFileResp>>() {}.type
@@ -974,7 +980,7 @@ class Bot(
         val action = ActionPathEnum.DOWNLOAD_FILE
         val params = JsonObject()
         params.addProperty("url", url)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<DownloadFileResp>>() {}.type
@@ -994,7 +1000,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.add("messages", msg.toJsonArray())
 
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<MsgId>>() {}.type)
     }
     /**
@@ -1008,7 +1014,7 @@ class Bot(
         val action = ActionPathEnum.GET_GROUP_ROOT_FILES
         val params = JsonObject()
         params.addProperty("group_id", groupId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GroupFilesResp>>() {}.type
@@ -1028,7 +1034,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("folder_id", folderId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GroupFilesResp>>() {}.type
@@ -1049,7 +1055,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("file_id", fileId)
         params.addProperty("busid", busid)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<GroupFileUrlResp>>() {}.type
@@ -1065,7 +1071,7 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend inline fun <reified T : Any> customRequestData(action: ActionPath, params: JsonObject?): ActionData<T> {
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<T>>() {}.type
@@ -1080,7 +1086,7 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend inline fun <reified T : Any> customRequestList(action: ActionPath, params: JsonObject?): ActionList<T> {
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionList<T>>() {}.type
@@ -1095,7 +1101,7 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend fun customRequestRaw(action: ActionPath, params: JsonObject?): ActionRaw {
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
     /**
@@ -1107,7 +1113,7 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend fun customRequest(action: ActionPath, params: String?): JsonsObject {
-        return actionHandler.action(channel, action, params?.run { JsonParser.parseString(this).asJsonObject })
+        return actionHandler.action(this, action, params?.run { JsonParser.parseString(this).asJsonObject })
     }
 
     /**
@@ -1121,7 +1127,7 @@ class Bot(
         val action = ActionPathEnum.GET_FORWARD_MSG
         val params = JsonObject()
         params.addProperty("id", resourceId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<ForwardMsgResp>>() {}.type
@@ -1142,7 +1148,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("page", page)
         params.addProperty("page_size", pageSize)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionList<EssenceMsgResp>>() {}.type
@@ -1160,7 +1166,7 @@ class Bot(
         val action = ActionPathEnum.SET_ESSENCE_MSG
         val params = JsonObject()
         params.addProperty("message_id", msgId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -1175,7 +1181,7 @@ class Bot(
         val action = ActionPathEnum.DELETE_ESSENCE_MSG
         val params = JsonObject()
         params.addProperty("message_id", msgId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -1204,7 +1210,7 @@ class Bot(
         params.addProperty("email", email)
         params.addProperty("college", college)
         params.addProperty("personalNote", personalNote)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
     /**
@@ -1221,7 +1227,7 @@ class Bot(
         params.addProperty("user_id", userId)
         params.add("messages", msg.toJsonArray())
 
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<MsgId>>() {}.type)
     }
     /**
@@ -1241,7 +1247,7 @@ class Bot(
         }
         params.add("messages", msg.toJsonArray())
 
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<MsgId>>() {}.type)
     }
     /**
@@ -1257,7 +1263,7 @@ class Bot(
 
         params.add("messages", msg.toJsonArray())
 
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(result.toString(), object : TypeToken<ActionData<String?>>() {}.type)
     }
     /**
@@ -1271,7 +1277,7 @@ class Bot(
         val action = ActionPathEnum.GET_WORD_SLICES
         val params = JsonObject()
         params.addProperty("content", content)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<WordSlicesResp>>() {}.type
@@ -1289,7 +1295,7 @@ class Bot(
         val action = ActionPathEnum.GET_ONLINE_CLIENTS
         val params = JsonObject()
         params.addProperty("no_cache", noCache)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<ClientsResp>>() {}.type
@@ -1307,7 +1313,7 @@ class Bot(
         val action = ActionPathEnum.OCR_IMAGE
         val params = JsonObject()
         params.addProperty("image", image)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<OcrResp>>() {}.type
@@ -1329,7 +1335,7 @@ class Bot(
         params.addProperty("user_id", userId)
         params.addProperty("file", file)
         params.addProperty("name", name)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -1344,7 +1350,7 @@ class Bot(
         val action = ActionPathEnum.SEND_GROUP_SIGN
         val params = JsonObject()
         params.addProperty("group_id", groupId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -1359,7 +1365,7 @@ class Bot(
         val action = ActionPathEnum.DELETE_UNIDIRECTIONAL_FRIEND
         val params = JsonObject()
         params.addProperty("user_id", userId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -1371,7 +1377,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getUnidirectionalFriendList(): ActionList<UnidirectionalFriendListResp> {
         val action = ActionPathEnum.GET_UNIDIRECTIONAL_FRIEND_LIST
-        val result = actionHandler.action(channel, action, null)
+        val result = actionHandler.action(this, action, null)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionList<UnidirectionalFriendListResp>>() {}.type
@@ -1386,7 +1392,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getStatus(): JsonsObject {
         val action = ActionPathEnum.GET_STATUS
-        return actionHandler.action(channel, action, null)
+        return actionHandler.action(this, action, null)
     }
 
     /**
@@ -1397,7 +1403,11 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getVersionInfo(): JsonsObject {
         val action = ActionPathEnum.GET_VERSION_INFO
-        return actionHandler.action(channel, action, null)
+        return actionHandler.action(this, action, null).apply {
+            val data = optJSONObject("data")
+            name = (data.get("app_name")?.asString ?: "onebot").trim()
+            version = (data.get("app_version")?.asString ?: "Unknown").trim()
+        }
     }
 
     /**
@@ -1410,7 +1420,7 @@ class Bot(
         val action = ActionPathEnum.GET_COOKIES
         val params = JsonObject()
         params.addProperty("domain", domain)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<CookiesResp>>() {}.type
@@ -1425,7 +1435,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getCSRFToken(): ActionData<CSRFTokenResp> {
         val action = ActionPathEnum.GET_CSRF_TOKEN
-        val result = actionHandler.action(channel, action, null)
+        val result = actionHandler.action(this, action, null)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<CSRFTokenResp>>() {}.type
@@ -1442,7 +1452,7 @@ class Bot(
         val action = ActionPathEnum.GET_CREDENTIALS
         val params = JsonObject()
         params.addProperty("domain", domain)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<CredentialsResp>>() {}.type
@@ -1460,7 +1470,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("user_id", userId)
         params.addProperty("refresh", noCache)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.fromJson(
             result.toString(),
             object : TypeToken<ActionData<UserInfoResp>>() {}.type
@@ -1482,7 +1492,7 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addProperty("file_id", fileId)
         params.addProperty("busid", busid)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 
@@ -1499,7 +1509,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("folder_id", folderId)
-        val result = actionHandler.action(channel, action, params)
+        val result = actionHandler.action(this, action, params)
         return GsonUtil.strToJavaBean(result.toString(), ActionRaw::class.java)
     }
 }

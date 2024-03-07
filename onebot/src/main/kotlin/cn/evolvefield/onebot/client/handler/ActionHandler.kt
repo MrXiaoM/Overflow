@@ -2,6 +2,7 @@ package cn.evolvefield.onebot.client.handler
 
 import cn.evole.onebot.sdk.action.ActionPath
 import cn.evole.onebot.sdk.util.json.JsonsObject
+import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.util.ActionFailedException
 import cn.evolvefield.onebot.client.util.ActionSendUtils
 import com.google.gson.JsonObject
@@ -44,8 +45,8 @@ class ActionHandler(
      * @param params  请求参数
      * @return 请求结果
      */
-    suspend fun action(channel: WebSocket, action: ActionPath, params: JsonObject?): JsonsObject {
-        if (!channel.isOpen) {
+    suspend fun action(bot: Bot, action: ActionPath, params: JsonObject?): JsonsObject {
+        if (!bot.channel.isOpen) {
             return JsonsObject(JsonObject().apply {
                 addProperty("status", "failed")
                 addProperty("retcode", -1)
@@ -53,7 +54,7 @@ class ActionHandler(
             })
         }
         val reqJson = generateReqJson(action, params)
-        val actionSendUtils = ActionSendUtils(logger, channel, timeout)
+        val actionSendUtils = ActionSendUtils(logger, bot.channel, timeout)
         val echo = reqJson["echo"].asString
         apiCallbackMap[echo] = actionSendUtils
         return try {

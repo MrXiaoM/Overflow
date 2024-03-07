@@ -214,13 +214,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             return null
         }
         val versionInfo = botImpl.getVersionInfo()
-        val data = versionInfo.optJSONObject("data")
-        val appName = (data.get("app_name")?.asString ?: "onebot").trim()
-        val appVersion = (data.get("app_version")?.asString ?: "Unknown").trim()
         if (printInfo) {
             logger.info("服务端版本信息\n${versionInfo.toPrettyString()}")
         }
-        val bot = botImpl.wrap(appName, appVersion)
+        val bot = botImpl.wrap()
 
         return bot.also {
             it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot))
