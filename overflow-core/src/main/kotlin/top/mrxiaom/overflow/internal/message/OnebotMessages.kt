@@ -79,7 +79,7 @@ internal object OnebotMessages {
                     putJsonObject("data") {
                         when (single) {
                             is PlainText -> put("text", single.content)
-                            is Face -> put("id", single.id)
+                            is Face -> put("id", single.id.toString())
                             is Image -> put("file", single.onebotFile)
                             is FlashImage -> {
                                 put("file", single.onebotFile)
@@ -87,13 +87,13 @@ internal object OnebotMessages {
                             }
                             is Audio -> put("file", single.onebotFile)
                             is ShortVideo -> put("file", single.onebotFile)
-                            is At -> put("qq", single.target)
+                            is At -> put("qq", single.target.toString())
                             is AtAll -> put("qq", "all")
                             is RockPaperScissors -> put("id", single.id) // Onebot 11 不支持自定义石头剪刀布
                             is Dice -> put("id", single.value) // Onebot 11 不支持自定义骰子
                             is PokeMessage -> {
-                                put("type", single.pokeType)
-                                put("id", single.id)
+                                put("type", single.pokeType.toString())
+                                put("id", single.id.toString())
                             }
                             is MusicShare -> {
                                 when (single.kind) {
@@ -126,11 +126,11 @@ internal object OnebotMessages {
                             }
                             is ContactRecommend -> {
                                 put("type", single.contactType.name.lowercase())
-                                put("id", single.id)
+                                put("id", single.id.toString())
                             }
                             is Location -> {
-                                put("lat", single.lat)
-                                put("lon", single.lon)
+                                put("lat", single.lat.toString())
+                                put("lon", single.lon.toString())
                                 if (single.title.isNotEmpty()) put("title", single.title)
                                 if (single.content.isNotEmpty()) put("content", single.content)
                             }
@@ -267,7 +267,7 @@ internal object OnebotMessages {
                 val data = obj["data"]?.jsonObject ?: buildJsonObject {  }
                 when (type) {
                     "text" -> add(data["text"].string)
-                    "face" -> add(Face(data["id"].int))
+                    "face" -> add(Face(data["id"].string.toInt()))
                     "image" -> {
                         val image = imageFromFile((data["url"] ?: data["file"]).string)
                         if (data["type"].string == "flash") {
@@ -282,7 +282,7 @@ internal object OnebotMessages {
                         if (data["qq"].string.lowercase() == "all")
                             add(AtAll)
                         else
-                            add(At(data["qq"]!!.jsonPrimitive.long))
+                            add(At(data["qq"].string.toLong()))
                     }
                     
                     // TODO "rps" "dice" 无法通过 OneBot 获取其具体值，先搁置
@@ -292,8 +292,8 @@ internal object OnebotMessages {
                     "new_dice" -> add(Dice(data["id"].int))
                     "poke" -> add(PokeMessage(
                         data["name"].string,
-                        data["type"].int,
-                        data["id"].int
+                        data["type"].string.toInt(),
+                        data["id"].string.toInt()
                     ))
                     "music" -> {
                         val id = data["id"].string
