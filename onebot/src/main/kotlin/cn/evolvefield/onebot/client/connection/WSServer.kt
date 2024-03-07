@@ -34,7 +34,7 @@ class WSServer(
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
         if (bot?.channel?.isOpen == true) {
-            conn.close(CloseFrame.NORMAL, "Overflow 不支持多客户端连接")
+            conn.close(CloseFrame.NORMAL, "Overflow 的反向 WS 适配器暂不支持多客户端连接")
             return
         }
         if (token.isNotBlank()) {
@@ -43,17 +43,17 @@ class WSServer(
                     if (lowercase().startsWith("bearer ")) substring(7) else this
                 }
                 if (param != token) {
-                    conn.close(CloseFrame.NORMAL, "token 错误")
+                    conn.close(CloseFrame.NORMAL, "客户端提供的 token 错误")
                     return
                 }
             } else if (handshake.resourceDescriptor.contains("access_token=")) {
                 val param = handshake.resourceDescriptor.substringAfter("access_token=").substringBefore("&")
                 if (param != token) {
-                    conn.close(CloseFrame.NORMAL, "token 错误")
+                    conn.close(CloseFrame.NORMAL, "客户端提供的 token 错误")
                     return
                 }
             } else {
-                conn.close(CloseFrame.NORMAL, "未提供 token")
+                conn.close(CloseFrame.NORMAL, "客户端未提供 token")
                 return
             }
         }
