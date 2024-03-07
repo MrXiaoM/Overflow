@@ -11,7 +11,7 @@ public class MsgAdapter implements JsonDeserializer<GetMsgResp> {
     public GetMsgResp deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
         JsonObject obj = json.getAsJsonObject();
 
-        int messageId = obj.get("message_id").getAsInt();
+        int messageId = getMessageId(obj);
         int realId = obj.get("real_id").getAsInt();
         GetMsgResp.Sender sender = gson.fromJson(obj.get("sender"), GetMsgResp.Sender.class);
         int time = obj.get("time").getAsInt();
@@ -23,5 +23,18 @@ public class MsgAdapter implements JsonDeserializer<GetMsgResp> {
         long targetId = obj.has("target_id") ? obj.get("target_id").getAsLong() : 0;
 
         return new GetMsgResp(messageId, realId, sender, time, message, rawMessage, peerId, groupId, targetId);
+    }
+
+    public static int getMessageId(JsonObject obj) {
+        String msgId = obj.get("message_id").getAsString();
+        try {
+            return Integer.parseInt(msgId);
+        } catch (NumberFormatException ignored) {
+            throw new NumberFormatException(
+                    "无法将消息ID `" + msgId + "` 的类型转换为 int32，" +
+                    "请向你所使用的 Onebot 实现维护者报告该问题，" +
+                    "不要将该问题反馈到 Overflow。"
+            );
+        }
     }
 }

@@ -25,6 +25,7 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
         String message = messageElement.isJsonPrimitive() ? messageElement.getAsJsonPrimitive().getAsString() : gson.toJson(messageElement);
         String rawMessage = obj.get("raw_message").getAsString();
         int font = obj.get("font").getAsInt();
+
         switch (messageType) {
             case "group": {
                 e = groupMessageEvent(new JsonsObject(obj));
@@ -39,7 +40,7 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
                 break;
             }
         }
-        if (e != null){
+        if (e != null) {
             e.setPostType(postType);
             e.setTime(time);
             e.setSelfId(selfId);
@@ -53,7 +54,7 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
     }
 
     private MessageEvent groupMessageEvent(JsonsObject obj) {
-        int messageId = obj.optInt("message_id");
+        int messageId = MsgAdapter.getMessageId(obj.get());
         String subType = obj.optString("sub_type");
         long groupId = obj.optLong("group_id");
         Anonymous anonymous = gson.fromJson(obj.get().get("anonymous"), Anonymous.class);
@@ -62,7 +63,7 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
     }
 
     private MessageEvent privateMessageEvent(JsonsObject obj) {
-        int messageId = obj.optInt("message_id");
+        int messageId = MsgAdapter.getMessageId(obj.get());
         String subType = obj.optString("sub_type");
         PrivateMessageEvent.PrivateSender sender = gson.fromJson(obj.get().get("sender"), PrivateMessageEvent.PrivateSender.class);
         return new PrivateMessageEvent(messageId, subType, sender);
