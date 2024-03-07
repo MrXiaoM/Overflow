@@ -74,7 +74,7 @@
 | 群匿名消息            | GroupMessageEvent               | message -> group -> anonymous   | ❌    |
 | 群系统提示            | -                               | message -> group -> notice      | ❌    |
 | 好友消息             | FriendMessageEvent              | message -> private -> friend    | ✅    |
-| 群临时会话消息          | GroupTempMessageEvent           | message -> private -> group     | ❌    |
+| 群临时会话消息          | GroupTempMessageEvent           | message -> private -> group     | ✅    |
 | 陌生人消息            | StrangerMessageEvent            | message -> private -> other     | ✅    |
 | 群戳一戳             | NudgeEvent                      | notice -> notify -> poke        | *✅*  |
 | 群撤回消息            | MessageRecallEvent.GroupRecall  | notice -> group_recall          | ✅    |

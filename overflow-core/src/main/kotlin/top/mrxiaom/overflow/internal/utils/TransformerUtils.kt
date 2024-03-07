@@ -60,7 +60,7 @@ internal fun Anonymous.wrapAsMember(group: Group): AnonymousMemberWrapper {
 
 internal suspend fun BotWrapper.group(groupId: Long): GroupWrapper {
     return getGroup(groupId) as? GroupWrapper ?: kotlin.run {
-        val data = impl.getGroupInfo(groupId, false).data ?: throw IllegalStateException("无法取得群信息")
+        val data = impl.getGroupInfo(groupId, false).data ?: throw IllegalStateException("无法取得群 $groupId 的信息")
         updateGroup(GroupWrapper(this, data))
     }
 }

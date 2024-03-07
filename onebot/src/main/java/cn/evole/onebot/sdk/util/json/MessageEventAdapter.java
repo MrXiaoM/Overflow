@@ -65,8 +65,11 @@ public class MessageEventAdapter implements JsonDeserializer<MessageEvent> {
     private MessageEvent privateMessageEvent(JsonsObject obj) {
         int messageId = MsgAdapter.getMessageId(obj.get());
         String subType = obj.optString("sub_type");
+        long groupId = obj.optLong("group_id");
+        int tempSource = obj.optInt("temp_source", Integer.MIN_VALUE);
         PrivateMessageEvent.PrivateSender sender = gson.fromJson(obj.get().get("sender"), PrivateMessageEvent.PrivateSender.class);
-        return new PrivateMessageEvent(messageId, subType, sender);
+        String fromNick = obj.optString("from_nick", sender.nickname);
+        return new PrivateMessageEvent(messageId, subType, sender, groupId, tempSource, fromNick);
     }
 
     private MessageEvent guildMessageEvent(JsonsObject obj) {

@@ -7,14 +7,12 @@ import cn.evole.onebot.sdk.event.request.FriendAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.contact.remarkOrNick
-import net.mamoe.mirai.event.events.FriendMessageEvent
-import net.mamoe.mirai.event.events.MessageRecallEvent
-import net.mamoe.mirai.event.events.NewFriendRequestEvent
-import net.mamoe.mirai.event.events.StrangerMessageEvent
+import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
+import top.mrxiaom.overflow.internal.utils.*
 import top.mrxiaom.overflow.internal.utils.bot
 import top.mrxiaom.overflow.internal.utils.queryProfile
 import top.mrxiaom.overflow.internal.utils.wrapAsFriend
@@ -59,7 +57,37 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                     friend, miraiMessage, messageSource.time
                 ))
             }
-            "other", "group" -> { // TODO: group 群临时会话
+            "group" -> {
+                if (listOf("shamrock", "go-cqhttp").contains(bot.appName.lowercase())
+                    && !listOf(/*Group:*/0, /*Discussion:*/7).contains(e.tempSource)) return
+                if (e.groupId <= 0) return
+                val group = bot.group(e.groupId)
+                val member = group.queryMember(e.userId)
+
+                if (member == null || member.id == bot.id) {
+                    // TODO: 过滤自己发送的消息
+                    return
+                }
+                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
+                val messageString = miraiMessage.toString()
+                val messageSource = IncomingSource.temp(
+                    bot = bot,
+                    ids = intArrayOf(e.messageId),
+                    internalIds = intArrayOf(e.messageId),
+                    originalMessage = miraiMessage,
+                    sender = member,
+                    subject = member,
+                    isOriginalMessageInitialized = true,
+                    target = bot,
+                    time = (e.time / 1000).toInt()
+                )
+                miraiMessage = messageSource.plus(miraiMessage)
+                bot.logger.verbose("[群临时消息] ${member.remarkOrNick}(${member.id}) -> $messageString")
+                bot.eventDispatcher.broadcastAsync(GroupTempMessageEvent(
+                    member, miraiMessage, messageSource.time
+                ))
+            }
+            "other" -> {
                 val stranger = e.privateSender.wrapAsStranger(bot)
 
                 if (stranger.id == bot.id) {

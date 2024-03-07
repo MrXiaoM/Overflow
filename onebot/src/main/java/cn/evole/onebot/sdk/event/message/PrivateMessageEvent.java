@@ -24,7 +24,22 @@ public class PrivateMessageEvent extends MessageEvent {
     public int messageId;
     public String subType;
     public PrivateSender privateSender;
-
+    public long groupId;
+    /**
+     * go-cqhttp: <a href="https://docs.go-cqhttp.org/reference/data_struct.html#post-message-tempsource">docs</a><br/>
+     *     Group(0),
+     *     Consultation(1),
+     *     Seek(2),
+     *     QQMovie(3),
+     *     HotChat(4),
+     *     VerifyMsg(6),
+     *     Discussion(7),
+     *     Dating(8),
+     *     Contact(9),
+     *     Unknown(-1)
+     */
+    public int tempSource;
+    public String fromNick;
     /**
      * sender信息
      */
