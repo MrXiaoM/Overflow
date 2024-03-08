@@ -6,4 +6,4 @@ class ActionFailedException(
     val app: String,
     val msg: String,
     val json: JsonsObject
-): IllegalStateException("app=$app ,message=$msg, retJson=$json")
+): IllegalStateException("app=$app, message=$msg, retJson=$json")

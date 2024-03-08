@@ -10,6 +10,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
 import org.java_websocket.WebSocket
 import org.slf4j.Logger
+import java.util.*
 
 /**
  * Description:
@@ -45,10 +46,29 @@ class ActionSendRequest(
             }.onFailure { resp.cancel() }.getOrThrow()
         }
         if (resp.optString("status") == "failed") {
-            val ret = resp.optInt("retcode").takeIf { it != 0 }?.run { ", retCode=$this" } ?: ""
+            val extra = run {
+                req["params"]?.asJsonObject?.also { params ->
+                    params["message"]?.asJsonArray?.also { messages ->
+                        val extraFileTypes = messages.filter {
+                            listOf("image", "record", "video").contains(it.asJsonObject?.get("type")?.asString)
+                                    && it.asJsonObject?.has("file") == true
+                        }.mapNotNull {
+                            val file = it.asJsonObject!!["file"].asString
+                            if (file.startsWith("base64://")) {
+                                val bytes = Base64.getDecoder().decode(file.replace("base64://", ""))
+                                "msgFileType=${bytes.fileType}"
+                            } else null
+                        }
+                        if (extraFileTypes.isNotEmpty()) {
+                            return@run extraFileTypes.joinToString(", ")
+                        }
+                    }
+                }
+                ""
+            }
             throw ActionFailedException(
                 app = "${bot.appName} v${bot.appVersion}",
-                msg = "${resp.optString("message")}$ret",
+                msg = "${resp.optString("message")}$extra",
                 json = resp
             )
         }

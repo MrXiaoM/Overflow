@@ -1,6 +1,7 @@
 package top.mrxiaom.overflow.internal.message.data
 
 
+import cn.evolvefield.onebot.client.util.fileType
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Contact
@@ -11,6 +12,7 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.utils.base64Length
 import top.mrxiaom.overflow.internal.utils.lengthToString
+import java.util.*
 
 @OptIn(MiraiInternalApi::class)
 internal class WrappedImageProtocol : InternalImageProtocol {
@@ -48,12 +50,13 @@ internal data class WrappedImage(
     override val height: Int,
 ): Image {
     private val _stringValue: String? by lazy(LazyThreadSafetyMode.NONE) {
-        val file = if (url.startsWith("base64://") && url.length > 60) {
-            val s = url.substring(9)
+        val fileString = if (url.startsWith("base64://") && url.length > 32) {
+            val s = url.replace("base64://", "")
             val len = base64Length(s)
-            "base64://${s.substring(0, 32)}... (about ${lengthToString(len)})"
+            val type = Base64.getDecoder().decode(s).fileType ?: "*"
+            "${url.substring(0, 32)}... (${if (type == "*") "" else "$type, "}about ${lengthToString(len)})"
         } else url
-        "[overflow:image,url=$file,isEmoji=$isEmoji]"
+        "[overflow:image,url=$fileString]"
     }
     override val imageId: String = url
 
