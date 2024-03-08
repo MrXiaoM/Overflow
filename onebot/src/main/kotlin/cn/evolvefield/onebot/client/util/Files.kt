@@ -54,12 +54,12 @@ val COUNT_BYTES_USED_FOR_DETECTING_FILE_TYPE: Int by lazy { FILE_TYPES.maxOf { i
  */
 
 val ByteArray.fileType: String?
-    get() = getFileType(copyOf(COUNT_BYTES_USED_FOR_DETECTING_FILE_TYPE))
+    get() = getFileTypeByHeader(copyOf(COUNT_BYTES_USED_FOR_DETECTING_FILE_TYPE))
 
 /**
  * 根据文件头获取文件类型
  */
-fun getFileType(fileHeader: ByteArray): String? {
+fun getFileTypeByHeader(fileHeader: ByteArray): String? {
     val hex = fileHeader.toUHexString(
         "",
         length = COUNT_BYTES_USED_FOR_DETECTING_FILE_TYPE.coerceAtMost(fileHeader.size)
