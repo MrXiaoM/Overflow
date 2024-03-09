@@ -2,12 +2,7 @@
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
-import cn.evole.onebot.sdk.event.notice.group.GroupBanNoticeEvent
-import cn.evole.onebot.sdk.event.notice.group.GroupDecreaseNoticeEvent
-import cn.evole.onebot.sdk.event.notice.group.GroupIncreaseNoticeEvent
-import cn.evole.onebot.sdk.event.notice.group.GroupMsgDeleteNoticeEvent
-import cn.evole.onebot.sdk.event.notice.group.GroupNotifyNoticeEvent
-import cn.evole.onebot.sdk.event.notice.group.GroupTitleChangeNoticeEvent
+import cn.evole.onebot.sdk.event.notice.group.*
 import cn.evole.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener

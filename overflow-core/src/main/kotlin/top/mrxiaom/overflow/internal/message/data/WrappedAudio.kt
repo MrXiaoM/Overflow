@@ -7,7 +7,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.safeCast
 import top.mrxiaom.overflow.internal.utils.base64Length
 import top.mrxiaom.overflow.internal.utils.lengthToString
-import java.util.Base64
+import java.util.*
 
 @Serializable
 @SerialName(WrappedAudio.SERIAL_NAME)

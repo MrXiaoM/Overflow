@@ -13,10 +13,6 @@ import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
 import top.mrxiaom.overflow.internal.utils.*
-import top.mrxiaom.overflow.internal.utils.bot
-import top.mrxiaom.overflow.internal.utils.queryProfile
-import top.mrxiaom.overflow.internal.utils.wrapAsFriend
-import top.mrxiaom.overflow.internal.utils.wrapAsStranger
 
 internal fun addFriendListeners() {
     listOf(

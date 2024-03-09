@@ -4,7 +4,6 @@ import cn.evole.onebot.sdk.action.ActionRaw
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
-import cn.evolvefield.onebot.client.handler.EventBus
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
@@ -17,7 +16,6 @@ import net.mamoe.mirai.data.MemberInfo
 import net.mamoe.mirai.data.StrangerInfo
 import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.event.Event
-import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.internal.event.EventChannelToEventDispatcherAdapter
 import net.mamoe.mirai.internal.event.InternalEventMechanism
@@ -26,7 +24,6 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import top.mrxiaom.overflow.BotBuilder
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.IBotStarter
 import top.mrxiaom.overflow.OverflowAPI

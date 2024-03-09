@@ -23,7 +23,6 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.internal.Overflow
-import top.mrxiaom.overflow.internal.message.OnebotMessages
 import java.lang.management.ManagementFactory
 import java.lang.management.MemoryMXBean
 import java.lang.management.MemoryUsage

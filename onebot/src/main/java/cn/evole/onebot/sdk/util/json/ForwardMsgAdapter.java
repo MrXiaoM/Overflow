@@ -3,7 +3,10 @@ package cn.evole.onebot.sdk.util.json;
 
 import cn.evole.onebot.sdk.response.group.ForwardMsgResp;
 import cn.evole.onebot.sdk.util.JsonHelper;
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

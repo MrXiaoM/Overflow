@@ -6,7 +6,6 @@ import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.contact.MemberPermission
 import top.mrxiaom.overflow.event.LegacyGuildMessageEvent
-import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.utils.bot
 

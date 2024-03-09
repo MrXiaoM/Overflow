@@ -16,7 +16,6 @@ import net.mamoe.mirai.event.events.BotEvent
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.systemProp
 import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
-import top.mrxiaom.overflow.internal.message.OnebotMessages
 import kotlin.coroutines.CoroutineContext
 
 /**

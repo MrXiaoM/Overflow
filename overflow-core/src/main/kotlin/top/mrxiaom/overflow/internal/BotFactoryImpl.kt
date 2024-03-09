@@ -1,11 +1,9 @@
 package top.mrxiaom.overflow.internal
 
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.auth.BotAuthorization
 import net.mamoe.mirai.utils.BotConfiguration
-import top.mrxiaom.overflow.internal.contact.BotWrapper
 
 internal object BotFactoryImpl : BotFactory {
     override fun newBot(qq: Long, passwordMd5: ByteArray, configuration: BotConfiguration): Bot = end(qq)

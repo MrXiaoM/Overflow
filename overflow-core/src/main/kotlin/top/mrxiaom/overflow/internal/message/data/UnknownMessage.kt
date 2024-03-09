@@ -2,14 +2,10 @@ package top.mrxiaom.overflow.internal.message.data
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import net.mamoe.mirai.message.data.AbstractPolymorphicMessageKey
 import net.mamoe.mirai.message.data.MessageContent
 import net.mamoe.mirai.utils.createFileIfNotExists
 import net.mamoe.mirai.utils.safeCast
-import top.mrxiaom.overflow.message.data.ContactRecommend
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*

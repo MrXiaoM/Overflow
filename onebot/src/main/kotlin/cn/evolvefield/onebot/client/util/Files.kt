@@ -12,9 +12,6 @@
 
 package cn.evolvefield.onebot.client.util
 
-import kotlin.jvm.JvmMultifileClass
-import kotlin.jvm.JvmName
-
 private class FileType(
     signature: String,
     val requiredHeaderSize: Int,
