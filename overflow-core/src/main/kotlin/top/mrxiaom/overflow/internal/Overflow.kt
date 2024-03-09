@@ -2,6 +2,7 @@ package top.mrxiaom.overflow.internal
 
 import cn.evole.onebot.sdk.action.ActionRaw
 import cn.evole.onebot.sdk.response.contact.FriendInfoResp
+import cn.evole.onebot.sdk.util.JsonHelper.gson
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import kotlinx.coroutines.CoroutineName
@@ -230,7 +231,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
         val versionInfo = botImpl.getVersionInfo()
         if (printInfo) {
-            logger.info("服务端版本信息\n${versionInfo.toPrettyString()}")
+            logger.info("服务端版本信息\n${gson.toJson(versionInfo)}")
         }
         val bot = botImpl.wrap()
 

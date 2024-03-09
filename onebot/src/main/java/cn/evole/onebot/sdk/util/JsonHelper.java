@@ -1,14 +1,11 @@
 package cn.evole.onebot.sdk.util;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 
 import java.util.function.Supplier;
 
 public abstract class JsonHelper {
-    public static final Gson gson = new Gson();
+    public static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     public static int ignorable(JsonObject obj, String key, int def) {
         JsonElement element = obj.get(key);
         if (element == null || !element.isJsonPrimitive()) return def;
