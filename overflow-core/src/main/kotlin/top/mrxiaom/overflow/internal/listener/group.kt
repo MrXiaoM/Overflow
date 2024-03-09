@@ -3,6 +3,8 @@ package top.mrxiaom.overflow.internal.listener
 
 import cn.evole.onebot.sdk.event.message.GroupMessageEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupBanNoticeEvent
+import cn.evole.onebot.sdk.event.notice.group.GroupDecreaseNoticeEvent
+import cn.evole.onebot.sdk.event.notice.group.GroupIncreaseNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupMsgDeleteNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupNotifyNoticeEvent
 import cn.evole.onebot.sdk.event.notice.group.GroupTitleChangeNoticeEvent
@@ -26,6 +28,8 @@ internal fun addGroupListeners() {
         GroupNotifyListener(),
         GroupMessageRecallListener(),
         GroupAddRequestListener(),
+        GroupDecreaseNoticeListener(),
+        GroupIncreaseNoticeListener(),
         GroupTitleChangeNoticeListener(),
         GroupBanNoticeListener(),
 
@@ -148,6 +152,47 @@ internal class GroupAddRequestListener : EventListener<GroupAddRequestEvent> {
                     groupId = e.groupId,
                     groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),
                     invitorNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: ""
+                ))
+            }
+        }
+    }
+}
+
+internal class GroupDecreaseNoticeListener : EventListener<GroupDecreaseNoticeEvent> {
+    override suspend fun onMessage(e: GroupDecreaseNoticeEvent) {
+        val bot = e.bot ?: return
+        val group = bot.group(e.groupId)
+        val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+        when (e.subType) {
+            "leave" -> { // 主动退群
+                bot.eventDispatcher.broadcastAsync(MemberLeaveEvent.Quit(member))
+            }
+            "kick" -> { // 成员被踢
+                bot.eventDispatcher.broadcastAsync(MemberLeaveEvent.Kick(
+                    member = member,
+                    operator = group.queryMember(e.operatorId)
+                ))
+            }
+            "kick_me" -> { // 登录号被踢
+                // Mirai没有这个Event
+            }
+        }
+    }
+}
+
+internal class GroupIncreaseNoticeListener : EventListener<GroupIncreaseNoticeEvent> {
+    override suspend fun onMessage(e: GroupIncreaseNoticeEvent) {
+        val bot = e.bot ?: return
+        val group = bot.group(e.groupId)
+        val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+        when (e.subType) {
+            "approve" -> { // 管理员已同意入群
+                bot.eventDispatcher.broadcastAsync(MemberJoinEvent.Active(member))
+            }
+            "invite" -> { // 管理员邀请入群
+                bot.eventDispatcher.broadcastAsync(MemberJoinEvent.Invite(
+                    member = member,
+                    invitor = group.queryMember(e.operatorId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
                 ))
             }
         }
