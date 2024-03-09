@@ -1,23 +1,23 @@
 package cn.evole.onebot.sdk.util.json;
 
 import cn.evole.onebot.sdk.response.group.GetMsgResp;
+import cn.evole.onebot.sdk.util.JsonHelper;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
 
-public class MsgAdapter implements JsonDeserializer<GetMsgResp> {
-    Gson gson = new Gson();
+public class MsgAdapter extends JsonHelper implements JsonDeserializer<GetMsgResp> {
+
 
     public GetMsgResp deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
         JsonObject obj = json.getAsJsonObject();
 
         int messageId = getMessageId(obj);
-        int realId = obj.get("real_id").getAsInt();
+        int realId = ignorable(obj, "real_id", 0);
         GetMsgResp.Sender sender = gson.fromJson(obj.get("sender"), GetMsgResp.Sender.class);
         int time = obj.get("time").getAsInt();
-        JsonElement messageElement = obj.get("message");
-        String message = messageElement.isJsonPrimitive() ? messageElement.getAsJsonPrimitive().getAsString() : gson.toJson(messageElement);
-        String rawMessage = obj.has("raw_message") ? obj.get("raw_message").getAsString() : "";
+        String message = forceString(obj, "message");
+        String rawMessage = ignorable(obj, "raw_message", "");
         long peerId = obj.has("peer_id") ? obj.get("peer_id").getAsLong() : 0;
         long groupId = obj.has("group_id") ? obj.get("group_id").getAsLong() : 0;
         long targetId = obj.has("target_id") ? obj.get("target_id").getAsLong() : 0;

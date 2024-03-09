@@ -1,6 +1,6 @@
 package cn.evolvefield.onebot.client.util
 
-import cn.evole.onebot.sdk.util.json.JsonsObject
+import cn.evole.onebot.sdk.util.JsonHelper.ignorable
 import cn.evolvefield.onebot.client.core.Bot
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CompletableDeferred
@@ -28,14 +28,13 @@ class ActionSendRequest(
     private val channel: WebSocket,
     private val requestTimeout: Long
 ) {
-    private val resp = CompletableDeferred<JsonsObject>()
-    //private var resp: JsonsObject? = null
+    private val resp = CompletableDeferred<JsonObject>()
     /**
      * @param req Request json data
      * @return Response json data
      */
     @Throws(TimeoutCancellationException::class, ActionFailedException::class)
-    suspend fun send(req: JsonObject): JsonsObject {
+    suspend fun send(req: JsonObject): JsonObject {
         val resp = mutex.withLock {
             kotlin.runCatching {
                 withTimeout(requestTimeout) {
@@ -45,7 +44,7 @@ class ActionSendRequest(
                 }
             }.onFailure { resp.cancel() }.getOrThrow()
         }
-        if (resp.optString("status") == "failed") {
+        if (resp.get("status").asString == "failed") {
             val extra = run {
                 req["params"]?.asJsonObject?.also { params ->
                     params["message"]?.asJsonArray?.also { messages ->
@@ -68,22 +67,18 @@ class ActionSendRequest(
             }
             throw ActionFailedException(
                 app = "${bot.appName} v${bot.appVersion}",
-                msg = "${resp.optString("message")}$extra",
+                msg = "${ignorable(resp, "message", "")}$extra",
                 json = resp
             )
         }
         return resp
-        //synchronized(this) { this.wait(requestTimeout) }
-        //return resp
     }
 
     /**
      * @param resp Response json data
      */
-    fun onCallback(resp: JsonsObject) {
+    fun onCallback(resp: JsonObject) {
         this.resp.complete(resp)
-        //this.resp = resp
-        //synchronized(this) { this.notify() }
     }
 
     companion object {

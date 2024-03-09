@@ -2,7 +2,8 @@ package cn.evolvefield.onebot.client.util
 
 import cn.evole.onebot.sdk.event.Event
 import cn.evole.onebot.sdk.map.MessageMap
-import cn.evole.onebot.sdk.util.json.JsonsObject
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
 
 /**
  * Description:
@@ -12,7 +13,7 @@ import cn.evole.onebot.sdk.util.json.JsonsObject
  */
 object ListenerUtils {
     fun getMessageType(message: String?): Class<out Event> {
-        return getMessageType(JsonsObject(message))
+        return getMessageType(JsonParser.parseString(message).asJsonObject)
     }
 
     /**
@@ -21,13 +22,13 @@ object ListenerUtils {
      * @param obj json
      * @return
      */
-    fun getMessageType(obj: JsonsObject): Class<out Event> {
+    fun getMessageType(obj: JsonObject): Class<out Event> {
         var type: String? = null
-        val postType = obj.optString("post_type")
+        val postType = obj.get("post_type").asString
         if ("message" == postType) {
             type = "wholeMessage"
             //消息类型
-            val messageType = obj.optString("message_type")
+            val messageType = obj.get("message_type").asString
             if ("group" == messageType) {
                 //群聊消息类型
                 type = "groupMessage"
@@ -40,13 +41,13 @@ object ListenerUtils {
             }
         } else if ("request" == postType) {
             //请求类型
-            type = obj.optString("request_type")
+            type = obj.get("request_type").asString
         } else if ("notice" == postType) {
             //通知类型
-            type = obj.optString("notice_type")
+            type = obj.get("notice_type").asString
         } else if ("meta_event" == postType) {
             //周期类型
-            type = obj.optString("meta_event_type")
+            type = obj.get("meta_event_type").asString
         }
         return MessageMap.messageMap[type]!!
     }

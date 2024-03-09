@@ -2,7 +2,6 @@ package cn.evole.onebot.sdk.event.message;
 
 import cn.evole.onebot.sdk.util.json.MessageEventAdapter;
 import com.google.gson.annotations.JsonAdapter;
-import com.google.gson.annotations.SerializedName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,7 +23,7 @@ public class PrivateMessageEvent extends MessageEvent {
     public int messageId;
     public String subType;
     public PrivateSender privateSender;
-    public long groupId;
+    public long groupId; // OpenShamrock
     /**
      * go-cqhttp: <a href="https://docs.go-cqhttp.org/reference/data_struct.html#post-message-tempsource">docs</a><br/>
      *     Group(0),
@@ -39,25 +38,18 @@ public class PrivateMessageEvent extends MessageEvent {
      *     Unknown(-1)
      */
     public int tempSource;
-    public String fromNick;
+    public String fromNick; // OpenShamrock
     /**
      * sender信息
      */
     @Data
+    @JsonAdapter(MessageEventAdapter.PrivateSender.class)
     public static class PrivateSender {
-
-        @SerializedName( "user_id")
         public long userId;
-
-        @SerializedName( "nickname")
+        public long groupId; // go-cqhttp
         public String nickname;
-
-        @SerializedName( "sex")
         public String sex;
-
-        @SerializedName( "age")
         public int age;
-
     }
 
 }

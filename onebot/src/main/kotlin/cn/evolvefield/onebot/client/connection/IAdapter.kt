@@ -1,9 +1,10 @@
 package cn.evolvefield.onebot.client.connection
 
-import cn.evole.onebot.sdk.util.json.JsonsObject
+import cn.evole.onebot.sdk.util.JsonHelper.ignorable
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.util.ActionSendRequest
+import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -18,8 +19,8 @@ interface IAdapter {
 
     fun onReceiveMessage(message: String) {
         try {
-            val json = JsonsObject(message)
-            if (json.optString(META_EVENT) != HEART_BEAT) { // 过滤心跳
+            val json = JsonParser.parseString(message).asJsonObject
+            if (ignorable(json, META_EVENT, "") != HEART_BEAT) { // 过滤心跳
                 logger.debug("Client received <-- {}", json.toString())
 
                 if (json.has(API_RESULT_KEY)) { // 接口回调

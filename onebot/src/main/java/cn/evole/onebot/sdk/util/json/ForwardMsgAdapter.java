@@ -2,41 +2,45 @@ package cn.evole.onebot.sdk.util.json;
 
 
 import cn.evole.onebot.sdk.response.group.ForwardMsgResp;
+import cn.evole.onebot.sdk.util.JsonHelper;
 import com.google.gson.*;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ForwardMsgAdapter implements JsonDeserializer<ForwardMsgResp> {
-    Gson gson = new Gson();
-
+public class ForwardMsgAdapter extends JsonHelper implements JsonDeserializer<ForwardMsgResp> {
     public ForwardMsgResp deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) {
         List<ForwardMsgResp.Node> nodes = new ArrayList<>();
         JsonObject jsonObj = json.getAsJsonObject();
         JsonElement messagesArray;
         messagesArray = jsonObj.get("messages");
         if (messagesArray == null) {
-            messagesArray = jsonObj.get("message");
+            messagesArray = jsonObj.get("message"); // Lagrange
         }
         for (JsonElement jsonElement : messagesArray.getAsJsonArray()) {
-            JsonsObject obj = new JsonsObject(jsonElement.getAsJsonObject());
+            JsonObject obj = jsonElement.getAsJsonObject();
             if (obj.has("data")) {
-                obj = new JsonsObject(jsonElement.getAsJsonObject().get("data").getAsJsonObject());
+                obj = obj.get("data").getAsJsonObject();
             }
-            int time = obj.optInt("time");
-            String messageType = obj.optString("message_type");
-            int messageId = obj.optInt("message_id");
-            int realId = obj.optInt("real_id");
-            ForwardMsgResp.Sender sender = gson.fromJson(obj.optJSONObject("anonymous"), ForwardMsgResp.Sender.class);
+            int time = ignorable(obj, "time", 0); // OpenShamrock
+            String messageType = ignorable(obj, "message_type", ""); // OpenShamrock
+            int messageId = ignorable(obj, "message_id", 0); // OpenShamrock
+            int realId = ignorable(obj, "real_id", 0); // OpenShamrock
+            ForwardMsgResp.Sender sender = fromJson(obj, "sender", ForwardMsgResp.Sender.class); // OpenShamrock
+            if (sender == null) { // Lagrange
+                long userId = ignorable(obj, "user_id", 0);
+                String nickName = ignorable(obj, "nickname", "");
+                sender = new ForwardMsgResp.Sender(userId, nickName, "unknown", 0, "");
+            }
             String message;
             if (obj.has("content")) {
-                message = gson.toJson(obj.optJSONArray("content"));
+                message = forceString(obj, "content"); // Lagrange
             } else {
-                message = gson.toJson(obj.optJSONArray("message"));
+                message = forceString(obj, "message"); // go-cqhttp, OpenShamrock
             }
-            long peerId = obj.optLong("peer_id");
-            long targetId = obj.optLong("target_id");
+            long peerId = ignorable(obj, "peer_id", 0); // OpenShamrock
+            long targetId = ignorable(obj, "target_id", 0); // OpenShamrock
             nodes.add(new ForwardMsgResp.Node(time, messageType, messageId, realId, peerId, targetId, sender, message));
         }
         return new ForwardMsgResp(nodes);

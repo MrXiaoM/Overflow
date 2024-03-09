@@ -1,7 +1,7 @@
 package cn.evolvefield.onebot.client.handler
 
 import cn.evole.onebot.sdk.action.ActionPath
-import cn.evole.onebot.sdk.util.json.JsonsObject
+import cn.evole.onebot.sdk.util.JsonHelper.ignorable
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.util.ActionFailedException
 import cn.evolvefield.onebot.client.util.ActionSendRequest
@@ -32,8 +32,8 @@ class ActionHandler(
      *
      * @param respJson 回调结果
      */
-    fun onReceiveActionResp(respJson: JsonsObject) {
-        respJson.optString("echo").takeIf(String::isNotBlank)?.also { echo ->
+    fun onReceiveActionResp(respJson: JsonObject) {
+        ignorable(respJson, "echo", "").takeIf(String::isNotBlank)?.also { echo ->
             // 唤醒挂起的协程
             apiCallbackMap.remove(echo)?.onCallback(respJson) ?: run {
                 logger.warn("收到了未知的 action 回应: $respJson")
@@ -47,18 +47,17 @@ class ActionHandler(
      * @param params  请求参数
      * @return 请求结果
      */
-    suspend fun action(bot: Bot, action: ActionPath, params: JsonObject?): JsonsObject {
+    suspend fun action(bot: Bot, action: ActionPath, params: JsonObject?): JsonObject {
         if (!bot.channel.isOpen) {
-            return JsonsObject(JsonObject().apply {
+            return JsonObject().apply {
                 addProperty("status", "failed")
                 addProperty("retcode", -1)
                 addProperty("message", "WebSocket channel is not opened")
-            })
+            }
         }
-        val reqJson = generateReqJson(action, params)
         val request = ActionSendRequest(bot, logger, bot.channel, timeout)
-        val echo = reqJson["echo"].asString.also {
-            apiCallbackMap[it] = request
+        val reqJson = generateReqJson(action, params) { echo ->
+            apiCallbackMap[echo] = request
         }
         return try {
             request.send(reqJson)
@@ -66,11 +65,11 @@ class ActionHandler(
             logger.warn("Request failed: [${action.path}] ${e.message}")
             logger.trace("Stacktrace: ", e)
             if (e is ActionFailedException) e.json
-            else JsonsObject(JsonObject().apply {
+            else JsonObject().apply {
                 addProperty("status", "failed")
                 addProperty("retcode", -1)
                 addProperty("message", e.message ?: "")
-            })
+            }
         }
     }
 
@@ -82,14 +81,18 @@ class ActionHandler(
      * @param params 请求参数
      * @return 请求数据结构
      */
-    private fun generateReqJson(action: ActionPath, params: JsonObject?): JsonObject {
+    private fun generateReqJson(
+        action: ActionPath,
+        params: JsonObject?,
+        block: (String) -> Unit = {}
+    ): JsonObject {
         val json = JsonObject()
         json.addProperty("action", action.path)
         if (params != null) json.add("params", params)
-        json.addProperty("echo", echo++)
-        if (echo >= Long.MAX_VALUE) {
-            echo = 0 // reset echo
-        }
+        val echoLong = echo++
+        json.addProperty("echo", echoLong)
+        if (echo >= Long.MAX_VALUE) echo = 0 // reset echo
+        block(echoLong.toString())
         return json
     }
 
