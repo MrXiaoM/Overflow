@@ -4,9 +4,11 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
+import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
+import net.mamoe.mirai.console.events.StartupEvent
 import net.mamoe.mirai.console.extensions.PostStartupExtension
 import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
 import net.mamoe.mirai.console.permission.Permission
@@ -18,8 +20,13 @@ import net.mamoe.mirai.console.plugin.description.PluginDescription
 import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.SemVersion
+import net.mamoe.mirai.event.ConcurrencyKind
+import net.mamoe.mirai.event.EventPriority
+import net.mamoe.mirai.event.GlobalEventChannel
+import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.weeksToMillis
 import org.java_websocket.client.WebSocketClient
+import org.slf4j.Logger
 import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.internal.Overflow
@@ -38,25 +45,25 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     override val parentPermission: Permission
         get() = ConsoleCommandOwner.parentPermission
 
+    private lateinit var miraiLogger: MiraiLogger
+    private lateinit var oneBotLogger: Logger
+
     override fun permissionId(name: String): PermissionId {
         return ConsoleCommandOwner.permissionId(name)
     }
 
-    private fun net.mamoe.mirai.console.internal.extension.AbstractConcurrentComponentStorage.contributePostStartupExtension(
-        instance: PostStartupExtension
-    ): Unit = contribute(PostStartupExtension, this@OverflowCoreAsPlugin, lazyInstance = { instance })
-
     @OptIn(ConsoleExperimentalApi::class, ConsoleFrontEndImplementation::class)
-    suspend fun onEnable() {
-        val miraiLogger = LoggerInFolder(Overflow::class, "Onebot", File("logs/onebot"), 1.weeksToMillis)
-        val oneBotLogger = net.mamoe.mirai.console.internal.logging.externalbind.slf4j.SLF4JAdapterLogger(miraiLogger)
+    fun onEnable() {
+        miraiLogger = LoggerInFolder(Overflow::class, "Onebot", File("logs/onebot"), 1.weeksToMillis)
+        oneBotLogger = net.mamoe.mirai.console.internal.logging.externalbind.slf4j.SLF4JAdapterLogger(miraiLogger)
 
-        MiraiConsoleImplementation.getBridge().globalComponentStorage.contributePostStartupExtension {
-            onPostStartup()
-        }
+        GlobalEventChannel
+            .parentScope(MiraiConsole.INSTANCE)
+            .subscribeOnce<StartupEvent>(
+                priority = EventPriority.HIGHEST,
+            ) { onPostStartup() }
 
         OnebotMessages.registerSerializers()
-        Overflow.instance.startWithConfig(true, oneBotLogger)
 
         // No AutoLogin
         val dataScope: MiraiConsoleImplementation.ConsoleDataScope = net.mamoe.mirai.console.internal.data.builtins.DataScope
@@ -71,12 +78,12 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 OverflowAPI.logger.warning("由于 mirai 端不再需要处理登录，Overflow 已清空自动登录配置，旧配置已备份到 ${backup.name}")
             }
         }
+
+        // Unregister unnecessary commands
         val unregisterCommands = arrayOf("login", "autoLogin", "status")
         CommandManager.INSTANCE.allRegisteredCommands.filter {
             it.owner == ConsoleCommandOwner && unregisterCommands.contains(it.primaryName)
-        }.forEach {
-            CommandManager.INSTANCE.unregisterCommand(it)
-        }
+        }.forEach(CommandManager.INSTANCE::unregisterCommand)
 
         BuiltInCommands.StatusCommand.register()
 
@@ -150,17 +157,20 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     }
 
     @Suppress("DEPRECATION_ERROR")
-    private fun onPostStartup() {
-        net.mamoe.mirai.internal.spi.EncryptService.factory?.also {
-            OverflowAPI.logger.apply {
-                warning("-------------------------------------------")
-                warning("你的 mirai-console 中已安装签名服务!")
-                warning("这在 overflow 中是不必要的，请移除签名服务相关插件")
-                warning("当前已装载签名服务: ${it::class.jvmName}")
-                warning("位置: ${it::class.java.classLoader}")
-                warning("-------------------------------------------")
+    private suspend fun StartupEvent.onPostStartup() {
+        runCatching {
+            net.mamoe.mirai.internal.spi.EncryptService.factory?.also {
+                OverflowAPI.logger.apply {
+                    warning("-------------------------------------------")
+                    warning("你的 mirai-console 中已安装签名服务!")
+                    warning("这在 overflow 中是不必要的，请移除签名服务相关插件")
+                    warning("当前已装载签名服务: ${it::class.jvmName}")
+                    warning("位置: ${it::class.java.classLoader}")
+                    warning("-------------------------------------------")
+                }
             }
         }
+        Overflow.instance.startWithConfig(true, oneBotLogger)
     }
 
     internal object TheLoader : PluginLoader<Plugin, PluginDescription> {
@@ -171,9 +181,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
 
         override fun enable(plugin: Plugin) {
             if (plugin !== OverflowCoreAsPlugin) return
-            runBlocking(CoroutineName("OverflowPluginLoader")) {
-                plugin.onEnable()
-            }
+            plugin.onEnable()
         }
 
         override fun load(plugin: Plugin) {
