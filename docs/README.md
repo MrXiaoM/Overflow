@@ -14,7 +14,7 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 欢迎补充任何视频平台上的 Overflow 部署教程视频，提交格式为 `视频简略标题 (视频平台/视频作者)`
 
-+ [2024 手把手教你配置QQ机器人 (哔哩哔哩/人间工作)](https://www.bilibili.com/video/BV17m41197tQ/)
++ [2024 手把手教你配置QQ机器人 (百度归档/人间工作)](https://vdse.bdstatic.com/017126b61b0e633156c0d4217fb5e0ec.mp4)
 
 ## 安装方法
 
