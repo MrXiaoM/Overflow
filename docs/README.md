@@ -28,7 +28,7 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 按以上任意一种方法安装好后，请往下看进行进一步配置。
 
-# 配置文件
+## 配置文件
 
 另请参见 [配置文件说明](configuration.md)
 
@@ -48,7 +48,7 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 + 对于 **非QQ平台** 或者 **无法获得账号凭证** 的 Onebot 实现，请在 `overflow.json` 中开启 `no_platform`。
 + Overflow 不支持 CQ 码，请在 Onebot 端使用`数组格式 (array)` (又称`消息段格式`) 消息。
 
-> **如何确定 Onebot 实现是否可以取得账号凭证？**
+> **如何确定 Onebot 实现是否可以取得账号凭证？**  
 > 如果支持以下几个API，则说明该实现可以取得账号凭证
 > + `get_cookies`
 > + `get_csrf_token`
