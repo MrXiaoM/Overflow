@@ -219,7 +219,12 @@ internal object OnebotMessages {
                     "type" to "node",
                     "data" to mutableMapOf(
                         "name" to it.senderName,
-                        "uin" to it.senderId,
+                        "uin" to it.senderId.run {
+                            when (appName) {
+                                "lagrange.onebot" -> toString() // Lagrange need string uin
+                                else -> this
+                            }
+                        },
                         "content" to message,
                     ),
                     "time" to it.time
