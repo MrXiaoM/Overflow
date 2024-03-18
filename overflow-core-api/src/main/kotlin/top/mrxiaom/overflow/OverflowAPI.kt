@@ -7,6 +7,7 @@ import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiLogger
 import top.mrxiaom.overflow.contact.RemoteBot
+import top.mrxiaom.overflow.message.MessageProcessor
 
 val Overflow: OverflowAPI
     get() = OverflowAPI.get()
@@ -44,6 +45,18 @@ interface OverflowAPI {
      * 序列化 mirai 格式消息为 Onebot 格式 json 数组消息
      */
     fun serializeMessage(bot: RemoteBot?, message: Message): String
+
+    /**
+     * 获取消息处理器列表
+     */
+    val messageProcessors: List<MessageProcessor<*>>
+
+    /**
+     * 注册消息处理器
+     *
+     * 如果要添加一种新的消息类型，除了编写并注册消息处理器外，还需要将该消息类型注册到 [net.mamoe.mirai.message.MessageSerializers]
+     */
+    fun registerMessageProcessor(processor: MessageProcessor<*>)
 
     /**
      * 反序列化 Onebot 格式 json 数组消息为 mirai 格式消息

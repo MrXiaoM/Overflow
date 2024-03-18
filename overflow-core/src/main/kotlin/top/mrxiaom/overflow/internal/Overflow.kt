@@ -46,6 +46,7 @@ import top.mrxiaom.overflow.internal.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
 import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin
 import top.mrxiaom.overflow.internal.utils.wrapAsOtherClientInfo
+import top.mrxiaom.overflow.message.MessageProcessor
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.system.exitProcess
@@ -275,6 +276,11 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override fun serializeMessage(bot: RemoteBot?, message: Message): String = OnebotMessages.serializeToOneBotJson(bot, message)
     @JvmBlockingBridge
     override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, message, null)
+    override val messageProcessors: List<MessageProcessor<*>>
+        get() = OnebotMessages.processors.toList()
+    override fun registerMessageProcessor(processor: MessageProcessor<*>) {
+        OnebotMessages.processors.add(processor)
+    }
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
         if (bot.asOnebot.appName == "shamrock") {
             val data = bot.asOnebot.impl.getUserInfo(targetId, false).data
