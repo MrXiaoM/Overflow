@@ -14,44 +14,56 @@ import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
+import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.data.*
+import top.mrxiaom.overflow.message.MessageProcessor
 import top.mrxiaom.overflow.message.data.*
 
 /**
  * Json 数组消息 (Onebot) 与 [MessageChain] (mirai) 的序列化与反序列化
  */
 internal object OnebotMessages {
+    internal val processors: HashSet<MessageProcessor<*>> = hashSetOf()
     @OptIn(MiraiExperimentalApi::class)
-    internal fun registerSerializers() = MessageSerializers.apply {
-        registerSerializer(At::class, At.serializer())
-        registerSerializer(Dice::class, Dice.serializer())
-        registerSerializer(Face::class, Face.serializer())
-        registerSerializer(FlashImage::class, FlashImage.serializer())
-        registerSerializer(ForwardMessage::class, ForwardMessage.serializer())
-        registerSerializer(LightApp::class, LightApp.serializer())
-        registerSerializer(MessageSource::class, MessageSource.serializer())
-        registerSerializer(MusicShare::class, MusicShare.serializer())
-        registerSerializer(PlainText::class, PlainText.serializer())
-        registerSerializer(PokeMessage::class, PokeMessage.serializer())
-        registerSerializer(QuoteReply::class, QuoteReply.serializer())
-        registerSerializer(RockPaperScissors::class, RockPaperScissors.serializer())
-        registerSerializer(SimpleServiceMessage::class, SimpleServiceMessage.serializer())
-        registerSerializer(VipFace::class, VipFace.serializer())
+    internal fun registerMessages() {
+        MessageSerializers.apply {
+            registerSerializer(At::class, At.serializer())
+            registerSerializer(Dice::class, Dice.serializer())
+            registerSerializer(Face::class, Face.serializer())
+            registerSerializer(FlashImage::class, FlashImage.serializer())
+            registerSerializer(ForwardMessage::class, ForwardMessage.serializer())
+            registerSerializer(LightApp::class, LightApp.serializer())
+            registerSerializer(MessageSource::class, MessageSource.serializer())
+            registerSerializer(MusicShare::class, MusicShare.serializer())
+            registerSerializer(PlainText::class, PlainText.serializer())
+            registerSerializer(PokeMessage::class, PokeMessage.serializer())
+            registerSerializer(QuoteReply::class, QuoteReply.serializer())
+            registerSerializer(RockPaperScissors::class, RockPaperScissors.serializer())
+            registerSerializer(SimpleServiceMessage::class, SimpleServiceMessage.serializer())
+            registerSerializer(VipFace::class, VipFace.serializer())
 
-        registerSerializer(WrappedAudio::class, WrappedAudio.serializer())
-        registerSerializer(WrappedVideo::class, WrappedVideo.serializer())
-        registerSerializer(WrappedImage::class, WrappedImage.serializer())
-        registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
-        registerSerializer(UnknownMessage::class, UnknownMessage.serializer())
-        registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
-        registerSerializer(MarketFaceImpl::class, MarketFaceImpl.serializer())
-        registerSerializer(ContactRecommend::class, ContactRecommend.serializer())
-        registerSerializer(Location::class, Location.serializer())
-        registerSerializer(Markdown::class, Markdown.serializer())
-        registerSerializer(InlineKeyboard::class, InlineKeyboard.serializer())
+            registerSerializer(WrappedAudio::class, WrappedAudio.serializer())
+            registerSerializer(WrappedVideo::class, WrappedVideo.serializer())
+            registerSerializer(WrappedImage::class, WrappedImage.serializer())
+            registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
+            registerSerializer(UnknownMessage::class, UnknownMessage.serializer())
+            registerSerializer(WrappedFileMessage::class, WrappedFileMessage.serializer())
+            registerSerializer(MarketFaceImpl::class, MarketFaceImpl.serializer())
+            registerSerializer(ContactRecommend::class, ContactRecommend.serializer())
+            registerSerializer(Location::class, Location.serializer())
+            registerSerializer(Markdown::class, Markdown.serializer())
+            registerSerializer(InlineKeyboard::class, InlineKeyboard.serializer())
+        }
+        listOf(
+            ProcessorText, ProcessorFace, ProcessorImage, ProcessorRecord,
+            ProcessorVideo, ProcessorAt, ProcessorRSP, ProcessorDice,
+            ProcessorNewDice, ProcessorPoke, ProcessorMusic, ProcessorReply,
+            ProcessorReplyLagrange, ProcessorJson, ProcessorXML, ProcessorMarkdown,
+            ProcessorMarkdownGensokyo, ProcessorInlineKeyboardShamrock, ProcessorInlineKeyboardGensokyo
+        ).forEach(Overflow::registerMessageProcessor)
     }
 
     /**
@@ -457,13 +469,13 @@ internal object OnebotMessages {
     internal fun audioFromFile(file: String): Audio = WrappedAudio(file, 0)
     internal fun videoFromFile(file: String): ShortVideo = WrappedVideo(file)
 
-    private val Image.onebotFile: String
+    internal val Image.onebotFile: String
         get() = imageId
-    private val FlashImage.onebotFile: String
+    internal val FlashImage.onebotFile: String
         get() = image.onebotFile
-    private val Audio.onebotFile: String
+    internal val Audio.onebotFile: String
         get() = (this as? WrappedAudio)?.file ?: ""
-    private val ShortVideo.onebotFile: String
+    internal val ShortVideo.onebotFile: String
         get() = (this as? WrappedVideo)?.file ?: ""
     internal val JsonElement?.string
         get() = this?.jsonPrimitive?.content ?: ""

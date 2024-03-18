@@ -143,6 +143,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         addGroupListeners()
         addFriendListeners()
         addGuildListeners()
+        OnebotMessages.registerMessages()
 
         // 暂定禁止 mirai-console 的终端用户须知，它可能已不适用于 Overflow
         try {
