@@ -1,10 +1,10 @@
-# Overflow 项目进度
+# 项目进度
 
 项目的进度、计划、以及协议无法实现的说明与平替等内容将在本文档中呈现。
 
 ## 已实现消息类型
 
-[top.mrxiaom.overflow.internal.message](/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/messag)
+[top.mrxiaom.overflow.internal.message](https://github.com/MrXiaoM/Overflow/tree/main/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/messag)
 
 > ✅ - 支持  
 > ❌ - 不支持  
@@ -31,7 +31,7 @@
 | 文件消息      | FileMessage       | file    | *✅* | -   |
 
 扩展消息类型  
-[top.mrxiaom.overflow.message.data](overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/message/data)
+[top.mrxiaom.overflow.message.data](https://github.com/MrXiaoM/Overflow/tree/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/message/data)
 
 | 消息类型            | Overflow         | onebot   | 接收 | 发送 |
 |-----------------|------------------|----------|----|----|
@@ -64,7 +64,7 @@
 
 ## 已实现事件
 
-[top.mrxiaom.overflow.internal.listener](/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/listener)
+[top.mrxiaom.overflow.internal.listener](https://github.com/MrXiaoM/Overflow/tree/main/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/listener)
 
 由于 onebot 事件有子类型，此表中 onebot 事件格式为 `事件类型 -> 子类型`
 
@@ -96,7 +96,7 @@
 | *Coming soon...* | -                               | -                                   | ❔    |
 
 扩展事件类型  
-[top.mrxiaom.overflow.event](overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/event)
+[top.mrxiaom.overflow.event](https://github.com/MrXiaoM/Overflow/tree/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/event)
 
 | 事件类型       | Overflow                | onebot                      | 是否支持 |
 |------------|-------------------------|-----------------------------|------|
