@@ -1,4 +1,4 @@
-# Overflow 开发文档
+# 开发文档
 
 # 开发版使用说明
 
@@ -81,7 +81,11 @@ val bot2 = BotBuilder.reversed(5700)
 
 # 向 Onebot 发送自定义 action
 
-预设的 action 类型列表另请参见 [ActionPathEnum.java](/onebot/src/main/java/cn/evole/onebot/sdk/enums/ActionPathEnum.java) (以下应当填写的是字符串 path 的值)
+预设的 action 类型列表另请参见 [ActionPathEnum.java](https://github.com/MrXiaoM/Overflow/blob/main/onebot/src/main/java/cn/evole/onebot/sdk/enums/ActionPathEnum.java) (以下应当填写的是字符串 path 的值)
+
+相关文档：
++ [go-cqhttp API](https://docs.go-cqhttp.org/api)
++ [Onebot API](https://github.com/botuniverse/onebot-11/blob/master/api/public.md)
 
 ```kotlin
 val onebot = bot as RemoteBot
@@ -103,7 +107,7 @@ remoteGroup.updateGroupMemberList() // suspend
 
 # 资源相关消息说明
 
-正如[用户手册](/docs/README.md#资源相关消息说明)所说，为减少运行内存占用，你可以使用以下方法来上传图片、语音、短视频来减少其造成的资源占用
+正如[用户手册](/docs/UserManual.md#资源相关消息说明)所说，为减少运行内存占用，你可以使用以下方法来上传图片、语音、短视频来减少其造成的资源占用
 
 ```kotlin
 val image = OverflowAPI.get().imageFromFile("https://xxxxx")
@@ -116,4 +120,4 @@ val video = OverflowAPI.get().videoFromFile("https://xxxxx")
 // Base64: base64://b3ZlcmZsb3c=
 ```
 
-为了兼容 mirai 已有的部分插件等可能已停止更新的业务逻辑，Overflow 添加了 [FileService](/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/spi/FileService.kt)，使用示例另请参见 [overflow-shamrock-ext](https://github.com/MrXiaoM/overflow-shamrock-ext)
+为了兼容 mirai 已有的部分插件等可能已停止更新的业务逻辑，Overflow 添加了 [FileService](https://github.com/MrXiaoM/Overflow/blob/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/spi/FileService.kt)，使用示例另请参见 [overflow-shamrock-ext](https://github.com/MrXiaoM/overflow-shamrock-ext)

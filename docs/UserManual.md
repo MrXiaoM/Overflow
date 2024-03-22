@@ -1,4 +1,4 @@
-# Overflow 用户手册
+# 用户手册
 
 Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实现使 mirai 在Bot协议寒冬中续命。
 
