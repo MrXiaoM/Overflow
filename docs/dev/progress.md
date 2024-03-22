@@ -4,7 +4,7 @@
 
 ## 已实现消息类型
 
-[top.mrxiaom.overflow.internal.message](https://github.com/MrXiaoM/Overflow/tree/main/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/messag)
+[top.mrxiaom.overflow.internal.message.data](https://github.com/MrXiaoM/Overflow/tree/main/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/message/data)
 
 > ✅ - 支持  
 > ❌ - 不支持  
