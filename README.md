@@ -14,7 +14,7 @@
 
 正在进行快速开发阶段，项目结构、包名等可能随时改变，正式发布前**请勿**提交变动较大的 Pull Requests。
 
-- **[用户手册: 快速开始](docs/README.md)**
+- **[用户手册: 快速开始](docs/UserManual.md)**
 - **[开发文档](docs/dev/README.md)**
 
 # 鸣谢
