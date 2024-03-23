@@ -180,7 +180,7 @@ internal object OnebotMessages {
                 val resId = bot.impl.sendForwardMsgLagrange(nodes).data
                 if (resId != null) {
                     val forwardMsg = Json.encodeToString(buildJsonArray {
-                        buildJsonObject {
+                        addJsonObject {
                             put("type", "forward")
                             putJsonObject("data") {
                                 put("id", resId)
