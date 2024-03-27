@@ -36,9 +36,9 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 首先部署一个 Onebot 协议实现，以下是一些示例：
 
-+ [whitechi73/OpenShamrock](https://wiki.mrxiaom.top/overflow/openshamrock/) Xposed/LSPatch hook QQ 并实现 Onebot
++ [whitechi73/OpenShamrock](https://wiki.mrxiaom.top/overflow/openshamrock/) Xposed/LSPatch hook QQ 并实现 Onebot *新版Kritor版本暂不支持*
 + [Hoshinonyaruko/Gensokyo](https://wiki.mrxiaom.top/overflow/gensokyo) (非稳定支持) 官方Bot 转 Onebot
-+ [LagrangeDev/Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core) QQNT 协议库
++ [LagrangeDev/Lagrange.Core](https://github.com/LagrangeDev/Lagrange.Core) QQNT 协议库 *新版Kritor版本暂不支持*
 + [cnlimiter/onebot-mirai](https://github.com/cnlimiter/onebot-mirai) mirai 转 Onebot，相当于可以实现 mirai 接龙
 + [LLOneBot/LLOneBot](https://github.com/LLOneBot/LLOneBot) 在 QQNT 客户端中装载插件实现 Onebot
 

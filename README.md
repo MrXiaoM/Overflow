@@ -12,10 +12,13 @@
   [![project-tRNA](https://img.shields.io/badge/project--tRNA-a7a3ff?style=for-the-badge)](https://github.com/project-tRNA) [![星标](https://shields.io/github/stars/MrXiaoM/Overflow?logo=github&style=for-the-badge&label=%E6%98%9F%E6%A0%87)](https://github.com/MrXiaoM/Overflow/stargazers) [![mirai](https://img.shields.io/badge/mirai--core--api-2.16.0-blue?style=for-the-badge)](https://github.com/mamoe/mirai) [![Onebot 11](https://img.shields.io/badge/Onebot-11-313343?style=for-the-badge)](https://11.onebot.dev) [![论坛](https://img.shields.io/badge/MiraiForum-post-5094e4?style=for-the-badge)](https://mirai.mamoe.net/topic/2565)
 </div>
 
-正在进行快速开发阶段，项目结构、包名等可能随时改变，正式发布前**请勿**提交变动较大的 Pull Requests。
+当前 Overflow 正趋于稳定，欢迎各位测试。
 
 - **[用户手册: 快速开始](docs/UserManual.md)**
 - **[开发文档](docs/dev/README.md)**
+
+由于主要维护者的学业等原因，Overflow 暂不支持 OpenShamrock、Lagrange 等协议实现在新版本中使用的 [Kritor](https://github.com/KarinJS/kritor) 协议标准。  
+Overflow 可能会在该协议标准发布正式版后再逐步跟进支持。
 
 # 鸣谢
 
