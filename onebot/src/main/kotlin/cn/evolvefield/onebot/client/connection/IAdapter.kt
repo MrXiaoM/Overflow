@@ -4,6 +4,7 @@ import cn.evole.onebot.sdk.util.JsonHelper.ignorable
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.util.ActionSendRequest
+import cn.evolvefield.onebot.client.util.OnebotException
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.CoroutineScope
@@ -33,6 +34,8 @@ interface IAdapter {
             }
         } catch (e: JsonSyntaxException) {
             logger.error("Json语法错误: {}", message)
+        } catch (e: OnebotException) {
+            logger.error("解析异常: {}", e.info)
         }
     }
 

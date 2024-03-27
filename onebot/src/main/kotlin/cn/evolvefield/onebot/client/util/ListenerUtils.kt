@@ -49,6 +49,6 @@ object ListenerUtils {
             //周期类型
             type = obj.get("meta_event_type").asString
         }
-        return MessageMap.messageMap[type]!!
+        return MessageMap.messageMap[type] ?: throw OnebotException("无法解析类型为 $type 的事件")
     }
 }

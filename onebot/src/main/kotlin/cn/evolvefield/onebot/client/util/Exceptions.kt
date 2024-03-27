@@ -6,4 +6,8 @@ class ActionFailedException(
     val app: String,
     val msg: String,
     val json: JsonObject
-): IllegalStateException("app=$app, message=$msg, retJson=$json")
+): OnebotException("app=$app, message=$msg, retJson=$json")
+
+open class OnebotException(
+    val info: String
+): IllegalStateException(info)
