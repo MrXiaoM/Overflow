@@ -85,7 +85,11 @@ internal class LoggerInFolder @JvmOverloads constructor(
 internal class WithFileLogger(
     val logger: MiraiLogger,
     file: File
-) : MiraiLogger, PlatformLogger(logger.identity, { file.appendText(it + "\n") }, false) {
+) : MiraiLogger, PlatformLogger(logger.identity, {
+    synchronized(logger) {
+        file.appendText(it + "\n")
+    }
+}, false) {
     // Implementation notes v2.5.0:
     // Extending `PlatformLogger` for binary compatibility for JVM target only.
     // See actual declaration in androidMain for a better impl (implements `MiraiLogger` only)
