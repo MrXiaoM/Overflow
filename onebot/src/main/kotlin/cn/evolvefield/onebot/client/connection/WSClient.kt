@@ -89,9 +89,9 @@ class WSClient(
     }
 
     companion object {
-        fun createAndConnect(scope: CoroutineScope, config: BotConfig, uri: URI, logger: Logger, actionHandler: ActionHandler, retryTimes: Int, retryWaitMills: Long, retryRestMills: Long, header: Map<String, String> = mapOf()): WSClient? {
+        suspend fun createAndConnect(scope: CoroutineScope, config: BotConfig, uri: URI, logger: Logger, actionHandler: ActionHandler, retryTimes: Int, retryWaitMills: Long, retryRestMills: Long, header: Map<String, String> = mapOf()): WSClient? {
             val ws = WSClient(scope, config, uri, logger, actionHandler, retryTimes, retryWaitMills, retryRestMills, header)
-            return ws.takeIf { runBlocking { ws.connectSuspend() } }
+            return ws.takeIf { ws.connectSuspend() }
         }
     }
 }

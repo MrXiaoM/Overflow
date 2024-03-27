@@ -20,6 +20,7 @@ import net.mamoe.mirai.console.plugin.description.PluginDescription
 import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.SemVersion
+import net.mamoe.mirai.console.util.sendAnsiMessage
 import net.mamoe.mirai.event.ConcurrencyKind
 import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.GlobalEventChannel
@@ -59,6 +60,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
 
         GlobalEventChannel
             .parentScope(MiraiConsole.INSTANCE)
+            .context(MiraiConsole.INSTANCE.coroutineContext)
             .subscribeOnce<StartupEvent>(
                 priority = EventPriority.HIGHEST,
             ) { onPostStartup() }
@@ -169,6 +171,18 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                     warning("-------------------------------------------")
                 }
             }
+        }
+        ConsoleCommandSender.sendAnsiMessage {
+            appendLine()
+            reset()
+            append("如需关闭控制台，请按下 ")
+            lightBlue().append("Ctrl+C").reset().append(" 组合键，或使用命令 ").lightBlue().append("/stop").reset().append(" ")
+            append("来关闭。强制")
+            lightYellow().append("结束进程/关闭窗口").reset()
+            append("可能会导致")
+            lightRed().append("数据丢失").reset()
+            appendLine()
+            appendLine()
         }
         Overflow.instance.startWithConfig(true, oneBotLogger)
     }

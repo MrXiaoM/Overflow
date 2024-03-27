@@ -5,6 +5,7 @@ import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CancellationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
@@ -31,7 +32,7 @@ class ConnectFactory private constructor(
      * @return 连接实例
      */
     @JvmOverloads
-    fun createWebsocketClient(scope: CoroutineScope = CoroutineScope(CoroutineName("WSClient"))): WSClient? {
+    suspend fun createWebsocketClient(scope: CoroutineScope = CoroutineScope(CoroutineName("WSClient"))): WSClient? {
         val builder = StringBuilder()
         val header = mutableMapOf<String, String>()
         var ws: WSClient? = null
@@ -56,7 +57,12 @@ class ConnectFactory private constructor(
                 header
             )
         } catch (e: Exception) {
-            logger.error("▌ {} 连接错误，请检查服务端是否开启 ┈━═☆", url)
+            if (e is CancellationException) {
+                logger.info("▌ 连接请求已取消 ┈━═☆")
+            } else {
+                logger.error("▌ {} 连接错误，请检查服务端是否开启 ┈━═☆", url)
+                logger.error("▌ 错误信息: {}: {}", e.javaClass.simpleName, e.message)
+            }
         }
         return ws
     }
