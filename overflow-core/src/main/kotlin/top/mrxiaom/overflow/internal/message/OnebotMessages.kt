@@ -113,8 +113,6 @@ internal object OnebotMessages {
                                 }
                             }
                             is QuoteReply -> when { // 忽略分片消息情况
-                                // TODO: 待定，Lagrange.Core 中的 reply id 类型较混乱，写入的时候 uint.ToString()，读取的时候 (uint)int.Parse()
-                                app.contains("lagrange") -> put("id", single.source.ids[0].toUInt().toString())
                                 else -> put("id", single.source.ids[0].toString())
                             }
                             // is ForwardMessage -> put("id", single.id) // 转发消息有单独的发送方法
@@ -330,7 +328,6 @@ internal object OnebotMessages {
 
                     "reply" -> {
                         val id = when {
-                            app.contains("lagrange") -> data["id"].string.toUInt().toInt()
                             else -> data["id"].string.toInt()
                         }
                         val msgData = (bot as BotWrapper).impl.getMsg(id).data
