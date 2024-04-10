@@ -17,8 +17,20 @@
 - **[用户手册: 快速开始](docs/UserManual.md)**
 - **[开发文档](docs/dev/README.md)**
 
-由于主要维护者的学业等原因，Overflow 暂不支持 OpenShamrock、Lagrange 等协议实现在新版本中使用的 [Kritor](https://github.com/KarinJS/kritor) 协议标准。  
-Overflow 可能会在该协议标准发布正式版后再逐步跟进支持。
+## 兼容性说明
+
+Overflow 支持且**仅支持**连接到大多数标准的 Onebot 或 go-cqhttp 协议，支持安装未使用 mirai 内部特性或 mirai 码的插件
++ [x] 使用正向(主动)或反向(被动) WebSocket 连接
++ [x] 在连接时使用 token 鉴权
++ [x] 在代码中调用自定义的 action
++ [ ] 在消息中使用 CQ 码 *不支持*
++ [x] 将 mirai 消息段序列化/反序列化为 json
++ [ ] 使用 MiraiCode (Mirai 码) 处理消息 *不支持*
+
+由于主要维护者的学业等原因，Overflow 暂不支持 OpenShamrock (`1.1.0+`)、Lagrange (`0.0.3+`) 等协议实现在新版本中使用的 [Kritor](https://github.com/KarinJS/kritor) 协议标准。  
+如需使用 OpenShamrock，请使用 LTS (Long Term Stop) 版本 `1.0.9`。  
+Overflow ~~可能会在该协议标准发布正式版后再逐步~~*将不会*跟进支持。  
+有关 Kritor 支持的相关信息，另请参见 [Krigacy](https://github.com/MrXiaoM/Krigacy)。
 
 # 鸣谢
 
