@@ -1,10 +1,12 @@
 package cn.evolvefield.onebot.client.handler
 
 import cn.evole.onebot.sdk.event.Event
+import cn.evole.onebot.sdk.event.UnsolvedEvent
 import cn.evole.onebot.sdk.util.JsonHelper.gson
 import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.client.listener.message
 import cn.evolvefield.onebot.client.util.ListenerUtils
+import com.google.gson.JsonParser
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
@@ -35,11 +37,24 @@ object EventBus {
      * 执行任务
      */
     suspend fun onReceive(message: String) {
-        val messageType = ListenerUtils.getMessageType(message) //获取消息对应的实体类型
-        val bean = gson.fromJson(message, messageType) //将消息反序列化为对象
-        log.debug(String.format("接收到上报消息内容：%s", bean.toString()))
-        val executes = getExecutes(messageType)
-        log.debug("executes: ${executes.size}\n")
+        val messageType = ListenerUtils[message] // 获取消息对应的实体类型
+        val executes: List<EventListener<out Event>>
+        val bean: Event
+        if (messageType == null) {
+            bean = UnsolvedEvent().also { it.jsonString = message }
+            log.warn("接收到来自协议端的未知事件 $message")
+            executes = getExecutes(UnsolvedEvent::class.java)
+            if (executes.isNotEmpty()) {
+                val json = JsonParser.parseString(message).asJsonObject
+                bean.postType = json["post_type"].asString
+                bean.time = json["time"].asLong
+                bean.selfId = json["self_id"].asLong
+            }
+        } else {
+            bean = gson.fromJson(message, messageType) // 将消息反序列化为对象
+            log.debug(String.format("接收到上报消息内容：%s", bean.toString()))
+            executes = getExecutes(messageType)
+        }
         for (eventListener in executes) {
             eventListener.message(bean) //调用监听方法
         }
