@@ -98,9 +98,10 @@
 扩展事件类型  
 [top.mrxiaom.overflow.event](https://github.com/MrXiaoM/Overflow/tree/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/event)
 
-| 事件类型       | Overflow                | onebot                      | 是否支持 |
-|------------|-------------------------|-----------------------------|------|
-| 频道消息事件(临时) | LegacyGuildMessageEvent | message -> guild -> channel | ✅    |
+| 事件类型           | Overflow                | onebot                      | 是否支持 |
+|----------------|-------------------------|-----------------------------|------|
+| 频道消息事件(临时)     | LegacyGuildMessageEvent | message -> guild -> channel | ✅    |
+| 未处理的 Onebot 事件 | UnsolvedOnebotEvent     | *                           | ✅    |
 
 实现事件说明如下
 * 群头衔变更事件 onebot-sdk 里有但是没用到，先实现再说。

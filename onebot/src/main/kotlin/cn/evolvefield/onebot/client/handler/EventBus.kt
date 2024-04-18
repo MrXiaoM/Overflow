@@ -42,14 +42,11 @@ object EventBus {
         val bean: Event
         if (messageType == null) {
             bean = UnsolvedEvent().also { it.jsonString = message }
-            log.warn("接收到来自协议端的未知事件 $message")
             executes = getExecutes(UnsolvedEvent::class.java)
-            if (executes.isNotEmpty()) {
-                val json = JsonParser.parseString(message).asJsonObject
-                bean.postType = json["post_type"].asString
-                bean.time = json["time"].asLong
-                bean.selfId = json["self_id"].asLong
-            }
+            val json = JsonParser.parseString(message).asJsonObject
+            bean.postType = json["post_type"].asString
+            bean.time = json["time"].asLong
+            bean.selfId = json["self_id"].asLong
         } else {
             bean = gson.fromJson(message, messageType) // 将消息反序列化为对象
             log.debug(String.format("接收到上报消息内容：%s", bean.toString()))

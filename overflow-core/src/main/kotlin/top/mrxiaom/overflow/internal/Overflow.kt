@@ -38,6 +38,7 @@ import top.mrxiaom.overflow.internal.contact.StrangerWrapper
 import top.mrxiaom.overflow.internal.data.UserProfileImpl
 import top.mrxiaom.overflow.internal.data.asMirai
 import top.mrxiaom.overflow.internal.data.asOnebot
+import top.mrxiaom.overflow.internal.listener.addBotListeners
 import top.mrxiaom.overflow.internal.listener.addFriendListeners
 import top.mrxiaom.overflow.internal.listener.addGroupListeners
 import top.mrxiaom.overflow.internal.listener.addGuildListeners
@@ -142,6 +143,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         addGroupListeners()
         addFriendListeners()
         addGuildListeners()
+        addBotListeners()
 
         // 暂定禁止 mirai-console 的终端用户须知，它可能已不适用于 Overflow
         try {
