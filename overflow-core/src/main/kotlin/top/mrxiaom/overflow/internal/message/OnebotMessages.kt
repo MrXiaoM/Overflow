@@ -32,7 +32,7 @@ internal object OnebotMessages {
         registerSerializer(FlashImage::class, FlashImage.serializer())
         registerSerializer(ForwardMessage::class, ForwardMessage.serializer())
         registerSerializer(LightApp::class, LightApp.serializer())
-        registerSerializer(MessageSource::class, MessageSource.serializer())
+        registerMessageSourceSerializers()
         registerSerializer(MusicShare::class, MusicShare.serializer())
         registerSerializer(PlainText::class, PlainText.serializer())
         registerSerializer(PokeMessage::class, PokeMessage.serializer())
