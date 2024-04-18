@@ -40,7 +40,7 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 + [Hoshinonyaruko/Gensokyo](https://wiki.mrxiaom.top/overflow/gensokyo) (非稳定支持) 官方Bot 转 Onebot
 + [KonataDev/Lagrange.Core](https://github.com/KonataDev/Lagrange.Core) QQNT 协议库 *0.0.3+ Kritor版本暂不支持*
 + [cnlimiter/onebot-mirai](https://github.com/cnlimiter/onebot-mirai) mirai 转 Onebot，相当于可以实现 mirai 接龙
-+ [LLOneBot/LLOneBot](https://github.com/LLOneBot/LLOneBot) 在 QQNT 客户端中装载插件实现 Onebot
++ [LLOneBot/LLOneBot](https://wiki.mrxiaom.top/overflow/lloneBot) 在 QQNT 客户端中装载插件实现 Onebot
 
 除此之外，你还可以到 [Onebot 生态](https://onebot.dev/ecosystem.html#onebot-%E5%AE%9E%E7%8E%B0-1) 中寻找更多的 Onebot 11 实现，Overflow 基本可以连接到它们。
 
