@@ -14,6 +14,7 @@ import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
+import top.mrxiaom.overflow.OverflowAPI.Companion.logger
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.contact.BotWrapper
@@ -268,147 +269,165 @@ internal object OnebotMessages {
                 val obj = o.jsonObject
                 val type = obj["type"].string
                 val data = obj["data"]?.jsonObject ?: buildJsonObject {  }
-                when (type) {
-                    "text" -> add(data["text"].string)
-                    "face" -> add(Face(data["id"].string.toInt()))
-                    "image" -> {
-                        val image = imageFromFile((data["url"] ?: data["file"]).string)
-                        if (data["type"].string == "flash") {
-                            add(image.flash())
-                        } else {
-                            add(image)
-                        }
-                    }
-                    "record" -> add(audioFromFile(data["file"].string))
-                    "video" -> add(videoFromFile(data["file"].string))
-                    "at" -> {
-                        if (data["qq"].string.lowercase() == "all")
-                            add(AtAll)
-                        else
-                            add(At(data["qq"].string.toLong()))
-                    }
-                    
-                    // TODO "rps" "dice" 无法通过 OneBot 获取其具体值，先搁置
-                    "rps" -> add(RockPaperScissors.random())
-                    "dice" -> add(Dice.random())
-
-                    "new_dice" -> add(Dice(data["id"].int))
-                    "poke" -> add(PokeMessage(
-                        data["name"].string,
-                        data["type"].string.toInt(),
-                        data["id"].string.toInt()
-                    ))
-                    "music" -> {
-                        val id = data["id"].string
-                        when(data["type"].string) {
-                            "163" -> add(deserializeNeteaseMusic(id))
-                            "qq" -> add(deserializeQQMusic(id))
-                            "custom" -> {
-                                add(MusicShare(MusicKind.QQMusic,
-                                    data["title"].string, data["content"].string,
-                                    data["url"].string, data["image"].string,
-                                    data["audio"].string
-                                ))
+                try {
+                    when (type) {
+                        "text" -> add(data["text"].string)
+                        "face" -> add(Face(data["id"].string.toInt()))
+                        "image" -> {
+                            val image = imageFromFile((data["url"] ?: data["file"]).string)
+                            if (data["type"].string == "flash") {
+                                add(image.flash())
+                            } else {
+                                add(image)
                             }
                         }
-                    }
-                    "forward" -> {
-                        val id = data["id"].string
-                        if (id.isNotEmpty()) {
-                            val nodes = Mirai.downloadForwardMessage(bot as Bot, id)
-                            val raw = RawForwardMessage(nodes)
-                            add(raw.render(ForwardMessage.DisplayStrategy))
+
+                        "record" -> add(audioFromFile(data["file"].string))
+                        "video" -> add(videoFromFile(data["file"].string))
+                        "at" -> {
+                            if (data["qq"].string.lowercase() == "all")
+                                add(AtAll)
+                            else
+                                add(At(data["qq"].string.toLong()))
                         }
-                    }
-                    "mface" -> add(MarketFaceImpl(ImMsgBody.MarketFace( // TODO 根据 emojiId 获取 name
-                        faceId = data["id"].string.encodeToByteArray()
-                    )))
-                    "xml" -> add(SimpleServiceMessage(60, data["data"].string))
-                    "json" -> add(LightApp(data["data"].string))
 
-                    "reply" -> {
-                        val id = when {
-                            else -> data["id"].string.toInt()
-                        }
-                        val msgData = (bot as BotWrapper).impl.getMsg(id).data
-                        val msgSource = MessageSourceBuilder()
-                            .id(id)
-                            .internalId(id)
-                        if (msgData != null) msgSource
-                            .sender(msgData.sender.userId.toLong())
-                            .target(msgData.targetId)
-                            .messages { deserializeFromOneBot(bot, msgData.message) }
-                            .time(msgData.time)
-                        val kind = if (msgData?.groupId == 0L) MessageSourceKind.FRIEND else MessageSourceKind.GROUP
-                        
-                        add(QuoteReply(msgSource.build(bot.id, kind)))
-                    }
+                        // TODO "rps" "dice" 无法通过 OneBot 获取其具体值，先搁置
+                        "rps" -> add(RockPaperScissors.random())
+                        "dice" -> add(Dice.random())
 
-                    "file" -> { // OpenShamrock
-                        //val sub = data["sub"].string
-                        //val biz = data["biz"].int
-                        val size = data["size"]?.long ?: 0L
-                        //val expire = data["expire"].int
-                        val name = data["name"]?.string ?: ""
-                        val id = data["id"].string
-                        val url = data["url"].string
+                        "new_dice" -> add(Dice(data["id"].int))
+                        "poke" -> add(
+                            PokeMessage(
+                                data["name"].string,
+                                data["type"].string.toInt(),
+                                data["id"].string.toInt()
+                            )
+                        )
 
-                        add(WrappedFileMessage(id, 0, name, size, url))
-                    }
-
-                    "markdown" -> when (app) { // 其它实现可能有其它格式，预留判断
-                        "shamrock" -> add(Markdown(data["content"].string))
-                        else -> add(Markdown(data["content"].string))
-                    }
-
-                    "contact" -> {
-                        val contactType = when (val typeStr = data["type"].string.lowercase()) {
-                            "group" -> ContactRecommend.ContactType.Group
-                            "private", "qq" -> ContactRecommend.ContactType.Private
-                            else -> throw IllegalArgumentException("未知联系人类型 $typeStr")
-                        }
-                        val id = data["id"].string
-                            .substringBefore("&") // OpenShamrock bug
-                            .toLong()
-                        add(ContactRecommend(contactType, id))
-                    }
-
-                    "location" -> {
-                        val lat = data["lat"].string.toFloat()
-                        val lon = data["lon"].string.toFloat()
-                        val title = data["title"].string
-                        val content = data["content"].string
-                        add(Location(lat, lon, title, content))
-                    }
-
-                    "inline_keyboard" -> { // OpenShamrock
-                        val botAppId = data["bot_appid"].long
-                        val rows = data["rows"]!!.jsonArray.map { e1 ->
-                            val obj1 = e1.jsonObject
-                            InlineKeyboardRow(
-                                buttons = obj1["buttons"]!!.jsonArray.map { e2 ->
-                                    val button = e2.jsonObject
-                                    InlineKeyboardButton(
-                                        id = button["id"].string,
-                                        label = button["label"].string,
-                                        visitedLabel = button["visited_label"].string,
-                                        style = button["style"].int,
-                                        type = button["type"].int,
-                                        clickLimit = button["click_limit"].int,
-                                        unsupportTips = button["unsupport_tips"].string,
-                                        data = button["data"].string,
-                                        atBotShowChannelList = button["at_bot_show_channel_list"].boolean,
-                                        permissionType = button["permission_type"].int,
-                                        specifyRoleIds = button["specify_role_ids"]!!.jsonArray.map { it.string },
-                                        specifyTinyIds = button["specify_tinyids"]!!.jsonArray.map { it.string }
+                        "music" -> {
+                            val id = data["id"].string
+                            when (data["type"].string) {
+                                "163" -> add(deserializeNeteaseMusic(id))
+                                "qq" -> add(deserializeQQMusic(id))
+                                "custom" -> {
+                                    add(
+                                        MusicShare(
+                                            MusicKind.QQMusic,
+                                            data["title"].string, data["content"].string,
+                                            data["url"].string, data["image"].string,
+                                            data["audio"].string
+                                        )
                                     )
                                 }
-                            )
+                            }
                         }
-                        add(InlineKeyboard(botAppId, rows))
-                    }
 
-                    else -> add(UnknownMessage(type, Json.encodeToString(data)).printLog())
+                        "forward" -> {
+                            val id = data["id"].string
+                            if (id.isNotEmpty()) {
+                                val nodes = Mirai.downloadForwardMessage(bot as Bot, id)
+                                val raw = RawForwardMessage(nodes)
+                                add(raw.render(ForwardMessage.DisplayStrategy))
+                            }
+                        }
+
+                        "mface" -> add(
+                            MarketFaceImpl(
+                                ImMsgBody.MarketFace( // TODO 根据 emojiId 获取 name
+                                    faceId = data["id"].string.encodeToByteArray()
+                                )
+                            )
+                        )
+
+                        "xml" -> add(SimpleServiceMessage(60, data["data"].string))
+                        "json" -> add(LightApp(data["data"].string))
+
+                        "reply" -> {
+                            val id = when {
+                                else -> data["id"].string.toInt()
+                            }
+                            val msgData = (bot as BotWrapper).impl.getMsg(id).data
+                            val msgSource = MessageSourceBuilder()
+                                .id(id)
+                                .internalId(id)
+                            if (msgData != null) msgSource
+                                .sender(msgData.sender.userId.toLong())
+                                .target(msgData.targetId)
+                                .messages { deserializeFromOneBot(bot, msgData.message) }
+                                .time(msgData.time)
+                            val kind = if (msgData?.groupId == 0L) MessageSourceKind.FRIEND else MessageSourceKind.GROUP
+
+                            add(QuoteReply(msgSource.build(bot.id, kind)))
+                        }
+
+                        "file" -> { // OpenShamrock
+                            //val sub = data["sub"].string
+                            //val biz = data["biz"].int
+                            val size = data["size"]?.long ?: 0L
+                            //val expire = data["expire"].int
+                            val name = data["name"]?.string ?: ""
+                            val id = data["id"].string
+                            val url = data["url"].string
+
+                            add(WrappedFileMessage(id, 0, name, size, url))
+                        }
+
+                        "markdown" -> when (app) { // 其它实现可能有其它格式，预留判断
+                            "shamrock" -> add(Markdown(data["content"].string))
+                            else -> add(Markdown(data["content"].string))
+                        }
+
+                        "contact" -> {
+                            val contactType = when (val typeStr = data["type"].string.lowercase()) {
+                                "group" -> ContactRecommend.ContactType.Group
+                                "private", "qq" -> ContactRecommend.ContactType.Private
+                                else -> throw IllegalArgumentException("未知联系人类型 $typeStr")
+                            }
+                            val id = data["id"].string
+                                .substringBefore("&") // OpenShamrock bug
+                                .toLong()
+                            add(ContactRecommend(contactType, id))
+                        }
+
+                        "location" -> {
+                            val lat = data["lat"].string.toFloat()
+                            val lon = data["lon"].string.toFloat()
+                            val title = data["title"].string
+                            val content = data["content"].string
+                            add(Location(lat, lon, title, content))
+                        }
+
+                        "inline_keyboard" -> { // OpenShamrock
+                            val botAppId = data["bot_appid"].long
+                            val rows = data["rows"]!!.jsonArray.map { e1 ->
+                                val obj1 = e1.jsonObject
+                                InlineKeyboardRow(
+                                    buttons = obj1["buttons"]!!.jsonArray.map { e2 ->
+                                        val button = e2.jsonObject
+                                        InlineKeyboardButton(
+                                            id = button["id"].string,
+                                            label = button["label"].string,
+                                            visitedLabel = button["visited_label"].string,
+                                            style = button["style"].int,
+                                            type = button["type"].int,
+                                            clickLimit = button["click_limit"].int,
+                                            unsupportTips = button["unsupport_tips"].string,
+                                            data = button["data"].string,
+                                            atBotShowChannelList = button["at_bot_show_channel_list"].boolean,
+                                            permissionType = button["permission_type"].int,
+                                            specifyRoleIds = button["specify_role_ids"]!!.jsonArray.map { it.string },
+                                            specifyTinyIds = button["specify_tinyids"]!!.jsonArray.map { it.string }
+                                        )
+                                    }
+                                )
+                            }
+                            add(InlineKeyboard(botAppId, rows))
+                        }
+
+                        else -> add(UnknownMessage(type, Json.encodeToString(data)).printLog())
+                    }
+                } catch (t: Throwable) {
+                    logger.warning("解析消息 $type$data 时出现错误 ($app ${bot.appVersion})", t)
                 }
             }
         }
