@@ -1,7 +1,5 @@
 package top.mrxiaom.overflow.internal.plugin
 
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
@@ -9,7 +7,6 @@ import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.command.*
 import net.mamoe.mirai.console.command.CommandManager.INSTANCE.register
 import net.mamoe.mirai.console.events.StartupEvent
-import net.mamoe.mirai.console.extensions.PostStartupExtension
 import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
 import net.mamoe.mirai.console.permission.Permission
 import net.mamoe.mirai.console.permission.PermissionId
@@ -21,7 +18,8 @@ import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.console.util.sendAnsiMessage
-import net.mamoe.mirai.event.ConcurrencyKind
+import net.mamoe.mirai.event.Event
+import net.mamoe.mirai.event.EventChannel
 import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.utils.MiraiLogger
@@ -30,6 +28,7 @@ import org.java_websocket.client.WebSocketClient
 import org.slf4j.Logger
 import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
+import top.mrxiaom.overflow.event.UnsolvedOnebotEvent
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.OnebotMessages
@@ -46,8 +45,11 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     override val parentPermission: Permission
         get() = ConsoleCommandOwner.parentPermission
 
+    private val logger: MiraiLogger
+        get() = OverflowAPI.logger
     private lateinit var miraiLogger: MiraiLogger
     private lateinit var oneBotLogger: Logger
+    internal lateinit var channel: EventChannel<Event>
 
     override fun permissionId(name: String): PermissionId {
         return ConsoleCommandOwner.permissionId(name)
@@ -58,12 +60,19 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
         miraiLogger = LoggerInFolder(Overflow::class, "Onebot", File("logs/onebot"), 1.weeksToMillis)
         oneBotLogger = net.mamoe.mirai.console.internal.logging.externalbind.slf4j.SLF4JAdapterLogger(miraiLogger)
 
-        GlobalEventChannel
+        channel = GlobalEventChannel
             .parentScope(MiraiConsole.INSTANCE)
             .context(MiraiConsole.INSTANCE.coroutineContext)
-            .subscribeOnce<StartupEvent>(
+
+        channel.subscribeOnce<StartupEvent>(
                 priority = EventPriority.HIGHEST,
             ) { onPostStartup() }
+
+        channel.subscribeAlways<UnsolvedOnebotEvent>(priority = EventPriority.LOWEST) {
+                if (!isCancelled) {
+                    logger.warning("接收到来自协议端的未知事件 $messageRaw")
+                }
+            }
 
         OnebotMessages.registerSerializers()
 
@@ -77,7 +86,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 val backup = File(configFolder, "Console/AutoLogin.yml.overflow.${System.currentTimeMillis()}.old")
                 file.copyTo(backup)
                 accounts.clear()
-                OverflowAPI.logger.warning("由于 mirai 端不再需要处理登录，Overflow 已清空自动登录配置，旧配置已备份到 ${backup.name}")
+                logger.warning("由于 mirai 端不再需要处理登录，Overflow 已清空自动登录配置，旧配置已备份到 ${backup.name}")
             }
         }
 
@@ -162,7 +171,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     private suspend fun StartupEvent.onPostStartup() {
         runCatching {
             net.mamoe.mirai.internal.spi.EncryptService.factory?.also {
-                OverflowAPI.logger.apply {
+                logger.apply {
                     warning("-------------------------------------------")
                     warning("你的 mirai-console 中已安装签名服务!")
                     warning("这在 overflow 中是不必要的，请移除签名服务相关插件")

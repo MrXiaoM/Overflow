@@ -17,15 +17,6 @@ internal fun addBotListeners() {
         UnsolvedEventListener(),
 
     ).forEach(EventBus::addListener)
-
-    GlobalEventChannel
-        .parentScope(Overflow.scope)
-        .context(Overflow.scope.coroutineContext)
-        .subscribeAlways<UnsolvedOnebotEvent>(priority = EventPriority.LOWEST) {
-            if (!isCancelled) {
-                logger.warning("接收到来自协议端的未知事件 $messageRaw")
-            }
-        }
 }
 
 internal class UnsolvedEventListener : EventListener<UnsolvedEvent> {
