@@ -347,9 +347,9 @@ internal object OnebotMessages {
                     "file" -> { // OpenShamrock
                         //val sub = data["sub"].string
                         //val biz = data["biz"].int
-                        val size = data["size"].long
+                        val size = data["size"]?.long ?: 0L
                         //val expire = data["expire"].int
-                        val name = data["name"].string
+                        val name = data["name"]?.string ?: ""
                         val id = data["id"].string
                         val url = data["url"].string
 
