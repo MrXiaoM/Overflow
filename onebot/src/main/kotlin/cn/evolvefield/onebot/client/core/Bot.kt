@@ -926,7 +926,7 @@ class Bot(
      * @param groupId 群号
      * @param msg     自定义转发消息
      * [参考文档](https://lagrangedev.github.io/Lagrange.Doc/Lagrange.OneBot/API/Extend/#%E5%8F%91%E9%80%81%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91-%E7%BE%A4%E8%81%8A)
-     * @return [ActionData]
+     * @return [ActionData] resId
      */
     suspend fun sendGroupForwardMsgLagrange(groupId: Long, msg: List<Map<String, Any>>): ActionData<String?> {
         val action = ActionPathEnum.SEND_GROUP_FORWARD_MSG
