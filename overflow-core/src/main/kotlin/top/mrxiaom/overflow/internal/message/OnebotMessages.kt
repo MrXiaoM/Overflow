@@ -176,7 +176,10 @@ internal object OnebotMessages {
         val nodes = serializeForwardNodes(bot, forward.nodeList)
         when (bot.appName.lowercase()) {
             "lagrange.onebot" -> {
-                val resId = bot.impl.sendForwardMsgLagrange(nodes).data
+                val resId = when (contact) {
+                    is Group -> bot.impl.sendGroupForwardMsgLagrange(contact.id, nodes).data
+                    else -> bot.impl.sendForwardMsgLagrange(nodes).data
+                }
                 if (resId != null) {
                     val forwardMsg = Json.encodeToString(buildJsonArray {
                         addJsonObject {
