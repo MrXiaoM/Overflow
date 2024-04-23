@@ -921,6 +921,23 @@ class Bot(
         return result.withToken()
     }
     /**
+     * 发送合并转发 (群)
+     *
+     * @param groupId 群号
+     * @param msg     自定义转发消息
+     * [参考文档](https://lagrangedev.github.io/Lagrange.Doc/Lagrange.OneBot/API/Extend/#%E5%8F%91%E9%80%81%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91-%E7%BE%A4%E8%81%8A)
+     * @return [ActionData]
+     */
+    suspend fun sendGroupForwardMsgLagrange(groupId: Long, msg: List<Map<String, Any>>): ActionData<String?> {
+        val action = ActionPathEnum.SEND_GROUP_FORWARD_MSG
+        val params = JsonObject()
+        params.addProperty("group_id", groupId)
+        params.add("messages", msg.toJsonArray())
+
+        val result = actionHandler.action(this, action, params)
+        return result.withToken()
+    }
+    /**
      * 获取群根目录文件列表
      *
      * @param groupId 群号
