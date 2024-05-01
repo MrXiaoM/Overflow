@@ -45,6 +45,7 @@ import top.mrxiaom.overflow.internal.listener.addGuildListeners
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
+import top.mrxiaom.overflow.internal.message.data.WrappedImage
 import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin
 import top.mrxiaom.overflow.internal.utils.wrapAsOtherClientInfo
 import java.io.File
@@ -271,7 +272,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             }
         }
     }
-    override fun imageFromFile(file: String): Image = OnebotMessages.imageFromFile(file)
+    override fun imageFromFile(file: String): Image = Image.fromId(file)
     override fun audioFromFile(file: String): Audio = OnebotMessages.audioFromFile(file)
     override fun videoFromFile(file: String): ShortVideo = OnebotMessages.videoFromFile(file)
     override fun serializeMessage(bot: RemoteBot?, message: Message): String = OnebotMessages.serializeToOneBotJson(bot, message)
@@ -402,7 +403,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     override suspend fun queryImageUrl(bot: Bot, image: Image): String {
         // Onebot 没有 imageId 概念，Overflow 使用 imageId 字段来存储 Onebot 中的 file 链接
-        return image.imageId
+        if (image !is WrappedImage) throw IllegalStateException("Image type ${image::class.qualifiedName} do not support")
+        return image.url
     }
 
     @LowLevelApi

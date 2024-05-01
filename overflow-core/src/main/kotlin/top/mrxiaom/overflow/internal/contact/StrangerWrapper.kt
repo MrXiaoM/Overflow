@@ -79,7 +79,7 @@ internal class StrangerWrapper(
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {
-        return OnebotMessages.imageFromFile(FileService.instance!!.upload(resource))
+        return Overflow.imageFromFile(FileService.instance!!.upload(resource))
     }
 
     override suspend fun uploadShortVideo(
