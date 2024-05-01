@@ -277,7 +277,13 @@ internal object OnebotMessages {
                         "text" -> add(data["text"].string)
                         "face" -> add(Face(data["id"].string.toInt()))
                         "image" -> {
-                            val image = imageFromFile((data["url"] ?: data["file"]).string)
+                            val imageUrl = (data["url"] ?: data["file"]).string
+                            val imageId = data["file"]?.run {
+                                if (string.startsWith("http")) "!$string" else string
+                            } ?: "!$imageUrl"
+                            val fileSize = data["file_size"]?.string?.toLongOrNull() ?: 0L
+
+                            val image = WrappedImage(imageUrl, imageId, ImageType.UNKNOWN, fileSize, 0, 0)
                             if (data["type"].string == "flash") {
                                 add(image.flash())
                             } else {
@@ -475,14 +481,15 @@ internal object OnebotMessages {
     internal fun audioFromFile(file: String): Audio = WrappedAudio(file, 0)
     internal fun videoFromFile(file: String): ShortVideo = WrappedVideo(file)
 
+    @OptIn(MiraiExperimentalApi::class)
     private val Image.onebotFile: String
-        get() = imageId
+        get() = (this as? WrappedImage)?.url ?: throw IllegalStateException("Image type ${this::class.qualifiedName} do not support")
     private val FlashImage.onebotFile: String
         get() = image.onebotFile
     private val Audio.onebotFile: String
-        get() = (this as? WrappedAudio)?.file ?: ""
+        get() = (this as? WrappedAudio)?.file ?: throw IllegalStateException("Audio type ${this::class.qualifiedName} do not support")
     private val ShortVideo.onebotFile: String
-        get() = (this as? WrappedVideo)?.file ?: ""
+        get() = (this as? WrappedVideo)?.file ?: throw IllegalStateException("ShortVideo type ${this::class.qualifiedName} do not support")
     internal val JsonElement?.string
         get() = this?.jsonPrimitive?.content ?: ""
     internal val JsonElement?.int
