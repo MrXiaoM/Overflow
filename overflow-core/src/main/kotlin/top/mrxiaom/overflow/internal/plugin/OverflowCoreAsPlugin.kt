@@ -27,6 +27,7 @@ import net.mamoe.mirai.utils.weeksToMillis
 import org.java_websocket.client.WebSocketClient
 import org.slf4j.Logger
 import top.mrxiaom.overflow.OverflowAPI
+import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.event.UnsolvedOnebotEvent
 import top.mrxiaom.overflow.internal.Overflow
@@ -128,6 +129,17 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                     (it.asOnebot.impl.channel as? WebSocketClient)?.reconnectBlocking()
                 }
                 sendMessage("重新连接执行完成")
+            }
+           @SubCommand
+            @Description("调用API")
+            suspend fun CommandSender.exec(
+                @Name("API请求路径") apiPath: String,
+                @Name("请求参数") params :String?
+            ) {
+                val bot = (Bot.instances.firstOrNull() as RemoteBot) ?: return Unit.also {
+                    sendMessage("至少有一个Bot在线才能执行该命令")
+                }
+                sendMessage(bot.executeAction(apiPath,params))
             }
             @SubCommand
             @Description("发送群消息")
