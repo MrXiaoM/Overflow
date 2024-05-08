@@ -25,7 +25,10 @@ import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.weeksToMillis
 import org.java_websocket.client.WebSocketClient
+import org.java_websocket.framing.CloseFrame
+import org.java_websocket.server.WebSocketServer
 import org.slf4j.Logger
+import top.mrxiaom.overflow.BotBuilder
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.contact.RemoteBot
@@ -124,26 +127,52 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             }
             @SubCommand
             @Description("重新连接 Onebot")
-            suspend fun CommandSender.reconnect() {
+            suspend fun CommandSender.reconnect(
+                @Name("QQ号") qq: Long? = null
+            ) {
                 if (Bot.instances.isEmpty()) Overflow.instance.startWithConfig(true, oneBotLogger)
-                else Bot.instances.forEach {
-                    // TODO: WebSocketServer
-                    (it.asOnebot.impl.channel as? WebSocketClient)?.reconnectBlocking()
+                else Bot.instances.filter { qq == null || it.id == qq }.forEach {
+                    when (val channel = it.asOnebot.impl.channel) {
+                        is WebSocketClient -> channel.reconnectBlocking()
+                        is WebSocketServer -> channel.close(CloseFrame.NORMAL, "主动关闭 (重连)")
+                    }
                 }
                 sendMessage("重新连接执行完成")
             }
-           @SubCommand
+
+            @SubCommand
+            @Description("通过 WebSocket 连接到多个 Onebot 实现 (实验性)")
+            suspend fun CommandSender.connect(
+                @Name("WS类型") wsType: WebSocketType,
+                @Name("正向地址或反向端口") hostOrPort: String,
+                @Name("连接令牌") token: String? = null
+            ) {
+                val finalBot = when (wsType) {
+                    WebSocketType.POSITIVE -> BotBuilder.positive(hostOrPort)
+                    WebSocketType.REVERSED -> BotBuilder.reversed(hostOrPort.toIntOrNull()?.takeIf { it in 0..65535 } ?: return)
+                }.also {
+                    if (token != null) it.token(token)
+                }.connect()
+
+                if (finalBot != null) {
+                    sendMessage("${finalBot.id} 登录成功，昵称为 ${finalBot.nick}")
+                } else {
+                    sendMessage("登录失败，详见控制台日志")
+                }
+            }
+
+            @SubCommand
             @Description("调用API")
             suspend fun CommandSender.exec(
                 @Name("API请求路径") apiPath: String,
                 @Name("请求参数") params : String?,
                 @Name("发送回应") showRet : Boolean = true 
             ) {
-                val bot = (Bot.instances.firstOrNull() as RemoteBot) ?: return Unit.also {
+                val bot = (bot ?: Bot.instances.firstOrNull())?.asRemoteBot ?: return Unit.also {
                     sendMessage("至少有一个Bot在线才能执行该命令")
                 }
                 val ret = bot.executeAction(apiPath,params)
-                if(showRet){
+                if (showRet) {
                     sendMessage(ret)
                 }
             }
@@ -151,9 +180,9 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             @Description("发送群消息")
             suspend fun CommandSender.group(
                 @Name("群号") groupId: Long,
-                @Name("消息")vararg message: String
+                @Name("消息") vararg message: String
             ) {
-                val bot = Bot.instances.firstOrNull() ?: return Unit.also {
+                val bot = (bot ?: Bot.instances.firstOrNull()) ?: return Unit.also {
                     sendMessage("至少有一个Bot在线才能执行该命令")
                 }
                 val group = bot.groups[groupId] ?: return Unit.also {
@@ -170,7 +199,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 @Name("好友QQ") friendId: Long,
                 @Name("消息") vararg message: String
             ) {
-                val bot = Bot.instances.firstOrNull() ?: return Unit.also {
+                val bot = (bot ?: Bot.instances.firstOrNull()) ?: return Unit.also {
                     sendMessage("至少有一个Bot在线才能执行该命令")
                 }
                 val friend = bot.friends[friendId] ?: return Unit.also {
@@ -216,6 +245,10 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
 
     internal suspend fun startWithConfig(printInfo: Boolean = true) {
         Overflow.instance.startWithConfig(printInfo, oneBotLogger)
+    }
+
+    enum class WebSocketType {
+        POSITIVE, REVERSED
     }
 
     internal object TheLoader : PluginLoader<Plugin, PluginDescription> {
