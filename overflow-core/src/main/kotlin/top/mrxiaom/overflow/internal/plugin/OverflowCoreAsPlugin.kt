@@ -130,7 +130,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             suspend fun CommandSender.reconnect(
                 @Name("QQ号") qq: Long? = null
             ) {
-                if (Bot.instances.isEmpty()) Overflow.instance.startWithConfig(true, oneBotLogger)
+                if (Bot.instances.isEmpty()) startWithConfig()
                 else Bot.instances.filter { qq == null || it.id == qq }.forEach {
                     when (val channel = it.asOnebot.impl.channel) {
                         is WebSocketClient -> channel.reconnectBlocking()
@@ -145,6 +145,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             suspend fun CommandSender.connect(
                 @Name("WS类型") wsType: WebSocketType,
                 @Name("正向地址或反向端口") hostOrPort: String,
+                @Name("是否为QQ平台") platform: Boolean = true,
                 @Name("连接令牌") token: String? = null
             ) {
                 val finalBot = when (wsType) {
@@ -152,6 +153,12 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                     WebSocketType.REVERSED -> BotBuilder.reversed(hostOrPort.toIntOrNull()?.takeIf { it in 0..65535 } ?: return)
                 }.also {
                     if (token != null) it.token(token)
+                    if (!platform) it.noPlatform()
+                    val config = Overflow.instance.config
+                    it.retryTimes(config.retryTimes)
+                    it.retryWaitMills(config.retryWaitMills)
+                    it.retryRestMills(config.retryRestMills)
+                    it.overrideLogger(oneBotLogger)
                 }.connect()
 
                 if (finalBot != null) {
