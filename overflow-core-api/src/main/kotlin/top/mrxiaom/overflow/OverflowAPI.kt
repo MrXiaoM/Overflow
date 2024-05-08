@@ -11,6 +11,10 @@ import top.mrxiaom.overflow.contact.RemoteBot
 val Overflow: OverflowAPI
     get() = OverflowAPI.get()
 interface OverflowAPI {
+    /**
+     * Overflow 版本号
+     */
+    val version: String
     val botStarter: IBotStarter
     /**
      * 以 Onebot 格式新建图片消息

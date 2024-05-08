@@ -11,6 +11,7 @@ import kotlinx.serialization.json.Json
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.MiraiConsole
+import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.data.FriendInfo
 import net.mamoe.mirai.data.MemberInfo
@@ -131,13 +132,20 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         @get:JvmName("getInstance")
         val instance: Overflow get() = _instance
 
+        val versionNumber: Int?
+            get() = BuildConstants.COMMIT_COUNT
+
         @JvmStatic
-        val version = BuildConstants.VERSION
+        val version: String =
+            if (versionNumber == null) BuildConstants.VERSION
+            else "${BuildConstants.VERSION}.$versionNumber"
 
         private val isNotExit by lazy {
             !System.getProperty("overflow.not-exit").isNullOrBlank()
         }
     }
+
+    override val version: String = Overflow.version
 
     init {
         _instance = this

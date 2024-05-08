@@ -13,9 +13,12 @@ setupMavenCentralPublication {
 }
 
 var commitHash = "local"
+var commitCount: Int? = null
 if (File(rootProject.projectDir, ".git").exists()) {
     val repo = Grgit.open(mapOf("currentDir" to rootProject.projectDir))
     commitHash = repo.head().abbreviatedId
+    val log = repo.log()
+    commitCount = log.size
 }
 
 val miraiVersion = rootProject.ext["miraiVersion"].toString()
@@ -27,6 +30,7 @@ buildConfig {
     buildConfigField("String", "VERSION", "\"${project.version}\"")
     buildConfigField("String", "MIRAI_VERSION", "\"$miraiVersion\"")
     buildConfigField("String", "COMMIT_HASH", "\"$commitHash\"")
+    buildConfigField("kotlin.Int?", "COMMIT_COUNT", commitCount?.toString() ?: "null")
     buildConfigField("java.time.Instant", "BUILD_TIME", "java.time.Instant.ofEpochSecond(${System.currentTimeMillis() / 1000L}L)")
 }
 
