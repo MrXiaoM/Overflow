@@ -135,7 +135,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         val versionNumber: Int?
             get() = BuildConstants.COMMIT_COUNT
 
-        @JvmStatic
+        @JvmField
         val version: String =
             if (versionNumber == null) BuildConstants.VERSION
             else "${BuildConstants.VERSION}.$versionNumber"
