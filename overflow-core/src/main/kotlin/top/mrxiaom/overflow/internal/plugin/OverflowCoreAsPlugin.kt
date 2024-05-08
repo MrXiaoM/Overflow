@@ -26,6 +26,7 @@ import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.weeksToMillis
 import org.java_websocket.client.WebSocketClient
 import org.slf4j.Logger
+import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
@@ -51,6 +52,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     private lateinit var miraiLogger: MiraiLogger
     private lateinit var oneBotLogger: Logger
     internal lateinit var channel: EventChannel<Event>
+    internal var autoConnect = true
 
     override fun permissionId(name: String): PermissionId {
         return ConsoleCommandOwner.permissionId(name)
@@ -209,7 +211,11 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             appendLine()
             appendLine()
         }
-        Overflow.instance.startWithConfig(true, oneBotLogger)
+        if (autoConnect) startWithConfig()
+    }
+
+    internal suspend fun startWithConfig(printInfo: Boolean = true) {
+        Overflow.instance.startWithConfig(printInfo, oneBotLogger)
     }
 
     internal object TheLoader : PluginLoader<Plugin, PluginDescription> {
