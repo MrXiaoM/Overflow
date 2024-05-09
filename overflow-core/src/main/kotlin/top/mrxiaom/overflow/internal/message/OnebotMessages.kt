@@ -277,13 +277,7 @@ internal object OnebotMessages {
                         "text" -> add(data["text"].string)
                         "face" -> add(Face(data["id"].string.toInt()))
                         "image" -> {
-                            val imageUrl = (data["url"] ?: data["file"]).string
-                            val imageId = data["file"]?.run {
-                                if (string.startsWith("http")) "!$string" else string
-                            } ?: "!$imageUrl"
-                            val fileSize = data["file_size"]?.string?.toLongOrNull() ?: 0L
-
-                            val image = WrappedImage(imageUrl, imageId, ImageType.UNKNOWN, fileSize, 0, 0)
+                            val image = imageFromFile((data["url"] ?: data["file"]).string)
                             if (data["type"].string == "flash") {
                                 add(image.flash())
                             } else {
@@ -478,18 +472,18 @@ internal object OnebotMessages {
             else -> "text"
         }
     }
+    internal fun imageFromFile(file: String): Image = Image.fromId(file)
     internal fun audioFromFile(file: String): Audio = WrappedAudio(file, 0)
     internal fun videoFromFile(file: String): ShortVideo = WrappedVideo(file)
 
-    @OptIn(MiraiExperimentalApi::class)
     private val Image.onebotFile: String
-        get() = (this as? WrappedImage)?.url ?: throw IllegalStateException("Image type ${this::class.qualifiedName} do not support")
+        get() = imageId
     private val FlashImage.onebotFile: String
         get() = image.onebotFile
     private val Audio.onebotFile: String
-        get() = (this as? WrappedAudio)?.file ?: throw IllegalStateException("Audio type ${this::class.qualifiedName} do not support")
+        get() = (this as? WrappedAudio)?.file ?: ""
     private val ShortVideo.onebotFile: String
-        get() = (this as? WrappedVideo)?.file ?: throw IllegalStateException("ShortVideo type ${this::class.qualifiedName} do not support")
+        get() = (this as? WrappedVideo)?.file ?: ""
     internal val JsonElement?.string
         get() = this?.jsonPrimitive?.content ?: ""
     internal val JsonElement?.int

@@ -174,7 +174,7 @@ internal class MemberWrapper(
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {
-        return Overflow.imageFromFile(FileService.instance!!.upload(resource))
+        return OnebotMessages.imageFromFile(FileService.instance!!.upload(resource))
     }
 
     override suspend fun uploadShortVideo(
