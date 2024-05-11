@@ -928,6 +928,10 @@ class Bot(
      * [参考文档](https://lagrangedev.github.io/Lagrange.Doc/Lagrange.OneBot/API/Extend/#%E5%8F%91%E9%80%81%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91-%E7%BE%A4%E8%81%8A)
      * @return [ActionData] resId
      */
+    @Deprecated(
+        message = "自 Lagrange 0.0.2 (7bcfdbb) 起，发送合并转发的实现与 go-cqhttp 一致，无需额外兼容",
+        replaceWith = ReplaceWith("sendGroupForwardMsg")
+    )
     suspend fun sendGroupForwardMsgLagrange(groupId: Long, msg: List<Map<String, Any>>): ActionData<String?> {
         val action = ActionPathEnum.SEND_GROUP_FORWARD_MSG
         val params = JsonObject()
@@ -1174,6 +1178,10 @@ class Bot(
      * [参考文档](https://github.com/LagrangeDev/Lagrange.Core/blob/master/Lagrange.OneBot/Core/Operation/Message/SendForwardMessageOperation.cs)
      * @return [ActionData] resId
      */
+    @Deprecated(
+        message = "自 Lagrange 0.0.2 (7bcfdbb) 起，发送合并转发的实现与 go-cqhttp 一致，无需额外兼容",
+        replaceWith = ReplaceWith("sendForwardMsg")
+    )
     suspend fun sendForwardMsgLagrange(msg: List<Map<String, Any>>): ActionData<String?> {
         val action = ActionPathEnum.SEND_FORWARD_MSG
         val params = JsonObject()

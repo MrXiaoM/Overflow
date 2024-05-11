@@ -174,35 +174,9 @@ internal object OnebotMessages {
     internal suspend fun sendForwardMessage(contact: Contact, forward: ForwardMessage): MsgId? {
         val bot = contact.bot.asOnebot
         val nodes = serializeForwardNodes(bot, forward.nodeList)
-        when (bot.appName.lowercase()) {
-            "lagrange.onebot" -> {
-                val resId = when (contact) {
-                    is Group -> bot.impl.sendGroupForwardMsgLagrange(contact.id, nodes).data
-                    else -> bot.impl.sendForwardMsgLagrange(nodes).data
-                }
-                if (resId != null) {
-                    val forwardMsg = Json.encodeToString(buildJsonArray {
-                        addJsonObject {
-                            put("type", "forward")
-                            putJsonObject("data") {
-                                put("id", resId)
-                            }
-                        }
-                    })
-
-                    return when (contact) {
-                        is Group -> bot.impl.sendGroupMsg(contact.id, forwardMsg, false).data
-                        else -> bot.impl.sendPrivateMsg(contact.id, forwardMsg, false).data
-                    }
-                }
-                return null
-            }
-            else -> { // go-cqhttp, shamrock
-                return when (contact) {
-                    is Group -> bot.impl.sendGroupForwardMsg(contact.id, nodes).data
-                    else -> bot.impl.sendPrivateForwardMsg(contact.id, nodes).data
-                }
-            }
+        return when (contact) {
+            is Group -> bot.impl.sendGroupForwardMsg(contact.id, nodes).data
+            else -> bot.impl.sendPrivateForwardMsg(contact.id, nodes).data
         }
     }
 
@@ -213,33 +187,20 @@ internal object OnebotMessages {
      * @param nodeList mirai 转发消息节点
      */
     internal fun serializeForwardNodes(bot: RemoteBot, nodeList: List<ForwardMessage.Node>): List<Map<String, Any>> {
-        val appName = bot.appName.lowercase()
+        //val appName = bot.appName.lowercase()
         return nodeList.map {
             val message = JsonParser.parseString(serializeToOneBotJson(bot, it.messageChain))
-            when (appName) {
-                "shamrock", "go-cqhttp", "lagrange.onebot" -> mutableMapOf(
-                    "type" to "node",
-                    "data" to mutableMapOf(
-                        "name" to it.senderName,
-                        "uin" to it.senderId.run {
-                            when (appName) {
-                                "lagrange.onebot" -> toString() // Lagrange need string uin
-                                else -> this
-                            }
-                        },
-                        "content" to message,
-                    ),
-                    "time" to it.time
-                )
-                else -> mutableMapOf(
-                    "type" to "node",
-                    "data" to mutableMapOf(
-                        "user_id" to it.senderId,
-                        "nickname" to it.senderName,
-                        "content" to message
-                    )
-                )
-            }
+            mutableMapOf(
+                "type" to "node",
+                "data" to mutableMapOf(
+                    "uin" to it.senderId,
+                    "user_id" to it.senderId.toString(),
+                    "name" to it.senderName,
+                    "nickname" to it.senderName,
+                    "content" to message,
+                ),
+                "time" to it.time
+            )
         }
     }
 
