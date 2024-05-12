@@ -1,9 +1,9 @@
 @file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.listener
 
-import cn.evole.onebot.sdk.event.message.GroupMessageEvent
-import cn.evole.onebot.sdk.event.notice.group.*
-import cn.evole.onebot.sdk.event.request.GroupAddRequestEvent
+import cn.evolvefield.onebot.sdk.event.message.GroupMessageEvent
+import cn.evolvefield.onebot.sdk.event.notice.group.*
+import cn.evolvefield.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.contact.nameCardOrNick
@@ -37,7 +37,7 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
         when(e.subType) {
             "normal" -> {
                 val group = bot.group(e.groupId)
-                val member = e.sender.wrapAsMember(group)
+                val member = e.sender?.wrapAsMember(group) ?: return
 
                 var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
                 val messageString = miraiMessage.toString()
@@ -62,7 +62,7 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
             }
             "anonymous" -> {
                 val group = bot.group(e.groupId)
-                val member = e.anonymous.wrapAsMember(group)
+                val member = e.anonymous?.wrapAsMember(group) ?: return
 
                 var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
                 val messageString = miraiMessage.toString()
@@ -131,7 +131,7 @@ internal class GroupAddRequestListener : EventListener<GroupAddRequestEvent> {
                 bot.eventDispatcher.broadcastAsync(MemberJoinRequestEvent(
                     bot = bot,
                     eventId = Overflow.instance.putMemberJoinRequestFlag(e.flag),
-                    message = e.comment ?: "",
+                    message = e.comment,
                     fromId = e.userId,
                     groupId = e.groupId,
                     groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),

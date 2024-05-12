@@ -1,7 +1,7 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
-import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
+import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
 import kotlinx.coroutines.CoroutineName
 import net.mamoe.mirai.contact.Stranger
 import net.mamoe.mirai.event.broadcast

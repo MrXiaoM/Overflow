@@ -1,8 +1,8 @@
 package top.mrxiaom.overflow.internal
 
-import cn.evole.onebot.sdk.action.ActionRaw
-import cn.evole.onebot.sdk.response.contact.FriendInfoResp
-import cn.evole.onebot.sdk.util.JsonHelper.gson
+import cn.evolvefield.onebot.sdk.action.ActionRaw
+import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
+import cn.evolvefield.onebot.sdk.util.gson
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import kotlinx.coroutines.CoroutineName
@@ -11,7 +11,6 @@ import kotlinx.serialization.json.Json
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.*
 import net.mamoe.mirai.console.MiraiConsole
-import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.data.FriendInfo
 import net.mamoe.mirai.data.MemberInfo
@@ -360,10 +359,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     }
 
     override suspend fun downloadForwardMessage(bot: Bot, resourceId: String): List<ForwardMessage.Node> {
-        return bot.asOnebot.impl.getForwardMsg(resourceId).data.message.map {
+        return bot.asOnebot.impl.getForwardMsg(resourceId).data?.message?.map {
             val msg = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, it.message)
-            ForwardMessage.Node(it.sender.userId, it.time, it.sender.nickname ?: "QQ用户", msg)
-        }
+            ForwardMessage.Node(it.sender!!.userId, it.time, it.sender!!.nickname.takeIf(String::isNotEmpty) ?: "QQ用户", msg)
+        } ?: listOf()
     }
 
     override suspend fun downloadLongMessage(bot: Bot, resourceId: String): MessageChain {
@@ -373,7 +372,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     @LowLevelApi
     override suspend fun getRawGroupList(bot: Bot): Sequence<Long> {
-        return bot.asOnebot.impl.getGroupList().data.map { it.groupId }.asSequence()
+        return (bot.asOnebot.impl.getGroupList().data?.map { it.groupId } ?: listOf()).asSequence()
     }
 
     @LowLevelApi
@@ -383,7 +382,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         groupCode: Long,
         ownerId: Long
     ): Sequence<MemberInfo> {
-        return bot.asOnebot.impl.getGroupMemberList(groupUin).data.map { it.asMirai }.asSequence()
+        return (bot.asOnebot.impl.getGroupMemberList(groupUin).data?.map { it.asMirai } ?: listOf()).asSequence()
     }
 
     @LowLevelApi
@@ -400,7 +399,11 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     @LowLevelApi
     override fun newFriend(bot: Bot, friendInfo: FriendInfo): Friend {
-        return FriendWrapper(bot.asOnebot, FriendInfoResp(friendInfo.uin, friendInfo.nick, friendInfo.remark))
+        return FriendWrapper(bot.asOnebot, FriendInfoResp().apply {
+            userId = friendInfo.uin
+            nickname = friendInfo.nick
+            remark = friendInfo.remark
+        })
     }
 
     @LowLevelApi

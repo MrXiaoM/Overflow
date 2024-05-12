@@ -1,6 +1,6 @@
 package top.mrxiaom.overflow.internal.utils
 
-import cn.evole.onebot.sdk.event.Event
+import cn.evolvefield.onebot.sdk.event.Event
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.KSerializer

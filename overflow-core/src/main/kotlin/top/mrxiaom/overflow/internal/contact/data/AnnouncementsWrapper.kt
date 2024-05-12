@@ -60,13 +60,14 @@ internal class AnnouncementsWrapper(
     companion object {
         suspend fun GroupWrapper.fetchAnnouncements(): AnnouncementsWrapper {
             val list = bot.impl.getGroupNotice(id).data?.map {
+                val message = it.message ?: return@map null
                 OnlineAnnouncementWrapper(
-                    content = it.message.text,
+                    content = message.text,
                     group = this,
                     senderId = it.senderId,
                     publicationTime = it.publishTime,
                     parameters = AnnouncementParametersBuilder().apply {
-                        for (image in it.message.images) {
+                        for (image in message.images) {
                             image(AnnouncementImage.create(
                                 image.id, image.height.toIntOrNull() ?: 0, image.width.toIntOrNull() ?: 0
                             ))
@@ -74,7 +75,7 @@ internal class AnnouncementsWrapper(
                     }.build()
                 )
             } ?: listOf()
-            return AnnouncementsWrapper(this, list)
+            return AnnouncementsWrapper(this, list.filterNotNull())
         }
     }
 }

@@ -1,6 +1,6 @@
 package cn.evolvefield.onebot.client.util
 
-import cn.evole.onebot.sdk.util.JsonHelper.ignorable
+import cn.evolvefield.onebot.sdk.util.ignorable
 import cn.evolvefield.onebot.client.core.Bot
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CompletableDeferred
@@ -67,7 +67,7 @@ class ActionSendRequest(
             }
             throw ActionFailedException(
                 app = "${bot.appName} v${bot.appVersion}",
-                msg = "${ignorable(resp, "message", "")}$extra",
+                msg = "${resp.ignorable("message", "")}$extra",
                 json = resp
             )
         }

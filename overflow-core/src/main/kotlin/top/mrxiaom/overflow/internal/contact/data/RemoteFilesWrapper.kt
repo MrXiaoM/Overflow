@@ -23,10 +23,10 @@ internal class RemoteFilesWrapper(
             val data = bot.impl.getGroupRootFiles(id).data
 
             val root = FolderWrapper(
-                this, null, "/", "/", 0, 0, 0, data.files.size
+                this, null, "/", "/", 0, 0, 0, data?.files?.size ?: 0
             )
-            root.folders.addAll(data.folders.toMiraiFolders(this))
-            root.files.addAll(data.files.toMiraiFiles(this))
+            data?.folders?.toMiraiFolders(this)?.also { root.folders.addAll(it) }
+            data?.files?.toMiraiFiles(this)?.also { root.files.addAll(it) }
             return RemoteFilesWrapper(this, root)
         }
     }

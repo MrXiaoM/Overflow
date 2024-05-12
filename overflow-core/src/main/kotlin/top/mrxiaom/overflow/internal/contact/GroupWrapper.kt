@@ -1,9 +1,9 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
-import cn.evole.onebot.sdk.entity.Anonymous
-import cn.evole.onebot.sdk.response.group.GroupInfoResp
-import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
+import cn.evolvefield.onebot.sdk.entity.Anonymous
+import cn.evolvefield.onebot.sdk.response.group.GroupInfoResp
+import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
@@ -48,7 +48,7 @@ internal class GroupWrapper(
     val data: GroupInfoResp
         get() = impl
     override suspend fun queryUpdate() {
-        impl = bot.impl.getGroupInfo(impl.groupId, false).data
+        impl = bot.impl.getGroupInfo(impl.groupId, false).data ?: throw IllegalStateException("刷新群 ${impl.groupId} 的群信息失败")
     }
 
     override suspend fun updateAnnouncements(): Announcements {
@@ -131,9 +131,11 @@ internal class GroupWrapper(
     override val botAsMember: MemberWrapper
         get() = members.firstOrNull { it.id == bot.id } ?: runBlocking {
             val data = bot.impl.getGroupMemberInfo(id, bot.id, false).data
-            MemberWrapper(this@GroupWrapper, data ?: GroupMemberInfoResp(
-                id, bot.id, bot.nick, "", "", 0, "", 0, 0, 0, "member", false, "", 0, true, 0
-            ))
+            MemberWrapper(this@GroupWrapper, data ?: GroupMemberInfoResp().apply {
+                groupId = id
+                userId = bot.id
+                nickname = bot.nick
+            })
         }
     override val owner: NormalMember
         get() = members.first { it.permission == MemberPermission.OWNER }

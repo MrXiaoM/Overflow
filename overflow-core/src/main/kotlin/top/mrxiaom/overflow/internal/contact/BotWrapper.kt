@@ -1,6 +1,6 @@
 package top.mrxiaom.overflow.internal.contact
 
-import cn.evole.onebot.sdk.response.contact.LoginInfoResp
+import cn.evolvefield.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.client.core.Bot
 import kotlinx.coroutines.*
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
@@ -53,7 +53,7 @@ internal class BotWrapper private constructor(
     private var otherClientsInternal: ContactList<OtherClientWrapper>? = null
     private var strangersInternal: ContactList<StrangerWrapper> = ContactList()
     suspend fun updateLoginInfo() {
-        loginInfo = impl.getLoginInfo().data
+        loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("刷新机器人信息失败")
     }
     suspend fun updateContacts() {
         friendsInternal.update(impl.getFriendList().data?.map {
@@ -97,7 +97,7 @@ internal class BotWrapper private constructor(
     override suspend fun getMsg(messageId: Int): MessageChain? {
         val bot = (net.mamoe.mirai.Bot.instances.firstOrNull() as? BotWrapper) ?: return null
         val data = bot.impl.getMsg(messageId).data ?: return null
-        if (data.message == null) return null
+        if (data.message.isEmpty()) return null
         return OnebotMessages.deserializeFromOneBot(bot, data.message)
     }
     override val id: Long = loginInfo.userId
@@ -178,14 +178,15 @@ internal class BotWrapper private constructor(
 
     @JvmBlockingBridge
     override suspend fun executeAction(actionPath: String, params: String?): String {
-        return impl.customRequest({ actionPath }, params).toString()
+        return impl.customRequest(actionPath, params).toString()
     }
 
     override fun toString(): String = "Bot($id)"
 
     companion object {
         internal suspend fun wrap(impl: Bot, botConfiguration: BotConfiguration? = null): BotWrapper {
-            val loginInfo = impl.getLoginInfo().data // also refresh bot id
+            // also refresh bot id
+            val loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("无法获取机器人账号信息")
             return (net.mamoe.mirai.Bot.getInstanceOrNull(impl.id) as? BotWrapper)?.apply {
                 implBot = impl
             } ?:

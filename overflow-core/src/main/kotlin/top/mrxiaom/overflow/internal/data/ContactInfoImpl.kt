@@ -1,9 +1,10 @@
 @file:OptIn(LowLevelApi::class)
 package top.mrxiaom.overflow.internal.data
 
-import cn.evole.onebot.sdk.response.contact.FriendInfoResp
-import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
-import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
+import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
+import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
+import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
+import cn.evolvefield.onebot.sdk.util.ignorable
 import com.google.gson.JsonObject
 import net.mamoe.mirai.LowLevelApi
 import net.mamoe.mirai.contact.MemberPermission
@@ -44,16 +45,24 @@ internal class MemberInfoImpl(
 ): MemberInfo
 
 internal val FriendInfo.asOnebot: FriendInfoResp
-    get() = FriendInfoResp(uin, nick, remark)
+    get() = FriendInfoResp().apply {
+        userId = uin
+        nickname = nick
+        remark = this@asOnebot.remark
+    }
 internal val StrangerInfo.asOnebot: StrangerInfoResp
-    get() = StrangerInfoResp(uin, nick, "", 0, "", 0, 0, JsonObject().also {
-        if (fromGroup > 0) it.addProperty("add_src_id", fromGroup)
-    })
+    get() = StrangerInfoResp().apply {
+        userId = uin
+        nickname = nick
+        ext = JsonObject().also {
+            if (fromGroup > 0) it.addProperty("add_src_id", fromGroup)
+        }
+    }
 internal val StrangerInfoResp.asMirai: StrangerInfo
     get() = StrangerInfoImpl(
         uin = userId,
         nick = nickname,
-        fromGroup = ext?.get("add_src_id")?.asLong ?: 0,
+        fromGroup = ext.ignorable("add_src_id", 0L),
     )
 
 internal val GroupMemberInfoResp.asMirai: MemberInfoImpl

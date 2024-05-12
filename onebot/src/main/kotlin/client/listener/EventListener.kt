@@ -1,6 +1,6 @@
 package cn.evolvefield.onebot.client.listener
 
-import cn.evole.onebot.sdk.event.Event
+import cn.evolvefield.onebot.sdk.event.Event
 
 /**
  * Description:

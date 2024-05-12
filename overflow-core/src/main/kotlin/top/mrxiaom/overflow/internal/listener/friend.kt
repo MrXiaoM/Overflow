@@ -1,9 +1,9 @@
 @file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.listener
 
-import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
-import cn.evole.onebot.sdk.event.notice.friend.PrivateMsgDeleteNoticeEvent
-import cn.evole.onebot.sdk.event.request.FriendAddRequestEvent
+import cn.evolvefield.onebot.sdk.event.message.PrivateMessageEvent
+import cn.evolvefield.onebot.sdk.event.notice.friend.PrivateMsgDeleteNoticeEvent
+import cn.evolvefield.onebot.sdk.event.request.FriendAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.contact.remarkOrNick
@@ -28,7 +28,7 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
         val bot = e.bot ?: return
         when (e.subType) {
             "friend" -> {
-                val friend = e.privateSender.wrapAsFriend(bot)
+                val friend = e.sender.wrapAsFriend(bot)
 
                 if (friend.id == bot.id) {
                     // TODO: 过滤自己发送的消息
@@ -84,7 +84,7 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                 ))
             }
             "other" -> {
-                val stranger = e.privateSender.wrapAsStranger(bot)
+                val stranger = e.sender.wrapAsStranger(bot)
 
                 if (stranger.id == bot.id) {
                     // TODO: 过滤自己发送的消息
@@ -119,7 +119,7 @@ internal class FriendAddRequestListener : EventListener<FriendAddRequestEvent> {
         bot.eventDispatcher.broadcastAsync(NewFriendRequestEvent(
             bot = bot,
             eventId = Overflow.instance.putNewFriendRequestFlag(e.flag),
-            message = e.comment ?: "",
+            message = e.comment,
             fromId = e.userId,
             fromGroupId = 0, // TODO: 获取来自哪个群
             fromNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: ""

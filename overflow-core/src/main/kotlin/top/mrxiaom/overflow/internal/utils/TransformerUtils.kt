@@ -1,15 +1,17 @@
 @file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.utils
 
-import cn.evole.onebot.sdk.entity.Anonymous
-import cn.evole.onebot.sdk.entity.MsgId
-import cn.evole.onebot.sdk.event.message.GroupMessageEvent
-import cn.evole.onebot.sdk.event.message.PrivateMessageEvent
-import cn.evole.onebot.sdk.response.contact.FriendInfoResp
-import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
-import cn.evole.onebot.sdk.response.group.GroupFilesResp
-import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
-import cn.evole.onebot.sdk.response.misc.ClientsResp
+import cn.evolvefield.onebot.sdk.entity.Anonymous
+import cn.evolvefield.onebot.sdk.entity.GroupSender
+import cn.evolvefield.onebot.sdk.entity.MsgId
+import cn.evolvefield.onebot.sdk.entity.PrivateSender
+import cn.evolvefield.onebot.sdk.event.message.GroupMessageEvent
+import cn.evolvefield.onebot.sdk.event.message.PrivateMessageEvent
+import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
+import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
+import cn.evolvefield.onebot.sdk.response.group.GroupFilesResp
+import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
+import cn.evolvefield.onebot.sdk.response.misc.ClientsResp
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.hexToBytes
@@ -40,18 +42,18 @@ internal fun GroupMemberInfoResp.wrapAsMember(group: Group): MemberWrapper {
     return (group as GroupWrapper).updateMember(this)
 }
 
-internal fun GroupMessageEvent.GroupSender.wrapAsMember(group: Group): MemberWrapper {
+internal fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
     return GroupMemberInfoResp().also {
         it.groupId = group.id
         it.userId = userId.toLong()
         it.nickname = nickname
-        it.card = card ?: ""
-        it.sex = sex ?: ""
+        it.card = card
+        it.sex = sex
         it.age = age
-        it.area = area ?: ""
-        it.level = level?.toIntOrNull() ?: 0
-        it.role = role ?: "member"
-        it.title = title ?: ""
+        it.area = area
+        it.level = level.toIntOrNull() ?: 0
+        it.role = role
+        it.title = title
     }.wrapAsMember(group)
 }
 
@@ -67,7 +69,7 @@ internal suspend fun BotWrapper.group(groupId: Long): GroupWrapper {
 }
 
 
-internal fun PrivateMessageEvent.PrivateSender.wrapAsFriend(bot: BotWrapper): FriendWrapper {
+internal fun PrivateSender.wrapAsFriend(bot: BotWrapper): FriendWrapper {
     return bot.updateFriend(FriendWrapper(bot, FriendInfoResp().also {
         it.userId = userId
         it.nickname = nickname
@@ -79,17 +81,13 @@ internal fun StrangerInfoResp.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
     return bot.updateStranger(StrangerWrapper(bot, this))
 }
 
-internal fun PrivateMessageEvent.PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
-    return StrangerInfoResp(
-        userId,
-        nickname,
-        "",
-        0,
-        "",
-        0,
-        0,
-        null
-    ).wrapAsStranger(bot)
+internal fun PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
+    val id = userId
+    val nick = nickname
+    return StrangerInfoResp().apply {
+        userId = id
+        nickname = nick
+    }.wrapAsStranger(bot)
 }
 
 internal fun ClientsResp.Clients.wrapAsOtherClientInfo(): OtherClientInfo {

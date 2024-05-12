@@ -1,8 +1,8 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
-import cn.evole.onebot.sdk.entity.Anonymous
-import cn.evole.onebot.sdk.response.group.GroupMemberInfoResp
+import cn.evolvefield.onebot.sdk.entity.Anonymous
+import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.*
@@ -41,11 +41,11 @@ internal class MemberWrapper(
     val data: GroupMemberInfoResp
         get() = impl
     override suspend fun queryUpdate() {
-        setImpl(bot.impl.getGroupMemberInfo(impl.groupId, impl.userId, false).data)
+        setImpl(bot.impl.getGroupMemberInfo(impl.groupId, impl.userId, false).data ?: throw IllegalStateException("更新群成员 ${impl.groupId} > ${impl.userId} 的信息失败"))
     }
     
     fun setImpl(impl: GroupMemberInfoResp) {
-        if (impl.card != impl.card) {
+        if (this.impl.card != impl.card) {
             bot.eventDispatcher.broadcastAsync(
                 MemberCardChangeEvent(this.impl.card, impl.card, this)
             )
@@ -64,7 +64,7 @@ internal class MemberWrapper(
 
     override val coroutineContext: CoroutineContext = CoroutineName("((Bot/${bot.id})Group/${group.id})Member/$id")
     override var nameCard: String
-        get() = impl.card ?: ""
+        get() = impl.card
         set(value) {
             if (id != bot.id) {
                 group.checkBotPermission(MemberPermission.ADMINISTRATOR)

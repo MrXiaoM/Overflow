@@ -1,6 +1,6 @@
 package top.mrxiaom.overflow.internal.message
 
-import cn.evole.onebot.sdk.entity.MsgId
+import cn.evolvefield.onebot.sdk.entity.MsgId
 import com.google.gson.JsonParser
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*

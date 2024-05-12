@@ -44,11 +44,9 @@ overflow-core 附有 mirai-console 兼容，在 IMirai 实现类 [Overflow](http
 
 在连接成功后，Overflow 将会请求 `get_version_info`，并将 `app_name` 保存到 [RemoteBot](https://github.com/MrXiaoM/Overflow/blob/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/contact/RemoteBot.kt).appName 中，如果有原版 Onebot 标准中没有的额外接口实现，可以判断 appName 再调取该接口，以兼容尽可能多的 Onebot 实现。
 
-`bot.asOnebot.impl` 即可获取当前 mirai bot 的 [Bot (Onebot)](https://github.com/MrXiaoM/Overflow/blob/main/onebot/src/main/kotlin/cn/evolvefield/onebot/client/core/Bot.kt) 实现，在这里主动调取接口。
+`bot.asOnebot.impl` 即可获取当前 mirai bot 的 [Bot (Onebot)](https://github.com/MrXiaoM/Overflow/blob/main/onebot/src/main/kotlin/client/core/Bot.kt) 实现，在这里主动调取接口。
 
-所有由服务端回复的结果，以及服务器发送的事件，均会在 onebot 模块转换为实体类，再传递给 overflow-core 模块使用，实体类均在 [cn.evole.onebot.sdk](https://github.com/MrXiaoM/Overflow/tree/main/onebot/src/main/java/cn/evole/onebot/sdk) 包中。按需创建或修改。
-
-实体类均为 Java Bean 形式，在 kotlin 调用难免会出现空指针异常，在编写代码时，请做好充足的空检查。
+所有由服务端回复的结果，以及服务器发送的事件，均会在 onebot 模块转换为实体类，再传递给 overflow-core 模块使用，实体类均在 [cn.evolvefield.onebot.sdk](https://github.com/MrXiaoM/Overflow/tree/main/onebot/src/main/kotlin/sdk) 包中。按需创建或修改。
 
 ## 提交高质量的 commit 以及 PR
 

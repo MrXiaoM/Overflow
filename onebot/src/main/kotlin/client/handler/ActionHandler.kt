@@ -1,10 +1,10 @@
 package cn.evolvefield.onebot.client.handler
 
-import cn.evole.onebot.sdk.action.ActionPath
-import cn.evole.onebot.sdk.util.JsonHelper.ignorable
+import cn.evolvefield.onebot.sdk.action.ActionPath
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.util.ActionFailedException
 import cn.evolvefield.onebot.client.util.ActionSendRequest
+import cn.evolvefield.onebot.sdk.util.nullableString
 import com.google.gson.JsonObject
 import org.slf4j.Logger
 
@@ -33,7 +33,7 @@ class ActionHandler(
      * @param respJson 回调结果
      */
     fun onReceiveActionResp(respJson: JsonObject) {
-        ignorable(respJson, "echo", "").takeIf(String::isNotBlank)?.also { echo ->
+        respJson.nullableString("echo", null)?.also { echo ->
             // 唤醒挂起的协程
             apiCallbackMap.remove(echo)?.onCallback(respJson) ?: run {
                 logger.warn("收到了未知的 action 回应: $respJson")

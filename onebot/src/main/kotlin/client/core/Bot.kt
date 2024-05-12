@@ -1,22 +1,22 @@
 package cn.evolvefield.onebot.client.core
 
-import cn.evole.onebot.sdk.action.ActionData
-import cn.evole.onebot.sdk.action.ActionList
-import cn.evole.onebot.sdk.action.ActionPath
-import cn.evole.onebot.sdk.action.ActionRaw
-import cn.evole.onebot.sdk.entity.Anonymous
-import cn.evole.onebot.sdk.entity.GuildMsgId
-import cn.evole.onebot.sdk.entity.MsgId
-import cn.evole.onebot.sdk.enums.ActionPathEnum
-import cn.evole.onebot.sdk.event.message.GroupMessageEvent
-import cn.evole.onebot.sdk.response.contact.FriendInfoResp
-import cn.evole.onebot.sdk.response.contact.LoginInfoResp
-import cn.evole.onebot.sdk.response.contact.StrangerInfoResp
-import cn.evole.onebot.sdk.response.contact.UnidirectionalFriendListResp
-import cn.evole.onebot.sdk.response.group.*
-import cn.evole.onebot.sdk.response.guild.*
-import cn.evole.onebot.sdk.response.misc.*
-import cn.evole.onebot.sdk.util.JsonHelper.*
+import cn.evolvefield.onebot.sdk.action.ActionData
+import cn.evolvefield.onebot.sdk.action.ActionList
+import cn.evolvefield.onebot.sdk.action.ActionPath
+import cn.evolvefield.onebot.sdk.action.ActionRaw
+import cn.evolvefield.onebot.sdk.entity.Anonymous
+import cn.evolvefield.onebot.sdk.entity.GuildMsgId
+import cn.evolvefield.onebot.sdk.entity.MsgId
+import cn.evolvefield.onebot.sdk.enums.ActionPathEnum
+import cn.evolvefield.onebot.sdk.event.message.GroupMessageEvent
+import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
+import cn.evolvefield.onebot.sdk.response.contact.LoginInfoResp
+import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
+import cn.evolvefield.onebot.sdk.response.contact.UnidirectionalFriendListResp
+import cn.evolvefield.onebot.sdk.response.group.*
+import cn.evolvefield.onebot.sdk.response.guild.*
+import cn.evolvefield.onebot.sdk.response.misc.*
+import cn.evolvefield.onebot.sdk.util.*
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import com.google.gson.*
@@ -550,7 +550,7 @@ class Bot(
         val action = ActionPathEnum.GET_LOGIN_INFO
         val result = actionHandler.action(this, action, null)
         return result.withToken<ActionData<LoginInfoResp>>().also {
-            idInternal = it.data.userId
+            it.data?.userId?.also { id -> idInternal = id }
         }
     }
 
@@ -930,9 +930,10 @@ class Bot(
      */
     @Deprecated(
         message = "自 Lagrange 0.0.2 (7bcfdbb) 起，发送合并转发的实现与 go-cqhttp 一致，无需额外兼容",
-        replaceWith = ReplaceWith("sendGroupForwardMsg")
+        replaceWith = ReplaceWith("sendGroupForwardMsg"),
+        level = DeprecationLevel.ERROR
     )
-    suspend fun sendGroupForwardMsgLagrange(groupId: Long, msg: List<Map<String, Any>>): ActionData<String?> {
+    suspend fun sendGroupForwardMsgLagrange(groupId: Long, msg: List<Map<String, Any>>): ActionData<String> {
         val action = ActionPathEnum.SEND_GROUP_FORWARD_MSG
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -1032,7 +1033,21 @@ class Bot(
      *
      * @param action 请求路径
      * @param params 请求参数
-     * @return [ActionRaw]
+     * @return [JsonObject]
+     */
+    @JvmBlockingBridge
+    suspend fun customRequest(action: String, params: String?): JsonObject {
+        return customRequest(object: ActionPath {
+            override val path: String = action
+        }, params)
+    }
+
+    /**
+     * 自定义请求
+     *
+     * @param action 请求路径
+     * @param params 请求参数
+     * @return [JsonObject]
      */
     @JvmBlockingBridge
     suspend fun customRequest(action: ActionPath, params: String?): JsonObject {
@@ -1180,9 +1195,10 @@ class Bot(
      */
     @Deprecated(
         message = "自 Lagrange 0.0.2 (7bcfdbb) 起，发送合并转发的实现与 go-cqhttp 一致，无需额外兼容",
-        replaceWith = ReplaceWith("sendForwardMsg")
+        replaceWith = ReplaceWith("sendForwardMsg"),
+        level = DeprecationLevel.ERROR
     )
-    suspend fun sendForwardMsgLagrange(msg: List<Map<String, Any>>): ActionData<String?> {
+    suspend fun sendForwardMsgLagrange(msg: List<Map<String, Any>>): ActionData<String> {
         val action = ActionPathEnum.SEND_FORWARD_MSG
         val params = JsonObject()
 
@@ -1317,9 +1333,9 @@ class Bot(
     suspend fun getVersionInfo(): JsonObject {
         val action = ActionPathEnum.GET_VERSION_INFO
         return actionHandler.action(this, action, null).apply {
-            val data = ignorableObject(this, "data") { JsonObject() }
-            name = ignorable(data,"app_name", "onebot").trim()
-            version = ignorable(data, "app_version", "Unknown").trim()
+            val data = ignorableObject("data") { JsonObject() }
+            name = data.ignorable("app_name", "onebot").trim()
+            version = data.ignorable("app_version", "Unknown").trim()
         }
     }
 

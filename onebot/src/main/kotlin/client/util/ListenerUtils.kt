@@ -1,7 +1,7 @@
 package cn.evolvefield.onebot.client.util
 
-import cn.evole.onebot.sdk.event.Event
-import cn.evole.onebot.sdk.map.MessageMap
+import cn.evolvefield.onebot.sdk.event.Event
+import cn.evolvefield.onebot.sdk.event.EventMap
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 
@@ -43,6 +43,6 @@ object ListenerUtils {
 
             else -> return null
         }
-        return MessageMap.messageMap[type]
+        return EventMap[type]
     }
 }
