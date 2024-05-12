@@ -55,11 +55,11 @@ internal class FriendWrapper(
         val receipt = runCatching {
             val forward = messageChain.findForwardMessage()
             val messageIds = if (forward != null) {
-                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
+                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds(bot)
             } else {
                 val msg = Overflow.serializeMessage(bot, messageChain)
                 val response = bot.impl.sendPrivateMsg(id, msg, false)
-                response.data.safeMessageIds
+                response.data.safeMessageIds(bot)
             }
 
             OutgoingSource.friend(

@@ -149,11 +149,11 @@ internal class MemberWrapper(
         val receipt = runCatching {
             val forward = message.findForwardMessage()
             val messageIds = if (forward != null) {
-                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds
+                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds(bot)
             } else {
                 val msg = Overflow.serializeMessage(bot, message)
                 val response = bot.impl.sendPrivateMsg(id, msg, false)
-                response.data.safeMessageIds
+                response.data.safeMessageIds(bot)
             }
             OutgoingSource.temp(
                 bot = bot,

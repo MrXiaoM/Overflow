@@ -13,6 +13,7 @@ import cn.evole.onebot.sdk.response.misc.ClientsResp
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.hexToBytes
+import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.internal.contact.*
 import top.mrxiaom.overflow.internal.contact.data.FileWrapper
 import top.mrxiaom.overflow.internal.contact.data.FolderWrapper
@@ -96,8 +97,9 @@ internal fun ClientsResp.Clients.wrapAsOtherClientInfo(): OtherClientInfo {
     return OtherClientInfo(appId.toInt(), platform, deviceName, deviceKind)
 }
 
-internal val MsgId?.safeMessageIds: IntArray
-    get() = this?.messageId?.run { intArrayOf(this) } ?: intArrayOf()
+internal fun MsgId?.safeMessageIds(bot: RemoteBot): IntArray {
+    return this?.messageId?.run { intArrayOf(this) } ?: throw IllegalStateException("消息发送失败，详见网络日志 (logs/onebot/*.log) 和 Onebot 实现 (${bot.appName} v${bot.appVersion}) 的日志")
+}
 
 internal fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderWrapper? = null): List<FileWrapper> {
     return map {
