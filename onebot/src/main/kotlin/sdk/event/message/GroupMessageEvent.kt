@@ -2,7 +2,7 @@ package cn.evolvefield.onebot.sdk.event.message
 
 import cn.evolvefield.onebot.sdk.entity.Anonymous
 import cn.evolvefield.onebot.sdk.entity.GroupSender
-import cn.evolvefield.sdk.util.json.MessageEventAdapter
+import cn.evolvefield.onebot.sdk.util.json.MessageEventAdapter
 import com.google.gson.annotations.JsonAdapter;
 import lombok.AllArgsConstructor
 import lombok.Data

@@ -1,4 +1,4 @@
-package cn.evolvefield.sdk.util.json
+package cn.evolvefield.onebot.sdk.util.json
 
 import cn.evolvefield.onebot.sdk.entity.PrivateSender
 import cn.evolvefield.onebot.sdk.event.message.GroupMessageEvent
@@ -20,18 +20,18 @@ class MessageEventAdapter : JsonDeserializer<MessageEvent> {
         context: JsonDeserializationContext
     ): MessageEvent? {
         val obj = json.asJsonObject
-        val subType = obj["sub_type"].asString
-        val messageType = obj["message_type"].asString
+        val subType = obj.string("sub_type")
+        val messageType = obj.string("message_type")
         return when (messageType) {
             "group" -> obj.groupMessage(subType)
             "private" -> obj.privateMessage(subType)
             "guild" -> obj.guildMessage(subType)
             else -> null
         }?.apply {
-            postType = obj["post_type"].asString
-            time = obj["time"].asLong
-            selfId = obj["self_id"].asLong
-            userId = obj["user_id"].asLong
+            postType = obj.string("post_type")
+            time = obj.long("time")
+            selfId = obj.long("self_id")
+            userId = obj.long("user_id")
             message = obj.forceString("message")
             rawMessage = obj.ignorable("raw_message", "")
             font = obj.ignorable("font", 0)

@@ -1,6 +1,6 @@
 package cn.evolvefield.onebot.sdk.entity
 
-import cn.evolvefield.sdk.util.json.MessageEventAdapter
+import cn.evolvefield.onebot.sdk.util.json.MessageEventAdapter
 import com.google.gson.annotations.JsonAdapter
 import lombok.Data
 
