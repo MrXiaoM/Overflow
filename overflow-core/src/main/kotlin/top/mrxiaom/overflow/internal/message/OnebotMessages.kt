@@ -187,13 +187,16 @@ internal object OnebotMessages {
      * @param nodeList mirai 转发消息节点
      */
     internal fun serializeForwardNodes(bot: RemoteBot, nodeList: List<ForwardMessage.Node>): List<Map<String, Any>> {
-        //val appName = bot.appName.lowercase()
+        val appName = bot.appName.lowercase()
         return nodeList.map {
             val message = JsonParser.parseString(serializeToOneBotJson(bot, it.messageChain))
             mutableMapOf(
                 "type" to "node",
                 "data" to mutableMapOf(
-                    "uin" to it.senderId,
+                    "uin" to when(appName) {
+                        "lagrange.onebot" -> it.senderId.toString()
+                        else -> it.senderId
+                    },
                     "user_id" to it.senderId.toString(),
                     "name" to it.senderName,
                     "nickname" to it.senderName,
