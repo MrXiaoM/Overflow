@@ -362,7 +362,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         return bot.asOnebot.impl.getForwardMsg(resourceId).data?.message?.map {
             val msg = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, it.message)
             ForwardMessage.Node(it.sender!!.userId, it.time, it.sender!!.nickname.takeIf(String::isNotEmpty) ?: "QQ用户", msg)
-        } ?: listOf()
+        } ?: throw IllegalStateException("无法下载转发消息，详见网络日志 (logs/onebot/*.log")
     }
 
     override suspend fun downloadLongMessage(bot: Bot, resourceId: String): MessageChain {

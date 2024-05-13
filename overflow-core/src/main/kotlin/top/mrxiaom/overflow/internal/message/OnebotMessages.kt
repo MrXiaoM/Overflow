@@ -394,7 +394,7 @@ internal object OnebotMessages {
                         else -> add(UnknownMessage(type, Json.encodeToString(data)).printLog())
                     }
                 } catch (t: Throwable) {
-                    logger.warning("解析消息 $type$data 时出现错误 ($app ${bot.appVersion})", t)
+                    logger.warning("解析消息 $type -> $data 时出现错误 (${bot.appName} v${bot.appVersion})", t)
                 }
             }
         }
