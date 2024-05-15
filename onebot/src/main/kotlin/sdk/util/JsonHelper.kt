@@ -1,9 +1,6 @@
 package cn.evolvefield.onebot.sdk.util
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
+import com.google.gson.*
 import java.util.function.Supplier
 
 val gson: Gson = GsonBuilder().setPrettyPrinting().create()
@@ -111,10 +108,39 @@ fun JsonObject.forceString(key: String): String {
 }
 
 fun <T> JsonObject.fromJson(key: String, type: Class<T>): T? {
-    return gson.fromJson(this[key], type)
+    return gson.fromJson(this[key].deepCopyIgnoreNulls(), type)
 }
 inline fun <reified T : Any> JsonObject.fromJson(key: String): T? {
-    return gson.fromJson(this[key], T::class.java)
+    return gson.fromJson(this[key].deepCopyIgnoreNulls(), T::class.java)
+}
+fun JsonElement.deepCopyIgnoreNulls(): JsonElement {
+    return ignoreNulls(this) ?: deepCopy()
+}
+fun ignoreNulls(json: JsonElement): JsonElement? {
+    return when (json) {
+        is JsonObject -> {
+            return JsonObject().apply {
+                val members = asMap()
+                for ((key, value) in members) {
+                    ignoreNulls(value)?.also { add(key, it) }
+                }
+            }
+        }
+        is JsonArray -> {
+            val elements = json.asList()
+            if (elements.isNotEmpty()) {
+                JsonArray(elements.size).apply {
+                    for (element in elements) {
+                        ignoreNulls(element)?.also { add(it) }
+                    }
+                }
+            }
+            JsonArray()
+        }
+        is JsonPrimitive -> return json.deepCopy()
+
+        else -> return null
+    }
 }
 val <T> T.nullable: T?
     get() = this
