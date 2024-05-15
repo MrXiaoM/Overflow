@@ -119,8 +119,8 @@ fun JsonElement.deepCopyIgnoreNulls(): JsonElement {
 fun ignoreNulls(json: JsonElement): JsonElement? {
     return when (json) {
         is JsonObject -> {
-            return JsonObject().apply {
-                val members = asMap()
+            val members = json.asMap()
+            JsonObject().apply {
                 for ((key, value) in members) {
                     ignoreNulls(value)?.also { add(key, it) }
                 }
@@ -137,9 +137,9 @@ fun ignoreNulls(json: JsonElement): JsonElement? {
             }
             JsonArray()
         }
-        is JsonPrimitive -> return json.deepCopy()
+        is JsonPrimitive -> json.deepCopy()
 
-        else -> return null
+        else -> null
     }
 }
 val <T> T.nullable: T?
