@@ -18,7 +18,7 @@ fun JsonObject.nullableInt(key: String, def: Int?): Int? {
     }
 }
 fun JsonObject.int(key: String): Int {
-    return this[key].asInt
+    return this[key]?.asInt ?: throw JsonParseException("Can`t find `$key`")
 }
 fun JsonObject.intFromString(key: String): Int {
     return string(key).toInt()
@@ -39,7 +39,7 @@ fun JsonObject.longFromString(key: String): Long {
     return string(key).toLong()
 }
 fun JsonObject.long(key: String): Long {
-    return this[key].asLong
+    return this[key]?.asLong ?: throw JsonParseException("Can`t find `$key`")
 }
 fun JsonObject.ignorable(key: String, def: Float): Float {
     return nullableFloat(key, def.nullable) ?: def
@@ -57,7 +57,7 @@ fun JsonObject.floatFromString(key: String): Float {
     return string(key).toFloat()
 }
 fun JsonObject.float(key: String): Float {
-    return this[key].asFloat
+    return this[key]?.asFloat ?: throw JsonParseException("Can`t find `$key`")
 }
 fun JsonObject.ignorable(key: String, def: Double): Double {
     return nullableDouble(key, def.nullable) ?: def
@@ -75,7 +75,7 @@ fun JsonObject.doubleFromString(key: String): Double {
     return string(key).toDouble()
 }
 fun JsonObject.double(key: String): Double {
-    return this[key].asDouble
+    return this[key]?.asDouble ?: throw JsonParseException("Can`t find `$key`")
 }
 fun JsonObject.ignorable(key: String, def: String): String {
     return nullableString(key, def.nullable) ?: def
@@ -86,7 +86,7 @@ fun JsonObject.nullableString(key: String, def: String?): String? {
     return element.asString
 }
 fun JsonObject.string(key: String): String {
-    return this[key].asString
+    return this[key]?.asString ?: throw JsonParseException("Can`t find `$key`")
 }
 
 fun JsonObject.ignorableObject(key: String, def: Supplier<JsonObject>): JsonObject {
@@ -113,7 +113,8 @@ fun <T> JsonObject.fromJson(key: String, type: Class<T>): T? {
 inline fun <reified T : Any> JsonObject.fromJson(key: String): T? {
     return gson.fromJson(this[key].deepCopyIgnoreNulls(), T::class.java)
 }
-fun JsonElement.deepCopyIgnoreNulls(): JsonElement {
+fun JsonElement?.deepCopyIgnoreNulls(): JsonElement? {
+    if (this == null) return null
     return ignoreNulls(this) ?: deepCopy()
 }
 fun ignoreNulls(json: JsonElement): JsonElement? {
