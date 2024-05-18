@@ -1,6 +1,7 @@
 package cn.evolvefield.onebot.sdk.util.json
 
 import cn.evolvefield.onebot.sdk.response.group.ForwardMsgResp
+import cn.evolvefield.onebot.sdk.util.JsonDeserializerKt
 import cn.evolvefield.onebot.sdk.util.forceString
 import cn.evolvefield.onebot.sdk.util.fromJson
 import cn.evolvefield.onebot.sdk.util.ignorable
@@ -9,11 +10,11 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import java.lang.reflect.Type
 
-class ForwardMsgAdapter : JsonDeserializer<ForwardMsgResp> {
-    override fun deserialize(
+class ForwardMsgAdapter : JsonDeserializerKt<ForwardMsgResp> {
+    override fun deserializeFromJson(
         json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext
+        type: Type,
+        ctx: JsonDeserializationContext
     ): ForwardMsgResp {
         val nodes = mutableListOf<ForwardMsgResp.Node>()
         val jsonObj = json.asJsonObject

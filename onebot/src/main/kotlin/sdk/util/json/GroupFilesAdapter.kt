@@ -8,11 +8,11 @@ import com.google.gson.JsonElement
 import java.lang.reflect.Type
 
 class GroupFilesAdapter {
-    class Files : JsonDeserializer<GroupFilesResp.Files> {
-        override fun deserialize(
+    class Files : JsonDeserializerKt<GroupFilesResp.Files> {
+        override fun deserializeFromJson(
             json: JsonElement,
-            typeOfT: Type,
-            context: JsonDeserializationContext
+            type: Type,
+            ctx: JsonDeserializationContext
         ): GroupFilesResp.Files {
             val obj = json.asJsonObject
             return GroupFilesResp.Files().apply {

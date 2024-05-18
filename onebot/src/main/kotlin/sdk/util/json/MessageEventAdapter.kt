@@ -11,13 +11,14 @@ import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import com.google.gson.JsonParseException
 import java.lang.reflect.Type
 
-class MessageEventAdapter : JsonDeserializer<MessageEvent> {
-    override fun deserialize(
+class MessageEventAdapter : JsonDeserializerKt<MessageEvent> {
+    override fun deserializeFromJson(
         json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext
+        type: Type,
+        ctx: JsonDeserializationContext
     ): MessageEvent? {
         val obj = json.asJsonObject
         val subType = obj.string("sub_type")

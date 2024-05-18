@@ -1,21 +1,15 @@
 package cn.evolvefield.onebot.sdk.util.json
 
 import cn.evolvefield.onebot.sdk.response.group.GetMsgResp
-import cn.evolvefield.onebot.sdk.util.forceString
-import cn.evolvefield.onebot.sdk.util.fromJson
-import cn.evolvefield.onebot.sdk.util.ignorable
-import cn.evolvefield.onebot.sdk.util.int
-import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
+import cn.evolvefield.onebot.sdk.util.*
+import com.google.gson.*
 import java.lang.reflect.Type
 
-class MsgAdapter : JsonDeserializer<GetMsgResp> {
-    override fun deserialize(
+class MsgAdapter : JsonDeserializerKt<GetMsgResp> {
+    override fun deserializeFromJson(
         json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext
+        type: Type,
+        ctx: JsonDeserializationContext
     ): GetMsgResp {
         val obj = json.asJsonObject
         return GetMsgResp().apply {

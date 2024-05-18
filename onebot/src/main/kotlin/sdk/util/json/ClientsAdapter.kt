@@ -1,6 +1,7 @@
 package cn.evolvefield.onebot.sdk.util.json
 
 import cn.evolvefield.onebot.sdk.response.misc.ClientsResp
+import cn.evolvefield.onebot.sdk.util.JsonDeserializerKt
 import cn.evolvefield.onebot.sdk.util.ignorable
 import cn.evolvefield.onebot.sdk.util.long
 import cn.evolvefield.onebot.sdk.util.string
@@ -9,11 +10,11 @@ import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import java.lang.reflect.Type
 
-class ClientsAdapter : JsonDeserializer<ClientsResp.Clients> {
-    override fun deserialize(
+class ClientsAdapter : JsonDeserializerKt<ClientsResp.Clients> {
+    override fun deserializeFromJson(
         json: JsonElement,
-        typeOfT: Type,
-        context: JsonDeserializationContext
+        type: Type,
+        ctx: JsonDeserializationContext
     ): ClientsResp.Clients {
         val obj = json.asJsonObject
         return ClientsResp.Clients().apply {
