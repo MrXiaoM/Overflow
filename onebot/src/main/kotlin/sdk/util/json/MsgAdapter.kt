@@ -33,7 +33,12 @@ class MsgAdapter : JsonDeserializer<GetMsgResp> {
 
     companion object {
         fun JsonObject.messageId(): Int {
-            val msgId: String = this["message_id"].asString
+            val msgId: String = this["message_id"]?.asString ?: throw IllegalStateException("""
+                收到消息ID为空的消息事件。type=${this["message_type"]}, sub_type=${this["sub_type"]}
+                请向你所使用的 Onebot 实现维护者报告该问题，
+                不要将该问题反馈到 Overflow。
+            """.trimIndent()
+            )
             try {
                 return msgId.toInt()
             } catch (ignored: NumberFormatException) {
