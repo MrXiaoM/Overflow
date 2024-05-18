@@ -1,6 +1,7 @@
 package cn.evolvefield.onebot.sdk.util
 
 import com.google.gson.*
+import com.google.gson.reflect.TypeToken
 import java.util.function.Supplier
 
 val gson: Gson = GsonBuilder().setPrettyPrinting().create()
@@ -108,10 +109,16 @@ fun JsonObject.forceString(key: String): String {
 }
 
 fun <T> JsonObject.fromJson(key: String, type: Class<T>): T? {
-    return gson.fromJson(this[key].deepCopyIgnoreNulls(), type)
+    return gson.fromJson(this[key], type)
 }
 inline fun <reified T : Any> JsonObject.fromJson(key: String): T? {
-    return gson.fromJson(this[key].deepCopyIgnoreNulls(), T::class.java)
+    return gson.fromJson(this[key], T::class.java)
+}
+inline fun <reified T> JsonElement.withToken(): T {
+    return gson.fromJson(deepCopyIgnoreNulls(), object : TypeToken<T>() {}.type)
+}
+inline fun <reified T> JsonElement.withClass(): T {
+    return gson.fromJson(deepCopyIgnoreNulls(), T::class.java)
 }
 fun JsonElement?.deepCopyIgnoreNulls(): JsonElement? {
     if (this == null) return null
@@ -142,6 +149,37 @@ fun ignoreNulls(json: JsonElement): JsonElement? {
 
         else -> null
     }
+}
+fun <T> List<T>.toJsonArray(): JsonArray {
+    val array = JsonArray()
+    for (any in this) {
+        when (any) {
+            is JsonElement -> array.add(any)
+            is Map<*, *> -> array.add(any.toJsonObject())
+            is List<*> -> array.add(any.toJsonArray())
+            is Boolean -> array.add(any)
+            is Number -> array.add(any)
+            is Char -> array.add(any)
+            else -> array.add(any.toString())
+        }
+    }
+    return array
+}
+fun <K,V> Map<K, V>.toJsonObject(): JsonObject {
+    val obj = JsonObject()
+    for (entry in entries) {
+        val key = entry.key.toString()
+        when (val value = entry.value) {
+            is JsonElement -> obj.add(key, value)
+            is Map<*, *> -> obj.add(key, value.toJsonObject())
+            is List<*> -> obj.add(key, value.toJsonArray())
+            is Boolean -> obj.addProperty(key, value)
+            is Number -> obj.addProperty(key, value)
+            is Char -> obj.addProperty(key, value)
+            else -> obj.addProperty(key, value.toString())
+        }
+    }
+    return obj
 }
 val <T> T.nullable: T?
     get() = this

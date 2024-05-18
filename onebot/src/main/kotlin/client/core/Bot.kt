@@ -20,7 +20,6 @@ import cn.evolvefield.onebot.sdk.util.*
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import com.google.gson.*
-import com.google.gson.reflect.TypeToken
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import org.java_websocket.WebSocket
 
@@ -1429,44 +1428,4 @@ class Bot(
         val result = actionHandler.action(this, action, params)
         return result.withClass()
     }
-}
-
-fun <T> List<T>.toJsonArray(): JsonArray {
-    val array = JsonArray()
-    for (any in this) {
-        when (any) {
-            is JsonElement -> array.add(any)
-            is Map<*, *> -> array.add(any.toJsonObject())
-            is List<*> -> array.add(any.toJsonArray())
-            is Boolean -> array.add(any)
-            is Number -> array.add(any)
-            is Char -> array.add(any)
-            else -> array.add(any.toString())
-        }
-    }
-    return array
-}
-fun <K,V> Map<K, V>.toJsonObject(): JsonObject {
-    val obj = JsonObject()
-    for (entry in entries) {
-        val key = entry.key.toString()
-        when (val value = entry.value) {
-            is JsonElement -> obj.add(key, value)
-            is Map<*, *> -> obj.add(key, value.toJsonObject())
-            is List<*> -> obj.add(key, value.toJsonArray())
-            is Boolean -> obj.addProperty(key, value)
-            is Number -> obj.addProperty(key, value)
-            is Char -> obj.addProperty(key, value)
-            else -> obj.addProperty(key, value.toString())
-        }
-    }
-    return obj
-}
-
-inline fun <reified T> JsonElement.withToken(): T {
-    return gson.fromJson(this, object : TypeToken<T>() {}.type)
-}
-
-inline fun <reified T> JsonElement.withClass(): T {
-    return gson.fromJson(this, T::class.java)
 }
