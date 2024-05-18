@@ -32,15 +32,16 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 另请参见 [配置文件说明](configuration.md)
 
-## 部署 Onebot 协议实现
+## Onebot 协议实现部署教程
 
-首先部署一个 Onebot 协议实现，以下是一些示例：
+首先部署一个 Onebot 协议实现，以下是**相关教程**：
 
 + **[已归档]**~~[whitechi73/OpenShamrock](https://wiki.mrxiaom.top/overflow/openshamrock/) Xposed/LSPatch hook QQ 并实现 Onebot *1.1.0+ Kritor版本暂不支持*~~
-+ [Hoshinonyaruko/Gensokyo](https://wiki.mrxiaom.top/overflow/gensokyo) (非稳定支持) 官方Bot 转 Onebot
++ [Hoshinonyaruko/Gensokyo](https://wiki.mrxiaom.top/overflow/gensokyo) 官方Bot 转 Onebot
 + [KonataDev/Lagrange.Core](https://github.com/KonataDev/Lagrange.Core) QQNT 协议库 *0.0.3+ Kritor版本暂不支持*
 + [cnlimiter/onebot-mirai](https://github.com/cnlimiter/onebot-mirai) mirai 转 Onebot，相当于可以实现 mirai 接龙
 + [LLOneBot/LLOneBot](https://wiki.mrxiaom.top/overflow/lloneBot) 在 QQNT 客户端中装载插件实现 Onebot
++ [NapNeko/NapCatQQ](https://napneko.github.io/zh-CN/guide/getting-started) 使用无头 QQNT 客户端实现 Onebot
 
 除此之外，你还可以到 [Onebot 生态](https://onebot.dev/ecosystem.html#onebot-%E5%AE%9E%E7%8E%B0-1) 中寻找更多的 Onebot 11 实现，Overflow 基本可以连接到它们。
 
@@ -117,4 +118,3 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 | `-Doverflow.config=路径`     | 修改配置文件(overflow.json)的路径                  |
 | `-Doverflow.not-exit=true` | 设置无法连接到 Onebot 时不结束进程                     |
 | `-Doverflow.timeout=超时时间`  | 设置主动发送 action 的请求超时时间(毫秒)，默认为10000毫秒(10秒) |
- 
