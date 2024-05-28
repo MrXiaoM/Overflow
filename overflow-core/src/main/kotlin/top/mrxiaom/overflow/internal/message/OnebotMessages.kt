@@ -232,7 +232,10 @@ internal object OnebotMessages {
             if (source != null) add(source)
 
             val app = bot.appName.lowercase()
-            for (o in json) {
+
+            var hasQuote = false
+
+            for ((i, o) in json.withIndex()) {
                 val obj = o.jsonObject
                 val type = obj["type"].string
                 val data = obj["data"]?.jsonObject ?: buildJsonObject {  }
@@ -252,6 +255,8 @@ internal object OnebotMessages {
                         "record" -> add(audioFromFile(data["file"].string))
                         "video" -> add(videoFromFile(data["file"].string))
                         "at" -> {
+                            if (i == 1 && hasQuote)
+                                continue
                             if (data["qq"].string.lowercase() == "all")
                                 add(AtAll)
                             else
@@ -323,6 +328,11 @@ internal object OnebotMessages {
                                 .messages { deserializeFromOneBot(bot, msgData.message) }
                                 .time(msgData.time)
                             val kind = if (msgData?.groupId == 0L) MessageSourceKind.FRIEND else MessageSourceKind.GROUP
+
+                            // lagrange
+                            if (i == 0 && app == "lagrange.onebot") {
+                                hasQuote = true
+                            }
 
                             add(QuoteReply(msgSource.build(bot.id, kind)))
                         }
