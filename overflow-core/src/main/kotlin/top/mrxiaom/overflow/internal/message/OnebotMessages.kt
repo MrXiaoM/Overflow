@@ -91,8 +91,13 @@ internal object OnebotMessages {
                         is At -> put("qq", single.target.toString())
                         is AtAll -> put("qq", "all")
                         is RockPaperScissors -> {
-                            put("id", single.id)
-                            put("result", single.id) // LLOnebot, NapCat
+                            val id = when (single) {
+                                RockPaperScissors.PAPER -> 1
+                                RockPaperScissors.SCISSORS -> 2
+                                RockPaperScissors.ROCK -> 3
+                            }
+                            put("id", id)
+                            put("result", id) // LLOnebot, NapCat
                         }
                         is Dice -> {
                             put("id", single.value)
@@ -283,9 +288,9 @@ internal object OnebotMessages {
                             // result: LLOnebot, NapCat
                             val id = (data["result"] ?: data["id"])?.string?.toInt()
                             when (id) {
-                                0 -> add(RockPaperScissors.ROCK)
                                 1 -> add(RockPaperScissors.PAPER)
                                 2 -> add(RockPaperScissors.SCISSORS)
+                                3 -> add(RockPaperScissors.ROCK)
                                 else -> add(RockPaperScissors.random()) // not support
                             }
                         }
