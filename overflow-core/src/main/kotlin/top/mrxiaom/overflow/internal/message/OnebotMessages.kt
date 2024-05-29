@@ -75,97 +75,107 @@ internal object OnebotMessages {
             val app = (bot?.appName ?: "Onebot").lowercase()
 
             for (single in messageChain) {
-                addJsonObject {
-                    put("type", single.messageType(bot))
-                    putJsonObject("data") {
-                        when (single) {
-                            is PlainText -> put("text", single.content)
-                            is Face -> put("id", single.id.toString())
-                            is Image -> put("file", single.onebotFile)
-                            is FlashImage -> {
-                                put("file", single.onebotFile)
-                                put("type", "flash")
-                            }
-                            is Audio -> put("file", single.onebotFile)
-                            is ShortVideo -> put("file", single.onebotFile)
-                            is At -> put("qq", single.target.toString())
-                            is AtAll -> put("qq", "all")
-                            is RockPaperScissors -> put("id", single.id) // Onebot 11 不支持自定义石头剪刀布
-                            is Dice -> put("id", single.value) // Onebot 11 不支持自定义骰子
-                            is PokeMessage -> {
-                                put("type", single.pokeType.toString())
-                                put("id", single.id.toString())
-                            }
-                            is MusicShare -> {
-                                when (single.kind) {
-                                    MusicKind.NeteaseCloudMusic -> {
-                                        put("type", "163")
-                                        put("id", single.jumpUrl.substringAfterLast("id="))
-                                    }
-                                    // MusicKind.QQMusic -> {}
-                                    else -> {
-                                        put("type", "custom")
-                                        put("url", single.jumpUrl)
-                                        put("audio", single.musicUrl)
-                                        put("title", single.title)
-                                        put("content", single.summary)
-                                        put("image", single.pictureUrl)
-                                    }
+                val type = single.messageType(bot) ?: continue
+                //var ignoreEmptyData = false
+                val data = buildJsonObject {
+                    when (single) {
+                        is PlainText -> put("text", single.content)
+                        is Face -> put("id", single.id.toString())
+                        is Image -> put("file", single.onebotFile)
+                        is FlashImage -> {
+                            put("file", single.onebotFile)
+                            put("type", "flash")
+                        }
+                        is Audio -> put("file", single.onebotFile)
+                        is ShortVideo -> put("file", single.onebotFile)
+                        is At -> put("qq", single.target.toString())
+                        is AtAll -> put("qq", "all")
+                        is RockPaperScissors -> put("id", single.id) // Onebot 11 不支持自定义石头剪刀布
+                        is Dice -> put("id", single.value) // Onebot 11 不支持自定义骰子
+                        is PokeMessage -> {
+                            put("type", single.pokeType.toString())
+                            put("id", single.id.toString())
+                        }
+
+                        is MusicShare -> {
+                            when (single.kind) {
+                                MusicKind.NeteaseCloudMusic -> {
+                                    put("type", "163")
+                                    put("id", single.jumpUrl.substringAfterLast("id="))
+                                }
+                                // MusicKind.QQMusic -> {}
+                                else -> {
+                                    put("type", "custom")
+                                    put("url", single.jumpUrl)
+                                    put("audio", single.musicUrl)
+                                    put("title", single.title)
+                                    put("content", single.summary)
+                                    put("image", single.pictureUrl)
                                 }
                             }
-                            is QuoteReply -> when { // 忽略分片消息情况
-                                else -> put("id", single.source.ids[0].toString())
-                            }
-                            // is ForwardMessage -> put("id", single.id) // 转发消息有单独的发送方法
-                            is LightApp -> put("data", single.content)
-                            is ServiceMessage -> put("data", single.content)
-                            is Markdown -> when (app) { // 其它实现可能有其它格式，预留判断
-                                "shamrock" -> put("content", single.content)
-                                else -> put("content", single.content)
-                            }
-                            is ContactRecommend -> {
-                                put("type", single.contactType.name.lowercase())
-                                put("id", single.id.toString())
-                            }
-                            is Location -> {
-                                put("lat", single.lat.toString())
-                                put("lon", single.lon.toString())
-                                if (single.title.isNotEmpty()) put("title", single.title)
-                                if (single.content.isNotEmpty()) put("content", single.content)
-                            }
-                            is InlineKeyboard -> { // OpenShamrock
-                                put("bot_appid", single.botAppId)
-                                putJsonArray("rows") {
-                                    single.rows.forEach {  row ->
-                                        add(buildJsonObject row@{
-                                            putJsonArray("buttons") {
-                                                row.buttons.forEach { button ->
-                                                    add(buildJsonObject {
-                                                        put("id", button.id)
-                                                        put("label", button.label)
-                                                        put("visited_label", button.visitedLabel)
-                                                        put("style", button.style)
-                                                        put("type", button.type)
-                                                        put("click_limit", button.clickLimit)
-                                                        put("unsupport_tips", button.unsupportTips)
-                                                        put("data", button.data)
-                                                        put("at_bot_show_channel_list", button.atBotShowChannelList)
-                                                        put("permission_type", button.permissionType)
-                                                        putJsonArray("specify_role_ids") {
-                                                            button.specifyRoleIds.forEach { add(it) }
-                                                        }
-                                                        putJsonArray("specify_tinyids") {
-                                                            button.specifyTinyIds.forEach { add(it) }
-                                                        }
-                                                    })
-                                                }
+                        }
+
+                        is QuoteReply -> when { // 忽略分片消息情况
+                            else -> put("id", single.source.ids[0].toString())
+                        }
+                        // is ForwardMessage -> put("id", single.id) // 转发消息有单独的发送方法
+                        is LightApp -> put("data", single.content)
+                        is ServiceMessage -> put("data", single.content)
+                        is Markdown -> when (app) { // 其它实现可能有其它格式，预留判断
+                            "shamrock" -> put("content", single.content)
+                            else -> put("content", single.content)
+                        }
+
+                        is ContactRecommend -> {
+                            put("type", single.contactType.name.lowercase())
+                            put("id", single.id.toString())
+                        }
+
+                        is Location -> {
+                            put("lat", single.lat.toString())
+                            put("lon", single.lon.toString())
+                            if (single.title.isNotEmpty()) put("title", single.title)
+                            if (single.content.isNotEmpty()) put("content", single.content)
+                        }
+
+                        is InlineKeyboard -> { // OpenShamrock
+                            put("bot_appid", single.botAppId)
+                            putJsonArray("rows") {
+                                single.rows.forEach { row ->
+                                    add(buildJsonObject row@{
+                                        putJsonArray("buttons") {
+                                            row.buttons.forEach { button ->
+                                                add(buildJsonObject {
+                                                    put("id", button.id)
+                                                    put("label", button.label)
+                                                    put("visited_label", button.visitedLabel)
+                                                    put("style", button.style)
+                                                    put("type", button.type)
+                                                    put("click_limit", button.clickLimit)
+                                                    put("unsupport_tips", button.unsupportTips)
+                                                    put("data", button.data)
+                                                    put("at_bot_show_channel_list", button.atBotShowChannelList)
+                                                    put("permission_type", button.permissionType)
+                                                    putJsonArray("specify_role_ids") {
+                                                        button.specifyRoleIds.forEach { add(it) }
+                                                    }
+                                                    putJsonArray("specify_tinyids") {
+                                                        button.specifyTinyIds.forEach { add(it) }
+                                                    }
+                                                })
                                             }
-                                        })
-                                    }
+                                        }
+                                    })
                                 }
                             }
                         }
                     }
+                }
+
+                if (/* !ignoreEmptyData && */data.isEmpty()) continue
+                addJsonObject {
+                    put("type", type)
+                    put("data", data)
                 }
             }
         }
@@ -410,7 +420,7 @@ internal object OnebotMessages {
         }
     }
 
-    private fun Message.messageType(bot: RemoteBot?): String {
+    private fun Message.messageType(bot: RemoteBot?): String? {
         val appName = (bot?.appName ?: "Onebot").lowercase()
         return when (this) {
             is PlainText -> "text"
@@ -443,7 +453,7 @@ internal object OnebotMessages {
             is ContactRecommend -> "contact"
             is Location -> "location"
             is InlineKeyboard -> "inline_keyboard"
-            else -> "text"
+            else -> null
         }
     }
     internal fun imageFromFile(file: String): Image = Image.fromId(file)
