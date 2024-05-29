@@ -90,8 +90,14 @@ internal object OnebotMessages {
                         is ShortVideo -> put("file", single.onebotFile)
                         is At -> put("qq", single.target.toString())
                         is AtAll -> put("qq", "all")
-                        is RockPaperScissors -> put("id", single.id) // Onebot 11 不支持自定义石头剪刀布
-                        is Dice -> put("id", single.value) // Onebot 11 不支持自定义骰子
+                        is RockPaperScissors -> {
+                            put("id", single.id)
+                            put("result", single.id) // LLOnebot, NapCat
+                        }
+                        is Dice -> {
+                            put("id", single.value)
+                            put("result", single.value) // LLOnebot, NapCat
+                        }
                         is PokeMessage -> {
                             put("type", single.pokeType.toString())
                             put("id", single.id.toString())
@@ -273,9 +279,25 @@ internal object OnebotMessages {
                                 add(At(data["qq"].string.toLong()))
                         }
 
-                        // TODO "rps" "dice" 无法通过 OneBot 获取其具体值，先搁置
-                        "rps" -> add(RockPaperScissors.random())
-                        "dice" -> add(Dice.random())
+                        "rps" -> {
+                            // result: LLOnebot, NapCat
+                            val id = (data["result"] ?: data["id"])?.string?.toInt()
+                            when (id) {
+                                0 -> add(RockPaperScissors.ROCK)
+                                1 -> add(RockPaperScissors.PAPER)
+                                2 -> add(RockPaperScissors.SCISSORS)
+                                else -> add(RockPaperScissors.random()) // not support
+                            }
+                        }
+                        "dice" -> {
+                            // result: LLOnebot, NapCat
+                            val id = (data["result"] ?: data["id"])?.string?.toInt()
+                            if (id != null && id in 1..6) {
+                                add(Dice(id))
+                            } else {
+                                add(Dice.random()) // not support
+                            }
+                        }
 
                         "new_dice" -> add(Dice(data["id"].int))
                         "poke" -> add(
