@@ -59,9 +59,11 @@ internal class BotWrapper private constructor(
         friendsInternal.update(impl.getFriendList().data?.map {
             FriendWrapper(this, it)
         }) { impl = it.impl }
+        logger.verbose("${friends.size} friends loaded")
         groupsInternal.update(impl.getGroupList().data?.map {
             GroupWrapper(this, it)
         }) { impl = it.impl }
+        logger.verbose("${groups.size} groups loaded")
     }
 
     override suspend fun queryUpdate() {
@@ -100,7 +102,9 @@ internal class BotWrapper private constructor(
         if (data.message.isEmpty()) return null
         return OnebotMessages.deserializeFromOneBot(bot, data.message)
     }
-    override val id: Long = loginInfo.userId
+    override val id: Long
+        get() = loginInfo.userId
+
     override val logger: MiraiLogger = configuration.botLoggerSupplier(this)
     internal val networkLogger: MiraiLogger by lazy { configuration.networkLoggerSupplier(this) }
     override val coroutineContext: CoroutineContext =
@@ -189,12 +193,26 @@ internal class BotWrapper private constructor(
             val loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("无法获取机器人账号信息")
             return (net.mamoe.mirai.Bot.getInstanceOrNull(impl.id) as? BotWrapper)?.apply {
                 implBot = impl
-            } ?:
-            BotWrapper(impl, loginInfo, botConfiguration ?: BotConfiguration {
+                updateContacts()
+            } ?: BotWrapper(impl, loginInfo, botConfiguration ?: BotConfiguration {
                 workingDir = File("bots/${impl.id}")
                 if (Overflow.instance.miraiConsole) {
-                    botLoggerSupplier = { LoggerInFolder(net.mamoe.mirai.Bot::class, "Bot.${it.id}", workingDir.resolve("logs"), 1.weeksToMillis) }
-                    networkLoggerSupplier = { LoggerInFolder(net.mamoe.mirai.Bot::class, "Net.${it.id}", workingDir.resolve("logs"), 1.weeksToMillis) }
+                    botLoggerSupplier = {
+                        LoggerInFolder(
+                            net.mamoe.mirai.Bot::class,
+                            "Bot.${it.id}",
+                            workingDir.resolve("logs"),
+                            1.weeksToMillis
+                        )
+                    }
+                    networkLoggerSupplier = {
+                        LoggerInFolder(
+                            net.mamoe.mirai.Bot::class,
+                            "Net.${it.id}",
+                            workingDir.resolve("logs"),
+                            1.weeksToMillis
+                        )
+                    }
                 } else {
                     botLoggerSupplier = { MiraiLogger.Factory.create(net.mamoe.mirai.Bot::class, "Bot.${it.id}") }
                     networkLoggerSupplier = { MiraiLogger.Factory.create(net.mamoe.mirai.Bot::class, "Net.${it.id}") }
