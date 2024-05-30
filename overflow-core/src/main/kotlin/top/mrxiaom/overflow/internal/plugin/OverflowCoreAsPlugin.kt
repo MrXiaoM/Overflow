@@ -18,6 +18,7 @@ import net.mamoe.mirai.console.plugin.loader.PluginLoader
 import net.mamoe.mirai.console.util.ConsoleExperimentalApi
 import net.mamoe.mirai.console.util.SemVersion
 import net.mamoe.mirai.console.util.sendAnsiMessage
+import net.mamoe.mirai.contact.remarkOrNick
 import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.EventChannel
 import net.mamoe.mirai.event.EventPriority
@@ -183,6 +184,24 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                     sendMessage(ret)
                 }
             }
+
+            @SubCommand
+            @Description("获取群聊列表")
+            suspend fun CommandSender.groups(
+                @Name("详细") details: Boolean = false
+            ) {
+                val bot = (bot ?: Bot.instances.firstOrNull()) ?: return Unit.also {
+                    sendMessage("至少有一个Bot在线才能执行该命令")
+                }
+                if (!details) {
+                    sendMessage("${bot.id} 的群数量: ${bot.groups.size}")
+                } else {
+                    sendMessage("共  ${bot.groups.size} 个群: " +
+                        bot.groups.joinToString(", ") { "[${it.id}:${it.name}]" }
+                    )
+                }
+            }
+
             @SubCommand
             @Description("发送群消息")
             suspend fun CommandSender.group(
@@ -200,6 +219,24 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 group.sendMessage(messageChain)
                 sendMessage("消息发送成功")
             }
+
+            @SubCommand
+            @Description("获取群聊列表")
+            suspend fun CommandSender.friends(
+                @Name("详细") details: Boolean = false
+            ) {
+                val bot = (bot ?: Bot.instances.firstOrNull()) ?: return Unit.also {
+                    sendMessage("至少有一个Bot在线才能执行该命令")
+                }
+                if (!details) {
+                    sendMessage("${bot.id} 的好友数量: ${bot.friends.size}")
+                } else {
+                    sendMessage("${bot.id} 共有 ${bot.friends.size} 个好友: " +
+                        bot.friends.joinToString(", ") { "[${it.id}:${it.remarkOrNick}]" }
+                    )
+                }
+            }
+
             @SubCommand
             @Description("发送好友消息")
             suspend fun CommandSender.friend(
