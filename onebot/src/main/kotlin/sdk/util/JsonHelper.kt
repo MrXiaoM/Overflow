@@ -125,29 +125,28 @@ fun JsonElement?.deepCopyIgnoreNulls(): JsonElement? {
     return ignoreNulls(this) ?: deepCopy()
 }
 fun ignoreNulls(json: JsonElement): JsonElement? {
-    return when (json) {
+    when (json) {
         is JsonObject -> {
             val members = json.asMap()
-            JsonObject().apply {
+            return JsonObject().also { obj ->
                 for ((key, value) in members) {
-                    ignoreNulls(value)?.also { add(key, it) }
+                    ignoreNulls(value)?.also { obj.add(key, it) }
                 }
             }
         }
         is JsonArray -> {
             val elements = json.asList()
-            if (elements.isNotEmpty()) {
-                JsonArray(elements.size).apply {
+            return if (elements.isNotEmpty()) {
+                JsonArray(elements.size).also { array ->
                     for (element in elements) {
-                        ignoreNulls(element)?.also { add(it) }
+                        ignoreNulls(element)?.also { array.add(it) }
                     }
                 }
-            }
-            JsonArray()
+            } else JsonArray()
         }
-        is JsonPrimitive -> json.deepCopy()
+        is JsonPrimitive -> return json.deepCopy()
 
-        else -> null
+        else -> return null
     }
 }
 fun <T> List<T>.toJsonArray(): JsonArray {
