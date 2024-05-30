@@ -78,9 +78,10 @@ internal class GroupWrapper(
     override suspend fun updateGroupMemberList(): ContactList<MemberWrapper> {
         return (membersInternal ?: ContactList()).apply {
             val data = bot.impl.getGroupMemberList(id).data
-            update(data?.map {
+            val membersList = data?.map {
                 MemberWrapper(this@GroupWrapper, it)
-            }) { setImpl(it.impl) }
+            }
+            if (membersList != null) update(membersList) { setImpl(it.impl) }
             membersInternal = this
         }
     }

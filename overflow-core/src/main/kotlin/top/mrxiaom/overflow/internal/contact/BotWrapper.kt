@@ -52,18 +52,31 @@ internal class BotWrapper private constructor(
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
     private var otherClientsInternal: ContactList<OtherClientWrapper>? = null
     private var strangersInternal: ContactList<StrangerWrapper> = ContactList()
+
+
     suspend fun updateLoginInfo() {
         loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("刷新机器人信息失败")
     }
     suspend fun updateContacts() {
-        friendsInternal.update(impl.getFriendList().data?.map {
+        val friendsList = impl.getFriendList().data?.map {
             FriendWrapper(this, it)
-        }) { impl = it.impl }
-        logger.verbose("${friends.size} friends loaded")
-        groupsInternal.update(impl.getGroupList().data?.map {
+        }
+        if (friendsList != null) {
+            friendsInternal.update(friendsList) { impl = it.impl }
+            logger.verbose("${friends.size} friends loaded.")
+        } else {
+            logger.warning("Can not fetch friends list.")
+        }
+
+        val groupsList = impl.getGroupList().data?.map {
             GroupWrapper(this, it)
-        }) { impl = it.impl }
-        logger.verbose("${groups.size} groups loaded")
+        }
+        if (groupsList != null) {
+            groupsInternal.update(groupsList) { impl = it.impl }
+            logger.verbose("${groups.size} groups loaded.")
+        } else {
+            logger.warning("Can not fetch groups list.")
+        }
     }
 
     override suspend fun queryUpdate() {

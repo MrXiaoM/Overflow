@@ -5,8 +5,6 @@ import cn.evolvefield.onebot.sdk.entity.Anonymous
 import cn.evolvefield.onebot.sdk.entity.GroupSender
 import cn.evolvefield.onebot.sdk.entity.MsgId
 import cn.evolvefield.onebot.sdk.entity.PrivateSender
-import cn.evolvefield.onebot.sdk.event.message.GroupMessageEvent
-import cn.evolvefield.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.sdk.response.group.GroupFilesResp
@@ -26,14 +24,14 @@ import top.mrxiaom.overflow.internal.contact.data.FolderWrapper
  * @param updater this 是旧的，it 是新的，应当把新的内容放进旧的
  */
 internal inline fun <reified T : Contact> ContactList<T>.update(
-    list: List<T>?,
+    list: List<T>,
     updater: T.(T) -> Unit
 ) {
-    if (list == null) return
-    // 删除旧的
+    // 删除旧的、在新的列表中不存在的
     delegate.removeIf { old -> list.none { old.id == it.id } }
     // 更新旧的
-    delegate.mapNotNull { old -> list.firstOrNull { old.id == it.id }?.to(old) }.forEach { it.second.updater(it.first) }
+    delegate.mapNotNull { old -> list.firstOrNull { old.id == it.id }?.to(old) }
+        .forEach { it.second.updater(it.first) }
     // 添加新的
     delegate.addAll(list.filterNot { delegate.any { old -> old.id == it.id } })
 }
