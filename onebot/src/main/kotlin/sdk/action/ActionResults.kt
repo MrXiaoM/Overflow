@@ -18,7 +18,7 @@ data class ActionData<T : Any> (
     @SerializedName("retcode")
     val retCode: Int,
     @SerializedName("data")
-    val data: T,
+    val data: T?,
     @SerializedName("echo")
     val echo: String? = null
 )
