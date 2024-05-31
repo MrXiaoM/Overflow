@@ -240,7 +240,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
         val versionInfo = botImpl.getVersionInfo()
         if (printInfo) {
-            logger.info("服务端版本信息\n${gson.toJson(versionInfo)}")
+            logger.info("协议端版本信息\n${gson.toJson(versionInfo.getAsJsonObject("data"))}")
         }
         val bot = botImpl.wrap()
 
