@@ -19,6 +19,7 @@ import cn.evolvefield.onebot.sdk.response.misc.*
 import cn.evolvefield.onebot.sdk.util.*
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.handler.ActionHandler
+import cn.evolvefield.onebot.sdk.response.ext.GetFileResp
 import com.google.gson.*
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import org.java_websocket.WebSocket
@@ -1427,5 +1428,20 @@ class Bot(
         params.addProperty("folder_id", folderId)
         val result = actionHandler.action(this, action, params)
         return result.withClass()
+    }
+
+    /**
+     * 获取群或好友文件信息
+     *
+     * LLOnebot, NapCat
+     * @param fileId 文件ID
+     * @return [ActionData] of [GetFileResp]
+     */
+    suspend fun extGetFile(fileId: String): ActionData<GetFileResp> {
+        val action = ActionPathEnum.EXT_GET_FILE
+        val params = JsonObject()
+        params.addProperty("file_id", fileId)
+        val result = actionHandler.action(this, action, params)
+        return result.withToken()
     }
 }

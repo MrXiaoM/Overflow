@@ -291,5 +291,12 @@ enum class ActionPathEnum(
     /**
      * 获取群文件下载链接
      */
-    GET_GROUP_FILE_URL("get_group_file_url")
+    GET_GROUP_FILE_URL("get_group_file_url"),
+
+    /**
+     * 获取文件下载链接
+     *
+     * 属于 LLOnebot, NapCat 扩展 API
+     */
+    EXT_GET_FILE("get_file"),
 }

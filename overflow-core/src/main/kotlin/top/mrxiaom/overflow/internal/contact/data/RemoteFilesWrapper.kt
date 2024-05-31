@@ -12,6 +12,7 @@ import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
 import top.mrxiaom.overflow.internal.utils.toMiraiFiles
 import top.mrxiaom.overflow.internal.utils.toMiraiFolders
 import top.mrxiaom.overflow.spi.FileService
+import java.net.URLEncoder
 import java.util.stream.Stream
 
 internal class RemoteFilesWrapper(
@@ -205,7 +206,13 @@ internal class FileWrapper(
     }
 
     override suspend fun getUrl(): String? {
-        return impl.getGroupFileUrl(contact.id, id, busid).data?.url
+        when (contact.bot.appName.lowercase()) {
+            "llonebot", "napcat" -> {
+                val file = contact.bot.impl.extGetFile(id).data
+                return file?.file?.run { "file:///${URLEncoder.encode(this, "UTF-8")}" }
+            }
+            else -> return impl.getGroupFileUrl(contact.id, id, busid).data?.url
+        }
     }
 
     override suspend fun moveTo(folder: AbsoluteFolder): Boolean {
