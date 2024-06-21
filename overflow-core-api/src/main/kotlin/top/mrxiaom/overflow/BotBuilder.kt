@@ -1,5 +1,6 @@
 package top.mrxiaom.overflow
 
+import kotlinx.coroutines.Job
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.Bot
 import org.slf4j.Logger
@@ -16,7 +17,8 @@ public class BotBuilder private constructor(
     private var retryRestMills: Long = 60000L,
     private var printInfo: Boolean = true,
     private var noPlatform: Boolean = false,
-    private var logger: Logger? = null
+    private var logger: Logger? = null,
+    private var parentJob: Job? = null
 ) {
     /**
      * 设置用于连接时鉴权的 token
@@ -88,6 +90,13 @@ public class BotBuilder private constructor(
     }
 
     /**
+     * 设置父工作，可选
+     */
+    public fun parentJob(job: Job?): BotBuilder = apply {
+        this.parentJob = job
+    }
+
+    /**
      * 连接到 Onebot
      *
      * @return 连接失败时，将返回 null
@@ -103,7 +112,8 @@ public class BotBuilder private constructor(
             retryRestMills = retryRestMills,
             printInfo = printInfo,
             noPlatform = noPlatform,
-            logger = logger
+            logger = logger,
+            parentJob = parentJob
         )
     }
 
@@ -135,6 +145,7 @@ public interface IBotStarter {
         retryRestMills: Long,
         printInfo: Boolean,
         noPlatform: Boolean,
-        logger: Logger?
+        logger: Logger?,
+        parentJob: Job?
     ): Bot?
 }

@@ -84,6 +84,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     val configFile: File by lazy {
         File(System.getProperty("overflow.config", "overflow.json"))
     }
+    val defaultJob: Job? by lazy {
+        if (!miraiConsole) return@lazy null
+        return@lazy MiraiConsole.job
+    }
     val config: Config by lazy {
         var config: Config? = null
         if (configFile.exists()) try {
@@ -178,7 +182,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     @JvmBlockingBridge
     suspend fun startWithConfig(
         printInfo: Boolean = false,
-        logger: Logger = LoggerFactory.getLogger("Onebot")
+        logger: Logger = LoggerFactory.getLogger("Onebot"),
+        job: Job? = null
     ): Boolean {
         return start0(
             BotConfig(
@@ -190,6 +195,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 retryTimes = config.retryTimes,
                 retryWaitMills = config.retryWaitMills,
                 retryRestMills = config.retryRestMills,
+                parentJob = job ?: defaultJob,
             ),
             printInfo = printInfo,
             logger = logger
@@ -211,8 +217,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             }
         }
 
-        val actionWaitJob = SupervisorJob(coroutineContext.job)
-        val service = ConnectFactory.create(botConfig, actionWaitJob, logger)
+        val service = ConnectFactory.create(botConfig, botConfig.parentJob, logger)
         val botImpl: cn.evolvefield.onebot.client.core.Bot
         if (reversed) {
             val ws = service.createWebsocketServerAndWaitConnect(this)
@@ -259,7 +264,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             retryRestMills: Long,
             printInfo: Boolean,
             noPlatform: Boolean,
-            logger: Logger?
+            logger: Logger?,
+            parentJob: Job?
         ): Bot? {
             val botConfig = BotConfig(
                 url = url,
@@ -270,6 +276,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 retryTimes = retryTimes,
                 retryWaitMills = retryWaitMills,
                 retryRestMills = retryRestMills,
+                parentJob = parentJob
             )
             return if (logger != null) {
                 start0(botConfig, printInfo, logger)

@@ -1,5 +1,7 @@
 package cn.evolvefield.onebot.client.config
 
+import kotlinx.coroutines.Job
+
 /**
  * Description:
  * Author: cnlimiter
@@ -19,8 +21,6 @@ class BotConfig(
      * token或者verifyKey鉴权
      */
     val token: String = "",
-
-    val botId: Long = 0,
     /**
      * 是否开启鉴权
      */
@@ -43,4 +43,5 @@ class BotConfig(
      * 重连休息时间 (毫秒)
      */
     val retryRestMills: Long = 60000L,
+    val parentJob: Job? = null
 )
