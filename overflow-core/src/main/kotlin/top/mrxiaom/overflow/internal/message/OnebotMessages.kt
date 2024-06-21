@@ -68,7 +68,6 @@ internal object OnebotMessages {
      * @param bot 机器人实例，用于获取当前 Onebot 实现名称以兼容各个实现
      * @param message mirai 消息，不支持转发消息
      */
-    @OptIn(MiraiExperimentalApi::class)
     internal fun serializeToOneBotJsonArray(bot: RemoteBot?, message: Message): JsonArray {
         val messageChain = (message as? MessageChain) ?: listOf(message)
         return buildJsonArray {
@@ -79,7 +78,11 @@ internal object OnebotMessages {
                 //var ignoreEmptyData = false
                 val data = buildJsonObject {
                     when (single) {
-                        is PlainText -> put("text", single.content)
+                        is PlainText -> {
+                            if (single.content.isNotEmpty())
+                                put("text", single.content)
+                            else return@buildJsonObject
+                        }
                         is Face -> put("id", single.id.toString())
                         is Image -> put("file", single.onebotFile)
                         is FlashImage -> {
@@ -262,7 +265,12 @@ internal object OnebotMessages {
                 val data = obj["data"]?.jsonObject ?: buildJsonObject {  }
                 try {
                     when (type) {
-                        "text" -> add(data["text"].string)
+                        "text" -> {
+                            val content = data["text"].string
+                            if (content.isNotEmpty()) {
+                                add(content)
+                            }
+                        }
                         "face" -> add(Face(data["id"].string.toInt()))
                         "image" -> {
                             val image = imageFromFile((data["url"] ?: data["file"]).string)
