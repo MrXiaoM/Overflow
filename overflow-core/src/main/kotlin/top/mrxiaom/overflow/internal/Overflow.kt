@@ -5,8 +5,7 @@ import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.util.gson
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.*
@@ -212,7 +211,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             }
         }
 
-        val service = ConnectFactory.create(botConfig, logger)
+        val actionWaitJob = SupervisorJob(coroutineContext.job)
+        val service = ConnectFactory.create(botConfig, actionWaitJob, logger)
         val botImpl: cn.evolvefield.onebot.client.core.Bot
         if (reversed) {
             val ws = service.createWebsocketServerAndWaitConnect(this)

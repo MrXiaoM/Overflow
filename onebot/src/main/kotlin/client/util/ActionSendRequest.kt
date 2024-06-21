@@ -3,11 +3,9 @@ package cn.evolvefield.onebot.client.util
 import cn.evolvefield.onebot.sdk.util.ignorable
 import cn.evolvefield.onebot.client.core.Bot
 import com.google.gson.JsonObject
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withTimeout
 import org.java_websocket.WebSocket
 import org.slf4j.Logger
 import java.util.*
@@ -24,11 +22,12 @@ import java.util.*
  */
 class ActionSendRequest(
     private val bot: Bot,
+    parent: Job?,
     private val logger: Logger,
     private val channel: WebSocket,
     private val requestTimeout: Long
 ) {
-    private val resp = CompletableDeferred<JsonObject>()
+    private val resp = CompletableDeferred<JsonObject>(parent)
     /**
      * @param req Request json data
      * @return Response json data

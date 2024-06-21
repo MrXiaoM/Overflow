@@ -7,8 +7,7 @@ import cn.evolvefield.onebot.client.util.OnebotException
 import cn.evolvefield.onebot.sdk.util.ignorable
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.slf4j.Logger
@@ -28,7 +27,9 @@ interface IAdapter {
                     actionHandler.onReceiveActionResp(json)
                 } else scope.launch { // 处理事件
                     mutex.withLock {
-                        EventBus.onReceive(message)
+                        withTimeoutOrNull(processTimeout) {
+                            EventBus.onReceive(message)
+                        } ?: throw IllegalStateException("事件处理超时: $message")
                     }
                 }
             }
@@ -51,6 +52,9 @@ interface IAdapter {
         private const val API_RESULT_KEY = "echo"
         private const val HEART_BEAT = "heartbeat"
 
+        val processTimeout by lazy {
+            System.getProperty("overflow.timeout-process")?.toLongOrNull() ?: 20000L
+        }
         val mutex = Mutex()
     }
 }

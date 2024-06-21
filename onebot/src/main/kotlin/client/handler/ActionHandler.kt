@@ -6,7 +6,9 @@ import cn.evolvefield.onebot.client.util.ActionFailedException
 import cn.evolvefield.onebot.client.util.ActionSendRequest
 import cn.evolvefield.onebot.sdk.util.nullableString
 import com.google.gson.JsonObject
+import kotlinx.coroutines.Job
 import org.slf4j.Logger
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Description:
@@ -15,12 +17,13 @@ import org.slf4j.Logger
  * Version: 1.0
  */
 class ActionHandler(
+    private val parent: Job?,
     private val logger: Logger
 ) {
     /**
      * 请求回调数据
      */
-    private val apiCallbackMap: MutableMap<String, ActionSendRequest> = HashMap()
+    private val apiCallbackMap: MutableMap<String, ActionSendRequest> = ConcurrentHashMap()
 
     /**
      * 用于标识请求，可以是任何类型的数据，OneBot 将会在调用结果中原样返回
@@ -55,7 +58,7 @@ class ActionHandler(
                 addProperty("message", "WebSocket channel is not opened")
             }
         }
-        val request = ActionSendRequest(bot, logger, bot.channel, timeout)
+        val request = ActionSendRequest(bot, parent, logger, bot.channel, timeout)
         val reqJson = generateReqJson(action, params) { echo ->
             apiCallbackMap[echo] = request
         }
