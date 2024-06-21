@@ -22,7 +22,7 @@ interface IAdapter {
         try {
             val json = JsonParser.parseString(message).asJsonObject
             if (json.ignorable(META_EVENT, "") != HEART_BEAT) { // 过滤心跳
-                logger.debug("Client received <-- {}", json.toString())
+                logger.debug("[Recv] <-- {}", json.toString())
 
                 if (json.has(API_RESULT_KEY)) { // 接口回调
                     actionHandler.onReceiveActionResp(json)

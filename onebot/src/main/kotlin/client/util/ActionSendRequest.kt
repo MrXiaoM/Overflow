@@ -38,7 +38,7 @@ class ActionSendRequest(
         val resp = mutex.withLock {
             kotlin.runCatching {
                 withTimeout(requestTimeout) {
-                    logger.debug("Send to server --> {}", req.toString())
+                    logger.debug("[Send] --> {}", req.toString())
                     channel.send(req.toString())
                     resp.await()
                 }
