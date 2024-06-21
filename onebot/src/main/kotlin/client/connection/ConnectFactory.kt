@@ -82,8 +82,12 @@ class ConnectFactory private constructor(
             val address = InetSocketAddress(config.reversedPort)
             pair = WSServer.createAndWaitConnect(scope, config, address, logger, actionHandler, config.token)
         } catch (e: Exception) {
-            logger.error("▌ 反向 WebSocket 绑定端口 {} 或连接客户端时出现错误 ┈━═☆", config.reversedPort)
-            logger.error(e.stackTraceToString())
+            if (e is CancellationException) {
+                logger.info("▌ 反向 WebSocket 服务端被用户主动关闭")
+            } else {
+                logger.error("▌ 反向 WebSocket 绑定端口 {} 或连接客户端时出现错误 ┈━═☆", config.reversedPort)
+                logger.error(e.stackTraceToString())
+            }
         }
         return pair
     }

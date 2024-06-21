@@ -28,7 +28,13 @@ class WSClient(
     header: Map<String, String> = mapOf(),
 ) : WebSocketClient(uri, header), IAdapter {
     private var retryCount = 0
-    private val connectDef = CompletableDeferred<Boolean>()
+    @OptIn(InternalCoroutinesApi::class)
+    private val connectDef = CompletableDeferred<Boolean>(config.parentJob).apply {
+        invokeOnCompletion(
+            onCancelling = true,
+            invokeImmediately = true
+        ) { close() }
+    }
     fun createBot(): Bot {
         return Bot(this, config, actionHandler)
     }

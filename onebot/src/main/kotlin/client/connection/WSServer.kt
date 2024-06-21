@@ -5,6 +5,7 @@ import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.InternalCoroutinesApi
 import org.java_websocket.WebSocket
 import org.java_websocket.framing.CloseFrame
 import org.java_websocket.handshake.ClientHandshake
@@ -27,7 +28,13 @@ class WSServer(
     private val token: String
 ) : WebSocketServer(address), IAdapter {
     private var bot: Bot? = null
-    val def = CompletableDeferred<Bot>()
+    @OptIn(InternalCoroutinesApi::class)
+    val def = CompletableDeferred<Bot>(config.parentJob).apply {
+        invokeOnCompletion(
+            onCancelling = true,
+            invokeImmediately = true
+        ) { stop() }
+    }
 
     override fun onStart() {
         logger.info("▌ 反向 WebSocket 服务端已在 $address 启动")
