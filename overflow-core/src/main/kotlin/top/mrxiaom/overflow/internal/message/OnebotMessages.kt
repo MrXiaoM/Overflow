@@ -370,7 +370,7 @@ internal object OnebotMessages {
                             if (msgData != null) msgSource
                                 .sender(msgData.sender.userId.toLong())
                                 .target(msgData.targetId)
-                                .messages { deserializeFromOneBot(bot, msgData.message) }
+                                .messages(deserializeFromOneBot(bot, msgData.message) as Iterable<Message>)
                                 .time(msgData.time)
                             val kind = if (msgData?.groupId == 0L) MessageSourceKind.FRIEND else MessageSourceKind.GROUP
 
