@@ -198,6 +198,14 @@ internal class BotWrapper private constructor(
         return impl.customRequest(actionPath, params).toString()
     }
 
+    override fun sendRawWebSocketMessage(message: String) {
+        implBot.channel.send(message)
+    }
+
+    override fun sendRawWebSocketMessage(message: ByteArray) {
+        implBot.channel.send(message)
+    }
+
     override fun toString(): String = "Bot($id)"
 
     companion object {

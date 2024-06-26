@@ -33,6 +33,18 @@ interface RemoteBot {
     suspend fun executeAction(actionPath: String, params: String?): String
 
     /**
+     * 发送自定义 WebSocket 消息
+     * @param message 消息内容
+     */
+    fun sendRawWebSocketMessage(message: String)
+
+    /**
+     * 发送自定义 WebSocket 消息
+     * @param message 消息内容
+     */
+    fun sendRawWebSocketMessage(message: ByteArray)
+
+    /**
      * 通过消息id获取消息，并反序列化为 mirai 格式消息
      * @param messageId 消息id
      */
