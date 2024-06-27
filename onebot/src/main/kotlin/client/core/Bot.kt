@@ -457,7 +457,7 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend fun setGroupMemberInvite(groupId: Long, enable: Boolean) {
-        var action = ActionPathEnum.SET_GROUP_MEMBER_INVITE
+        val action = ActionPathEnum.SET_GROUP_MEMBER_INVITE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("enable", enable)
