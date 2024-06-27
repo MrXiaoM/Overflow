@@ -427,6 +427,46 @@ class Bot(
     }
 
     /**
+     * 设置群组入口公告。
+     *
+     * 本函数用于更新指定群组的入口公告内容。通过构建特定的参数对象，调用动作处理程序来执行操作。
+     * 悬挂函数设计确保此操作在协程中异步执行，提高应用程序的响应能力。
+     *
+     * @param groupId 需要设置公告的群组ID。
+     * @param newValue 新的入口公告内容。
+     * @return 返回操作的结果，通常是一个包含操作状态和可能的返回数据的对象。
+     */
+    @JvmBlockingBridge
+    suspend fun setGroupEntranceAnnouncement(groupId: Long, newValue: String) {
+        val action = ActionPathEnum.SET_GROUP_ENTRANCE_ANNOUNCEMENT
+        val params = JsonObject()
+        params.addProperty("group_id", groupId)
+        params.addProperty("entrance_announcement", newValue)
+        val result = actionHandler.action(this, action, params)
+        return result.withClass()
+    }
+
+    /**
+     * 设置群组成员邀请权限。
+     *
+     * 本函数用于控制是否允许群组成员邀请其他人加入群组。通过传递不同的布尔值来启用或禁用此功能。
+     *
+     * @param groupId 需要设置邀请权限的群组的ID。
+     * @param enable 如果为true，则允许群组成员邀请其他人；如果为false，则禁止邀请。
+     * @return 返回操作的结果，通常是一个包含操作状态和可能的错误信息的类实例。
+     */
+    @JvmBlockingBridge
+    suspend fun setGroupMemberInvite(groupId: Long, enable: Boolean) {
+        var action = ActionPathEnum.SET_GROUP_MEMBER_INVITE
+        val params = JsonObject()
+        params.addProperty("group_id", groupId)
+        params.addProperty("enable", enable)
+        val result = actionHandler.action(this, action, params)
+        return result.withClass()
+    }
+
+
+    /**
      * 设置群名片（群备注）
      *
      * @param groupId 群号
@@ -1444,4 +1484,7 @@ class Bot(
         val result = actionHandler.action(this, action, params)
         return result.withToken()
     }
+
+
+
 }

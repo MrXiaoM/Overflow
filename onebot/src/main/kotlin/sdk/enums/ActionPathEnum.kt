@@ -299,4 +299,11 @@ enum class ActionPathEnum(
      * 属于 LLOnebot, NapCat 扩展 API
      */
     EXT_GET_FILE("get_file"),
+
+    /**
+     * 获取群公告
+     */
+    SET_GROUP_ENTRANCE_ANNOUNCEMENT("set_group_entrance_announcement"),
+
+    SET_GROUP_MEMBER_INVITE("set_group_member_invite"),
 }
