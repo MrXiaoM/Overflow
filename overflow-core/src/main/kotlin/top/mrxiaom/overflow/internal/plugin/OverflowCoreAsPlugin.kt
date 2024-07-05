@@ -30,9 +30,7 @@ import org.java_websocket.framing.CloseFrame
 import org.java_websocket.server.WebSocketServer
 import org.slf4j.Logger
 import top.mrxiaom.overflow.BotBuilder
-import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.OverflowAPI
-import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.event.UnsolvedOnebotEvent
 import top.mrxiaom.overflow.internal.Overflow
@@ -64,7 +62,12 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
 
     @OptIn(ConsoleExperimentalApi::class, ConsoleFrontEndImplementation::class)
     fun onEnable() {
-        miraiLogger = LoggerInFolder(Overflow::class, "Onebot", File("logs/onebot"), 1.weeksToMillis)
+        if (Overflow.instance.config.noLogDoNotReportIfYouSwitchThisOn) {
+            miraiLogger = MiraiLogger.Factory.create(Overflow::class, "Onebot")
+            miraiLogger.warning("你已开启 no_log，开启该选项后将不接受漏洞反馈。")
+        } else {
+            miraiLogger = LoggerInFolder(Overflow::class, "Onebot", File("logs/onebot"), 1.weeksToMillis)
+        }
         oneBotLogger = net.mamoe.mirai.console.internal.logging.externalbind.slf4j.SLF4JAdapterLogger(miraiLogger)
 
         channel = GlobalEventChannel
