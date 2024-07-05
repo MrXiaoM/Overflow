@@ -30,7 +30,6 @@ public data class Markdown(
         builder.append("[mirai:markdown:").appendStringAsMiraiCode(content).append("]")
     }
 
-    override val key: MessageKey<Markdown> get() = Key
     public companion object Key :
         AbstractPolymorphicMessageKey<MessageContent, Markdown>(MessageContent, { it.safeCast() }) {
         public const val SERIAL_NAME: String = "Markdown"

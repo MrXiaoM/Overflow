@@ -30,7 +30,6 @@ public data class InlineKeyboard(
     public override fun toString(): String = string
     public override fun contentToString(): String = content
 
-    override val key: MessageKey<InlineKeyboard> get() = Key
     public companion object Key :
         AbstractPolymorphicMessageKey<MessageContent, InlineKeyboard>(MessageContent, { it.safeCast() }) {
         public const val SERIAL_NAME: String = "InlineKeyboard"
