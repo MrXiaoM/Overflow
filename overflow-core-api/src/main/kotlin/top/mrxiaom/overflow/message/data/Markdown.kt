@@ -21,7 +21,7 @@ public data class Markdown(
      * Markdown 内容
      */
     public val content: String
-) : MessageContent, ConstrainSingle, CodableMessage {
+) : MessageContent, CodableMessage {
     public override fun toString(): String = "[overflow:markdown,$content]"
     public override fun contentToString(): String = content
 

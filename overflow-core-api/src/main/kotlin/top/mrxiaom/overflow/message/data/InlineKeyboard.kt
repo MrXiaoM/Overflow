@@ -19,7 +19,7 @@ public data class InlineKeyboard(
      * 按键行列表
      */
     public val rows: List<InlineKeyboardRow>
-) : MessageContent, ConstrainSingle {
+) : MessageContent {
     private val string by lazy {
         "[overflow:inlinekeyboard,$botAppId,${rows.joinToString(",")}]"
     }
