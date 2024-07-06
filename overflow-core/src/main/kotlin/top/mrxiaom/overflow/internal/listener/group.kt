@@ -20,7 +20,6 @@ import top.mrxiaom.overflow.internal.utils.wrapAsMember
 internal fun addGroupListeners() {
     listOf(
         GroupMessageListener(),
-        GroupNotifyListener(),
         GroupMessageRecallListener(),
         GroupAddRequestListener(),
         GroupDecreaseNoticeListener(),
@@ -86,21 +85,6 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
             }
             "notice" -> {
                 TODO("系统提示，如 管理员已禁止群内匿名聊天")
-            }
-        }
-    }
-}
-
-internal class GroupNotifyListener : EventListener<GroupNotifyNoticeEvent> {
-    override suspend fun onMessage(e: GroupNotifyNoticeEvent) {
-        val bot = e.bot ?: return
-        val group = bot.group(e.groupId)
-        when (e.subType) {
-            "poke" -> {
-                val operator = group.queryMember(e.operatorId) ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取操作者")
-                val target = group.queryMember(e.targetId) ?: throw IllegalStateException("群 ${group.id} 戳一戳 无法获取目标")
-                // TODO: 戳一戳无法获取被戳一方的动作、后缀信息
-                bot.eventDispatcher.broadcastAsync(NudgeEvent(operator, target, group, "拍了拍", ""))
             }
         }
     }

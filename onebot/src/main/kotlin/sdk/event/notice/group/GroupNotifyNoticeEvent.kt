@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor
 class GroupNotifyNoticeEvent : NoticeEvent() {
     @SerializedName("sub_type")
     var subType = ""
-    @SerializedName("operator_id")
+    @SerializedName("operator_id", alternate = ["sender_id"])
     var operatorId = 0L
     @SerializedName("target_id")
     var targetId = 0L
