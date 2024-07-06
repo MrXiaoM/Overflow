@@ -1,5 +1,10 @@
 package top.mrxiaom.overflow.internal.plugin
 
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
@@ -23,6 +28,7 @@ import net.mamoe.mirai.event.Event
 import net.mamoe.mirai.event.EventChannel
 import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.GlobalEventChannel
+import net.mamoe.mirai.event.events.EventCancelledException
 import net.mamoe.mirai.utils.MiraiLogger
 import net.mamoe.mirai.utils.weeksToMillis
 import org.java_websocket.client.WebSocketClient
@@ -39,6 +45,7 @@ import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.utils.LoggerInFolder
 import java.io.File
 import kotlin.reflect.jvm.jvmName
+import kotlin.system.exitProcess
 
 @Suppress("PluginMainServiceNotConfigured", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
@@ -55,9 +62,39 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
     private lateinit var oneBotLogger: Logger
     internal lateinit var channel: EventChannel<Event>
     internal var autoConnect = true
-
+    private val closingLock = Mutex()
     override fun permissionId(name: String): PermissionId {
         return ConsoleCommandOwner.permissionId(name)
+    }
+
+    @OptIn(DelicateCoroutinesApi::class, ConsoleFrontEndImplementation::class, ConsoleExperimentalApi::class)
+    fun shutdown() {
+        GlobalScope.launch {
+            kotlin.runCatching {
+                closingLock.withLock {
+                    if (!MiraiConsole.isActive) return@withLock
+                    ConsoleCommandSender.sendMessage("Stopping mirai-console")
+                    kotlin.runCatching {
+                        MiraiConsoleImplementation.shutdown()
+                    }.fold(
+                        onSuccess = {
+                            try {
+                                ConsoleCommandSender.sendMessage("mirai-console stopped successfully.")
+                            } catch (ignored: EventCancelledException) {}
+                        },
+                        onFailure = {
+                            MiraiConsole.mainLogger.error("Exception in stop", it)
+                            try {
+                                ConsoleCommandSender.sendMessage(
+                                    it.localizedMessage ?: it.message ?: it.toString()
+                                )
+                            } catch (ignored: EventCancelledException) {}
+                        }
+                    )
+                }
+            }.exceptionOrNull()?.let(MiraiConsole.mainLogger::error)
+            exitProcess(0)
+        }
     }
 
     @OptIn(ConsoleExperimentalApi::class, ConsoleFrontEndImplementation::class)

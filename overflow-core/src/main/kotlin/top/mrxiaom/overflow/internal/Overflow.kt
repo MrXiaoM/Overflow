@@ -223,7 +223,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             val ws = service.createWebsocketServerAndWaitConnect(this)
             if (ws == null) {
                 if (printInfo) logger.error("未连接到 Onebot")
-                if (miraiConsole && !isNotExit) exitProcess(1)
+                if (miraiConsole && !isNotExit) {
+                    OverflowCoreAsPlugin.shutdown()
+                    return null
+                }
                 return null
             }
             botImpl = ws.second
@@ -231,15 +234,21 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             val ws = service.createWebsocketClient(this)
             if (ws == null) {
                 if (printInfo) logger.error("未连接到 Onebot")
-                if (miraiConsole && !isNotExit) exitProcess(1)
+                if (miraiConsole && !isNotExit) {
+                    OverflowCoreAsPlugin.shutdown()
+                    return null
+                }
                 return null
             }
             botImpl = ws.createBot()
         }
         if (!botImpl.channel.isOpen) {
             if (printInfo) {
-                logger.error("未连接到 Onebot")
-                if (miraiConsole && !isNotExit) exitProcess(1)
+                logger.error("WebSocket 连接被关闭，未连接到 Onebot")
+                if (miraiConsole && !isNotExit) {
+                    OverflowCoreAsPlugin.shutdown()
+                    return null
+                }
             }
             return null
         }
