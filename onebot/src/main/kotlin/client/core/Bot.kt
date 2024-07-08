@@ -52,6 +52,21 @@ class Bot(
     private var idInternal: Long = 0
     val id: Long
         get() = idInternal
+
+    fun JsonObject.addMessage(key: String, msg: String) {
+        runCatching {
+            JsonParser.parseString(msg).asJsonArray
+        }.onSuccess {
+            if (config.useCQCode) {
+                addProperty(key, CQCode.fromJson(it))
+            } else {
+                add(key, it)
+            }
+        }.onFailure {
+            addProperty(key, msg)
+        }
+    }
+
     /**
      * 发送消息
      *
@@ -82,13 +97,7 @@ class Bot(
         val action = ActionPathEnum.SEND_PRIVATE_MSG
         val params = JsonObject()
         params.addProperty("user_id", userId)
-        kotlin.runCatching {
-            JsonParser.parseString(msg).asJsonArray
-        }.onSuccess {
-            params.add("message", it)
-        }.onFailure {
-            params.addProperty("message", msg)
-        }
+        params.addMessage("message", msg)
         params.addProperty("auto_escape", autoEscape)
         val result = actionHandler.action(this, action, params)
         return result.withToken()
@@ -107,13 +116,7 @@ class Bot(
         val action = ActionPathEnum.SEND_GROUP_MSG
         val params = JsonObject()
         params.addProperty("group_id", groupId)
-        kotlin.runCatching {
-            JsonParser.parseString(msg).asJsonArray
-        }.onSuccess {
-            params.add("message", it)
-        }.onFailure {
-            params.addProperty("message", msg)
-        }
+        params.addMessage("message", msg)
         params.addProperty("auto_escape", autoEscape)
         val result = actionHandler.action(this, action, params)
         return result.withToken()
@@ -153,13 +156,7 @@ class Bot(
         val params = JsonObject()
         params.addProperty("guild_id", guildId)
         params.addProperty("channel_id", channelId)
-        kotlin.runCatching {
-            JsonParser.parseString(msg).asJsonArray
-        }.onSuccess {
-            params.add("message", it)
-        }.onFailure {
-            params.addProperty("message", msg)
-        }
+        params.addMessage("message", msg)
         val result = actionHandler.action(this, action, params)
         return result.withToken()
     }

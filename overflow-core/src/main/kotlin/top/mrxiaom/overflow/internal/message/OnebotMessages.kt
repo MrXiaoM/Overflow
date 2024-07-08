@@ -1,6 +1,7 @@
 package top.mrxiaom.overflow.internal.message
 
 import cn.evolvefield.onebot.sdk.entity.MsgId
+import cn.evolvefield.onebot.sdk.util.CQCode
 import com.google.gson.JsonParser
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
@@ -239,9 +240,18 @@ internal object OnebotMessages {
      * @param source 消息源
      */
     internal suspend fun deserializeFromOneBot(bot: RemoteBot, message: String, source: MessageSource? = null): MessageChain {
-        return kotlin.runCatching { Json.parseToJsonElement(message).jsonArray }
-            .map { deserializeFromOneBotJson(bot, it, source) }.getOrNull() ?: kotlin.run {
+        return runCatching {
+            Json.parseToJsonElement(message).jsonArray
+        }.map {
+            deserializeFromOneBotJson(bot, it, source)
+        }.getOrElse {
+            return runCatching {
+                Json.parseToJsonElement(CQCode.toJson(message).toString()).jsonArray
+            }.map {
+                deserializeFromOneBotJson(bot, it, source)
+            }.getOrElse {
                 source?.plus(message) ?: PlainText(message).toMessageChain()
+            }
         }
     }
 
@@ -421,7 +431,11 @@ internal object OnebotMessages {
 
                         "inline_keyboard" -> { // OpenShamrock
                             val botAppId = data["bot_appid"].long
-                            val rows = data["rows"]!!.jsonArray.map { e1 ->
+                            val rowsRaw = data["rows"].run {
+                                if (this is JsonArray) this
+                                else Json.parseToJsonElement(string).jsonArray
+                            }
+                            val rows = rowsRaw.jsonArray.map { e1 ->
                                 val obj1 = e1.jsonObject
                                 InlineKeyboardRow(
                                     buttons = obj1["buttons"]!!.jsonArray.map { e2 ->

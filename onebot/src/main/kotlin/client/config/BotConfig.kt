@@ -32,6 +32,10 @@ class BotConfig(
      */
     val noPlatform: Boolean = false,
     /**
+     * 发送消息时，是否使用 CQ 码
+     */
+    val useCQCode: Boolean = false,
+    /**
      * 重连尝试次数
      */
     val retryTimes: Int = 5,
