@@ -192,6 +192,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 token = config.token,
                 isAccessToken = config.token.isNotBlank(),
                 noPlatform = config.noPlatform,
+                useCQCode = config.useCQCode,
                 retryTimes = config.retryTimes,
                 retryWaitMills = config.retryWaitMills,
                 retryRestMills = config.retryRestMills,
@@ -273,6 +274,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             retryRestMills: Long,
             printInfo: Boolean,
             noPlatform: Boolean,
+            useCQCode: Boolean,
             logger: Logger?,
             parentJob: Job?
         ): Bot? {
@@ -282,6 +284,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 token = token,
                 isAccessToken = token.isNotBlank(),
                 noPlatform = noPlatform,
+                useCQCode = useCQCode,
                 retryTimes = retryTimes,
                 retryWaitMills = retryWaitMills,
                 retryRestMills = retryRestMills,

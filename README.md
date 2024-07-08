@@ -23,7 +23,7 @@ Overflow 支持且**仅支持**连接到大多数标准的 Onebot 或 go-cqhttp 
 + [x] 使用正向(主动)或反向(被动) WebSocket 连接
 + [x] 在连接时使用 token 鉴权
 + [x] 在代码中调用自定义的 action
-+ [ ] 在消息中使用 CQ 码 *不支持*
++ [x] 在消息中使用 CQ 码 *测试中*
 + [x] 将 mirai 消息段序列化/反序列化为 json
 + [ ] 使用 MiraiCode (Mirai 码) 处理消息 *不支持*
 

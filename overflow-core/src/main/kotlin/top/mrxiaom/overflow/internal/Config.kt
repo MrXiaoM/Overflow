@@ -15,6 +15,8 @@ data class Config(
     var token: String = "",
     @SerialName("no_platform")
     val noPlatform: Boolean = false,
+    @SerialName("use_cq_code")
+    val useCQCode: Boolean = false,
     @SerialName("retry_times")
     var retryTimes: Int = 5,
     @SerialName("retry_wait_mills")

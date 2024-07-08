@@ -17,6 +17,7 @@ public class BotBuilder private constructor(
     private var retryRestMills: Long = 60000L,
     private var printInfo: Boolean = true,
     private var noPlatform: Boolean = false,
+    private var useCQCode: Boolean = false,
     private var logger: Logger? = null,
     private var parentJob: Job? = null
 ) {
@@ -83,6 +84,15 @@ public class BotBuilder private constructor(
     }
 
     /**
+     * 发送消息时使用 CQ 码
+     *
+     * 即使不开启该选项，也可使用 CQ 码接收消息
+     */
+    public fun useCQCode(): BotBuilder = apply {
+        this.useCQCode = true
+    }
+
+    /**
      * 覆写用于 Onebot 的日志记录器
      */
     public fun overrideLogger(logger: Logger): BotBuilder = apply {
@@ -112,6 +122,7 @@ public class BotBuilder private constructor(
             retryRestMills = retryRestMills,
             printInfo = printInfo,
             noPlatform = noPlatform,
+            useCQCode = useCQCode,
             logger = logger,
             parentJob = parentJob
         )
@@ -145,6 +156,7 @@ public interface IBotStarter {
         retryRestMills: Long,
         printInfo: Boolean,
         noPlatform: Boolean,
+        useCQCode: Boolean,
         logger: Logger?,
         parentJob: Job?
     ): Bot?
