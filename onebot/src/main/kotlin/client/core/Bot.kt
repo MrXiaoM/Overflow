@@ -185,7 +185,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getGuildServiceProfile(): ActionData<GuildServiceProfileResp> {
         val action = ActionPathEnum.GET_GUILD_SERVICE_PROFILE
-        val result = actionHandler.action(this, action, null)
+        val result = actionHandler.action(this, action)
         return result.withToken()
     }
     /**
@@ -195,7 +195,7 @@ class Bot(
      */
     suspend fun getGuildList(): ActionList<GuildListResp> {
         val action = ActionPathEnum.GET_GUILD_LIST
-        val result = actionHandler.action(this, action, null)
+        val result = actionHandler.action(this, action)
         return result.withToken()
     }
 
@@ -545,7 +545,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getLoginInfo(): ActionData<LoginInfoResp> {
         val action = ActionPathEnum.GET_LOGIN_INFO
-        val result = actionHandler.action(this, action, null)
+        val result = actionHandler.action(this, action)
         return result.withToken<ActionData<LoginInfoResp>>().also {
             it.data?.userId?.also { id -> idInternal = id }
         }
@@ -576,7 +576,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getFriendList(): ActionList<FriendInfoResp> {
         val action = ActionPathEnum.GET_FRIEND_LIST
-        val result = actionHandler.action(this, action, null)
+        val result = actionHandler.action(this, action)
         return result.withToken()
     }
 
@@ -620,7 +620,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getGroupList(): ActionList<GroupInfoResp> {
         val action = ActionPathEnum.GET_GROUP_LIST
-        val result = actionHandler.action(this, action, null)
+        val result = actionHandler.action(this, action)
         return result.withToken()
     }
 
@@ -683,7 +683,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun canSendImage(): ActionData<BooleanResp> {
         val action = ActionPathEnum.CAN_SEND_IMAGE
-        val result = actionHandler.action(this, action, null)
+        val result = actionHandler.action(this, action)
         return result.withToken()
     }
 
@@ -695,7 +695,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun canSendRecord(): ActionData<BooleanResp> {
         val action = ActionPathEnum.CAN_SEND_RECORD
-        val result = actionHandler.action(this, action, null)
+        val result = actionHandler.action(this, action)
         return result.withToken()
     }
 
@@ -1306,7 +1306,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getUnidirectionalFriendList(): ActionList<UnidirectionalFriendListResp> {
         val action = ActionPathEnum.GET_UNIDIRECTIONAL_FRIEND_LIST
-        val result = actionHandler.action(this, action, null)
+        val result = actionHandler.action(this, action)
         return result.withToken()
     }
 
@@ -1318,7 +1318,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getStatus(): JsonObject {
         val action = ActionPathEnum.GET_STATUS
-        return actionHandler.action(this, action, null)
+        return actionHandler.action(this, action)
     }
 
     /**
@@ -1329,7 +1329,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getVersionInfo(): JsonObject {
         val action = ActionPathEnum.GET_VERSION_INFO
-        return actionHandler.action(this, action, null).apply {
+        return actionHandler.action(this, action).apply {
             val data = ignorableObject("data") { JsonObject() }
             name = data.ignorable("app_name", "onebot").trim()
             version = data.ignorable("app_version", "Unknown").trim()
@@ -1358,7 +1358,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getCSRFToken(): ActionData<CSRFTokenResp> {
         val action = ActionPathEnum.GET_CSRF_TOKEN
-        val result = actionHandler.action(this, action, null)
+        val result = actionHandler.action(this, action)
         return result.withToken()
     }
 
