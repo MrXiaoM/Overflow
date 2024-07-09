@@ -69,25 +69,35 @@ internal suspend fun BotWrapper.httpGet(
     params: Map<String, Any?> = mapOf(),
     bknKey: String = "bkn"
 ): String {
-    val credentials = impl.getCredentials(cookieDomain).data ?: throw IllegalStateException("credentials is empty")
+    val credentials = impl.getCredentials(cookieDomain).data ?: throw IllegalStateException("$cookieDomain 的 cookie 与 bkn 请求失败，请检查你的 Onebot 实现是否支持 `get_credentials` 接口")
     val cookie = credentials.cookies
     val bkn = credentials.token
     return withContext(Dispatchers.IO) {
-        val paramString = (if (params.containsKey(bknKey)) params else params.toMutableMap().apply {
-            put(bknKey, "")
-        }).filter { it.value != null }.map {
-            val value = if (it.key == bknKey) bkn else URLEncoder.encode(it.value.toString(), "UTF-8")
+        val paramString = params.plus(bknKey to bkn).filter {
+            it.value != null
+        }.map {
+            val value = URLEncoder.encode(it.value.toString(), "UTF-8")
             "${it.key}=$value"
         }.joinToString("&")
-        val conn = URL("$url?$paramString").openConnection() as HttpURLConnection
-
-        conn.requestMethod = "get"
-        conn.addRequestProperty("cookie", cookie)
-        for ((key, value) in header) {
-            conn.addRequestProperty(key, value.toString())
+        val requestUrl = "$url?$paramString"
+        val conn = URL(requestUrl).openConnection() as HttpURLConnection
+        runCatching {
+            conn.requestMethod = "GET"
+            conn.addRequestProperty("cookie", cookie)
+            for ((key, value) in header) {
+                conn.addRequestProperty(key, value.toString())
+            }
+            conn.connect()
+            conn.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
+        }.getOrElse { cause ->
+            val headers = conn.requestProperties.entries.joinToString("\n  ") { "${it.key}: ${it.value}" }
+            throw IllegalStateException("""
+                GET $requestUrl failed. (${conn.responseCode})
+                headers: [
+                  $headers
+                ]
+            """.trimIndent(), cause)
         }
-        conn.connect()
-        conn.inputStream.use { it.readBytes().toString(Charsets.UTF_8) }
     }
 }
 
