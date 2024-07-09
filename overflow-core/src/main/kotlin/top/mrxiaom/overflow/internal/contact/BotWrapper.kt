@@ -58,25 +58,17 @@ internal class BotWrapper private constructor(
         loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("刷新机器人信息失败")
     }
     suspend fun updateContacts() {
-        val friendsList = impl.getFriendList().data?.map {
+        val friendsList = impl.getFriendList().data.map {
             FriendWrapper(this, it)
         }
-        if (friendsList != null) {
-            friendsInternal.update(friendsList) { impl = it.impl }
-            logger.verbose("${friends.size} friends loaded.")
-        } else {
-            logger.warning("Can not fetch friends list.")
-        }
+        friendsInternal.update(friendsList) { impl = it.impl }
+        logger.verbose("${friends.size} friends loaded.")
 
-        val groupsList = impl.getGroupList().data?.map {
+        val groupsList = impl.getGroupList().data.map {
             GroupWrapper(this, it)
         }
-        if (groupsList != null) {
-            groupsInternal.update(groupsList) { impl = it.impl }
-            logger.verbose("${groups.size} groups loaded.")
-        } else {
-            logger.warning("Can not fetch groups list.")
-        }
+        groupsInternal.update(groupsList) { impl = it.impl }
+        logger.verbose("${groups.size} groups loaded.")
     }
 
     override suspend fun queryUpdate() {
@@ -119,7 +111,6 @@ internal class BotWrapper private constructor(
         get() = loginInfo.userId
 
     override val logger: MiraiLogger = configuration.botLoggerSupplier(this)
-    internal val networkLogger: MiraiLogger by lazy { configuration.networkLoggerSupplier(this) }
     override val coroutineContext: CoroutineContext =
         CoroutineName("Bot.$id")
             .plus(logger.asCoroutineExceptionHandler())
