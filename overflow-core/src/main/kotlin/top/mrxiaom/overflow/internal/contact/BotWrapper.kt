@@ -102,10 +102,9 @@ internal class BotWrapper private constructor(
     }
     @JvmBlockingBridge
     override suspend fun getMsg(messageId: Int): MessageChain? {
-        val bot = (net.mamoe.mirai.Bot.instances.firstOrNull() as? BotWrapper) ?: return null
-        val data = bot.impl.getMsg(messageId).data ?: return null
+        val data = impl.getMsg(messageId).data ?: return null
         if (data.message.isEmpty()) return null
-        return OnebotMessages.deserializeFromOneBot(bot, data.message)
+        return OnebotMessages.toMiraiMessage(data.isJsonMessage, data.message, this)
     }
     override val id: Long
         get() = loginInfo.userId

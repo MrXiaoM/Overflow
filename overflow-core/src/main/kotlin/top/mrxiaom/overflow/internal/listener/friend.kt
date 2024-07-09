@@ -10,7 +10,7 @@ import net.mamoe.mirai.contact.remarkOrNick
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
-import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.message.OnebotMessages.toMiraiMessage
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
 import top.mrxiaom.overflow.internal.utils.*
 
@@ -34,20 +34,20 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                     // TODO: 过滤自己发送的消息
                     return
                 }
-                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
-                val messageString = miraiMessage.toString()
+                val message = e.toMiraiMessage(bot)
+                val messageString = message.toString()
                 val messageSource = IncomingSource.friend(
                     bot = bot,
                     ids = intArrayOf(e.messageId),
                     internalIds = intArrayOf(e.messageId),
                     isOriginalMessageInitialized = true,
-                    originalMessage = miraiMessage,
+                    originalMessage = message,
                     sender = friend,
                     subject = friend,
                     target = bot,
                     time = (e.time / 1000).toInt()
                 )
-                miraiMessage = messageSource.plus(miraiMessage)
+                val miraiMessage = messageSource.plus(message)
                 bot.logger.verbose("${friend.remarkOrNick}(${friend.id}) -> $messageString")
                 bot.eventDispatcher.broadcastAsync(FriendMessageEvent(
                     friend, miraiMessage, messageSource.time
@@ -64,20 +64,20 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                     // TODO: 过滤自己发送的消息
                     return
                 }
-                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
-                val messageString = miraiMessage.toString()
+                val message = e.toMiraiMessage(bot)
+                val messageString = message.toString()
                 val messageSource = IncomingSource.temp(
                     bot = bot,
                     ids = intArrayOf(e.messageId),
                     internalIds = intArrayOf(e.messageId),
-                    originalMessage = miraiMessage,
+                    originalMessage = message,
                     sender = member,
                     subject = member,
                     isOriginalMessageInitialized = true,
                     target = bot,
                     time = (e.time / 1000).toInt()
                 )
-                miraiMessage = messageSource.plus(miraiMessage)
+                val miraiMessage = messageSource.plus(message)
                 bot.logger.verbose("[群临时消息] ${member.remarkOrNick}(${member.id}) -> $messageString")
                 bot.eventDispatcher.broadcastAsync(GroupTempMessageEvent(
                     member, miraiMessage, messageSource.time
@@ -90,20 +90,20 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                     // TODO: 过滤自己发送的消息
                     return
                 }
-                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
-                val messageString = miraiMessage.toString()
+                val message = e.toMiraiMessage(bot)
+                val messageString = message.toString()
                 val messageSource = IncomingSource.stranger(
                     bot = bot,
                     ids = intArrayOf(e.messageId),
                     internalIds = intArrayOf(e.messageId),
                     isOriginalMessageInitialized = true,
-                    originalMessage = miraiMessage,
+                    originalMessage = message,
                     sender = stranger,
                     subject = stranger,
                     target = bot,
                     time = (e.time / 1000).toInt()
                 )
-                miraiMessage = messageSource.plus(miraiMessage)
+                val miraiMessage = messageSource.plus(message)
                 bot.logger.verbose("${stranger.remarkOrNick}(${stranger.id}) -> $messageString")
                 bot.eventDispatcher.broadcastAsync(StrangerMessageEvent(
                     stranger, miraiMessage, messageSource.time

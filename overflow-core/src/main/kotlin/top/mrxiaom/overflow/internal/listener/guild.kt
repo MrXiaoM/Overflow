@@ -6,7 +6,7 @@ import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.sdk.entity.GuildSender
 import net.mamoe.mirai.contact.MemberPermission
 import top.mrxiaom.overflow.event.LegacyGuildMessageEvent
-import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.message.OnebotMessages.toMiraiMessage
 import top.mrxiaom.overflow.internal.utils.bot
 
 internal fun addGuildListeners() {
@@ -21,8 +21,8 @@ internal class GuildMessageListener : EventListener<GuildMessageEvent> {
         val bot = e.bot ?: return
         when (e.subType) {
             "channel" -> {
-                val miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
-                val messageString = miraiMessage.toString()
+                val message = e.toMiraiMessage(bot)
+                val messageString = message.toString()
 
                 if (e.sender.userId == bot.id) {
                     // TODO: 过滤自己发送的消息
@@ -33,7 +33,7 @@ internal class GuildMessageListener : EventListener<GuildMessageEvent> {
                         guildId = e.guildId,
                         channelId = e.channelId,
                         messageId = e.messageId,
-                        message = miraiMessage,
+                        message = message,
                         senderId = e.sender.userId,
                         senderTinyId = e.sender.tinyId,
                         senderNick = e.sender.nickname,

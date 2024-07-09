@@ -10,7 +10,7 @@ import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.Overflow
-import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.message.OnebotMessages.toMiraiMessage
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
 import top.mrxiaom.overflow.internal.utils.bot
 import top.mrxiaom.overflow.internal.utils.group
@@ -38,18 +38,18 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
                 val group = bot.group(e.groupId)
                 val member = e.sender?.wrapAsMember(group) ?: return
 
-                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
-                val messageString = miraiMessage.toString()
+                val message = e.toMiraiMessage(bot)
+                val messageString = message.toString()
                 val messageSource = IncomingSource.group(
                     bot = bot,
                     ids = intArrayOf(e.messageId),
                     internalIds = intArrayOf(e.messageId),
                     isOriginalMessageInitialized = true,
-                    originalMessage = miraiMessage,
+                    originalMessage = message,
                     sender = member,
                     time = (e.time / 1000).toInt()
                 )
-                miraiMessage = messageSource.plus(miraiMessage)
+                val miraiMessage = messageSource.plus(message)
                 if (member.id == bot.id) {
                     // TODO: 过滤自己发送的消息
                 } else {
@@ -63,19 +63,18 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
                 val group = bot.group(e.groupId)
                 val member = e.anonymous?.wrapAsMember(group) ?: return
 
-                var miraiMessage = OnebotMessages.deserializeFromOneBot(bot, e.message)
-                val messageString = miraiMessage.toString()
+                val message = e.toMiraiMessage(bot)
+                val messageString = message.toString()
                 val messageSource = IncomingSource.group(
                     bot = bot,
                     ids = intArrayOf(e.messageId),
                     internalIds = intArrayOf(e.messageId),
                     isOriginalMessageInitialized = true,
-                    originalMessage = miraiMessage,
+                    originalMessage = message,
                     sender = member,
                     time = (e.time / 1000).toInt()
                 )
-                miraiMessage = messageSource.plus(miraiMessage)
-
+                val miraiMessage = messageSource.plus(message)
                 bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCard}(${member.anonymousId}) -> $messageString")
                 bot.eventDispatcher.broadcastAsync(
                     GroupMessageEvent(

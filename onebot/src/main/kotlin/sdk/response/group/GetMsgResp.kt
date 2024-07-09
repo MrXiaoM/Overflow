@@ -14,6 +14,7 @@ class GetMsgResp {
     var realId = 0
     lateinit var sender: Sender
     var time = 0
+    var isJsonMessage = false
     var message = ""
     var rawMessage = ""
     var peerId = 0L

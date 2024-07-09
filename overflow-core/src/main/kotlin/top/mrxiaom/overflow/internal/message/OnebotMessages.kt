@@ -1,6 +1,7 @@
 package top.mrxiaom.overflow.internal.message
 
 import cn.evolvefield.onebot.sdk.entity.MsgId
+import cn.evolvefield.onebot.sdk.event.message.MessageEvent
 import cn.evolvefield.onebot.sdk.util.CQCode
 import com.google.gson.JsonParser
 import kotlinx.serialization.encodeToString
@@ -232,27 +233,60 @@ internal object OnebotMessages {
         }
     }
 
+    internal suspend fun MessageEvent.toMiraiMessage(bot: RemoteBot, source: MessageSource? = null): MessageChain {
+        return toMiraiMessage(isJsonMessage, message, bot, source)
+    }
+    internal suspend fun toMiraiMessage(isJsonMessage: Boolean, message: String, bot: RemoteBot, source: MessageSource? = null): MessageChain {
+        return run {
+            if (isJsonMessage) deserializeMessageFromJson(bot, message, source)
+            else deserializeMessageFromCQCode(bot, message, source)
+        }
+            ?: source?.plus(message)
+            ?: PlainText(message).toMessageChain()
+    }
+
     /**
      * 反序列化消息
      *
      * @param bot 机器人实例
-     * @param message 消息内容，应为 json 数组消息，若 json 反序列化失败，将会返回为纯文本消息作为 fallback
+     * @param message 消息内容，应为 json 数组消息，若 json 反序列化失败，将会尝试通过 CQ 码反序列化，若依然失败，返回为纯文本消息作为 fallback
      * @param source 消息源
      */
     internal suspend fun deserializeFromOneBot(bot: RemoteBot, message: String, source: MessageSource? = null): MessageChain {
+        return deserializeMessageFromJson(bot, message, source)
+            ?: deserializeMessageFromCQCode(bot, message, source)
+            ?: source?.plus(message)
+            ?: PlainText(message).toMessageChain()
+    }
+
+    /**
+     * 通过Json消息段反序列化消息
+     *
+     * @param bot 机器人实例
+     * @param message 消息内容，应为 json 数组消息，若 json 反序列化失败，将会返回 null
+     * @param source 消息源
+     */
+    internal suspend fun deserializeMessageFromJson(bot: RemoteBot, message: String, source: MessageSource? = null): MessageChain? {
         return runCatching {
             Json.parseToJsonElement(message).jsonArray
         }.map {
             deserializeFromOneBotJson(bot, it, source)
-        }.getOrElse {
-            return runCatching {
-                Json.parseToJsonElement(CQCode.toJson(message).toString()).jsonArray
-            }.map {
-                deserializeFromOneBotJson(bot, it, source)
-            }.getOrElse {
-                source?.plus(message) ?: PlainText(message).toMessageChain()
-            }
-        }
+        }.getOrNull()
+    }
+    /**
+     * 根据CQ码反序列化消息
+     *
+     * @param bot 机器人实例
+     * @param message 消息内容，CQ 码，CQ 码反序列化失败 (通常不会失败)，将会返回 null
+     * @param source 消息源
+     */
+    internal suspend fun deserializeMessageFromCQCode(bot: RemoteBot, message: String, source: MessageSource? = null): MessageChain? {
+        return runCatching {
+            val cqCodeToJson = CQCode.toJson(message).toString()
+            Json.parseToJsonElement(cqCodeToJson).jsonArray
+        }.map {
+            deserializeFromOneBotJson(bot, it, source)
+        }.getOrNull()
     }
 
     /**
@@ -380,7 +414,7 @@ internal object OnebotMessages {
                             if (msgData != null) msgSource
                                 .sender(msgData.sender.userId.toLong())
                                 .target(msgData.targetId)
-                                .messages(deserializeFromOneBot(bot, msgData.message) as Iterable<Message>)
+                                .messages(toMiraiMessage(msgData.isJsonMessage, msgData.message, bot) as Iterable<Message>)
                                 .time(msgData.time)
                             val kind = if (msgData?.groupId == 0L) MessageSourceKind.FRIEND else MessageSourceKind.GROUP
 

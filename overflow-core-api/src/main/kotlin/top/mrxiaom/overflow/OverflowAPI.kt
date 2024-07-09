@@ -36,7 +36,7 @@ interface OverflowAPI {
     fun videoFromFile(file: String): ShortVideo
 
     /**
-     * 序列化 mirai 格式消息为 Onebot 格式 json 数组消息
+     * 序列化 mirai 格式消息为 Onebot 格式 json 消息段
      */
     @Deprecated(
         message = "Please use serializeMessage(bot, message)",
@@ -45,15 +45,37 @@ interface OverflowAPI {
     fun serializeMessage(message: Message): String = serializeMessage(null, message)
 
     /**
-     * 序列化 mirai 格式消息为 Onebot 格式 json 数组消息
+     * 序列化 mirai 格式消息为 Onebot 格式 json 消息段
      */
     fun serializeMessage(bot: RemoteBot?, message: Message): String
 
     /**
-     * 反序列化 Onebot 格式 json 数组消息为 mirai 格式消息
+     * 序列化 Onebot 格式 json 消息段为 CQ 码
+     */
+    fun serializeJsonToCQCode(messageJson: String): String
+
+    /**
+     * 序列化 Onebot 格式 CQ 码 为 json 消息段
+     */
+    fun serializeCQCodeToJson(messageCQCode: String): String
+
+    /**
+     * 反序列化 Onebot 格式 json 消息段或 CQ 码，反序列化为 mirai 格式消息
      */
     @JvmBlockingBridge
     suspend fun deserializeMessage(bot: Bot, message: String): MessageChain
+
+    /**
+     * 反序列化 json 消息段为 mirai 格式消息
+     */
+    @JvmBlockingBridge
+    suspend fun deserializeMessageFromJson(bot: Bot, message: String): MessageChain?
+
+    /**
+     * 反序列化 CQ 码 为 mirai 格式消息
+     */
+    @JvmBlockingBridge
+    suspend fun deserializeMessageFromCQCode(bot: Bot, message: String): MessageChain?
 
     companion object {
         public val logger = MiraiLogger.Factory.create(OverflowAPI::class, "Overflow")

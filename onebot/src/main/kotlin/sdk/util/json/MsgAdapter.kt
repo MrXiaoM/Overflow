@@ -17,6 +17,7 @@ class MsgAdapter : JsonDeserializerKt<GetMsgResp> {
             realId = obj.ignorable("real_id", 0)
             sender = obj.fromJson("sender")!!
             time = obj.int("time")
+            isJsonMessage = obj.has("message") && obj["message"].isJsonArray
             message = obj.forceString("message")
             rawMessage = obj.ignorable("raw_message", "")
             peerId = obj.ignorable("peer_id", 0L)

@@ -5,6 +5,8 @@ import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.util.gson
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
+import cn.evolvefield.onebot.sdk.util.CQCode
+import com.google.gson.JsonParser
 import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
@@ -48,7 +50,6 @@ import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin
 import top.mrxiaom.overflow.internal.utils.wrapAsOtherClientInfo
 import java.io.File
 import kotlin.coroutines.CoroutineContext
-import kotlin.system.exitProcess
 
 internal val OverflowAPI.scope: CoroutineScope
     get() = this as Overflow
@@ -300,9 +301,27 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override fun imageFromFile(file: String): Image = OnebotMessages.imageFromFile(file)
     override fun audioFromFile(file: String): Audio = OnebotMessages.audioFromFile(file)
     override fun videoFromFile(file: String): ShortVideo = OnebotMessages.videoFromFile(file)
-    override fun serializeMessage(bot: RemoteBot?, message: Message): String = OnebotMessages.serializeToOneBotJson(bot, message)
+    override fun serializeMessage(bot: RemoteBot?, message: Message): String {
+        return OnebotMessages.serializeToOneBotJson(bot, message)
+    }
+    override fun serializeJsonToCQCode(messageJson: String): String {
+        return CQCode.fromJson(JsonParser.parseString(messageJson).asJsonArray)
+    }
+    override fun serializeCQCodeToJson(messageCQCode: String): String {
+        return gson.toJson(CQCode.toJson(messageCQCode))
+    }
     @JvmBlockingBridge
-    override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, message, null)
+    override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain {
+        return OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, message, null)
+    }
+    @JvmBlockingBridge
+    override suspend fun deserializeMessageFromJson(bot: Bot, message: String): MessageChain? {
+        return OnebotMessages.deserializeMessageFromJson(bot.asRemoteBot, message, null)
+    }
+    @JvmBlockingBridge
+    override suspend fun deserializeMessageFromCQCode(bot: Bot, message: String): MessageChain? {
+        return OnebotMessages.deserializeMessageFromCQCode(bot.asRemoteBot, message, null)
+    }
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
         if (bot.asOnebot.appName == "shamrock") {
             val data = bot.asOnebot.impl.getUserInfo(targetId, false).data
@@ -391,7 +410,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     @LowLevelApi
     override suspend fun getRawGroupList(bot: Bot): Sequence<Long> {
-        return (bot.asOnebot.impl.getGroupList().data?.map { it.groupId } ?: listOf()).asSequence()
+        return bot.asOnebot.impl.getGroupList().data.map { it.groupId }.asSequence()
     }
 
     @LowLevelApi
@@ -401,7 +420,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         groupCode: Long,
         ownerId: Long
     ): Sequence<MemberInfo> {
-        return (bot.asOnebot.impl.getGroupMemberList(groupUin).data?.map { it.asMirai } ?: listOf()).asSequence()
+        return bot.asOnebot.impl.getGroupMemberList(groupUin).data.map { it.asMirai }.asSequence()
     }
 
     @LowLevelApi

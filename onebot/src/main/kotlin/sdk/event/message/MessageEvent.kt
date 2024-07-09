@@ -15,6 +15,7 @@ import lombok.experimental.SuperBuilder
 open class MessageEvent : Event() {
     var messageType = ""
     var userId = 0L
+    var isJsonMessage = false
     var message = ""
     var rawMessage = ""
     var font = 0

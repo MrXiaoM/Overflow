@@ -33,6 +33,7 @@ class MessageEventAdapter : JsonDeserializerKt<MessageEvent> {
             time = obj.long("time")
             selfId = obj.long("self_id")
             userId = obj.long("user_id")
+            isJsonMessage = obj.has("message") && obj["message"].isJsonArray
             message = obj.forceString("message")
             rawMessage = obj.ignorable("raw_message", "")
             font = obj.ignorable("font", 0)
