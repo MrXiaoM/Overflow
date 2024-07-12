@@ -119,7 +119,7 @@ internal class GroupAddRequestListener : EventListener<GroupAddRequestEvent> {
                     groupId = e.groupId,
                     groupName = bot.getGroup(e.groupId)?.name ?: e.groupId.toString(),
                     fromNick = e.userId.takeIf { it > 0 }?.run { bot.queryProfile(this) { nickname } } ?: "",
-                    invitorId = null // TODO: 获取邀请者
+                    invitorId = e.invitorId.takeIf { it > 0 } // LLOnebot: 获取邀请者
                 ))
             }
             "invite" -> { // 某人邀请机器人入群

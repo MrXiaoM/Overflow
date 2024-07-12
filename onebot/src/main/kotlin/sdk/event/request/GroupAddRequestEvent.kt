@@ -17,4 +17,6 @@ class GroupAddRequestEvent : RequestEvent() {
     var subType = ""
     @SerializedName("group_id")
     var groupId = 0L
+    @SerializedName("invitor_id")
+    var invitorId = 0L
 }
