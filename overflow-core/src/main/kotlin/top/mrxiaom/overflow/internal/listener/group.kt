@@ -51,7 +51,11 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
                 )
                 val miraiMessage = messageSource.plus(message)
                 if (member.id == bot.id) {
-                    // TODO: 过滤自己发送的消息
+                    bot.logger.verbose("[SYNC] [${group.name}(${group.id})] <- $messageString")
+                    @Suppress("DEPRECATION") // TODO: 无法获取到哪个客户端发送的消息
+                    bot.eventDispatcher.broadcastAsync(GroupMessageSyncEvent(
+                        group, miraiMessage, member, member.nameCardOrNick, messageSource.time
+                    ))
                 } else {
                     bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
                     bot.eventDispatcher.broadcastAsync(GroupMessageEvent(
