@@ -5,6 +5,7 @@ import cn.evolvefield.onebot.sdk.event.message.GuildMessageEvent
 import cn.evolvefield.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evolvefield.onebot.sdk.event.meta.HeartbeatMetaEvent
 import cn.evolvefield.onebot.sdk.event.meta.LifecycleMetaEvent
+import cn.evolvefield.onebot.sdk.event.notice.NotifyNoticeEvent
 import cn.evolvefield.onebot.sdk.event.notice.friend.FriendAddNoticeEvent
 import cn.evolvefield.onebot.sdk.event.notice.friend.PrivateMsgDeleteNoticeEvent
 import cn.evolvefield.onebot.sdk.event.notice.group.*
@@ -32,8 +33,7 @@ object EventMap {
         "group_increase" to GroupIncreaseNoticeEvent::class,
         "group_ban" to GroupBanNoticeEvent::class,
         "group_recall" to GroupMsgDeleteNoticeEvent::class,
-        "notify" to GroupNotifyNoticeEvent::class,
-        "poke" to GroupPokeNoticeEvent::class,
+        "notify" to NotifyNoticeEvent::class,
         "lucky_king" to GroupLuckyKingNoticeEvent::class,
         "honor" to GroupHonorChangeNoticeEvent::class,
         "group_card" to GroupCardChangeNoticeEvent::class,
