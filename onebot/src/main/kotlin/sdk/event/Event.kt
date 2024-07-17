@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder
 open class Event {
     @SerializedName("post_type")
     var postType: String = ""
-    @SerializedName("type")
+    @SerializedName("time")
     var time: Long = 0
     @SerializedName("self_id")
     var selfId: Long = 0
