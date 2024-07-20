@@ -105,6 +105,8 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 ------
 
+WebSocket 各关闭码的详细意义另请参见 [CloseFrame.java](https://github.com/TooTallNate/Java-WebSocket/blob/982dabd77d5d3d312822f83591c9b31bdd96be80/src/main/java/org/java_websocket/framing/CloseFrame.java#L40-L150)。
+
 # 项目进度相关说明
 
 另请参见 [Overflow 项目进度](dev/progress.md)

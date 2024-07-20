@@ -40,7 +40,7 @@ dependencies {
     compileOnly("net.mamoe:mirai-console")
     implementation("net.mamoe:mirai-core-api")
     implementation("net.mamoe:mirai-core-utils")
-    implementation("org.java-websocket:Java-WebSocket:1.5.4")
+    implementation("org.java-websocket:Java-WebSocket:1.5.7")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
 
@@ -53,7 +53,7 @@ dependencies {
     api(project(":overflow-core-api"))
 
     testImplementation("com.google.code.gson:gson:2.10.1")
-    testImplementation("org.java-websocket:Java-WebSocket:1.5.4")
+    testImplementation("org.java-websocket:Java-WebSocket:1.5.7")
     testImplementation("net.mamoe:mirai-console")
     testImplementation("net.mamoe:mirai-console-terminal")
 }

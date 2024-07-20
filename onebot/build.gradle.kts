@@ -23,9 +23,9 @@ dependencies {
     implementation("org.slf4j:slf4j-api:2.0.5")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
     implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
-    implementation("org.java-websocket:Java-WebSocket:1.5.4")
+    implementation("org.java-websocket:Java-WebSocket:1.5.7")
 
-    annotationProcessor("org.java-websocket:Java-WebSocket:1.5.4")
+    annotationProcessor("org.java-websocket:Java-WebSocket:1.5.7")
     annotationProcessor("org.projectlombok:lombok:1.18.26")
 
     testCompileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
