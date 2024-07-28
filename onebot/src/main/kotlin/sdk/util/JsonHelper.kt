@@ -1,5 +1,6 @@
 package cn.evolvefield.onebot.sdk.util
 
+import cn.evolvefield.onebot.sdk.action.ActionList
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import java.util.function.Supplier
@@ -81,7 +82,7 @@ fun JsonObject.double(key: String): Double {
 fun JsonObject.ignorable(key: String, def: String): String {
     return nullableString(key, def.nullable) ?: def
 }
-fun JsonObject.nullableString(key: String, def: String?): String? {
+fun JsonObject.nullableString(key: String, def: String? = null): String? {
     val element = this[key]
     if (element == null || !element.isJsonPrimitive) return def
     return element.asString
@@ -89,7 +90,9 @@ fun JsonObject.nullableString(key: String, def: String?): String? {
 fun JsonObject.string(key: String): String {
     return this[key]?.asString ?: throw JsonParseException("Can`t find `$key`")
 }
-
+fun JsonObject.ok(): Boolean {
+    return this["status"]?.asString == "ok"
+}
 fun JsonObject.ignorableObject(key: String, def: Supplier<JsonObject>): JsonObject {
     val element = this[key]
     if (element == null || !element.isJsonObject) return def.get()
@@ -115,7 +118,14 @@ inline fun <reified T : Any> JsonObject.fromJson(key: String): T? {
     return gson.fromJson(this[key], T::class.java)
 }
 inline fun <reified T> JsonElement.withToken(): T {
-    return gson.fromJson(deepCopyIgnoreNulls(), object : TypeToken<T>() {}.type)
+    val element = deepCopyIgnoreNulls()
+    if (T::class == ActionList::class && element is JsonObject) {
+        // gensokyo: null friend list
+        if (element.ok() && !element.has("data")) {
+            element.add("data", JsonArray())
+        }
+    }
+    return gson.fromJson(element, object : TypeToken<T>() {}.type)
 }
 inline fun <reified T> JsonElement.withClass(): T {
     return gson.fromJson(deepCopyIgnoreNulls(), T::class.java)
