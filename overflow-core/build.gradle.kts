@@ -19,6 +19,7 @@ if (File(rootProject.projectDir, ".git").exists()) {
     commitHash = repo.head().abbreviatedId
     val log = repo.log()
     commitCount = log.size
+    println("v ${commitHash.substring(0, 7)}-SHAPSHOT.$commitCount")
 }
 
 val miraiVersion = rootProject.ext["miraiVersion"].toString()

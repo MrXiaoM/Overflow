@@ -7,7 +7,7 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.0.0" apply false
     id("com.github.gmazzo.buildconfig") version "3.1.0" apply false
     id("me.him188.kotlin-jvm-blocking-bridge") version "3.0.0-180.1" apply false
-    id("org.ajoberstar.grgit") version "3.0.0" apply false
+    id("org.ajoberstar.grgit") version "5.2.2" apply false
 
     signing
     `maven-publish`
