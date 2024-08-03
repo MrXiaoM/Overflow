@@ -6,6 +6,7 @@ import cn.evolvefield.onebot.sdk.event.notice.group.*
 import cn.evolvefield.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
+import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.MiraiInternalApi
@@ -26,6 +27,7 @@ internal fun addGroupListeners() {
         GroupIncreaseNoticeListener(),
         GroupTitleChangeNoticeListener(),
         GroupBanNoticeListener(),
+        GroupAdminNoticeListener(),
 
     ).forEach(EventBus::addListener)
 }
@@ -248,6 +250,29 @@ internal class GroupBanNoticeListener : EventListener<GroupBanNoticeEvent> {
                     operator = operator
                 ))
             }
+        }
+    }
+}
+internal class GroupAdminNoticeListener : EventListener<GroupAdminNoticeEvent> {
+    override suspend fun onMessage(e: GroupAdminNoticeEvent) {
+        val bot = e.bot ?: return
+        val group = bot.group(e.groupId)
+        val member = group.queryMember(e.userId) ?: return
+        val origin = member.permission
+        when (e.subType) {
+            "set" -> {
+                member.impl.role = "admin"
+            }
+            "unset" -> {
+                member.impl.role = "member"
+            }
+        }
+        if (origin != member.permission) {
+            bot.eventDispatcher.broadcastAsync(MemberPermissionChangeEvent(
+                member = member,
+                origin = origin,
+                new = member.permission
+            ))
         }
     }
 }

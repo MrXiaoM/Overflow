@@ -80,6 +80,7 @@
 | 群撤回消息            | MessageRecallEvent.GroupRecall  | notice -> group_recall              | ✅    |
 | 好友撤回消息           | MessageRecallEvent.FriendRecall | notice -> friend_recall             | ✅    |
 | 群名片更改            | MemberCardChangeEvent           | -                                   | ✅    |
+| 管理员更改            | MemberPermissionChangeEvent     | notice -> group_admin               | ✅    |
 | 加群验证消息           | MemberJoinRequestEvent          | request -> group -> add             | ✅    |
 | 被邀请加群            | BotInvitedJoinGroupRequestEvent | request -> group -> invite          | ✅    |
 | 加好友验证            | NewFriendRequestEvent           | request -> friend                   | ✅    |
