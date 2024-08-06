@@ -25,6 +25,7 @@ object ListenerUtils {
     operator fun get(obj: JsonObject): Class<out Event>? {
         val type = when (obj.get("post_type").asString) {
             // 消息类型
+            "message_sent",
             "message" -> when (obj.get("message_type").asString) {
                     "group" -> "groupMessage" // 群聊消息类型
                     "private" -> "privateMessage" // 私聊消息类型
