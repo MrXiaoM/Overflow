@@ -37,23 +37,40 @@ object EventBus {
      * 执行任务
      */
     suspend fun onReceive(message: String) {
+        val (bean, executes) = matchBeanAndExecutes(message)
+        if (executes.isEmpty()) return
+        for (eventListener in executes) {
+            eventListener.message(bean) //调用监听方法
+        }
+    }
+
+    private fun matchBeanAndExecutes(
+        message: String
+    ): Pair<Event, List<EventListener<out Event>>> {
         val messageType = ListenerUtils[message] // 获取消息对应的实体类型
-        val executes: List<EventListener<out Event>>
-        val bean: Event
         if (messageType == null) {
-            bean = UnsolvedEvent().also { it.jsonString = message }
-            executes = getExecutes(UnsolvedEvent::class.java)
+            val bean = UnsolvedEvent().also { it.jsonString = message }
+            val executes = getExecutes(UnsolvedEvent::class.java)
             val json = JsonParser.parseString(message).asJsonObject
             bean.postType = json["post_type"].asString
             bean.time = json["time"].asLong
             bean.selfId = json["self_id"].asLong
+            return bean to executes
         } else {
-            bean = gson.fromJson(message, messageType) // 将消息反序列化为对象
+            val bean = gson.fromJson(message, messageType) // 将消息反序列化为对象
             log.debug(String.format("接收到上报消息内容：%s", bean.toString()))
-            executes = getExecutes(messageType)
-        }
-        for (eventListener in executes) {
-            eventListener.message(bean) //调用监听方法
+            val executes = getExecutes(messageType)
+            if (executes.isEmpty()) { // 如果该事件未被监听，将其定为 UnsolvedEvent
+                val newBean = UnsolvedEvent().also { it.jsonString = message }
+                val newExecutes = getExecutes(UnsolvedEvent::class.java)
+                val json = JsonParser.parseString(message).asJsonObject
+                newBean.postType = json["post_type"].asString
+                newBean.time = json["time"].asLong
+                newBean.selfId = json["self_id"].asLong
+                return newBean to newExecutes
+            } else {
+                return bean to executes
+            }
         }
     }
 
