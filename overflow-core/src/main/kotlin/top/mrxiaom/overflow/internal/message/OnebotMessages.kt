@@ -413,7 +413,7 @@ internal object OnebotMessages {
                                 .internalId(id)
                             if (msgData != null) msgSource
                                 .sender(msgData.sender.userId.toLong())
-                                .target(msgData.targetId)
+                                .target(msgData.groupId.takeIf { it != 0L }?:msgData.targetId)  // LLOneBot 没有提供 targetId
                                 .messages(toMiraiMessage(msgData.isJsonMessage, msgData.message, bot) as Iterable<Message>)
                                 .time(msgData.time)
                             val kind = if (msgData?.groupId == 0L) MessageSourceKind.FRIEND else MessageSourceKind.GROUP
