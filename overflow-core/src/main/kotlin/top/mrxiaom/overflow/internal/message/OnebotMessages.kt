@@ -141,6 +141,20 @@ internal object OnebotMessages {
                             else -> put("id", single.source.ids[0].toString())
                         }
                         // is ForwardMessage -> put("id", single.id) // 转发消息有单独的发送方法
+                        is MarketFaceImpl -> {
+                            val key = single.delegate.key.decodeToString()
+                            val emojiId = single.delegate.faceId.decodeToString()
+                            val emojiPackageId = single.delegate.param.decodeToString()
+                            val summary = single.delegate.faceName.decodeToString()
+                            // LLOnebot: 发送商城表情
+                            if (key.isNotBlank() && emojiId.isNotBlank() && emojiPackageId.isNotBlank()) {
+                                put("key", key)
+                                put("id", emojiId)
+                                put("emoji_id", emojiId)
+                                put("emoji_package_id", emojiPackageId)
+                                put("summary", summary)
+                            }
+                        }
                         is LightApp -> put("data", single.content)
                         is ServiceMessage -> put("data", single.content)
                         is Markdown -> when (app) { // 其它实现可能有其它格式，预留判断
@@ -404,13 +418,23 @@ internal object OnebotMessages {
                             }
                         }
 
-                        "mface" -> add(
-                            MarketFaceImpl(
-                                ImMsgBody.MarketFace( // TODO 根据 emojiId 获取 name
-                                    faceId = data["id"].string.encodeToByteArray()
+                        "mface" -> {
+                            // LLOnebot: 更详细的商城表情信息
+                            val key = data["key"]?.string ?: ""
+                            val emojiId = (data["emoji_id"] ?: data["id"])?.string ?: ""
+                            val emojiPackageId = data["emoji_package_id"]?.string ?: ""
+                            val summary = data["summary"]?.string ?: "[动画表情]"
+                            add(
+                                MarketFaceImpl(
+                                    ImMsgBody.MarketFace(
+                                        key = key.encodeToByteArray(),
+                                        faceId = emojiId.encodeToByteArray(),
+                                        param = emojiPackageId.encodeToByteArray(),
+                                        faceName = summary.encodeToByteArray(),
+                                    )
                                 )
                             )
-                        )
+                        }
 
                         "xml" -> add(SimpleServiceMessage(60, data["data"].string))
                         "json" -> add(LightApp(data["data"].string))
