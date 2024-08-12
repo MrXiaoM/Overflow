@@ -21,7 +21,7 @@ interface ExtendedMessageSerializerService : BaseService {
      * @param data 消息数据
      * @return Mirai 消息，返回 null 代表不进行额外处理，交给其它序列化器或 Overflow 自带序列化器处理
      */
-    fun deserialize(bot: RemoteBot, type: String, data: JsonObject): Message?
+    suspend fun deserialize(bot: RemoteBot, type: String, data: JsonObject): Message?
 
     /**
      * 序列化 Mirai 消息为 Onebot 消息段
@@ -38,7 +38,7 @@ interface ExtendedMessageSerializerService : BaseService {
         internal val instances: List<ExtendedMessageSerializerService>
             get() = loader.allServices.sortedBy { it.priority }
 
-        fun List<ExtendedMessageSerializerService>.deserialize(
+        suspend fun List<ExtendedMessageSerializerService>.deserialize(
             bot: RemoteBot,
             type: String,
             data: JsonObject
