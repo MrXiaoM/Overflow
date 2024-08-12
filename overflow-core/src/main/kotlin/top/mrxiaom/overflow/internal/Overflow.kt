@@ -1,3 +1,4 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal
 
 import cn.evolvefield.onebot.sdk.action.ActionRaw
@@ -48,6 +49,8 @@ import top.mrxiaom.overflow.internal.message.data.OfflineMessageSourceImpl
 import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
 import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin
 import top.mrxiaom.overflow.internal.utils.wrapAsOtherClientInfo
+import top.mrxiaom.overflow.spi.MediaURLService
+import top.mrxiaom.overflow.spi.MediaURLService.Companion.queryImageUrl
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 
@@ -450,6 +453,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     }
 
     override suspend fun queryImageUrl(bot: Bot, image: Image): String {
+        val extUrl = MediaURLService.instances.queryImageUrl(bot.asRemoteBot, image)
+        if (extUrl != null) return extUrl
         // Onebot 没有 imageId 概念，Overflow 使用 imageId 字段来存储 Onebot 中的 file 链接
         return image.imageId
     }

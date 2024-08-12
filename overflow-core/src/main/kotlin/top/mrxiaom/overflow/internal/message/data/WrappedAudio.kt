@@ -1,3 +1,4 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.message.data
 
 import cn.evolvefield.onebot.client.util.fileType
@@ -7,12 +8,14 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.safeCast
 import top.mrxiaom.overflow.internal.utils.base64Length
 import top.mrxiaom.overflow.internal.utils.lengthToString
+import top.mrxiaom.overflow.spi.MediaURLService
+import top.mrxiaom.overflow.spi.MediaURLService.Companion.queryAudioUrl
 import java.util.*
 
 @Serializable
 @SerialName(WrappedAudio.SERIAL_NAME)
 internal data class WrappedAudio(
-    override val urlForDownload: String,
+    val url: String,
     override val length: Long,
 ): OnlineAudio, OfflineAudio {
     private val _stringValue: String by lazy(LazyThreadSafetyMode.NONE) {
@@ -31,6 +34,11 @@ internal data class WrappedAudio(
         length.takeIf { it > 0 } ?: if (!file.startsWith("base64://")) 0
         else base64Length(file.replace("base64://", ""))
     }
+    override val urlForDownload: String
+        get() {
+            val extUrl = MediaURLService.instances.queryAudioUrl(this)
+            return extUrl ?: url
+        }
     override val filename: String = urlForDownload.substringAfterLast("/")
     val file: String = urlForDownload
 

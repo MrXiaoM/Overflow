@@ -1,3 +1,4 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.message.data
 
 import cn.evolvefield.onebot.client.util.fileType
@@ -10,31 +11,37 @@ import net.mamoe.mirai.message.data.ShortVideo
 import net.mamoe.mirai.utils.safeCast
 import top.mrxiaom.overflow.internal.utils.base64Length
 import top.mrxiaom.overflow.internal.utils.lengthToString
+import top.mrxiaom.overflow.spi.MediaURLService
+import top.mrxiaom.overflow.spi.MediaURLService.Companion.queryVideoUrl
 import java.util.*
 
 @Serializable
 @SerialName(WrappedVideo.SERIAL_NAME)
 internal data class WrappedVideo(
-    val file: String
+    val file: String,
+    override val filename: String = if (file.startsWith("base64://")) "base64" else file.substringAfterLast("/"),
+    override val videoId: String = filename,
 ) : OnlineShortVideo {
     private val _stringValue: String by lazy(LazyThreadSafetyMode.NONE) {
-        val fileString = if (file.startsWith("base64://") && file.length > 32) {
-            val s = file.replace("base64://", "")
+        val fileString = if (urlForDownload.startsWith("base64://") && urlForDownload.length > 32) {
+            val s = urlForDownload.replace("base64://", "")
             val len = base64Length(s)
             val type = Base64.getDecoder().decode(s).fileType ?: "*"
-            "${file.substring(0, 32)}... (${if (type == "*") "" else "$type, "}about ${lengthToString(len)})"
-        } else file
+            "${urlForDownload.substring(0, 32)}... (${if (type == "*") "" else "$type, "}about ${lengthToString(len)})"
+        } else urlForDownload
         "[overflow:video,file=$fileString]"
     }
     override val fileFormat: String = "mp4"
     override val fileMd5: ByteArray = ByteArray(16)
     override val fileSize: Long by lazy {
-        if (!file.startsWith("base64://")) 0
-        else base64Length(file.substring(9))
+        if (!urlForDownload.startsWith("base64://")) 0
+        else base64Length(urlForDownload.substring(9))
     }
-    override val filename: String = if (file.startsWith("base64://")) "base64" else file.substringAfterLast("/")
-    override val urlForDownload: String = file
-    override val videoId: String = filename
+    override val urlForDownload: String
+        get() {
+            val extUrl = MediaURLService.instances.queryVideoUrl(this)
+            return extUrl ?: file
+        }
 
     override fun contentToString(): String {
         return "[视频消息]"
