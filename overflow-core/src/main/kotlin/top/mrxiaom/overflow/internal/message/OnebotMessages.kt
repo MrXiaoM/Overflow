@@ -1,3 +1,4 @@
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.message
 
 import cn.evolvefield.onebot.sdk.entity.MsgId
@@ -22,6 +23,9 @@ import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.data.*
 import top.mrxiaom.overflow.message.data.*
+import top.mrxiaom.overflow.spi.ExtendedMessageSerializerService
+import top.mrxiaom.overflow.spi.ExtendedMessageSerializerService.Companion.deserialize
+import top.mrxiaom.overflow.spi.ExtendedMessageSerializerService.Companion.serialize
 
 /**
  * Json 数组消息 (Onebot) 与 [MessageChain] (mirai) 的序列化与反序列化
@@ -74,11 +78,13 @@ internal object OnebotMessages {
         val messageChain = (message as? MessageChain) ?: listOf(message)
         return buildJsonArray {
             val app = (bot?.appName ?: "Onebot").lowercase()
+            val extensions = ExtendedMessageSerializerService.instances
 
             for (single in messageChain) {
-                val type = single.messageType(bot) ?: continue
+                val pair = extensions.serialize(bot, message)
+                val type = pair?.first ?: single.messageType(bot) ?: continue
                 //var ignoreEmptyData = false
-                val data = buildJsonObject {
+                val data = pair?.second ?: buildJsonObject {
                     when (single) {
                         is PlainText -> {
                             if (single.content.isNotEmpty())
@@ -300,6 +306,7 @@ internal object OnebotMessages {
             if (source != null) add(source)
 
             val app = bot.appName.lowercase()
+            val extensions = ExtendedMessageSerializerService.instances
 
             var hasQuote = false
 
@@ -307,6 +314,11 @@ internal object OnebotMessages {
                 val obj = o.jsonObject
                 val type = obj["type"].string
                 val data = obj["data"]?.jsonObject ?: buildJsonObject {  }
+                val extMessage = extensions.deserialize(bot, type, data)
+                if (extMessage != null) {
+                    add(extMessage)
+                    continue
+                }
                 try {
                     when (type) {
                         "text" -> {
