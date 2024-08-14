@@ -41,7 +41,7 @@ public class BotBuilder private constructor(
     }
 
     /**
-     * 设置尝试重连次数，设为 -1 时禁用自动重连
+     * 设置尝试重连次数，设为 0 时禁用自动重连
      *
      * 仅主动 WebSocket 可自动重连
      */
