@@ -199,20 +199,46 @@ internal class BotWrapper private constructor(
     override fun toString(): String = "Bot($id)"
 
     companion object {
-        internal suspend fun wrap(impl: Bot, botConfiguration: BotConfiguration? = null): BotWrapper {
+        internal suspend fun wrap(
+            impl: Bot,
+            botConfiguration: BotConfiguration? = null,
+            workingDir: (Long.() -> File)? = null
+        ): BotWrapper {
             // also refresh bot id
             val loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("无法获取机器人账号信息")
             return (net.mamoe.mirai.Bot.getInstanceOrNull(impl.id) as? BotWrapper)?.apply {
                 implBot = impl
                 updateContacts()
-            } ?: BotWrapper(impl, loginInfo, botConfiguration ?: BotConfiguration {
-                workingDir = File("bots/${impl.id}")
+            } ?: run {
+                val configuration = botConfiguration ?: impl.defaultBotConfiguration
+                if (workingDir != null) {
+                    configuration.workingDir = workingDir.invoke(impl.id)
+                }
+                BotWrapper(impl, loginInfo, configuration).apply {
+                    updateContacts()
+
+                    //updateOtherClients()
+                    @Suppress("INVISIBLE_MEMBER")
+                    net.mamoe.mirai.Bot._instances[id] = this
+                }
+            }
+        }
+        internal suspend fun Bot.wrap(
+            configuration: BotConfiguration? = null,
+            workingDir: (Long.() -> File)? = null
+        ): BotWrapper {
+            return wrap(this, configuration, workingDir)
+        }
+
+        private val Bot.defaultBotConfiguration: BotConfiguration
+            get() = BotConfiguration {
+                this.workingDir = File("bots/$id")
                 if (Overflow.instance.miraiConsole) {
                     botLoggerSupplier = {
                         LoggerInFolder(
                             net.mamoe.mirai.Bot::class,
                             "Bot.${it.id}",
-                            workingDir.resolve("logs"),
+                            this.workingDir.resolve("logs"),
                             1.weeksToMillis
                         )
                     }
@@ -220,7 +246,7 @@ internal class BotWrapper private constructor(
                         LoggerInFolder(
                             net.mamoe.mirai.Bot::class,
                             "Net.${it.id}",
-                            workingDir.resolve("logs"),
+                            this.workingDir.resolve("logs"),
                             1.weeksToMillis
                         )
                     }
@@ -228,16 +254,6 @@ internal class BotWrapper private constructor(
                     botLoggerSupplier = { MiraiLogger.Factory.create(net.mamoe.mirai.Bot::class, "Bot.${it.id}") }
                     networkLoggerSupplier = { MiraiLogger.Factory.create(net.mamoe.mirai.Bot::class, "Net.${it.id}") }
                 }
-            }).apply {
-                updateContacts()
-
-                //updateOtherClients()
-                @Suppress("INVISIBLE_MEMBER")
-                net.mamoe.mirai.Bot._instances[id] = this
             }
-        }
-        internal suspend fun Bot.wrap(): BotWrapper {
-            return wrap(this)
-        }
     }
 }

@@ -210,6 +210,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     private suspend fun start0(
         botConfig: BotConfig,
         printInfo: Boolean = false,
+        configuration: BotConfiguration? = null,
+        workingDir: (Long.() -> File)? = null,
         logger: Logger = LoggerFactory.getLogger("Onebot")
     ): Bot? {
         val reversed = botConfig.reversedPort in 1..65535
@@ -261,7 +263,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         if (printInfo) {
             logger.info("协议端版本信息\n${gson.toJson(versionInfo.getAsJsonObject("data"))}")
         }
-        val bot = botImpl.wrap()
+        val bot = botImpl.wrap(configuration, workingDir)
 
         return bot.also {
             it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot))
@@ -280,7 +282,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             noPlatform: Boolean,
             useCQCode: Boolean,
             logger: Logger?,
-            parentJob: Job?
+            parentJob: Job?,
+            configuration: BotConfiguration,
+            workingDir: (Long.() -> File)?
         ): Bot? {
             val botConfig = BotConfig(
                 url = url,
@@ -295,9 +299,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 parentJob = parentJob
             )
             return if (logger != null) {
-                start0(botConfig, printInfo, logger)
+                start0(botConfig, printInfo, configuration, workingDir, logger)
             } else {
-                start0(botConfig, printInfo)
+                start0(botConfig, printInfo, configuration, workingDir)
             }
         }
     }

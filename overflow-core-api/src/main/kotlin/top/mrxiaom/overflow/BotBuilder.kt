@@ -3,7 +3,12 @@ package top.mrxiaom.overflow
 import kotlinx.coroutines.Job
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.Bot
+import net.mamoe.mirai.utils.BotConfiguration
+import net.mamoe.mirai.utils.MiraiLogger
 import org.slf4j.Logger
+import java.io.File
+import java.util.function.Consumer
+import java.util.function.Supplier
 
 /**
  * Onebot 连接向导
@@ -19,7 +24,12 @@ public class BotBuilder private constructor(
     private var noPlatform: Boolean = false,
     private var useCQCode: Boolean = false,
     private var logger: Logger? = null,
-    private var parentJob: Job? = null
+    private var parentJob: Job? = null,
+    private var configuration: BotConfiguration = BotConfiguration {
+        botLoggerSupplier = { MiraiLogger.Factory.create(Bot::class, "Bot.${it.id}") }
+        networkLoggerSupplier = { MiraiLogger.Factory.create(Bot::class, "Net.${it.id}") }
+    },
+    private var workingDir: (Long.() -> File)? = null,
 ) {
     /**
      * 设置用于连接时鉴权的 token
@@ -107,6 +117,31 @@ public class BotBuilder private constructor(
     }
 
     /**
+     * 覆盖原有 BotConfiguration
+     */
+    @JvmSuppressWildcards
+    public fun withBotConfiguration(supplier: Supplier<BotConfiguration>): BotBuilder = apply {
+        this.configuration = supplier.get()
+    }
+
+    /**
+     * 修改原有 BotConfiguration
+     */
+    @JvmSuppressWildcards
+    public fun modifyBotConfiguration(consumer: Consumer<BotConfiguration>): BotBuilder = apply {
+        consumer.accept(configuration)
+    }
+
+    /**
+     * 设置或取消设置工作目录
+     * @param block 传入QQ号，返回路径
+     */
+    @JvmSuppressWildcards
+    public fun workingDir(block: (Long.() -> File)?): BotBuilder = apply {
+        this.workingDir = block
+    }
+
+    /**
      * 连接到 Onebot
      *
      * @return 连接失败时，将返回 null
@@ -124,7 +159,9 @@ public class BotBuilder private constructor(
             noPlatform = noPlatform,
             useCQCode = useCQCode,
             logger = logger,
-            parentJob = parentJob
+            parentJob = parentJob,
+            configuration = configuration,
+            workingDir = workingDir,
         )
     }
 
@@ -158,6 +195,8 @@ public interface IBotStarter {
         noPlatform: Boolean,
         useCQCode: Boolean,
         logger: Logger?,
-        parentJob: Job?
+        parentJob: Job?,
+        configuration: BotConfiguration,
+        workingDir: (Long.() -> File)?
     ): Bot?
 }
