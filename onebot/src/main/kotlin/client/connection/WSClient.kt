@@ -28,6 +28,7 @@ class WSClient(
     header: Map<String, String> = mapOf(),
 ) : WebSocketClient(uri, header), IAdapter {
     private var retryCount = 0
+    private var scheduleClose = false
     @OptIn(InternalCoroutinesApi::class)
     private val connectDef = CompletableDeferred<Boolean>(config.parentJob).apply {
         invokeOnCompletion(
@@ -48,6 +49,16 @@ class WSClient(
         logger.info("▌ 已连接到服务器 ┈━═☆")
     }
 
+    override fun connect() {
+        scheduleClose = false
+        super.connect()
+    }
+
+    override fun close() {
+        scheduleClose = true
+        super.close()
+    }
+
     override fun onMessage(message: String) = onReceiveMessage(message)
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {
@@ -59,7 +70,7 @@ class WSClient(
         unlockMutex()
 
         // 自动重连
-        if (code != CloseFrame.NORMAL) retry()
+        if (!scheduleClose) retry()
     }
 
     private fun retry() {
