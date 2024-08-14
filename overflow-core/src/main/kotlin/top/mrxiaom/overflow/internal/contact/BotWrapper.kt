@@ -209,11 +209,11 @@ internal class BotWrapper private constructor(
                 implBot = impl
                 updateContacts()
             } ?: run {
-                val configuration = configuration ?: defaultBotConfiguration
+                val botConfiguration = configuration ?: defaultBotConfiguration
                 if (workingDir != null) {
-                    configuration.workingDir = workingDir.invoke(id)
+                    botConfiguration.workingDir = workingDir.invoke(id)
                 }
-                BotWrapper(this, loginInfo, configuration).apply {
+                BotWrapper(this, loginInfo, botConfiguration).apply {
                     updateContacts()
 
                     //updateOtherClients()
