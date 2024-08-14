@@ -199,22 +199,21 @@ internal class BotWrapper private constructor(
     override fun toString(): String = "Bot($id)"
 
     companion object {
-        internal suspend fun wrap(
-            impl: Bot,
-            botConfiguration: BotConfiguration? = null,
+        internal suspend fun Bot.wrap(
+            configuration: BotConfiguration? = null,
             workingDir: (Long.() -> File)? = null
         ): BotWrapper {
             // also refresh bot id
-            val loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("无法获取机器人账号信息")
-            return (net.mamoe.mirai.Bot.getInstanceOrNull(impl.id) as? BotWrapper)?.apply {
+            val loginInfo = getLoginInfo().data ?: throw IllegalStateException("无法获取机器人账号信息")
+            return (net.mamoe.mirai.Bot.getInstanceOrNull(id) as? BotWrapper)?.apply {
                 implBot = impl
                 updateContacts()
             } ?: run {
-                val configuration = botConfiguration ?: impl.defaultBotConfiguration
+                val configuration = configuration ?: defaultBotConfiguration
                 if (workingDir != null) {
-                    configuration.workingDir = workingDir.invoke(impl.id)
+                    configuration.workingDir = workingDir.invoke(id)
                 }
-                BotWrapper(impl, loginInfo, configuration).apply {
+                BotWrapper(this, loginInfo, configuration).apply {
                     updateContacts()
 
                     //updateOtherClients()
@@ -222,12 +221,6 @@ internal class BotWrapper private constructor(
                     net.mamoe.mirai.Bot._instances[id] = this
                 }
             }
-        }
-        internal suspend fun Bot.wrap(
-            configuration: BotConfiguration? = null,
-            workingDir: (Long.() -> File)? = null
-        ): BotWrapper {
-            return wrap(this, configuration, workingDir)
         }
 
         private val Bot.defaultBotConfiguration: BotConfiguration
