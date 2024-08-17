@@ -620,7 +620,7 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getGroupList(): ActionList<GroupInfoResp> {
         val action = ActionPathEnum.GET_GROUP_LIST
-        val result = actionHandler.action(this, action)
+        val result = actionHandler.action(this, action, JsonObject().apply { addProperty("no_cache", false) })
         return result.withToken()
     }
 
@@ -654,6 +654,7 @@ class Bot(
         val action = ActionPathEnum.GET_GROUP_MEMBER_LIST
         val params = JsonObject()
         params.addProperty("group_id", groupId)
+        params.addProperty("no_cache", false)
         val result = actionHandler.action(this, action, params)
         return result.withToken()
     }
