@@ -263,6 +263,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         if (printInfo) {
             logger.info("协议端版本信息\n${gson.toJson(versionInfo.getAsJsonObject("data"))}")
         }
+        if (botImpl.onebotVersion == 12) {
+            throw IllegalStateException("Overflow 暂不支持 Onebot 12")
+        }
         val bot = botImpl.wrap(configuration, workingDir)
 
         return bot.also {

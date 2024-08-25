@@ -50,7 +50,7 @@ class ActionHandler(
      * @param params  请求参数
      * @return 请求结果
      */
-    suspend fun action(bot: Bot, action: ActionPath, params: JsonObject? = null): JsonObject {
+    suspend fun action(bot: Bot, action: ActionPath, params: JsonObject? = null, showWarning: Boolean = true): JsonObject {
         if (!bot.channel.isOpen) {
             return JsonObject().apply {
                 addProperty("status", "failed")
@@ -65,8 +65,10 @@ class ActionHandler(
         return try {
             request.send(reqJson)
         } catch (e: Exception) {
-            logger.warn("请求失败: [${action.path}] ${e.message}。如果你认为这是 Overflow 的问题，请带上 logs/onebot 中的日志来反馈。")
-            logger.trace("Stacktrace: ", e)
+            if (showWarning) {
+                logger.warn("请求失败: [${action.path}] ${e.message}。如果你认为这是 Overflow 的问题，请带上 logs/onebot 中的日志来反馈。")
+                logger.trace("Stacktrace: ", e)
+            }
             if (e is ActionFailedException) e.json
             else JsonObject().apply {
                 addProperty("status", "failed")

@@ -265,6 +265,10 @@ enum class ActionPathEnum(
      */
     GET_VERSION_INFO("get_version_info"),
     /**
+     * 获取版本信息
+     */
+    GET_VERSION("get_version"),
+    /**
      * 获取 Cookie
      */
     GET_COOKIES("get_cookies"),

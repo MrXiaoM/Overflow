@@ -43,10 +43,13 @@ class Bot(
 ) {
     private var name: String = "Onebot"
     private var version: String = "Unknown"
+    private var onebot: Int = 11
     val appName: String
         get() = name
     val appVersion: String
         get() = version
+    val onebotVersion: Int
+        get() = onebot
     val channel: WebSocket
         get() = conn
     private var idInternal: Long = 0
@@ -1330,10 +1333,27 @@ class Bot(
     @JvmBlockingBridge
     suspend fun getVersionInfo(): JsonObject {
         val action = ActionPathEnum.GET_VERSION_INFO
-        return actionHandler.action(this, action).apply {
-            val data = ignorableObject("data") { JsonObject() }
-            name = data.ignorable("app_name", "onebot").trim()
-            version = data.ignorable("app_version", "Unknown").trim()
+        return actionHandler.action(this, action, showWarning = false).apply {
+            if (ignorable("status", "failed") != "ok") {
+                val result = actionHandler.action(this@Bot, ActionPathEnum.GET_VERSION, showWarning = false)
+                val data = result.ignorableObject("data") { JsonObject() }
+                val target = data.ignorable("onebot_version", "unknown (12 request)")
+                if (target != "12") {
+                    throw IllegalStateException("无法获取该 Onebot 实现的版本信息 [$target]，确定你连接的 Onebot 实现为 Onebot 11 或 Onebot 12 吗？")
+                }
+                name = data.ignorable("impl", "onebot").trim()
+                version = data.ignorable("version", "Unknown").trim()
+                onebot = 12
+            } else {
+                val data = ignorableObject("data") { JsonObject() }
+                val target = data.ignorable("protocol_version", "unknown (11 request)")
+                if (target != "v11") {
+                    throw IllegalStateException("无法获取该 Onebot 实现的版本信息 [$target]，确定你连接的 Onebot 实现为 Onebot 11 或 Onebot 12 吗？")
+                }
+                name = data.ignorable("app_name", "onebot").trim()
+                version = data.ignorable("app_version", "Unknown").trim()
+                onebot = 11
+            }
         }
     }
 
