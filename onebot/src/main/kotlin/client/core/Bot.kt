@@ -967,14 +967,26 @@ class Bot(
      * @return [ActionData] of [GroupFilesResp]
      */
     @JvmBlockingBridge
-    suspend fun getGroupFilesByFolder(groupId: Long, folderId: String): ActionData<GroupFilesResp> {
+    suspend fun getGroupFilesByFolder(groupId: Long, folderId: String, showWarning: Boolean = true): ActionData<GroupFilesResp> {
         val action = ActionPathEnum.GET_GROUP_FILES_BY_FOLDER
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("folder_id", folderId)
-        val result = actionHandler.action(this, action, params)
+        val result = actionHandler.action(this, action, params, showWarning)
         return result.withToken()
     }
+
+    suspend fun createGroupFileFolder(groupId: Long, name: String, parentId: String): ActionRaw {
+        val action = ActionPathEnum.CREATE_GROUP_FILE_FOLDER
+        val params = JsonObject().apply {
+            addProperty("group_id", groupId)
+            addProperty("name", name)
+            addProperty("parent_id", parentId)
+        }
+        val result = actionHandler.action(this, action, params)
+        return result.withClass()
+    }
+
     /**
      * 获取群文件下载链接
      *

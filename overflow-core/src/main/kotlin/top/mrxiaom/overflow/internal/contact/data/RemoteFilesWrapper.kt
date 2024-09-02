@@ -1,6 +1,11 @@
 package top.mrxiaom.overflow.internal.contact.data
 
+import cn.evolvefield.onebot.sdk.response.group.GroupFilesResp
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
+import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.contact.file.AbsoluteFile
 import net.mamoe.mirai.contact.file.AbsoluteFileFolder
 import net.mamoe.mirai.contact.file.AbsoluteFolder
@@ -8,7 +13,9 @@ import net.mamoe.mirai.contact.file.RemoteFiles
 import net.mamoe.mirai.message.data.FileMessage
 import net.mamoe.mirai.utils.*
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
+import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper.Companion.update
 import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
+import top.mrxiaom.overflow.internal.utils.toMiraiFile
 import top.mrxiaom.overflow.internal.utils.toMiraiFiles
 import top.mrxiaom.overflow.internal.utils.toMiraiFolders
 import top.mrxiaom.overflow.spi.FileService
@@ -27,12 +34,16 @@ internal class RemoteFilesWrapper(
                 this, null, "/", "/", 0, 0, 0, data?.files?.size ?: 0
             )
             if (data != null) {
-                data.folders?.toMiraiFolders(this)?.also { root.folders.addAll(it) }
-                data.files?.toMiraiFiles(this)?.also { root.files.addAll(it) }
+                root.update(data)
             } else {
                 bot.logger.warning("获取群 $id 的文件列表失败，可能是 Onebot 实现不支持，详见网络日志")
             }
             return RemoteFilesWrapper(this, root)
+        }
+
+        internal fun FolderWrapper.update(data: GroupFilesResp) {
+            data.folders?.toMiraiFolders(contact)?.also { folders.addAll(it) }
+            data.files?.toMiraiFiles(contact)?.also { files.addAll(it) }
         }
     }
 }
@@ -69,80 +80,104 @@ internal class FolderWrapper(
     }
 
     override suspend fun exists(): Boolean {
-        TODO("Not yet implemented")
+        return true // TODO: 获取该文件夹当前是否还存在
     }
 
     override suspend fun files(): Flow<AbsoluteFile> {
-        TODO("Not yet implemented")
+        return files.asFlow()
     }
 
     override suspend fun refresh(): Boolean {
-        TODO("Not yet implemented")
+        return refreshed() != null
     }
 
     override suspend fun renameTo(newName: String): Boolean {
-        TODO("Not yet implemented")
+        TODO("暂无重命名文件夹实现")
     }
 
     override suspend fun children(): Flow<AbsoluteFileFolder> {
-        TODO("Not yet implemented")
+        return folders.plus(files).asFlow()
     }
 
     @JavaFriendlyAPI
     override suspend fun childrenStream(): Stream<AbsoluteFileFolder> {
-        TODO("Not yet implemented")
+        return folders.plus(files).stream()
     }
 
     override suspend fun createFolder(name: String): AbsoluteFolder {
-        TODO("Not yet implemented")
+        if (name.isEmpty()) throw IllegalArgumentException("子目录名称不能为空")
+        if (name.matches(Regex(":*?\"<>|"))) throw IllegalArgumentException("不能在非根目录下创建子目录")
+        contact.bot.impl.createGroupFileFolder(contact.id, name, id)
+        throw PermissionDeniedException("无法获取文件夹创建回执")
     }
 
     @JavaFriendlyAPI
     override suspend fun filesStream(): Stream<AbsoluteFile> {
-        TODO("Not yet implemented")
+        return files.toList<AbsoluteFile>().stream()
     }
 
     override suspend fun folders(): Flow<AbsoluteFolder> {
-        TODO("Not yet implemented")
+        return folders.asFlow()
     }
 
     @JavaFriendlyAPI
     override suspend fun foldersStream(): Stream<AbsoluteFolder> {
-        TODO("Not yet implemented")
+        return folders.toList<AbsoluteFolder>().stream()
+    }
+
+    suspend fun refreshFromOnebot(): GroupFilesResp? {
+        return contact.bot.impl.run {
+            val id = this@FolderWrapper.id
+            if (id == "/") {
+                getGroupRootFiles(contact.id, false).data
+            } else {
+                getGroupFilesByFolder(contact.id, id, false).data
+            }
+        }
     }
 
     override suspend fun refreshed(): AbsoluteFolder? {
-        TODO("Not yet implemented")
+        val data = refreshFromOnebot()
+        update(data ?: return null)
+        return this
     }
 
     override suspend fun resolveAll(path: String): Flow<AbsoluteFileFolder> {
-        TODO("Not yet implemented")
+        return children().filter { it.name == path }
     }
 
     @JavaFriendlyAPI
     override suspend fun resolveAllStream(path: String): Stream<AbsoluteFileFolder> {
-        TODO("Not yet implemented")
+        return childrenStream().filter { it.name == path }
     }
 
     override suspend fun resolveFileById(id: String, deep: Boolean): AbsoluteFile? {
-        TODO("Not yet implemented")
+        if (deep) {
+            TODO("暂不支持深入子目录查找文件")
+        }
+        return files.firstOrNull { it.id == id }
     }
 
     override suspend fun resolveFiles(path: String): Flow<AbsoluteFile> {
-        TODO("Not yet implemented")
+        // TODO: 获取子目录内的文件
+        return files().filter { it.absolutePath.removePrefix(absolutePath) == path }
     }
 
     @JavaFriendlyAPI
     override suspend fun resolveFilesStream(path: String): Stream<AbsoluteFile> {
-        TODO("Not yet implemented")
+        // TODO: 获取子目录内的文件
+        return filesStream().filter { it.absolutePath.removePrefix(absolutePath) == path }
     }
 
     override suspend fun resolveFolder(name: String): AbsoluteFolder? {
-        TODO("Not yet implemented")
+        if (name.isEmpty()) throw IllegalArgumentException("子目录名称不能为空")
+        if (name.matches(Regex(":*?\"<>|"))) throw IllegalArgumentException("请求子目录包含不允许的字符")
+        return folders().firstOrNull { it.name == name }
     }
 
     override suspend fun resolveFolderById(id: String): AbsoluteFolder? {
-        TODO("Not yet implemented")
+        if (name.isEmpty()) throw IllegalArgumentException("子目录名称不能为空")
+        return folders().firstOrNull { it.id == id }
     }
 
     @Suppress("INVISIBLE_MEMBER")
@@ -152,7 +187,7 @@ internal class FolderWrapper(
         callback: ProgressionCallback<AbsoluteFile, Long>?
     ): AbsoluteFile {
         impl.uploadGroupFile(contact.id, FileService.instance!!.upload(content), filepath, id)
-        TODO("文件上传回执")
+        throw PermissionDeniedException("没有任何方法获取文件发送回执")
     }
 
     override fun toString(): String = "AbsoluteFolder(name=$name, absolutePath=$absolutePath, id=$id)"
@@ -220,19 +255,20 @@ internal class FileWrapper(
     }
 
     override suspend fun moveTo(folder: AbsoluteFolder): Boolean {
-        TODO("Not yet implemented")
+        TODO("暂无移动文件实现")
     }
 
     override suspend fun refresh(): Boolean {
-        TODO("Not yet implemented")
+        return refreshed() != null
     }
 
     override suspend fun refreshed(): AbsoluteFile? {
-        TODO("Not yet implemented")
+        val data = parent?.refreshFromOnebot() ?: return null
+        return data.files?.firstOrNull { it.fileId == id }?.toMiraiFile(contact, parent)
     }
 
     override suspend fun renameTo(newName: String): Boolean {
-        TODO("Not yet implemented")
+        TODO("暂无重命名文件实现")
     }
 
     override fun toMessage(): FileMessage {

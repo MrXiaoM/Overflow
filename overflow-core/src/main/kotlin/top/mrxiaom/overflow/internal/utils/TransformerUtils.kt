@@ -98,18 +98,20 @@ internal fun MsgId?.safeMessageIds(bot: RemoteBot): IntArray {
 }
 
 internal fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderWrapper? = null): List<FileWrapper> {
-    return map {
-        val md5 = it.md5?.hexToBytes() ?: ByteArray(16)
-        val sha1 = it.sha1?.hexToBytes() ?: ByteArray(16)
-        FileWrapper(group, parent,
-            it.fileId, it.fileName, md5, sha1, it.fileSize, it.deadTime, it.modifyTime, it.uploadTime, it.uploader, it.busid
-        )
-    }
+    return map { it.toMiraiFile(group, parent) }
+}
+internal fun GroupFilesResp.Files.toMiraiFile(group: GroupWrapper, parent: FolderWrapper? = null): FileWrapper {
+    val md5 = md5?.hexToBytes() ?: ByteArray(16)
+    val sha1 = sha1?.hexToBytes() ?: ByteArray(16)
+    return FileWrapper(group, parent,
+        fileId, fileName, md5, sha1, fileSize, deadTime, modifyTime, uploadTime, uploader, busid
+    )
 }
 internal fun List<GroupFilesResp.Folders>.toMiraiFolders(group: GroupWrapper, parent: FolderWrapper? = null): List<FolderWrapper> {
-    return map {
-        FolderWrapper(group, parent,
-            it.folderId, it.folderName, it.createTime, it.createTime, it.creator, it.totalFileCount
-        )
-    }
+    return map { it.toMiraiFolder(group, parent) }
+}
+internal fun GroupFilesResp.Folders.toMiraiFolder(group: GroupWrapper, parent: FolderWrapper? = null): FolderWrapper {
+    return FolderWrapper(group, parent,
+        folderId, folderName, createTime, createTime, creator, totalFileCount
+    )
 }

@@ -303,4 +303,9 @@ enum class ActionPathEnum(
      * 属于 LLOnebot, NapCat 扩展 API
      */
     EXT_GET_FILE("get_file"),
+
+    /**
+     * 创建群文件夹
+     */
+    CREATE_GROUP_FILE_FOLDER("create_group_file_folder"),
 }
