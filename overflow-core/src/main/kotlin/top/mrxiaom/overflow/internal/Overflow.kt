@@ -171,6 +171,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             injectMiraiConsole()
         } catch (ignored: ClassNotFoundException) {
         }
+        OnebotMessages.registerSerializers()
     }
 
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")

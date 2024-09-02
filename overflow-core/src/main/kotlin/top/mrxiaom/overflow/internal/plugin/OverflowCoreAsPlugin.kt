@@ -121,8 +121,6 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 }
             }
 
-        OnebotMessages.registerSerializers()
-
         // No AutoLogin
         val dataScope: MiraiConsoleImplementation.ConsoleDataScope = net.mamoe.mirai.console.internal.data.builtins.DataScope
         dataScope.find(AutoLoginConfig::class)?.run {
