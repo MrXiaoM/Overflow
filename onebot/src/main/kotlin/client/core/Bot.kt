@@ -949,12 +949,13 @@ class Bot(
      * @param groupId 群号
      * @return [ActionData] of [GroupFilesResp]
      */
+    @JvmOverloads
     @JvmBlockingBridge
-    suspend fun getGroupRootFiles(groupId: Long): ActionData<GroupFilesResp> {
+    suspend fun getGroupRootFiles(groupId: Long, showWarning: Boolean = true): ActionData<GroupFilesResp> {
         val action = ActionPathEnum.GET_GROUP_ROOT_FILES
         val params = JsonObject()
         params.addProperty("group_id", groupId)
-        val result = actionHandler.action(this, action, params)
+        val result = actionHandler.action(this, action, params, showWarning)
         return result.withToken()
     }
 

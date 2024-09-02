@@ -65,10 +65,9 @@ class ActionHandler(
         return try {
             request.send(reqJson)
         } catch (e: Exception) {
-            if (showWarning) {
-                logger.warn("请求失败: [${action.path}] ${e.message}。如果你认为这是 Overflow 的问题，请带上 logs/onebot 中的日志来反馈。")
-                logger.trace("Stacktrace: ", e)
-            }
+            val message = "请求失败: [${action.path}] ${e.message}。如果你认为这是 Overflow 的问题，请带上 logs/onebot 中的日志来反馈。"
+            if (showWarning) logger.warn(message) else logger.trace(message)
+            logger.trace("Stacktrace: ", e)
             if (e is ActionFailedException) e.json
             else JsonObject().apply {
                 addProperty("status", "failed")

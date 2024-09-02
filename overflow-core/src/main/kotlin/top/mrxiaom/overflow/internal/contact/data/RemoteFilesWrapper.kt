@@ -21,13 +21,17 @@ internal class RemoteFilesWrapper(
 ) : RemoteFiles {
     companion object {
         internal suspend fun GroupWrapper.fetchFiles(): RemoteFilesWrapper {
-            val data = bot.impl.getGroupRootFiles(id).data
+            val data = bot.impl.getGroupRootFiles(id, false).data
 
             val root = FolderWrapper(
                 this, null, "/", "/", 0, 0, 0, data?.files?.size ?: 0
             )
-            data?.folders?.toMiraiFolders(this)?.also { root.folders.addAll(it) }
-            data?.files?.toMiraiFiles(this)?.also { root.files.addAll(it) }
+            if (data != null) {
+                data.folders?.toMiraiFolders(this)?.also { root.folders.addAll(it) }
+                data.files?.toMiraiFiles(this)?.also { root.files.addAll(it) }
+            } else {
+                bot.logger.warning("获取群 $id 的文件列表失败，可能是 Onebot 实现不支持，详见网络日志")
+            }
             return RemoteFilesWrapper(this, root)
         }
     }
