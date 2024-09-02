@@ -13,7 +13,7 @@ chmod +x mcl
 ./mcl -u --dry-run
 ```
 
-若网络环境不佳，可将 `github.com` 改为 `github.ink` 再试。
+若网络环境不佳，可将 `https://github.com` 改为 `https://mirror.ghproxy.com/github.com` 再试。
 
 等待安装完成后，以后只需执行
 

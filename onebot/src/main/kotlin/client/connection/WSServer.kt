@@ -34,6 +34,7 @@ class WSServer(
     }
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
+        if (handshake.resourceDescriptor != "/") return
         if (bot?.channel?.isOpen == true) {
             conn.close(CloseFrame.NORMAL, "Overflow 的反向 WS 适配器暂不支持多客户端连接")
             return

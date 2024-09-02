@@ -2,7 +2,23 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
     id("org.jetbrains.dokka")
+    id("com.github.gmazzo.buildconfig")
     id("me.him188.kotlin-jvm-blocking-bridge")
+}
+
+var commitHash = extra("commitHash") ?: "local"
+var commitCount: Int? = extra("commitCount")
+val miraiVersion = extra("miraiVersion") ?: "2.16.0"
+
+buildConfig {
+    className("BuildConstants")
+    packageName("top.mrxiaom.overflow")
+    useKotlinOutput()
+    buildConfigField("String", "VERSION", "\"${project.version}\"")
+    buildConfigField("String", "MIRAI_VERSION", "\"$miraiVersion\"")
+    buildConfigField("String", "COMMIT_HASH", "\"$commitHash\"")
+    buildConfigField("kotlin.Int?", "COMMIT_COUNT", commitCount?.toString() ?: "null")
+    buildConfigField("java.time.Instant", "BUILD_TIME", "java.time.Instant.ofEpochSecond(${System.currentTimeMillis() / 1000L}L)")
 }
 
 tasks.register<Jar>("dokkaJavadocJar") {
@@ -16,8 +32,6 @@ setupMavenCentralPublication {
     artifact(tasks.kotlinSourcesJar)
     artifact(tasks.getByName("dokkaJavadocJar"))
 }
-
-val miraiVersion = rootProject.ext["miraiVersion"].toString()
 
 dependencies {
     implementation(platform("net.mamoe:mirai-bom:$miraiVersion"))

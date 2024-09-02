@@ -11,4 +11,5 @@ repositories {
 
 dependencies {
     api(gradleApi())
+    api(gradleKotlinDsl())
 }

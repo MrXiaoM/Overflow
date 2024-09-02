@@ -39,5 +39,5 @@ jobs:
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
           ORG_GRADLE_PROJECT_MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           ORG_GRADLE_PROJECT_MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          # 加上 VERSION_OVERRIDE 将会设为 -SNAPSHOT 版本
-          ORG_GRADLE_PROJECT_VERSION_OVERRIDE: ${{ env.SHORT_SHA }}
+          # 加上 IS_SNAPSHOT 将会设为 -SNAPSHOT 版本
+          ORG_GRADLE_PROJECT_IS_SNAPSHOT: true

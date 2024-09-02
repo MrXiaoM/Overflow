@@ -1,9 +1,6 @@
-import org.ajoberstar.grgit.Grgit
-
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
-    id("com.github.gmazzo.buildconfig")
     id("me.him188.kotlin-jvm-blocking-bridge")
     id("org.ajoberstar.grgit")
 }
@@ -12,28 +9,7 @@ setupMavenCentralPublication {
     artifact(tasks.kotlinSourcesJar)
 }
 
-var commitHash = "local"
-var commitCount: Int? = null
-if (File(rootProject.projectDir, ".git").exists()) {
-    val repo = Grgit.open(mapOf("currentDir" to rootProject.projectDir))
-    commitHash = repo.head().abbreviatedId
-    val log = repo.log()
-    commitCount = log.size
-    println("v ${commitHash.substring(0, 7)}-SHAPSHOT.$commitCount")
-}
-
-val miraiVersion = rootProject.ext["miraiVersion"].toString()
-
-buildConfig {
-    className("BuildConstants")
-    packageName("${project.group}.${rootProject.name.toLowerCase()}")
-    useKotlinOutput()
-    buildConfigField("String", "VERSION", "\"${project.version}\"")
-    buildConfigField("String", "MIRAI_VERSION", "\"$miraiVersion\"")
-    buildConfigField("String", "COMMIT_HASH", "\"$commitHash\"")
-    buildConfigField("kotlin.Int?", "COMMIT_COUNT", commitCount?.toString() ?: "null")
-    buildConfigField("java.time.Instant", "BUILD_TIME", "java.time.Instant.ofEpochSecond(${System.currentTimeMillis() / 1000L}L)")
-}
+val miraiVersion = extra("miraiVersion") ?: "2.16.0"
 
 dependencies {
     implementation(platform("net.mamoe:mirai-bom:$miraiVersion"))

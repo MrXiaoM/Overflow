@@ -9,11 +9,16 @@ repositories {
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 ```
-快照仓库中依赖版本的格式为 `${miraiVersion}-${shortCommitHash}-SNAPSHOT`，如 `2.16.0-0abcdef-SNAPSHOT`
+快照仓库中依赖版本的格式为 `major.minor.patch.commits-shortHash-SNAPSHOT`，  
+示例：`0.9.9.481-d59fa60-SNAPSHOT`，详见 #92
 
-你可以在 [官网](https://mirai.mrxiaom.top/#get-started) 或者 [仓库 maven-metadata.xml](https://s01.oss.sonatype.org/content/repositories/snapshots/top/mrxiaom/overflow-core/maven-metadata.xml) 查询已发布的开发版本列表 
+你可以在 [官网](https://mirai.mrxiaom.top/#get-started) 或者 [仓库 maven-metadata.xml](https://s01.oss.sonatype.org/content/repositories/snapshots/top/mrxiaom/mirai/overflow-core/maven-metadata.xml) 查询已发布的开发版本列表  
+
+正式发行版可在 [Maven Central](https://central.sonatype.com/search?q=g%3Atop.mrxiaom.mirai) 上查询版本号
 
 # 在 mirai-console 中开发
+
+> 如果你无需使用 Overflow 特有接口，只需要跟平常一样开发 mirai 插件即可。
 
 此方法仅 Gradle 可用。
 
@@ -41,17 +46,17 @@ dependencies {
     // 若需要使用 Overflow 的接口，请取消注释下面这行
     // compileOnly("top.mrxiaom:overflow-core-api:$VERSION")
     
-    testConsoleRuntime("top.mrxiaom:overflow-core:$VERSION")
+    testConsoleRuntime("top.mrxiaom.mirai:overflow-core:$VERSION")
 }
 ```
 
 # 在 mirai-core 中开发
 
-将依赖 `net.mamoe:mirai-core` 替换为 `top.mrxiaom:overflow-core` 即可。
+将依赖 `net.mamoe:mirai-core` 替换为 `top.mrxiaom.mirai:overflow-core` 即可。
 
 ```kotlin
 dependencies {
-    implementation("top.mrxiaom:overflow-core:$VERSION")
+    implementation("top.mrxiaom.mirai:overflow-core:$VERSION")
 }
 ```
 ```xml

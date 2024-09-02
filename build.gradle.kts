@@ -1,3 +1,5 @@
+@file:Suppress("INVISIBLE_MEMBER")
+import org.ajoberstar.grgit.Grgit
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -11,20 +13,37 @@ plugins {
 
     signing
     `maven-publish`
-    id("io.github.gradle-nexus.publish-plugin") version "1.1.0"
+    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
-group = "top.mrxiaom"
+Helper.rootProj = rootProject
+group = "top.mrxiaom.mirai"
 
-val miraiVersion = "2.16.0"
-rootProject.ext["miraiVersion"] = miraiVersion
-version = miraiVersion
+val overflowVersion = "0.9.9".ext("overflowVersion")
+val miraiVersion = "2.16.0".ext("miraiVersion")
 
-if (findProperty("VERSION_OVERRIDE") != null) {
-    version = "$version-${findProperty("VERSION_OVERRIDE")}-SNAPSHOT"
+var commitHash = "local"
+var commitCount = 0
+if (File(rootProject.projectDir, ".git").exists()) {
+    val repo = Grgit.open(mapOf("currentDir" to rootProject.projectDir))
+    commitHash = repo.head().abbreviatedId
+    val log = repo.log()
+    commitCount = log.size
+}
+commitHash.ext("commitHash")
+commitCount.ext("commitCount")
+val commit = "$commitCount-${commitHash.substring(0, 7)}"
+
+version = overflowVersion
+
+if (findProperty("IS_SNAPSHOT") == "true") {
+    version = "$version.$commit-SNAPSHOT"
 }
 
-println("overflow version: $version")
+println("Mirai version: $miraiVersion")
+println("Overflow version: $overflowVersion")
+println("Commit: $commit")
+println("Version: $version")
 
 allprojects {
     group = rootProject.group
