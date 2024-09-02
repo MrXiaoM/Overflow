@@ -25,7 +25,7 @@ chmod +x mcl
 
 # Windows 安装教程
 
-下载 [已修改的MCL](https://github.com/MrXiaoM/mirai-console-loader/releases/download/v2.1.2-patch1/with-overflow.zip) 并解压，若网络环境不佳，可将 `github.com` 改为 `github.ink` 再试。
+下载 [已修改的MCL](https://github.com/MrXiaoM/mirai-console-loader/releases/download/v2.1.2-patch1/with-overflow.zip) 并解压，若网络环境不佳，可将 https://github.com 改为 https://mirror.ghproxy.com/github.com 再试。
 
 在解压的文件夹打开 CMD，执行
 
