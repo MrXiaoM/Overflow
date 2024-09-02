@@ -6,6 +6,7 @@ import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.client.listener.message
 import cn.evolvefield.onebot.client.util.ListenerUtils
+import cn.evolvefield.onebot.sdk.util.JsonHelper.applyJson
 import com.google.gson.JsonParser
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
@@ -48,16 +49,18 @@ object EventBus {
         message: String
     ): Pair<Event, List<EventListener<out Event>>> {
         val messageType = ListenerUtils[message] // 获取消息对应的实体类型
+        val json = JsonParser.parseString(message).asJsonObject
         if (messageType == null) {
             val bean = UnsolvedEvent().also { it.jsonString = message }
             val executes = getExecutes(UnsolvedEvent::class.java)
-            val json = JsonParser.parseString(message).asJsonObject
             bean.postType = json["post_type"].asString
             bean.time = json["time"].asLong
             bean.selfId = json["self_id"].asLong
+            bean.applyJson(json)
             return bean to executes
         } else {
             val bean = gson.fromJson(message, messageType) // 将消息反序列化为对象
+            bean.applyJson(json)
             log.debug(String.format("接收到上报消息内容：%s", bean.toString()))
             val executes = getExecutes(messageType)
             if (executes.isEmpty()) { // 如果该事件未被监听，将其定为 UnsolvedEvent
