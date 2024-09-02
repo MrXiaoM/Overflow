@@ -4,6 +4,7 @@ package top.mrxiaom.overflow.internal.contact
 import cn.evolvefield.onebot.sdk.entity.Anonymous
 import cn.evolvefield.onebot.sdk.response.group.GroupInfoResp
 import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
+import cn.evolvefield.onebot.sdk.util.gson
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
@@ -22,6 +23,7 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.contact.RemoteGroup
+import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.contact.data.*
 import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion.fetchAnnouncements
@@ -41,7 +43,9 @@ import kotlin.coroutines.CoroutineContext
 internal class GroupWrapper(
     override val bot: BotWrapper,
     internal var impl: GroupInfoResp
-) : Group, RemoteGroup, Updatable {
+) : Group, RemoteGroup, RemoteUser, Updatable {
+    override val onebotData: String
+        get() = gson.toJson(impl)
     private var membersInternal: ContactList<MemberWrapper>? = null
     private var anonymousInternal: HashMap<String, AnonymousMemberWrapper> = hashMapOf()
 

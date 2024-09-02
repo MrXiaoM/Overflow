@@ -3,6 +3,7 @@ package top.mrxiaom.overflow.internal.contact
 
 import cn.evolvefield.onebot.sdk.entity.Anonymous
 import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
+import cn.evolvefield.onebot.sdk.util.gson
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.*
@@ -19,6 +20,7 @@ import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
+import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.check
 import top.mrxiaom.overflow.internal.contact.data.EmptyMemberActive
@@ -36,7 +38,9 @@ import kotlin.coroutines.CoroutineContext
 internal class MemberWrapper(
     override val group: GroupWrapper,
     internal var impl: GroupMemberInfoResp
-) : NormalMember, Updatable {
+) : NormalMember, RemoteUser, Updatable {
+    override val onebotData: String
+        get() = gson.toJson(impl)
     override val bot: BotWrapper = group.bot
     val data: GroupMemberInfoResp
         get() = impl

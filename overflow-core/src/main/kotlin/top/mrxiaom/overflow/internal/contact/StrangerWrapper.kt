@@ -2,6 +2,7 @@
 package top.mrxiaom.overflow.internal.contact
 
 import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
+import cn.evolvefield.onebot.sdk.util.gson
 import kotlinx.coroutines.CoroutineName
 import net.mamoe.mirai.contact.Stranger
 import net.mamoe.mirai.event.broadcast
@@ -18,6 +19,7 @@ import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.OverflowAPI
+import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource
@@ -29,7 +31,9 @@ import kotlin.coroutines.CoroutineContext
 internal class StrangerWrapper(
     override val bot: BotWrapper,
     internal var impl: StrangerInfoResp,
-) : Stranger {
+) : Stranger, RemoteUser {
+    override val onebotData: String
+        get() = gson.toJson(impl)
     override val id: Long = impl.userId
     override val nick: String = impl.nickname
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})Stranger/$id")

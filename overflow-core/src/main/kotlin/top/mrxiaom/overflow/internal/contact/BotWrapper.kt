@@ -2,6 +2,7 @@ package top.mrxiaom.overflow.internal.contact
 
 import cn.evolvefield.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.client.core.Bot
+import cn.evolvefield.onebot.sdk.util.gson
 import kotlinx.coroutines.*
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.LowLevelApi
@@ -18,6 +19,7 @@ import net.mamoe.mirai.supervisorJob
 import net.mamoe.mirai.utils.*
 import org.java_websocket.framing.CloseFrame
 import top.mrxiaom.overflow.contact.RemoteBot
+import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.contact.data.FallbackFriendGroups
@@ -37,7 +39,7 @@ internal class BotWrapper private constructor(
     private var implBot: Bot,
     defLoginInfo: LoginInfoResp,
     override val configuration: BotConfiguration
-) : QQAndroidBot(), RemoteBot, Updatable, CoroutineScope {
+) : QQAndroidBot(), RemoteUser, RemoteBot, Updatable, CoroutineScope {
     val impl: Bot
         get() = implBot
     override val implGetter: () -> Bot = { impl }
@@ -106,6 +108,9 @@ internal class BotWrapper private constructor(
         if (data.message.isEmpty()) return null
         return OnebotMessages.toMiraiMessage(data.isJsonMessage, data.message, this)
     }
+
+    override val onebotData: String
+        get() = gson.toJson(loginInfo)
     override val id: Long
         get() = loginInfo.userId
 
