@@ -34,3 +34,12 @@ dependencies {
     testImplementation("net.mamoe:mirai-console")
     testImplementation("net.mamoe:mirai-console-terminal")
 }
+
+tasks {
+    register<JavaExec>("runConsole") {
+        mainClass.set("RunConsoleKt")
+        workingDir = File(project.projectDir, "run")
+        classpath = sourceSets.test.get().runtimeClasspath
+        standardInput = System.`in`
+    }
+}
