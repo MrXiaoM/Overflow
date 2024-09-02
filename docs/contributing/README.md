@@ -19,7 +19,7 @@ Overflow 使用 JDK 1.8 编译，在以下环境可以正常编译。
 
 | 操作系统           | JDK             | 架构    |
 |----------------|-----------------|-------|
-| Windows 10     | OpenJDK 11      | amd64 |
+| Windows 11     | OpenJDK 11      | amd64 |
 | Ubuntu 22.04.3 | AdoptOpenJDK 11 | amd64 |
 
 若无法正常编译，可尝试使用以上环境。
@@ -47,6 +47,19 @@ overflow-core 附有 mirai-console 兼容，在 IMirai 实现类 [Overflow](http
 `bot.asOnebot.impl` 即可获取当前 mirai bot 的 [Bot (Onebot)](https://github.com/MrXiaoM/Overflow/blob/main/onebot/src/main/kotlin/client/core/Bot.kt) 实现，在这里主动调取接口。
 
 所有由服务端回复的结果，以及服务器发送的事件，均会在 onebot 模块转换为实体类，再传递给 overflow-core 模块使用，实体类均在 [cn.evolvefield.onebot.sdk](https://github.com/MrXiaoM/Overflow/tree/main/onebot/src/main/kotlin/sdk) 包中。按需创建或修改。
+
+## 添加新消息类型/格式支持
+
+mirai 中不存在的消息类型，请添加到包 [top.mrxiaom.overflow.message.data](https://github.com/MrXiaoM/overflow/tree/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/message/data)，参考包中原有的消息类型即可。
+
+添加之后，到 [OnebotMessages](https://github.com/MrXiaoM/overflow/blob/dbd98d2b867356aa64b78d1a89e6cf8673337d0a/overflow-core/src/main/kotlin/top/mrxiaom/overflow/internal/message/OnebotMessages.kt)
++ 在 `registerSerializers` 注册序列化器，以便该消息能够在 mirai 这边被序列化与反序列化
++ 在 `serializeToOneBotJsonArray` 添加该消息转换为 Onebot 消息段的实现
++ 在 `deserializeFromOneBotJson` 添加 Onebot 消息段转换为该消息的实现
++ 在 `Message.messageType` 添加该消息的 Onebot 消息类型名
+
+正如上方步骤所述，`serializeToOneBotJsonArray` 和 `deserializeFromOneBotJson` 是 mirai 消息与 Onebot 消息段互相转换的重要方法。  
+方法开头获取了当前 Bot 的 Onebot 实现名称，如果某些 Onebot 实现增加了扩展消息格式，可以添加到这两个方法中。
 
 ## 提交高质量的 commit 以及 PR
 
