@@ -10,6 +10,9 @@ import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.sdk.response.group.GroupFilesResp
 import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
 import cn.evolvefield.onebot.sdk.response.misc.ClientsResp
+import cn.evolvefield.onebot.sdk.util.data
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.hexToBytes
@@ -36,11 +39,11 @@ internal inline fun <reified T : Contact> ContactList<T>.update(
     delegate.addAll(list.filterNot { delegate.any { old -> old.id == it.id } })
 }
 
-internal fun GroupMemberInfoResp.wrapAsMember(group: Group): MemberWrapper {
-    return (group as GroupWrapper).updateMember(this)
+internal fun GroupMemberInfoResp.wrapAsMember(group: Group, json: JsonElement): MemberWrapper {
+    return (group as GroupWrapper).updateMember(this, json)
 }
 
-internal fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
+internal fun GroupSender.wrapAsMember(group: Group, json: JsonElement): MemberWrapper {
     return GroupMemberInfoResp().also {
         it.groupId = group.id
         it.userId = userId.toLong()
@@ -52,7 +55,7 @@ internal fun GroupSender.wrapAsMember(group: Group): MemberWrapper {
         it.level = level.toIntOrNull() ?: 0
         it.role = role
         it.title = title
-    }.wrapAsMember(group)
+    }.wrapAsMember(group, json)
 }
 
 internal fun Anonymous.wrapAsMember(group: Group): AnonymousMemberWrapper {
@@ -61,33 +64,35 @@ internal fun Anonymous.wrapAsMember(group: Group): AnonymousMemberWrapper {
 
 internal suspend fun BotWrapper.group(groupId: Long): GroupWrapper {
     return getGroup(groupId) as? GroupWrapper ?: kotlin.run {
-        val data = impl.getGroupInfo(groupId, false).data ?: throw IllegalStateException("无法取得群 $groupId 的信息")
-        updateGroup(GroupWrapper(this, data))
+        val result = impl.getGroupInfo(groupId, false)
+        val data = result.data ?: throw IllegalStateException("无法取得群 $groupId 的信息")
+        updateGroup(GroupWrapper(this, data, result.json.data ?: JsonObject()))
     }
 }
 
 
-internal fun PrivateSender.wrapAsFriend(bot: BotWrapper): FriendWrapper {
+internal fun PrivateSender.wrapAsFriend(bot: BotWrapper, json: JsonElement): FriendWrapper {
     return bot.updateFriend(FriendWrapper(bot, FriendInfoResp().also {
         it.userId = userId
         it.nickname = nickname
         it.remark = ""
-    }))
+    }, json))
 }
 
-internal fun StrangerInfoResp.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
-    return bot.updateStranger(StrangerWrapper(bot, this))
+internal fun StrangerInfoResp.wrapAsStranger(bot: BotWrapper, json: JsonElement): StrangerWrapper {
+    return bot.updateStranger(StrangerWrapper(bot, this, json))
 }
 
-internal fun PrivateSender.wrapAsStranger(bot: BotWrapper): StrangerWrapper {
+internal fun PrivateSender.wrapAsStranger(bot: BotWrapper, json: JsonElement): StrangerWrapper {
     val id = userId
     val nick = nickname
     return StrangerInfoResp().apply {
         userId = id
         nickname = nick
-    }.wrapAsStranger(bot)
+    }.wrapAsStranger(bot, json)
 }
 
+@OptIn(MiraiInternalApi::class)
 internal fun ClientsResp.Clients.wrapAsOtherClientInfo(): OtherClientInfo {
     val platform = Platform.getByTerminalId(loginPlatform.toInt())
     return OtherClientInfo(appId.toInt(), platform, deviceName, deviceKind)

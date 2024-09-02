@@ -3,7 +3,7 @@ package top.mrxiaom.overflow.internal
 
 import cn.evolvefield.onebot.sdk.action.ActionRaw
 import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
-import cn.evolvefield.onebot.sdk.util.gson
+import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import cn.evolvefield.onebot.sdk.util.CQCode
@@ -450,16 +450,18 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     @LowLevelApi
     override fun newFriend(bot: Bot, friendInfo: FriendInfo): Friend {
-        return FriendWrapper(bot.asOnebot, FriendInfoResp().apply {
+        val impl = FriendInfoResp().apply {
             userId = friendInfo.uin
             nickname = friendInfo.nick
             remark = friendInfo.remark
-        })
+        }
+        return FriendWrapper(bot.asOnebot, impl, gson.toJsonTree(impl))
     }
 
     @LowLevelApi
     override fun newStranger(bot: Bot, strangerInfo: StrangerInfo): Stranger {
-        return StrangerWrapper(bot.asOnebot, strangerInfo.asOnebot)
+        val impl = strangerInfo.asOnebot
+        return StrangerWrapper(bot.asOnebot, impl, gson.toJsonTree(impl))
     }
 
     override suspend fun queryImageUrl(bot: Bot, image: Image): String {

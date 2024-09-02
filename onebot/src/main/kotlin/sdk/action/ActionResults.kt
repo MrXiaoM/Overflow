@@ -1,7 +1,14 @@
 package cn.evolvefield.onebot.sdk.action
 
+import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
 import java.util.LinkedList
+
+open class JsonContainer {
+    internal lateinit var element: JsonElement
+    val json: JsonElement
+        get() = element
+}
 
 data class ActionRaw(
     @SerializedName("status")
@@ -9,8 +16,8 @@ data class ActionRaw(
     @SerializedName("retCode")
     val retCode: Int,
     @SerializedName("echo")
-    val echo: String? = null
-)
+    val echo: String? = null,
+): JsonContainer()
 
 data class ActionData<T : Any> (
     @SerializedName("status")
@@ -21,7 +28,7 @@ data class ActionData<T : Any> (
     val data: T?,
     @SerializedName("echo")
     val echo: String? = null
-)
+): JsonContainer()
 
 data class ActionList<T : Any>(
     @SerializedName("status")
@@ -32,4 +39,4 @@ data class ActionList<T : Any>(
     val data: LinkedList<T>,
     @SerializedName("echo")
     val echo: String? = null
-)
+): JsonContainer()

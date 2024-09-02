@@ -6,7 +6,8 @@ import cn.evolvefield.onebot.sdk.event.notice.group.*
 import cn.evolvefield.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
-import net.mamoe.mirai.contact.MemberPermission
+import cn.evolvefield.onebot.sdk.util.jsonObject
+import com.google.gson.JsonObject
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.MiraiInternalApi
@@ -38,7 +39,8 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
         when(e.subType) {
             "normal" -> {
                 val group = bot.group(e.groupId)
-                val member = e.sender?.wrapAsMember(group) ?: return
+                val json = e.json.jsonObject?.get("sender") as? JsonObject
+                val member = e.sender?.wrapAsMember(group, json ?: JsonObject()) ?: return
 
                 val message = e.toMiraiMessage(bot)
                 val messageString = message.toString()

@@ -4,7 +4,13 @@ package top.mrxiaom.overflow.internal.contact
 import cn.evolvefield.onebot.sdk.entity.Anonymous
 import cn.evolvefield.onebot.sdk.response.group.GroupInfoResp
 import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
-import cn.evolvefield.onebot.sdk.util.gson
+import cn.evolvefield.onebot.sdk.util.data
+import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
+import cn.evolvefield.onebot.sdk.util.ignorable
+import cn.evolvefield.onebot.sdk.util.jsonObject
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.runBlocking
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
@@ -17,10 +23,7 @@ import net.mamoe.mirai.event.events.GroupMessagePostSendEvent
 import net.mamoe.mirai.event.events.GroupMessagePreSendEvent
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.DeprecatedSinceMirai
-import net.mamoe.mirai.utils.ExternalResource
-import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.currentTimeSeconds
+import net.mamoe.mirai.utils.*
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.contact.RemoteGroup
 import top.mrxiaom.overflow.contact.RemoteUser
@@ -42,10 +45,11 @@ import kotlin.coroutines.CoroutineContext
 @OptIn(MiraiInternalApi::class)
 internal class GroupWrapper(
     override val bot: BotWrapper,
-    internal var impl: GroupInfoResp
+    internal var impl: GroupInfoResp,
+    internal var implJson: JsonElement,
 ) : Group, RemoteGroup, RemoteUser, Updatable {
     override val onebotData: String
-        get() = gson.toJson(impl)
+        get() = gson.toJson(implJson)
     private var membersInternal: ContactList<MemberWrapper>? = null
     private var anonymousInternal: HashMap<String, AnonymousMemberWrapper> = hashMapOf()
 
@@ -59,10 +63,12 @@ internal class GroupWrapper(
         return announcements.also { it.update() }
     }
     internal suspend fun updateMember(userId: Long): MemberWrapper? {
-        return bot.impl.getGroupMemberInfo(id, userId, false).data?.run { updateMember(this) }
+        val result = bot.impl.getGroupMemberInfo(id, userId, false)
+        val data = result.data ?: return null
+        return updateMember(data, result.json.data ?: JsonObject())
     }
-    internal fun updateMember(member: GroupMemberInfoResp): MemberWrapper {
-        return (members[member.userId] ?: MemberWrapper(this, member).also { members.delegate.add(it) }).apply {
+    internal fun updateMember(member: GroupMemberInfoResp, json: JsonElement): MemberWrapper {
+        return (members[member.userId] ?: MemberWrapper(this, member, json).also { members.delegate.add(it) }).apply {
             impl = member
         }
     }
@@ -74,16 +80,24 @@ internal class GroupWrapper(
 
     internal suspend fun queryMember(userId: Long): MemberWrapper? {
         if (userId == bot.id) return botAsMember
-        return members[userId] ?: bot.impl
-            .getGroupMemberInfo(id, userId, false).data?.wrapAsMember(this)
+        return members[userId] ?: run {
+            val result = bot.impl.getGroupMemberInfo(id, userId, false)
+            val data = result.data ?: return null
+            data.wrapAsMember(this@GroupWrapper, result.json.data ?: JsonObject())
+        }
     }
 
     @JvmBlockingBridge
     override suspend fun updateGroupMemberList(): ContactList<MemberWrapper> {
         return (membersInternal ?: ContactList()).apply {
-            val data = bot.impl.getGroupMemberList(id).data
-            val membersList = data?.map {
-                MemberWrapper(this@GroupWrapper, it)
+            val result = bot.impl.getGroupMemberList(id)
+            val data = result.data.takeIf { it.isNotEmpty() }
+            val json = result.json.data as? JsonArray ?: JsonArray()
+            val membersList = data?.map { member ->
+                val memberJson = json.firstOrNull { memberJson ->
+                    memberJson.jsonObject?.ignorable("user_id", 0L) == member.userId
+                } ?: JsonObject()
+                MemberWrapper(this@GroupWrapper, member, memberJson)
             }
             if (membersList != null) update(membersList) { setImpl(it.impl) }
             membersInternal = this
@@ -135,12 +149,19 @@ internal class GroupWrapper(
         }
     override val botAsMember: MemberWrapper
         get() = members.firstOrNull { it.id == bot.id } ?: runBlocking {
-            val data = bot.impl.getGroupMemberInfo(id, bot.id, false).data
-            MemberWrapper(this@GroupWrapper, data ?: GroupMemberInfoResp().apply {
-                groupId = id
-                userId = bot.id
-                nickname = bot.nick
-            })
+            val result = bot.impl.getGroupMemberInfo(id, bot.id, false)
+            val data = result.data
+            if (data != null) {
+                val json = result.json.data ?: JsonObject()
+                MemberWrapper(this@GroupWrapper, data, json)
+            } else {
+                val impl = GroupMemberInfoResp().apply {
+                    groupId = id
+                    userId = bot.id
+                    nickname = bot.nick
+                }
+                MemberWrapper(this@GroupWrapper, impl, gson.toJsonTree(impl))
+            }
         }
     override val owner: NormalMember
         get() = members.first { it.permission == MemberPermission.OWNER }

@@ -28,7 +28,7 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
         val bot = e.bot ?: return
         when (e.subType) {
             "friend" -> {
-                val friend = e.sender.wrapAsFriend(bot)
+                val friend = e.sender.wrapAsFriend(bot, e.json)
 
                 if (friend.id == bot.id) {
                     // TODO: 过滤自己发送的消息
@@ -84,7 +84,7 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                 ))
             }
             "other" -> {
-                val stranger = e.sender.wrapAsStranger(bot)
+                val stranger = e.sender.wrapAsStranger(bot, e.json)
 
                 if (stranger.id == bot.id) {
                     // TODO: 过滤自己发送的消息

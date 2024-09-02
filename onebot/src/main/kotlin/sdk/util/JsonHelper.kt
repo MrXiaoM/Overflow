@@ -1,11 +1,45 @@
+@file:Suppress("unused")
 package cn.evolvefield.onebot.sdk.util
 
+import cn.evolvefield.onebot.sdk.action.ActionData
 import cn.evolvefield.onebot.sdk.action.ActionList
+import cn.evolvefield.onebot.sdk.action.JsonContainer
+import cn.evolvefield.onebot.sdk.util.JsonHelper.applyJson
+import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
+import cn.evolvefield.onebot.sdk.util.JsonHelper.nullable
+import cn.evolvefield.onebot.sdk.util.JsonHelper.ok
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
 import java.util.function.Supplier
 
-val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+// 不想污染全局扩展的，或者不想污染又必须 public 的扩展函数放这里
+object JsonHelper {
+    val gson: Gson = GsonBuilder().setPrettyPrinting().create()
+
+    fun <T> T.applyJson(json: JsonElement): T {
+        if (this is JsonContainer) {
+            element = json
+        }
+        if (this is ActionData<*>) {
+            data.applyJson(json.data ?: JsonObject())
+        }
+        return this
+    }
+    val JsonObject.ok: Boolean
+        get() = this["status"]?.asString == "ok"
+
+    val <T> T.nullable: T?
+        get() = this
+}
+
+val JsonElement.jsonObject: JsonObject?
+    get() = this as? JsonObject
+
+val JsonElement.jsonArray: JsonArray?
+    get() = this as? JsonArray
+
+val JsonElement.data: JsonElement?
+    get() = jsonObject?.run { this["data"] }
 
 fun JsonObject.ignorable(key: String, def: Int): Int {
     return nullableInt(key, def.nullable) ?: def
@@ -90,9 +124,6 @@ fun JsonObject.nullableString(key: String, def: String? = null): String? {
 fun JsonObject.string(key: String): String {
     return this[key]?.asString ?: throw JsonParseException("Can`t find `$key`")
 }
-fun JsonObject.ok(): Boolean {
-    return this["status"]?.asString == "ok"
-}
 fun JsonObject.ignorableObject(key: String, def: Supplier<JsonObject>): JsonObject {
     val element = this[key]
     if (element == null || !element.isJsonObject) return def.get()
@@ -121,14 +152,14 @@ inline fun <reified T> JsonElement.withToken(): T {
     val element = deepCopyIgnoreNulls()
     if (T::class == ActionList::class && element is JsonObject) {
         // gensokyo: null friend list
-        if (element.ok() && !element.has("data")) {
+        if (element.ok && !element.has("data")) {
             element.add("data", JsonArray())
         }
     }
-    return gson.fromJson(element, object : TypeToken<T>() {}.type)
+    return gson.fromJson<T>(element, object : TypeToken<T>() {}.type).applyJson(this)
 }
 inline fun <reified T> JsonElement.withClass(): T {
-    return gson.fromJson(deepCopyIgnoreNulls(), T::class.java)
+    return gson.fromJson(deepCopyIgnoreNulls(), T::class.java).applyJson(this)
 }
 fun JsonElement?.deepCopyIgnoreNulls(): JsonElement? {
     if (this == null) return null
@@ -190,5 +221,3 @@ fun <K,V> Map<K, V>.toJsonObject(): JsonObject {
     }
     return obj
 }
-val <T> T.nullable: T?
-    get() = this

@@ -1,5 +1,6 @@
 package cn.evolvefield.onebot.sdk.event
 
+import cn.evolvefield.onebot.sdk.action.JsonContainer
 import com.google.gson.annotations.SerializedName
 import lombok.AllArgsConstructor
 import lombok.Data
@@ -15,7 +16,7 @@ import lombok.experimental.SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-open class Event {
+open class Event : JsonContainer() {
     @SerializedName("post_type")
     var postType: String = ""
     @SerializedName("time")

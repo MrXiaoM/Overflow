@@ -2,7 +2,11 @@ package top.mrxiaom.overflow.internal.contact
 
 import cn.evolvefield.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.client.core.Bot
-import cn.evolvefield.onebot.sdk.util.gson
+import cn.evolvefield.onebot.sdk.util.*
+import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import kotlinx.coroutines.*
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.LowLevelApi
@@ -38,6 +42,7 @@ import kotlin.coroutines.cancellation.CancellationException
 internal class BotWrapper private constructor(
     private var implBot: Bot,
     defLoginInfo: LoginInfoResp,
+    defJson: JsonElement,
     override val configuration: BotConfiguration
 ) : QQAndroidBot(), RemoteUser, RemoteBot, Updatable, CoroutineScope {
     val impl: Bot
@@ -50,6 +55,7 @@ internal class BotWrapper private constructor(
     override val noPlatform: Boolean
         get() = implBot.config.noPlatform
     private var loginInfo: LoginInfoResp = defLoginInfo
+    private var json: JsonElement = defJson
     private var friendsInternal: ContactList<FriendWrapper> = ContactList()
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
     private var otherClientsInternal: ContactList<OtherClientWrapper>? = null
@@ -60,14 +66,24 @@ internal class BotWrapper private constructor(
         loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("刷新机器人信息失败")
     }
     suspend fun updateContacts() {
-        val friendsList = impl.getFriendList().data.map {
-            FriendWrapper(this, it)
+        val friendsData = impl.getFriendList()
+        val friendsJson = friendsData.json.data?.jsonArray ?: JsonArray()
+        val friendsList = friendsData.data.map { friend ->
+            val json = friendsJson.firstOrNull { friendJson ->
+                friendJson.jsonObject?.ignorable("user_id", 0L) == friend.userId
+            } ?: JsonObject()
+            FriendWrapper(this, friend, json)
         }
         friendsInternal.update(friendsList) { impl = it.impl }
         logger.verbose("${friends.size} friends loaded.")
 
-        val groupsList = impl.getGroupList().data.map {
-            GroupWrapper(this, it)
+        val groupsData = impl.getGroupList()
+        val groupsJson = groupsData.json.data?.jsonArray ?: JsonArray()
+        val groupsList = groupsData.data.map { group ->
+            val json = groupsJson.firstOrNull { groupJson ->
+                groupJson.jsonObject?.ignorable("group_id", 0L) == group.groupId
+            } ?: JsonObject()
+            GroupWrapper(this, group, json)
         }
         groupsInternal.update(groupsList) { impl = it.impl }
         logger.verbose("${groups.size} groups loaded.")
@@ -90,16 +106,19 @@ internal class BotWrapper private constructor(
     internal fun updateGroup(group: GroupWrapper): GroupWrapper {
         return ((groups[group.id] as? GroupWrapper) ?: group.also { groupsInternal.delegate.add(it) }). apply {
             impl = group.impl
+            implJson = group.implJson
         }
     }
     internal fun updateFriend(friend: FriendWrapper): FriendWrapper {
         return ((friends[friend.id] as? FriendWrapper) ?: friend.also { friendsInternal.delegate.add(it) }).apply {
             impl = friend.impl
+            implJson = friend.implJson
         }
     }
     internal fun updateStranger(stranger: StrangerWrapper): StrangerWrapper {
         return ((strangers[stranger.id] as? StrangerWrapper) ?: stranger.also { strangersInternal.delegate.add(it) }).apply {
             impl = stranger.impl
+            implJson = stranger.implJson
         }
     }
     @JvmBlockingBridge
@@ -110,7 +129,7 @@ internal class BotWrapper private constructor(
     }
 
     override val onebotData: String
-        get() = gson.toJson(loginInfo)
+        get() = gson.toJson(json)
     override val id: Long
         get() = loginInfo.userId
 
@@ -209,7 +228,9 @@ internal class BotWrapper private constructor(
             workingDir: (Long.() -> File)? = null
         ): BotWrapper {
             // also refresh bot id
-            val loginInfo = getLoginInfo().data ?: throw IllegalStateException("无法获取机器人账号信息")
+            val result = getLoginInfo()
+            val json = result.json.data ?: JsonObject()
+            val loginInfo = result.data ?: throw IllegalStateException("无法获取机器人账号信息")
             return (net.mamoe.mirai.Bot.getInstanceOrNull(id) as? BotWrapper)?.apply {
                 implBot = impl
                 updateContacts()
@@ -218,7 +239,7 @@ internal class BotWrapper private constructor(
                 if (workingDir != null) {
                     botConfiguration.workingDir = workingDir.invoke(id)
                 }
-                BotWrapper(this, loginInfo, botConfiguration).apply {
+                BotWrapper(this, loginInfo, json, botConfiguration).apply {
                     updateContacts()
 
                     //updateOtherClients()

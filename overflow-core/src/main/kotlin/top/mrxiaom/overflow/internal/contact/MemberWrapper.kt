@@ -3,7 +3,8 @@ package top.mrxiaom.overflow.internal.contact
 
 import cn.evolvefield.onebot.sdk.entity.Anonymous
 import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
-import cn.evolvefield.onebot.sdk.util.gson
+import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
+import com.google.gson.JsonElement
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.contact.*
@@ -37,10 +38,11 @@ import kotlin.coroutines.CoroutineContext
 @OptIn(MiraiInternalApi::class)
 internal class MemberWrapper(
     override val group: GroupWrapper,
-    internal var impl: GroupMemberInfoResp
+    internal var impl: GroupMemberInfoResp,
+    internal var implJson: JsonElement,
 ) : NormalMember, RemoteUser, Updatable {
     override val onebotData: String
-        get() = gson.toJson(impl)
+        get() = gson.toJson(implJson)
     override val bot: BotWrapper = group.bot
     val data: GroupMemberInfoResp
         get() = impl
