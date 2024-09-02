@@ -72,11 +72,11 @@ dependencies {
 
 ```kotlin
 // 正向 WebSocket
-val bot1 = BotBuilder.positive("ws://127.0.0.1:5800")
+val bot1 = BotBuilder.positive("ws://127.0.0.1:3001")
     .token("114514")
     .connect()
 // 反向 WebSocket
-val bot2 = BotBuilder.reversed(5700)
+val bot2 = BotBuilder.reversed(3002)
     .token("114514")
     .connect()
 // connect() 返回值为 null 时登录失败
