@@ -7,7 +7,9 @@ pluginManagement {
 }
 rootProject.name = "Overflow"
 
-include(":onebot")
-include(":overflow-core-api")
-include(":overflow-core")
-include(":overflow-core-all")
+if (System.getProperty("justTasks") == null) {
+    include(":onebot")
+    include(":overflow-core-api")
+    include(":overflow-core")
+    include(":overflow-core-all")
+}

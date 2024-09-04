@@ -145,6 +145,8 @@ private fun HttpClient.deleteArtifact(
 }
 
 fun deleteOutdatedArtifacts(auth: String) {
+    println()
+    println("正在登录到 OSS...")
     val client = HttpClient.newHttpClient()
     val sessionId = client.login(auth)
     if (sessionId == null) {
@@ -156,7 +158,10 @@ fun deleteOutdatedArtifacts(auth: String) {
     val deadDate = LocalDate.now().minusDays(limitDays)
     val deadTime = deadDate.atTime(0, 0, 0)
     val toRemove = versionList.filter { it.time.isBefore(deadTime) }
-    if (toRemove.isEmpty()) return
+    if (toRemove.isEmpty()) {
+        println("没有版本需要清理")
+        return
+    }
     println("正在清理 ${toRemove.size} 个在 $deadDate 前发布的旧版本…")
     val group = "top.mrxiaom.mirai"
     for (v in toRemove) {
