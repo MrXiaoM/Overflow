@@ -66,7 +66,6 @@ object EventBus {
             if (executes.isEmpty()) { // 如果该事件未被监听，将其定为 UnsolvedEvent
                 val newBean = UnsolvedEvent().also { it.jsonString = message }
                 val newExecutes = getExecutes(UnsolvedEvent::class.java)
-                val json = JsonParser.parseString(message).asJsonObject
                 newBean.postType = json["post_type"].asString
                 newBean.time = json["time"].asLong
                 newBean.selfId = json["self_id"].asLong
