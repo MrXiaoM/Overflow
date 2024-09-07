@@ -305,6 +305,13 @@ enum class ActionPathEnum(
     EXT_GET_FILE("get_file"),
 
     /**
+     * 获取用户头像
+     *
+     * 属于 Gensokyo 扩展 API
+     */
+    EXT_GET_AVATAR("get_file"),
+
+    /**
      * 创建群文件夹
      */
     CREATE_GROUP_FILE_FOLDER("create_group_file_folder"),

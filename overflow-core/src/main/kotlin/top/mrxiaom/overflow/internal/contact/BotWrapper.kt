@@ -128,6 +128,14 @@ internal class BotWrapper private constructor(
         return OnebotMessages.toMiraiMessage(data.isJsonMessage, data.message, this)
     }
 
+    private val avatar: String? by lazy {
+        if (appName.lowercase() != "gensokyo") null
+        else runBlocking { impl.extGetAvatar(null, id).data }
+    }
+    override fun avatarUrl(spec: AvatarSpec): String {
+        return avatar ?: super.avatarUrl(spec)
+    }
+
     override val onebotData: String
         get() = gson.toJson(json)
     override val id: Long

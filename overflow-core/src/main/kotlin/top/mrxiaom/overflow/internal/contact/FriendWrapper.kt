@@ -5,6 +5,8 @@ import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonElement
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.AvatarSpec
 import net.mamoe.mirai.contact.Friend
 import net.mamoe.mirai.contact.friendgroup.FriendGroup
 import net.mamoe.mirai.contact.roaming.RoamingMessages
@@ -49,6 +51,14 @@ internal class FriendWrapper(
 
     override suspend fun delete() {
         bot.impl.deleteFriend(id)
+    }
+
+    private val avatar: String? by lazy {
+        if (bot.appName.lowercase() != "gensokyo") null
+        else runBlocking { bot.impl.extGetAvatar(null, id).data }
+    }
+    override fun avatarUrl(spec: AvatarSpec): String {
+        return avatar ?: super.avatarUrl(spec)
     }
 
     @OptIn(MiraiInternalApi::class)

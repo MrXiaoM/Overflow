@@ -5,6 +5,8 @@ import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonElement
 import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.runBlocking
+import net.mamoe.mirai.contact.AvatarSpec
 import net.mamoe.mirai.contact.Stranger
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.EventCancelledException
@@ -47,6 +49,14 @@ internal class StrangerWrapper(
 
     override suspend fun delete() {
         OverflowAPI.logger.warning("Onebot 未提供删除陌生人接口 ($id)")
+    }
+
+    private val avatar: String? by lazy {
+        if (bot.appName.lowercase() != "gensokyo") null
+        else runBlocking { bot.impl.extGetAvatar(null, id).data }
+    }
+    override fun avatarUrl(spec: AvatarSpec): String {
+        return avatar ?: super.avatarUrl(spec)
     }
 
     @OptIn(MiraiInternalApi::class)

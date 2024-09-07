@@ -1475,4 +1475,22 @@ class Bot(
         val result = actionHandler.action(this, action, params)
         return result.withToken()
     }
+
+    /**
+     * 获取用户头像地址
+     *
+     * Gensokyo
+     * @param groupId 群号，获取群成员头像时使用
+     * @param userId QQ号，获取其它用户头像时使用
+     * @return [ActionData] of [String]
+     */
+    suspend fun extGetAvatar(groupId: Long?, userId: Long): ActionData<String> {
+        val action = ActionPathEnum.EXT_GET_AVATAR
+        val params = JsonObject().apply {
+            if (groupId != null) addProperty("group_id", groupId)
+            addProperty("user_id", userId)
+        }
+        val result = actionHandler.action(this, action, params)
+        return result.withToken()
+    }
 }

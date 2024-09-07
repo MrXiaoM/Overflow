@@ -7,6 +7,7 @@ import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonElement
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.contact.active.MemberActive
 import net.mamoe.mirai.event.broadcast
@@ -57,6 +58,14 @@ internal class MemberWrapper(
             )
         }
         this.impl = impl
+    }
+
+    private val avatar: String? by lazy {
+        if (bot.appName.lowercase() != "gensokyo") null
+        else runBlocking { bot.impl.extGetAvatar(group.id, id).data }
+    }
+    override fun avatarUrl(spec: AvatarSpec): String {
+        return avatar ?: super.avatarUrl(spec)
     }
 
     override val active: MemberActiveWrapper = MemberActiveWrapper(this)
