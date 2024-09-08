@@ -309,7 +309,7 @@ enum class ActionPathEnum(
      *
      * 属于 Gensokyo 扩展 API
      */
-    EXT_GET_AVATAR("get_file"),
+    EXT_GET_AVATAR("get_avatar"),
 
     /**
      * 创建群文件夹
