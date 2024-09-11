@@ -53,7 +53,7 @@ body:
       label: 其他组件版本
       description: |
         如 mirai-console 版本 (如果有)
-        如 OpenShamrock 等 Overflow 连接到的 Onebot 实现的版本
+        如 LLOnebot 等 Overflow 连接到的 Onebot 实现的版本
 
   - type: textarea
     id: journal-system
@@ -77,7 +77,7 @@ body:
         如果日志过大, 可以在 `补充信息` 上传文件.
       render: text
     validations:
-      required: false
+      required: true
 
   - type: textarea
     id: additional
