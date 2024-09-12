@@ -23,6 +23,7 @@ import net.mamoe.mirai.event.events.GroupMessagePostSendEvent
 import net.mamoe.mirai.event.events.GroupMessagePreSendEvent
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.spi.AudioToSilkService
 import net.mamoe.mirai.utils.*
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.contact.RemoteGroup
@@ -226,7 +227,8 @@ internal class GroupWrapper(
     }
 
     override suspend fun uploadAudio(resource: ExternalResource): OfflineAudio {
-        return OnebotMessages.audioFromFile(FileService.instance!!.upload(resource)) as OfflineAudio
+        val res = AudioToSilkService.instance.convert(resource)
+        return OnebotMessages.audioFromFile(FileService.instance!!.upload(res)) as OfflineAudio
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {

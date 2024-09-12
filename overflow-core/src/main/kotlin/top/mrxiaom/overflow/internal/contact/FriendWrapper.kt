@@ -16,6 +16,7 @@ import net.mamoe.mirai.event.events.FriendMessagePostSendEvent
 import net.mamoe.mirai.event.events.FriendMessagePreSendEvent
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.spi.AudioToSilkService
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
@@ -97,7 +98,8 @@ internal class FriendWrapper(
     }
 
     override suspend fun uploadAudio(resource: ExternalResource): OfflineAudio {
-        return OnebotMessages.audioFromFile(FileService.instance!!.upload(resource)) as OfflineAudio
+        val res = AudioToSilkService.instance.convert(resource)
+        return OnebotMessages.audioFromFile(FileService.instance!!.upload(res)) as OfflineAudio
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {
