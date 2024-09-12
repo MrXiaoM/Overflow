@@ -24,17 +24,23 @@ class GroupEssenceNoticeEvent : NoticeEvent() {
      * 消息发送者ID
      */
     @SerializedName("sender_id")
-    var senderId: Long? = null
+    var senderId: Long = 0L
 
     /**
      * 操作者ID
      */
     @SerializedName("operator_id")
-    var operatorId: Long? = null
+    var operatorId: Long = 0L
 
     /**
      * 消息ID
      */
     @SerializedName("message_id")
-    var messageId: Long? = null
+    var messageId: Int = 0
+
+    /**
+     * 群号
+     */
+    @SerializedName( "group_id")
+    var groupId = 0L
 }

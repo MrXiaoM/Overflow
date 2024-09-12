@@ -11,6 +11,7 @@ import com.google.gson.JsonObject
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.MiraiInternalApi
+import top.mrxiaom.overflow.event.MemberEssenceNoticeEvent
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages.toMiraiMessage
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
@@ -29,6 +30,8 @@ internal fun addGroupListeners() {
         GroupTitleChangeNoticeListener(),
         GroupBanNoticeListener(),
         GroupAdminNoticeListener(),
+        GroupEssenceNoticeListener(),
+        GroupCardChangeNoticeListener(),
 
     ).forEach(EventBus::addListener)
 }
@@ -276,5 +279,34 @@ internal class GroupAdminNoticeListener : EventListener<GroupAdminNoticeEvent> {
                 new = member.permission
             ))
         }
+    }
+}
+internal class GroupEssenceNoticeListener : EventListener<GroupEssenceNoticeEvent> {
+    override suspend fun onMessage(e: GroupEssenceNoticeEvent) {
+        val bot = e.bot ?: return
+        val group = bot.group(e.groupId)
+        val sender = group.queryMember(e.senderId) ?: return
+        val operator = group.queryMember(e.operatorId) ?: return
+        if (e.messageId <= 0) return
+        val event = when (e.subType) {
+            "add" -> MemberEssenceNoticeEvent.Add(
+                bot, group, sender, operator, e.messageId
+            )
+            "delete" -> MemberEssenceNoticeEvent.Delete(
+                bot, group, sender, operator, e.messageId
+            )
+            else -> return
+        }
+        bot.eventDispatcher.broadcastAsync(event)
+    }
+}
+internal class GroupCardChangeNoticeListener : EventListener<GroupCardChangeNoticeEvent> {
+    override suspend fun onMessage(e: GroupCardChangeNoticeEvent) {
+        val bot = e.bot ?: return
+        val group = bot.group(e.groupId)
+        val member = group.queryMember(e.userId) ?: return
+        bot.eventDispatcher.broadcastAsync(MemberCardChangeEvent(
+            e.cardOld, e.cardNew, member
+        ))
     }
 }
