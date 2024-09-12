@@ -79,7 +79,7 @@
 | 群戳一戳             | NudgeEvent                      | notice -> notify -> poke            | *✅*  |
 | 群撤回消息            | MessageRecallEvent.GroupRecall  | notice -> group_recall              | ✅    |
 | 好友撤回消息           | MessageRecallEvent.FriendRecall | notice -> friend_recall             | ✅    |
-| 群名片更改            | MemberCardChangeEvent           | -                                   | ✅    |
+| 群名片更改            | MemberCardChangeEvent           | notice -> group_card                | ✅    |
 | 管理员更改            | MemberPermissionChangeEvent     | notice -> group_admin               | ✅    |
 | 加群验证消息           | MemberJoinRequestEvent          | request -> group -> add             | ✅    |
 | 被邀请加群            | BotInvitedJoinGroupRequestEvent | request -> group -> invite          | ✅    |
@@ -99,13 +99,20 @@
 扩展事件类型  
 [top.mrxiaom.overflow.event](https://github.com/MrXiaoM/Overflow/tree/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/event)
 
-| 事件类型           | Overflow                | onebot                      | 是否支持 |
-|----------------|-------------------------|-----------------------------|------|
-| 频道消息事件(临时)     | LegacyGuildMessageEvent | message -> guild -> channel | ✅    |
-| 未处理的 Onebot 事件 | UnsolvedOnebotEvent     | *                           | ✅    |
+| 事件类型           | Overflow                        | onebot                      | 是否支持 |
+|----------------|---------------------------------|-----------------------------|------|
+| 频道消息事件(临时)     | LegacyGuildMessageEvent         | message -> guild -> channel | ✅    |
+| 群精华消息添加事件      | MemberEssenceNoticeEvent.Add    | notice -> essence -> add    | ✅    |
+| 群精华消息移除事件      | MemberEssenceNoticeEvent.Delete | notice -> essence -> delete | ✅    |
+| 未处理的 Onebot 事件 | UnsolvedOnebotEvent             | *                           | ✅    |
 
-实现事件说明如下
-* 群头衔变更事件 onebot-sdk 里有但是没用到，先实现再说。
+# 支持/扩展的 SPI
+
++ (已弃用)签名服务 `net.mamoe.mirai.internal.spi.EncryptService`
++ 语音转silk服务 `net.mamoe.mirai.spi.AudioToSilkService`
++ Onebot文件服务 `top.mrxiaom.overflow.spi.FileService`
++ 媒体消息下载链接服务 `top.mrxiaom.overflow.spi.MediaURLService`
++ 额外的Onebot消息序列化器服务 `top.mrxiaom.overflow.spi.ExtendedMessageSerializerService`
 
 # 现阶段发送频道消息方法
 
