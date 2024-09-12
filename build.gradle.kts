@@ -25,10 +25,11 @@ val miraiVersion = "2.16.0".ext("miraiVersion")
 var commitHash = "local"
 var commitCount = 0
 if (File(rootProject.projectDir, ".git").exists()) {
-    val repo = Grgit.open(mapOf("currentDir" to rootProject.projectDir))
-    commitHash = repo.head().abbreviatedId
-    val log = repo.log()
-    commitCount = log.size
+    Grgit.open(mapOf("currentDir" to rootProject.projectDir)).use { repo ->
+        commitHash = repo.head().abbreviatedId
+        val log = repo.log()
+        commitCount = log.size
+    }
 }
 commitHash.ext("commitHash")
 commitCount.ext("commitCount")
@@ -71,7 +72,7 @@ tasks.register("deleteOutdatedArtifacts") {
     if (auth == null) {
         println("OSS authorization not found, skipping delete outdated artifacts")
     } else {
-        deleteOutdatedArtifacts(auth)
+        deleteOutdatedArtifacts(rootProject.projectDir, auth)
     }
 }
 nexusPublishing {
