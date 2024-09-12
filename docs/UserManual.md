@@ -14,7 +14,7 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 欢迎补充任何视频平台上的 Overflow 部署教程视频，提交格式为 `视频简略标题 (视频平台/视频作者)`
 
-+ [2024 手把手教你配置QQ机器人 (百度归档/人间工作)](https://vdse.bdstatic.com/017126b61b0e633156c0d4217fb5e0ec.mp4) [WebArchive](http://web.archive.org/web/20240314063238/https://vdse.bdstatic.com/017126b61b0e633156c0d4217fb5e0ec.mp4)
++ ~~[2024 手把手教你配置QQ机器人 (百度归档/人间工作)](https://vdse.bdstatic.com/017126b61b0e633156c0d4217fb5e0ec.mp4) [WebArchive](http://web.archive.org/web/20240314063238/https://vdse.bdstatic.com/017126b61b0e633156c0d4217fb5e0ec.mp4)~~ 已过时
 
 ## 安装方法
 
@@ -30,15 +30,16 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 ## 配置文件
 
-另请参见 [配置文件说明](configuration.md)
+Overflow 主要配置文件为 `overflow.json`。
+
+详情另请参见 [配置文件说明](configuration.md)
 
 ## Onebot 协议实现部署教程
 
 首先部署一个 Onebot 协议实现，以下是**相关教程**：
 
-+ **[已归档]**~~[whitechi73/OpenShamrock](https://wiki.mrxiaom.top/overflow/openshamrock/) Xposed/LSPatch hook QQ 并实现 Onebot *1.1.0+ Kritor版本暂不支持*~~
 + [Hoshinonyaruko/Gensokyo](https://wiki.mrxiaom.top/overflow/gensokyo) 官方Bot 转 Onebot
-+ [KonataDev/Lagrange.Core](https://github.com/KonataDev/Lagrange.Core) QQNT 协议库 *0.0.3+ Kritor版本暂不支持*
++ [KonataDev/Lagrange.Core](https://github.com/KonataDev/Lagrange.Core) QQNT 协议库
 + [cnlimiter/onebot-mirai](https://github.com/cnlimiter/onebot-mirai) mirai 转 Onebot，相当于可以实现 mirai 接龙
 + [LLOneBot/LLOneBot](https://wiki.mrxiaom.top/overflow/lloneBot) 在 QQNT 客户端中装载插件实现 Onebot
 + [NapNeko/NapCatQQ](https://napneko.github.io/zh-CN/guide/getting-started) 使用无头 QQNT 客户端实现 Onebot
@@ -61,15 +62,13 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 启动 Overflow 后会生成配置文件 `overflow.json`，编辑配置文件再次启动即可。
 
-需要注意的是，**OpenShamrock** 不管是主动(正向) WebSocket 还是被动(反向) WebSocket 的接口信息配置，都需要**重新启动QQ**才能生效。
-
 从下方选择任意一种连接方式，**仅能选择一种**。
 
-以下提到的 `Onebot 端`，均为 `Onebot 协议实现`，如 OpenShamrock。
+以下提到的 `Onebot 端`，均为 `Onebot 协议实现`，如 LLOnebot。
 
 ------
 
-### 正向 WebSocket
+### 主动 WebSocket
 
 让 Overflow 去连接 Onebot 协议实现。
 
@@ -77,31 +76,31 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 
 在 `Onebot 端` 获取如下信息：
 
-+ 正向 WebSocket **端口** (也叫做主动 WebSocket 端口)
++ 主动 WebSocket **端口** (也叫做正向 WebSocket 端口)
 + 在 Overflow 侧可以与其**建立连接**的IP地址，可以是内网、公网或者内网穿透等等，模拟器可能需要配置端口转发。
 
 将以上信息以 `ws://IP:端口` 的格式填入 `ws_host`，如 `ws://127.0.0.1:3001`，再次启动即可。
 
-### 反向 WebSocket
+### 被动 WebSocket
 
 让 Onebot 协议实现去连接 Overflow。
 
 > 设置此项以后，正向 WebSocket 的配置将会**失效**。
 
-关键配置项：`reversed_ws_port` - 反向服务器端口。
+关键配置项：`reversed_ws_port` - 被动服务器端口。
 
 首先修改 `reversed_ws_port` 为 `[1, 65535]` 区间的数 (端口号有效值)，启动 Overflow，确保端口没有冲突，若有冲突请自行更改。
 
 在 `Overflow 侧` 获取以下信息：
 
-+ 反向服务器**端口**，即 `reversed_ws_port` 的值。
++ 被动服务器**端口**，即 `reversed_ws_port` 的值。
 + 在 `Onebot 端` 可以与其**建立连接**的IP地址。
 
-将以上信息以 `ws://IP:端口` 的格式写好备用，这个就叫做`反向 WebSocket 地址`了，如 `ws://127.0.0.1:3002`。
+将以上信息以 `ws://IP:端口` 的格式写好备用，这个就叫做`被动 WebSocket 地址`了，如 `ws://127.0.0.1:3002`。
 
-在 `Onebot 端` 的设置中找到 `反向 WebSocket 地址` 的配置，有些实现中它也叫作 `被动 WebSocket 地址`，将上面获取到的地址填入即可。
+在 `Onebot 端` 的设置中找到 `被动 WebSocket 地址` 的配置，有些实现中它也叫作 `反向 WebSocket 地址`，将上面获取到的地址填入即可。
 
-反向 WebSocket 仅支持一个客户端连接，目前没有支持多客户端以及多 Bot 的打算。
+被动 WebSocket 仅支持一个客户端连接，目前没有支持多客户端以及多 Bot 的打算。
 
 ------
 
