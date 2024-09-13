@@ -64,4 +64,22 @@ class OneBotProducerTest {
         }
         jobs.join()
     }
+    @Test
+    fun `should be called when server closing`(): Unit = runBlocking {
+        val factory = ConnectFactory.create(
+            BotConfig(
+                reversedPort = 3001
+            )
+        ).createProducer()
+
+        val defer = CompletableDeferred<Unit>()
+        factory.invokeOnClose {
+            defer.complete(Unit)
+        }
+        launch {
+            delay(3.seconds)
+            factory.close()
+        }
+        defer.join()
+    }
 }

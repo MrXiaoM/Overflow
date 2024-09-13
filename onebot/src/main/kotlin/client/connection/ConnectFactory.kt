@@ -95,7 +95,7 @@ class ConnectFactory private constructor(
     }
 
     @JvmOverloads
-    suspend fun createProducer(
+    fun createProducer(
         scope: CoroutineScope = CoroutineScope(CoroutineName("ConnectFactory"))
     ): OneBotProducer {
         if (config.isInReverseMode) {

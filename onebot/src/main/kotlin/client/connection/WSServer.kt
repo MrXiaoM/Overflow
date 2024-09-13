@@ -10,8 +10,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.java_websocket.WebSocket
+import org.java_websocket.WebSocketServerFactory
 import org.java_websocket.framing.CloseFrame
 import org.java_websocket.handshake.ClientHandshake
+import org.java_websocket.server.DefaultWebSocketServerFactory
 import org.java_websocket.server.WebSocketServer
 import org.slf4j.Logger
 import java.net.InetSocketAddress
@@ -36,6 +38,19 @@ class WSServer(
     private val botChannel = Channel<Bot>()
     private val muteX = Mutex()
     val connectDef = CompletableDeferred<Bot>(config.parentJob)
+
+    val closeHandler = mutableListOf<() -> Unit>()
+
+    init {
+        //等待测试
+        setWebSocketFactory(object : WebSocketServerFactory by DefaultWebSocketServerFactory() {
+            override fun close() {
+                for (i in closeHandler) {
+                    i()
+                }
+            }
+        })
+    }
 
     override fun onStart() {
         logger.info("▌ 反向 WebSocket 服务端已在 $address 启动")

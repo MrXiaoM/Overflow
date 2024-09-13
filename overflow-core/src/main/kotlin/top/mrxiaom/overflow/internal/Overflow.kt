@@ -1,4 +1,5 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+
 package top.mrxiaom.overflow.internal
 
 import cn.evolvefield.onebot.sdk.action.ActionRaw
@@ -6,6 +7,7 @@ import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
+import cn.evolvefield.onebot.client.connection.OneBotProducer
 import cn.evolvefield.onebot.sdk.util.CQCode
 import com.google.gson.JsonParser
 import kotlinx.coroutines.*
@@ -58,12 +60,14 @@ internal val OverflowAPI.scope: CoroutineScope
     get() = this as Overflow
 internal val Bot.asOnebot: BotWrapper
     get() = this as? BotWrapper ?: throw IllegalStateException("Bot 非 Overflow 实现")
+
 internal fun ActionRaw.check(failMsg: String): Boolean {
     if (retCode != 0) {
         logger.warning("$failMsg, status=$status, retCode=$retCode, echo=$echo")
     }
     return retCode == 0
 }
+
 @OptIn(MiraiExperimentalApi::class, MiraiInternalApi::class, LowLevelApi::class)
 class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override val coroutineContext: CoroutineContext = CoroutineName("overflow")
@@ -128,11 +132,13 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
     companion object {
         private lateinit var _instance: Overflow
+
         @JvmStatic
         fun setup() {
             @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
             _MiraiInstance.set(Overflow())
         }
+
         @JvmStatic
         @get:JvmName("getInstance")
         val instance: Overflow get() = _instance
@@ -168,7 +174,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         try {
             Class.forName("net.mamoe.mirai.console.MiraiConsole")
             miraiConsoleFlag = true
-            injectMiraiConsole()
+//            injectMiraiConsole()
         } catch (ignored: ClassNotFoundException) {
         }
         launch {
@@ -210,6 +216,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         ) != null
     }
 
+    //反向websocket 已存在的服务器列表
+    private val reverseServerConfig = mutableMapOf<Int, OneBotProducer>()
+
     private suspend fun start0(
         botConfig: BotConfig,
         printInfo: Boolean = false,
@@ -217,7 +226,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         workingDir: (Long.() -> File)? = null,
         logger: Logger = LoggerFactory.getLogger("Onebot")
     ): Bot? {
-        val reversed = botConfig.reversedPort in 1..65535
+        val reversed = botConfig.isInReverseMode
         if (printInfo) {
             logger.info("Overflow v$version 正在运行")
             if (reversed) {
@@ -227,30 +236,31 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             }
         }
 
-        val service = ConnectFactory.create(botConfig, botConfig.parentJob, logger)
-        val botImpl: cn.evolvefield.onebot.client.core.Bot
-        if (reversed) {
-            val ws = service.createWebsocketServerAndWaitConnect(this)
-            if (ws == null) {
-                if (printInfo) logger.error("未连接到 Onebot")
-                if (miraiConsole && !isNotExit) {
-                    OverflowCoreAsPlugin.shutdown()
-                    return null
+        val factory = ConnectFactory.create(botConfig, botConfig.parentJob, logger)
+        val service = when {
+            botConfig.isInReverseMode && botConfig.reversedPort in reverseServerConfig.keys -> {
+                logger.warn("在相同的端口(${botConfig.reversedPort})上寻找到已创建的ConnectFactory，已复用已有配置。")
+                reverseServerConfig[botConfig.reversedPort]!!
+            }
+            botConfig.isInReverseMode -> {
+                factory.createProducer().apply {
+                    invokeOnClose {
+                        reverseServerConfig.remove(botConfig.reversedPort)
+                    }
+                    logger.info("反向WebSocket服务端启动成功，端口为${botConfig.reversedPort}")
+                    reverseServerConfig[botConfig.reversedPort] = this
                 }
+            }
+            else -> factory.createProducer()
+        }
+        val botImpl = service.awaitNewBotConnection()
+        if (botImpl == null) {
+            if (printInfo) logger.error("未连接到 Onebot")
+            if (miraiConsole && !isNotExit) {
+                OverflowCoreAsPlugin.shutdown()
                 return null
             }
-            botImpl = ws.second
-        } else {
-            val ws = service.createWebsocketClient(this)
-            if (ws == null) {
-                if (printInfo) logger.error("未连接到 Onebot")
-                if (miraiConsole && !isNotExit) {
-                    OverflowCoreAsPlugin.shutdown()
-                    return null
-                }
-                return null
-            }
-            botImpl = ws.createBot()
+            return null
         }
         if (!botImpl.channel.isOpen) {
             if (printInfo) {
@@ -311,49 +321,57 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             }
         }
     }
+
     override fun imageFromFile(file: String): Image = OnebotMessages.imageFromFile(file)
     override fun audioFromFile(file: String): Audio = OnebotMessages.audioFromFile(file)
     override fun videoFromFile(file: String): ShortVideo = OnebotMessages.videoFromFile(file)
     override fun serializeMessage(bot: RemoteBot?, message: Message): String {
         return OnebotMessages.serializeToOneBotJson(bot, message)
     }
+
     override fun serializeJsonToCQCode(messageJson: String): String {
         return CQCode.fromJson(JsonParser.parseString(messageJson).asJsonArray)
     }
+
     override fun serializeCQCodeToJson(messageCQCode: String): String {
         return gson.toJson(CQCode.toJson(messageCQCode))
     }
+
     @JvmBlockingBridge
     override suspend fun deserializeMessage(bot: Bot, message: String): MessageChain {
         return OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, message, null)
     }
+
     @JvmBlockingBridge
     override suspend fun deserializeMessageFromJson(bot: Bot, message: String): MessageChain? {
         return OnebotMessages.deserializeMessageFromJson(bot.asRemoteBot, message, null)
     }
+
     @JvmBlockingBridge
     override suspend fun deserializeMessageFromCQCode(bot: Bot, message: String): MessageChain? {
         return OnebotMessages.deserializeMessageFromCQCode(bot.asRemoteBot, message, null)
     }
+
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {
         if (bot.asOnebot.appName == "shamrock") {
             val data = bot.asOnebot.impl.getUserInfo(targetId, false).data
                 ?: throw IllegalStateException("Can not fetch profile card.")
             val strangerInfo = bot.asOnebot.impl.getStrangerInfo(targetId, false).data
-            val sex = when(strangerInfo?.sex?.lowercase() ?: "") {
+            val sex = when (strangerInfo?.sex?.lowercase() ?: "") {
                 "male" -> UserProfile.Sex.MALE
                 "female" -> UserProfile.Sex.FEMALE
                 else -> UserProfile.Sex.UNKNOWN
             }
 
             val age = strangerInfo?.age ?:
-                // TODO: 不确定 birthday 的单位是毫秒还是秒
-                if (data.birthday > 0) ((currentTimeSeconds() - data.birthday) / 365.daysToSeconds).toInt() else 0
+            // TODO: 不确定 birthday 的单位是毫秒还是秒
+            if (data.birthday > 0) ((currentTimeSeconds() - data.birthday) / 365.daysToSeconds).toInt() else 0
 
             return UserProfileImpl(age, data.mail, 0, data.name, data.level, sex, data.hobbyEntry)
         } else {
-            val data = bot.asOnebot.impl.getStrangerInfo(targetId, false).data ?: throw IllegalStateException("Can not fetch stranger info (profile card).")
-            val sex = when(data.sex.lowercase()) {
+            val data = bot.asOnebot.impl.getStrangerInfo(targetId, false).data
+                ?: throw IllegalStateException("Can not fetch stranger info (profile card).")
+            val sex = when (data.sex.lowercase()) {
                 "male" -> UserProfile.Sex.MALE
                 "female" -> UserProfile.Sex.FEMALE
                 else -> UserProfile.Sex.UNKNOWN
@@ -361,16 +379,20 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             return UserProfileImpl(data.age, "", 0, data.nickname, data.level, sex, "")
         }
     }
+
     override suspend fun getOnlineOtherClientsList(bot: Bot, mayIncludeSelf: Boolean): List<OtherClientInfo> {
-        val data = bot.asOnebot.impl.getOnlineClients(false).data ?: throw IllegalStateException("Can not fetch online clients.")
+        val data = bot.asOnebot.impl.getOnlineClients(false).data
+            ?: throw IllegalStateException("Can not fetch online clients.")
         return data.clients.map {
             it.wrapAsOtherClientInfo()
         }
     }
+
     @LowLevelApi
     override suspend fun getGroupVoiceDownloadUrl(bot: Bot, md5: ByteArray, groupId: Long, dstUin: Long): String {
         TODO("Not yet implemented")
     }
+
     @MiraiExperimentalApi
     override suspend fun refreshKeys(bot: Bot) {
         // TODO: 2021/4/14 MiraiImpl.refreshKeysNow
@@ -412,7 +434,12 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override suspend fun downloadForwardMessage(bot: Bot, resourceId: String): List<ForwardMessage.Node> {
         return bot.asOnebot.impl.getForwardMsg(resourceId).data?.message?.map {
             val msg = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, it.message)
-            ForwardMessage.Node(it.sender!!.userId, it.time, it.sender!!.nickname.takeIf(String::isNotEmpty) ?: "QQ用户", msg)
+            ForwardMessage.Node(
+                it.sender!!.userId,
+                it.time,
+                it.sender!!.nickname.takeIf(String::isNotEmpty) ?: "QQ用户",
+                msg
+            )
         } ?: throw IllegalStateException("无法下载转发消息，详见网络日志 (logs/onebot/*.log")
     }
 
@@ -527,14 +554,23 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
         return eventId.also { newInviteJoinGroupRequestFlagMap[it] = flag }
     }
+
     override suspend fun acceptInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
         solveBotInvitedJoinGroupRequestEvent(event.bot, event.eventId, event.invitorId, event.groupId, true)
     }
+
     override suspend fun ignoreInvitedJoinGroupRequest(event: BotInvitedJoinGroupRequestEvent) {
         solveBotInvitedJoinGroupRequestEvent(event.bot, event.eventId, event.invitorId, event.groupId, false)
     }
+
     @LowLevelApi
-    override suspend fun solveBotInvitedJoinGroupRequestEvent(bot: Bot, eventId: Long, invitorId: Long, groupId: Long, accept: Boolean) {
+    override suspend fun solveBotInvitedJoinGroupRequestEvent(
+        bot: Bot,
+        eventId: Long,
+        invitorId: Long,
+        groupId: Long,
+        accept: Boolean
+    ) {
         newInviteJoinGroupRequestFlagMap[eventId]?.also {
             bot.asOnebot.impl.setGroupAddRequest(it, "invite", accept, "")
         }
@@ -550,17 +586,57 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
         return eventId.also { newMemberJoinRequestFlagMap[it] = flag }
     }
+
     override suspend fun acceptMemberJoinRequest(event: MemberJoinRequestEvent) {
-        solveMemberJoinRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, event.groupId, accept = true, blackList = false, message = event.message)
+        solveMemberJoinRequestEvent(
+            event.bot,
+            event.eventId,
+            event.fromId,
+            event.fromNick,
+            event.groupId,
+            accept = true,
+            blackList = false,
+            message = event.message
+        )
     }
+
     override suspend fun rejectMemberJoinRequest(event: MemberJoinRequestEvent, blackList: Boolean, message: String) {
-        solveMemberJoinRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, event.groupId, accept = false, blackList = blackList, message = message)
+        solveMemberJoinRequestEvent(
+            event.bot,
+            event.eventId,
+            event.fromId,
+            event.fromNick,
+            event.groupId,
+            accept = false,
+            blackList = blackList,
+            message = message
+        )
     }
+
     override suspend fun ignoreMemberJoinRequest(event: MemberJoinRequestEvent, blackList: Boolean) {
-        solveMemberJoinRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, event.groupId, accept = null, blackList = blackList, message = event.message)
+        solveMemberJoinRequestEvent(
+            event.bot,
+            event.eventId,
+            event.fromId,
+            event.fromNick,
+            event.groupId,
+            accept = null,
+            blackList = blackList,
+            message = event.message
+        )
     }
+
     @LowLevelApi
-    override suspend fun solveMemberJoinRequestEvent(bot: Bot, eventId: Long, fromId: Long, fromNick: String, groupId: Long, accept: Boolean?, blackList: Boolean, message: String) {
+    override suspend fun solveMemberJoinRequestEvent(
+        bot: Bot,
+        eventId: Long,
+        fromId: Long,
+        fromNick: String,
+        groupId: Long,
+        accept: Boolean?,
+        blackList: Boolean,
+        message: String
+    ) {
         if (accept == null) {
             // TODO 忽略加群请求
             return
@@ -580,14 +656,31 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
         return eventId.also { newFriendRequestFlagMap[it] = flag }
     }
+
     override suspend fun acceptNewFriendRequest(event: NewFriendRequestEvent) {
-        solveNewFriendRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, accept = true, blackList = false)
+        solveNewFriendRequestEvent(
+            event.bot,
+            event.eventId,
+            event.fromId,
+            event.fromNick,
+            accept = true,
+            blackList = false
+        )
     }
+
     override suspend fun rejectNewFriendRequest(event: NewFriendRequestEvent, blackList: Boolean) {
         solveNewFriendRequestEvent(event.bot, event.eventId, event.fromId, event.fromNick, false, blackList)
     }
+
     @LowLevelApi
-    override suspend fun solveNewFriendRequestEvent(bot: Bot, eventId: Long, fromId: Long, fromNick: String, accept: Boolean, blackList: Boolean) {
+    override suspend fun solveNewFriendRequestEvent(
+        bot: Bot,
+        eventId: Long,
+        fromId: Long,
+        fromNick: String,
+        accept: Boolean,
+        blackList: Boolean
+    ) {
         newFriendRequestFlagMap[eventId]?.also {
             bot.asOnebot.impl.setFriendAddRequest(it, accept, "")
         }

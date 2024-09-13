@@ -33,6 +33,11 @@ dependencies {
     testImplementation("org.java-websocket:Java-WebSocket:1.5.7")
     testImplementation("net.mamoe:mirai-console")
     testImplementation("net.mamoe:mirai-console-terminal")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks {
