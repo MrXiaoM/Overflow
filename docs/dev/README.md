@@ -83,7 +83,6 @@ val bot2 = BotBuilder.reversed(3002)
 ```
 
 多 Bot 支持当前为实验性功能，可能不稳定，**请勿**在生产环境中连接多个实例。  
-反向 WebSocket 暂不支持单个端口多个 Bot。
 
 # 向 Onebot 发送自定义 action
 
