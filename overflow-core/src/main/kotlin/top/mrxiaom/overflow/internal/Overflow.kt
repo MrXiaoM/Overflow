@@ -174,7 +174,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         try {
             Class.forName("net.mamoe.mirai.console.MiraiConsole")
             miraiConsoleFlag = true
-//            injectMiraiConsole()
+            injectMiraiConsole()
         } catch (ignored: ClassNotFoundException) {
         }
         launch {
