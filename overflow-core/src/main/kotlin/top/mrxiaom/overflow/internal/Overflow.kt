@@ -216,7 +216,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         ) != null
     }
 
-    //反向websocket 已存在的服务器列表
+    // 反向 WebSocket 已存在的服务器列表
     private val reverseServerConfig = mutableMapOf<Int, OneBotProducer>()
 
     private suspend fun start0(
@@ -237,22 +237,19 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
 
         val factory = ConnectFactory.create(botConfig, botConfig.parentJob, logger)
-        val service = when {
-            botConfig.isInReverseMode && botConfig.reversedPort in reverseServerConfig.keys -> {
-                logger.warn("在相同的端口(${botConfig.reversedPort})上寻找到已创建的ConnectFactory，已复用已有配置。")
-                reverseServerConfig[botConfig.reversedPort]!!
-            }
-            botConfig.isInReverseMode -> {
-                factory.createProducer().apply {
-                    invokeOnClose {
-                        reverseServerConfig.remove(botConfig.reversedPort)
-                    }
-                    logger.info("反向WebSocket服务端启动成功，端口为${botConfig.reversedPort}")
-                    reverseServerConfig[botConfig.reversedPort] = this
+        val service = if (botConfig.isInReverseMode) {
+            val saved = reverseServerConfig[botConfig.reversedPort]?.also {
+                if (printInfo) logger.warn("在相同的端口 (${botConfig.reversedPort}) 上寻找到已创建的 ConnectFactory，已复用已有配置。")
+            } ?: factory.createProducer().apply {
+                invokeOnClose {
+                    reverseServerConfig.remove(botConfig.reversedPort)
                 }
+                reverseServerConfig[botConfig.reversedPort] = this
             }
-            else -> factory.createProducer()
+        } else {
+            factory.createProducer()
         }
+        
         val botImpl = service.awaitNewBotConnection()
         if (botImpl == null) {
             if (printInfo) logger.error("未连接到 Onebot")
