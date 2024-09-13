@@ -48,4 +48,6 @@ class BotConfig(
      */
     val retryRestMills: Long = 60000L,
     val parentJob: Job? = null
-)
+) {
+    val isInReverseMode get() = reversedPort in 1..65535
+}

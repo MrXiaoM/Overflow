@@ -183,8 +183,8 @@ public class BotBuilder private constructor(
     }
 }
 
-public interface IBotStarter {
-    public suspend fun start(
+interface IBotStarter {
+    suspend fun start(
         url: String,
         reversedPort: Int,
         token: String,

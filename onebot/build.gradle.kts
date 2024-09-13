@@ -16,6 +16,10 @@ setupMavenCentralPublication {
     artifact(tasks.getByName("dokkaJavadocJar"))
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation("org.projectlombok:lombok:1.18.26")
     implementation("com.google.code.gson:gson:2.10.1")
@@ -27,6 +31,7 @@ dependencies {
 
     annotationProcessor("org.java-websocket:Java-WebSocket:1.5.7")
     annotationProcessor("org.projectlombok:lombok:1.18.26")
-
     testCompileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation(kotlin("test"))
 }
