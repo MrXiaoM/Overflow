@@ -33,6 +33,10 @@ setupMavenCentralPublication {
     artifact(tasks.getByName("dokkaJavadocJar"))
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation(platform("net.mamoe:mirai-bom:$miraiVersion"))
 
@@ -42,4 +46,5 @@ dependencies {
     implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
 
     implementation("org.slf4j:slf4j-api:2.0.5")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }

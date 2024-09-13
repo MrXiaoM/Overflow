@@ -29,6 +29,7 @@ class WSClient(
 ) : WebSocketClient(uri, header), IAdapter {
     private var retryCount = 0
     private var scheduleClose = false
+
     @OptIn(InternalCoroutinesApi::class)
     private val connectDef = CompletableDeferred<Boolean>(config.parentJob).apply {
         invokeOnCompletion(
@@ -36,6 +37,7 @@ class WSClient(
             invokeImmediately = true
         ) { close() }
     }
+
     fun createBot(): Bot {
         return Bot(this, config, actionHandler)
     }
@@ -82,7 +84,14 @@ class WSClient(
         scope.launch {
             if (retryCount < retryTimes) {
                 retryCount++
-                logger.warn("等待 ${String.format("%.1f", retryWaitMills / 1000.0F)} 秒后重连 (第 $retryCount/$retryTimes 次)")
+                logger.warn(
+                    "等待 ${
+                        String.format(
+                            "%.1f",
+                            retryWaitMills / 1000.0F
+                        )
+                    } 秒后重连 (第 $retryCount/$retryTimes 次)"
+                )
                 delay(retryWaitMills)
             } else {
                 retryCount = 0
@@ -106,9 +115,44 @@ class WSClient(
     }
 
     companion object {
-        suspend fun createAndConnect(scope: CoroutineScope, config: BotConfig, uri: URI, logger: Logger, actionHandler: ActionHandler, retryTimes: Int, retryWaitMills: Long, retryRestMills: Long, header: Map<String, String> = mapOf()): WSClient? {
-            val ws = WSClient(scope, config, uri, logger, actionHandler, retryTimes, retryWaitMills, retryRestMills, header)
+        suspend fun createAndConnect(
+            scope: CoroutineScope,
+            config: BotConfig,
+            uri: URI,
+            logger: Logger,
+            actionHandler: ActionHandler,
+            retryTimes: Int,
+            retryWaitMills: Long,
+            retryRestMills: Long,
+            header: Map<String, String> = mapOf()
+        ): WSClient? {
+            val ws =
+                WSClient(scope, config, uri, logger, actionHandler, retryTimes, retryWaitMills, retryRestMills, header)
             return ws.takeIf { ws.connectSuspend() }
+        }
+
+        fun create(
+            scope: CoroutineScope,
+            config: BotConfig,
+            uri: URI,
+            logger: Logger,
+            actionHandler: ActionHandler,
+            retryTimes: Int,
+            retryWaitMills: Long,
+            retryRestMills: Long,
+            header: Map<String, String> = mapOf()
+        ): WSClient {
+            return WSClient(
+                scope,
+                config,
+                uri,
+                logger,
+                actionHandler,
+                retryTimes,
+                retryWaitMills,
+                retryRestMills,
+                header
+            )
         }
     }
 }

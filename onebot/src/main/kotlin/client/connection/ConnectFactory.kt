@@ -34,6 +34,7 @@ class ConnectFactory private constructor(
      * @return 连接实例
      */
     @JvmOverloads
+    @Deprecated("please use build()")
     suspend fun createWebsocketClient(scope: CoroutineScope = CoroutineScope(CoroutineName("WSClient"))): WSClient? {
         val builder = StringBuilder()
         val header = mutableMapOf<String, String>()
@@ -74,6 +75,7 @@ class ConnectFactory private constructor(
      * @return 连接实例
      */
     @JvmOverloads
+    @Deprecated("please use build()")
     suspend fun createWebsocketServerAndWaitConnect(
         scope: CoroutineScope = CoroutineScope(CoroutineName("WSServer"))
     ): Pair<WSServer, Bot>? {
@@ -91,6 +93,40 @@ class ConnectFactory private constructor(
         }
         return pair
     }
+
+    @JvmOverloads
+    suspend fun createProducer(
+        scope: CoroutineScope = CoroutineScope(CoroutineName("ConnectFactory"))
+    ): OneBotProducer {
+        if (config.isInReverseMode) {
+            val address = InetSocketAddress(config.reversedPort)
+            return ReversedOneBotProducer(WSServer.create(scope, config, address, logger, actionHandler, config.token))
+        }
+        //使用正向包装
+        val builder = StringBuilder()
+        val header = mutableMapOf<String, String>()
+        builder.append(config.url)
+        if (config.isAccessToken) {
+            builder.append("?access_token=")
+            builder.append(config.token)
+            header["Authorization"] = "Bearer ${config.token}"
+        }
+
+        val url = builder.toString()
+
+        return PositiveOneBotProducer(WSClient.create(
+            scope,
+            config,
+            URI.create(url),
+            logger,
+            actionHandler,
+            config.retryTimes,
+            config.retryWaitMills,
+            config.retryRestMills,
+            header
+        ))
+    }
+
 
     companion object {
         @JvmStatic
