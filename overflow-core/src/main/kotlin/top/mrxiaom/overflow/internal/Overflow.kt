@@ -238,7 +238,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
 
         val factory = ConnectFactory.create(botConfig, botConfig.parentJob, logger)
         val service = if (botConfig.isInReverseMode) {
-            val saved = reverseServerConfig[botConfig.reversedPort]?.also {
+            reverseServerConfig[botConfig.reversedPort]?.also {
                 if (printInfo) logger.warn("在相同的端口 (${botConfig.reversedPort}) 上寻找到已创建的 ConnectFactory，已复用已有配置。")
             } ?: factory.createProducer().apply {
                 invokeOnClose {
