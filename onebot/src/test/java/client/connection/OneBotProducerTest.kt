@@ -9,6 +9,25 @@ import kotlin.time.Duration.Companion.seconds
 
 class OneBotProducerTest {
 
+    /**
+     * 请勿在CI里使用该test。
+     * 启动反向ws实例，强行停止后再次connect，awaitNewBotConnection()应该会返回一个bot链接。
+     * 这个bot的id是懒加载的，这个我也不太清楚
+     */
+    @Test
+    fun `test connection no mock`(): Unit = runBlocking {
+        val producer = ConnectFactory.create(
+            BotConfig(
+                reversedPort = 3001
+            )
+        ).createProducer()
+        while (true) {
+            println("waiting connect")
+            val bot = producer.awaitNewBotConnection()
+            println("新bot加入连接:${bot?.id}")
+        }
+    }
+
     @Test
     fun `positive connection should be connect once`(): Unit = runBlocking {
         val job1 = launch {
@@ -64,6 +83,7 @@ class OneBotProducerTest {
         }
         jobs.join()
     }
+
     @Test
     fun `should be called when server closing`(): Unit = runBlocking {
         val factory = ConnectFactory.create(

@@ -32,6 +32,7 @@ dependencies {
     annotationProcessor("org.java-websocket:Java-WebSocket:1.5.7")
     annotationProcessor("org.projectlombok:lombok:1.18.26")
     testCompileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
+    testImplementation("ch.qos.logback:logback-classic:1.4.14")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     testImplementation(kotlin("test"))
 }

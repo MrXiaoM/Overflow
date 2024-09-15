@@ -235,12 +235,13 @@ internal class BotWrapper private constructor(
             configuration: BotConfiguration? = null,
             workingDir: (Long.() -> File)? = null
         ): BotWrapper {
+            val newBot = this
             // also refresh bot id
             val result = getLoginInfo()
             val json = result.json.data ?: JsonObject()
             val loginInfo = result.data ?: throw IllegalStateException("无法获取机器人账号信息")
             return (net.mamoe.mirai.Bot.getInstanceOrNull(id) as? BotWrapper)?.apply {
-                implBot = impl
+                implBot = newBot
                 updateContacts()
             } ?: run {
                 val botConfiguration = configuration ?: defaultBotConfiguration
