@@ -8,10 +8,17 @@ setupMavenCentralPublication {
     artifact(tasks.kotlinSourcesJar)
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 dependencies {
     api(project(":onebot"))
     api(project(":overflow-core-api"))
     api(project(":overflow-core"))
+    testCompileOnly("net.mamoe:mirai-core-api:2.16.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.0")
 }
 
 tasks {

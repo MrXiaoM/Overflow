@@ -17,6 +17,7 @@ import org.java_websocket.server.DefaultWebSocketServerFactory
 import org.java_websocket.server.WebSocketServer
 import org.slf4j.Logger
 import java.net.InetSocketAddress
+import kotlin.random.Random
 import kotlin.time.Duration
 
 /**
@@ -25,6 +26,7 @@ import kotlin.time.Duration
  * Date: 2023/12/4 8:36
  * Description:
  */
+val random = Random(System.currentTimeMillis())
 class WSServer(
     override val scope: CoroutineScope,
     private val config: BotConfig,
@@ -34,8 +36,24 @@ class WSServer(
     private val token: String
 ) : WebSocketServer(address), IAdapter {
     //    private var bot: Bot? = null
+    data class BotWrapper(
+        val bot:Bot
+    ) {
+        private val hashCode by lazy {
+            random.nextInt()
+        }
+        override fun equals(other: Any?): Boolean {
+            return hashCode() == other?.hashCode()
+        }
+
+        override fun hashCode(): Int {
+            return hashCode
+        }
+    }
+
     private val bots: MutableList<Bot> = mutableListOf()
-    private val botChannel = Channel<Bot>()
+    //通过使Wrapper互不相等，使得当bot重新上线时，botChannel推送成功。
+    private val botChannel = Channel<BotWrapper>()
     private val muteX = Mutex()
     val connectDef = CompletableDeferred<Bot>(config.parentJob)
 
@@ -59,7 +77,7 @@ class WSServer(
 
     suspend fun awaitNewBot(timeout: Duration = Duration.INFINITE): Bot {
         return withTimeout(timeout) {
-            botChannel.receive()
+            botChannel.receive().bot
         }
     }
 
@@ -93,7 +111,7 @@ class WSServer(
                 }
             }
             bots.add(bot)
-            botChannel.send(bot)
+            botChannel.send(BotWrapper(bot))
         }
     }
 
@@ -108,7 +126,9 @@ class WSServer(
         unlockMutex()
         runBlocking {
             muteX.withLock {
-                bots.removeIf { it.conn == conn }
+                if (!bots.removeIf { it.conn == conn }) {
+                    logger.warn("bot移除失败，这并不应该被发生。")
+                }
             }
         }
     }
