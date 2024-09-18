@@ -66,8 +66,11 @@ internal class UnsolvedEventListener : EventListener<UnsolvedEvent> {
 
 internal fun BotWrapper.checkId(id: Long, msg: () -> String): Boolean {
     return (id <= 0).also {
-        logger.warning(msg()
-            .replace("%onebot", "${impl.appName} v${impl.appVersion}")
-            .replace("%value", id.toString()))
+        if (it) {
+            logger.warning(msg()
+                    .replace("%onebot", "${impl.appName} v${impl.appVersion}")
+                    .replace("%value", id.toString())
+            )
+        }
     }
 }
