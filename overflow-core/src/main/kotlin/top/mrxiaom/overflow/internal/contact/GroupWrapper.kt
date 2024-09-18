@@ -6,6 +6,7 @@ import cn.evolvefield.onebot.sdk.response.group.GroupInfoResp
 import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
 import cn.evolvefield.onebot.sdk.util.data
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
+import cn.evolvefield.onebot.sdk.util.JsonHelper.nullable
 import cn.evolvefield.onebot.sdk.util.ignorable
 import cn.evolvefield.onebot.sdk.util.jsonObject
 import com.google.gson.JsonArray
@@ -92,7 +93,7 @@ internal class GroupWrapper(
     override suspend fun updateGroupMemberList(): ContactList<MemberWrapper> {
         return (membersInternal ?: ContactList()).apply {
             val result = bot.impl.getGroupMemberList(id)
-            val data = result.data.takeIf { it.isNotEmpty() }
+            val data = result.data.takeIf { !it.nullable.isNullOrEmpty() }
             val json = result.json.data as? JsonArray ?: JsonArray()
             val membersList = data?.map { member ->
                 val memberJson = json.firstOrNull { memberJson ->
