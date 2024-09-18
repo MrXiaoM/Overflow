@@ -28,7 +28,11 @@ interface IAdapter {
                 } else scope.launch { // 处理事件
                     mutex.withLock {
                         withTimeoutOrNull(processTimeout) {
-                            EventBus.onReceive(message)
+                            runCatching {
+                                EventBus.onReceive(message)
+                            }.onFailure {
+                                logger.error("处理 Onebot 事件时出现异常: ", it)
+                            }
                         } ?: throw IllegalStateException("事件处理超时: $message")
                     }
                 }

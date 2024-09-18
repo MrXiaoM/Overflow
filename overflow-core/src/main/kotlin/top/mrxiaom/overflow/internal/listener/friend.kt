@@ -58,6 +58,9 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                     && !listOf(/*Group:*/0, /*Discussion:*/7).contains(e.tempSource)) return
                 if (e.groupId <= 0) return
                 val group = bot.group(e.groupId)
+                if (bot.checkId(e.userId) {
+                    "%onebot 返回了异常的 user_id=%value"
+                }) return
                 val member = group.queryMember(e.userId)
 
                 if (member == null || member.id == bot.id) {
@@ -131,7 +134,11 @@ internal class FriendMessageRecallListener : EventListener<PrivateMsgDeleteNotic
     override suspend fun onMessage(e: PrivateMsgDeleteNoticeEvent) {
         val bot = e.bot ?: return
         val operatorId = e.operatorId.takeIf { it > 0 } ?: e.userId
-        val friend = bot.getFriend(e.userId) ?: throw IllegalStateException("无法找到好友 ${e.userId}")
+        val friend = e.userId.takeIf { it > 0 }?.run { bot.getFriend(this) }
+        if (friend == null) {
+            bot.logger.warning("无法找到好友 ${e.userId}")
+            return
+        }
         bot.eventDispatcher.broadcastAsync(
             MessageRecallEvent.FriendRecall(bot,
             intArrayOf(e.msgId.toInt()),

@@ -11,6 +11,7 @@ import net.mamoe.mirai.event.events.NudgeEvent
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.event.UnsolvedOnebotEvent
+import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.scope
 import top.mrxiaom.overflow.internal.utils.bot
 import top.mrxiaom.overflow.internal.utils.group
@@ -30,6 +31,9 @@ internal class NotifyNoticeListener : EventListener<NotifyNoticeEvent> {
         when (e.subType) {
             "poke" -> {
                 val operatorId = e.realOperatorId
+                if (bot.checkId(operatorId) {
+                    "%onebot 返回了异常的数值 operator_id=%value"
+                }) return
                 // Lagrange: notice -> notify -> poke 不仅仅适用于群聊
                 if (e.groupId == 0L) {
                     val operator = bot.getFriend(operatorId)
@@ -57,5 +61,13 @@ internal class UnsolvedEventListener : EventListener<UnsolvedEvent> {
         Overflow.scope.launch {
             UnsolvedOnebotEvent(e.selfId, e.jsonString, e.time).broadcast()
         }
+    }
+}
+
+internal fun BotWrapper.checkId(id: Long, msg: () -> String): Boolean {
+    return (id <= 0).also {
+        logger.warning(msg()
+            .replace("%onebot", "${impl.appName} v${impl.appVersion}")
+            .replace("%value", id.toString()))
     }
 }

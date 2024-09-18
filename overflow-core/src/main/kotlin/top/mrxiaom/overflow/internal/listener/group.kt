@@ -39,6 +39,9 @@ internal fun addGroupListeners() {
 internal class GroupMessageListener : EventListener<GroupMessageEvent> {
     override suspend fun onMessage(e: GroupMessageEvent) {
         val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        }) return
         when(e.subType) {
             "normal" -> {
                 val group = bot.group(e.groupId)
@@ -103,6 +106,13 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
 internal class GroupMessageRecallListener : EventListener<GroupMsgDeleteNoticeEvent> {
     override suspend fun onMessage(e: GroupMsgDeleteNoticeEvent) {
         val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        } || bot.checkId(e.operatorId) {
+            "%onebot 返回了异常的数值 operator_id=%value"
+        } || bot.checkId(e.userId) {
+            "%onebot 返回了异常的数值 user_id=%value"
+        }) return
         val group = bot.group(e.groupId)
         val operator = group.queryMember(e.operatorId)
         val target = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
@@ -120,6 +130,9 @@ internal class GroupMessageRecallListener : EventListener<GroupMsgDeleteNoticeEv
 internal class GroupAddRequestListener : EventListener<GroupAddRequestEvent> {
     override suspend fun onMessage(e: GroupAddRequestEvent) {
         val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        }) return
         when (e.subType) {
             "add" -> { // 某人申请入群
                 bot.eventDispatcher.broadcastAsync(MemberJoinRequestEvent(
@@ -150,6 +163,11 @@ internal class GroupAddRequestListener : EventListener<GroupAddRequestEvent> {
 internal class GroupDecreaseNoticeListener : EventListener<GroupDecreaseNoticeEvent> {
     override suspend fun onMessage(e: GroupDecreaseNoticeEvent) {
         val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        } || bot.checkId(e.userId) {
+            "%onebot 返回了异常的数值 user_id=%value"
+        }) return
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
         when (e.subType) {
@@ -157,6 +175,9 @@ internal class GroupDecreaseNoticeListener : EventListener<GroupDecreaseNoticeEv
                 bot.eventDispatcher.broadcastAsync(MemberLeaveEvent.Quit(member))
             }
             "kick" -> { // 成员被踢
+                if (bot.checkId(e.operatorId) {
+                    "%onebot 返回了异常的数值 operator_id=%value"
+                }) return
                 bot.eventDispatcher.broadcastAsync(MemberLeaveEvent.Kick(
                     member = member,
                     operator = group.queryMember(e.operatorId)
@@ -172,6 +193,11 @@ internal class GroupDecreaseNoticeListener : EventListener<GroupDecreaseNoticeEv
 internal class GroupIncreaseNoticeListener : EventListener<GroupIncreaseNoticeEvent> {
     override suspend fun onMessage(e: GroupIncreaseNoticeEvent) {
         val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        } || bot.checkId(e.userId) {
+            "%onebot 返回了异常的数值 user_id=%value"
+        }) return
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
         when (e.subType) {
@@ -191,6 +217,11 @@ internal class GroupIncreaseNoticeListener : EventListener<GroupIncreaseNoticeEv
 internal class GroupTitleChangeNoticeListener : EventListener<GroupTitleChangeNoticeEvent> {
     override suspend fun onMessage(e: GroupTitleChangeNoticeEvent) {
         val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        } || bot.checkId(e.userId) {
+            "%onebot 返回了异常的数值 user_id=%value"
+        }) return
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
         MemberSpecialTitleChangeEvent(
@@ -210,14 +241,17 @@ internal class GroupBanNoticeListener : EventListener<GroupBanNoticeEvent> {
             "lift_ban" -> false
             else -> return
         }
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        }) return
         val group = bot.group(e.groupId)
-        val operator = group.queryMember(e.operatorId)
+        val operator = e.operatorId.takeIf { it > 0 }?.run { group.queryMember(this) }
         if (e.userId == 0L && e.duration == -1L) {
-            if (operator == null && e.operatorId != bot.id) {
-                throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
-            }
             val origin = group.settings.isMuteAll
             group.settings.muteAll = mute
+            if (operator == null && e.operatorId != bot.id) {
+                return
+            }
             bot.eventDispatcher.broadcastAsync(GroupMuteAllEvent(
                 origin = origin,
                 new = mute,
@@ -227,7 +261,10 @@ internal class GroupBanNoticeListener : EventListener<GroupBanNoticeEvent> {
             return
         }
         if (e.userId == bot.id) {
-            if (operator == null) throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
+            if (operator == null) {
+                bot.logger.warning("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
+                return
+            }
             if (mute) {
                 bot.eventDispatcher.broadcastAsync(BotMuteEvent(
                     durationSeconds = e.duration.toInt(),
@@ -240,9 +277,14 @@ internal class GroupBanNoticeListener : EventListener<GroupBanNoticeEvent> {
             }
         } else {
             if (operator == null && e.operatorId != bot.id) {
-                throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
+                bot.logger.warning("无法找到群 ${e.groupId} 的成员(操作者) ${e.operatorId}")
+                return
             }
-            val member = group.queryMember(e.userId) ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+            val member = group.queryMember(e.userId)
+            if (member == null) {
+                bot.logger.warning("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+                return
+            }
             if (mute) {
                 bot.eventDispatcher.broadcastAsync(MemberMuteEvent(
                     member = member,
@@ -261,6 +303,11 @@ internal class GroupBanNoticeListener : EventListener<GroupBanNoticeEvent> {
 internal class GroupAdminNoticeListener : EventListener<GroupAdminNoticeEvent> {
     override suspend fun onMessage(e: GroupAdminNoticeEvent) {
         val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        } || bot.checkId(e.userId) {
+            "%onebot 返回了异常的数值 user_id=%value"
+        }) return
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId) ?: return
         val origin = member.permission
@@ -284,6 +331,13 @@ internal class GroupAdminNoticeListener : EventListener<GroupAdminNoticeEvent> {
 internal class GroupEssenceNoticeListener : EventListener<GroupEssenceNoticeEvent> {
     override suspend fun onMessage(e: GroupEssenceNoticeEvent) {
         val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        } || bot.checkId(e.operatorId) {
+            "%onebot 返回了异常的数值 operator_id=%value"
+        } || bot.checkId(e.userId) {
+            "%onebot 返回了异常的数值 user_id=%value"
+        }) return
         val group = bot.group(e.groupId)
         val sender = group.queryMember(e.senderId) ?: return
         val operator = group.queryMember(e.operatorId) ?: return
@@ -303,6 +357,11 @@ internal class GroupEssenceNoticeListener : EventListener<GroupEssenceNoticeEven
 internal class GroupCardChangeNoticeListener : EventListener<GroupCardChangeNoticeEvent> {
     override suspend fun onMessage(e: GroupCardChangeNoticeEvent) {
         val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+            "%onebot 返回了异常的数值 group_id=%value"
+        } || bot.checkId(e.userId) {
+            "%onebot 返回了异常的数值 user_id=%value"
+        }) return
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId) ?: return
         bot.eventDispatcher.broadcastAsync(MemberCardChangeEvent(
