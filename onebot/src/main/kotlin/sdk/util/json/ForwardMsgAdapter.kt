@@ -18,9 +18,11 @@ class ForwardMsgAdapter : JsonDeserializerKt<ForwardMsgResp> {
     ): ForwardMsgResp {
         val nodes = mutableListOf<ForwardMsgResp.Node>()
         val jsonObj = json.asJsonObject
-        var msgArray = jsonObj.get("messages")
-        if (msgArray == null) {
-            msgArray = jsonObj.get("message") // Lagrange
+        val msgArray = when {
+            jsonObj.has("messages") -> jsonObj.get("messages") //Lagrange
+            jsonObj.has("message") -> jsonObj.get("message") // go-cqhttp
+            jsonObj.has("content") -> jsonObj.get("content") //old nap-cat
+            else -> throw IllegalArgumentException("不受支持的合并转发消息格式！请携带日志前往对应实现反馈。")
         }
         for (element in msgArray.asJsonArray) {
             val obj = element.asJsonObject.run {
