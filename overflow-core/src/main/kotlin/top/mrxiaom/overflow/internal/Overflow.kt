@@ -131,17 +131,16 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     }
 
     companion object {
-        private lateinit var _instance: Overflow
+        private var _instance: Overflow? = null
 
         @JvmStatic
         fun setup() {
-            @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
             _MiraiInstance.set(Overflow())
         }
 
         @JvmStatic
         @get:JvmName("getInstance")
-        val instance: Overflow get() = _instance
+        val instance: Overflow get() = _instance!!
 
         val versionNumber: Int?
             get() = BuildConstants.COMMIT_COUNT
@@ -159,7 +158,9 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override val version: String = Overflow.version
 
     init {
+        if (_instance != null) throw IllegalStateException("Overflow 被重复实例化")
         _instance = this
+        _MiraiInstance.set(this)
         addGroupListeners()
         addFriendListeners()
         addGuildListeners()
@@ -177,9 +178,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             injectMiraiConsole()
         } catch (ignored: ClassNotFoundException) {
         }
-        launch {
-            OnebotMessages.registerSerializers()
-        }
+        OnebotMessages.registerSerializers()
     }
 
     @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
