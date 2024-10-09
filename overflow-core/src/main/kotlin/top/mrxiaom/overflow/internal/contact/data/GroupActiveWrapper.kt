@@ -89,8 +89,9 @@ internal class GroupActiveWrapper(
     }
 
     override suspend fun refresh() {
-        val info = group.bot.getRawMemberLevelInfo(groupCode = group.id).check()
         refreshRank()
+        if (!group.bot.noPlatform) return
+        val info = group.bot.getRawMemberLevelInfo(groupCode = group.id).check()
         _isHonorVisible = info.honourFlag == 1
         _isTitleVisible = info.levelFlag == 1
         _isRankVisible = info.levelName.mapKeys { (level, _) -> level.removePrefix("lvln").toInt() }
