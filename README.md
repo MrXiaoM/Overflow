@@ -1,7 +1,7 @@
 <div align="center">
   <a href="https://github.com/MrXiaoM/Overflow/discussions" target="_blank"><img width="100%" src="https://mirai.mamoe.net/assets/uploads/files/1702556314432-overflow.png"/></a>
 
-  <h1>Overflow WIP</h1>
+  <h1>Overflow</h1>
   
   欢迎回到 mirai
   
@@ -12,7 +12,7 @@
   [![project-tRNA](https://img.shields.io/badge/project--tRNA-a7a3ff?style=for-the-badge)](https://github.com/project-tRNA) [![星标](https://shields.io/github/stars/MrXiaoM/Overflow?logo=github&style=for-the-badge&label=%E6%98%9F%E6%A0%87)](https://github.com/MrXiaoM/Overflow/stargazers) [![mirai](https://img.shields.io/badge/mirai--core--api-2.16.0-blue?style=for-the-badge)](https://github.com/mamoe/mirai) [![Onebot 11](https://img.shields.io/badge/Onebot-11-313343?style=for-the-badge)](https://11.onebot.dev) [![论坛](https://img.shields.io/badge/MiraiForum-post-5094e4?style=for-the-badge)](https://mirai.mamoe.net/topic/2565)
 </div>
 
-当前 Overflow 正趋于稳定，欢迎各位测试。
+当前 Overflow 基本稳定，欢迎各位使用。
 
 - **[用户手册: 快速开始](https://mirai.mrxiaom.top/docs/UserManual)**
 - **[开发文档](https://mirai.mrxiaom.top/docs/dev)**
