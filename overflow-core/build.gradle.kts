@@ -1,12 +1,21 @@
 plugins {
     kotlin("jvm")
     kotlin("plugin.serialization")
+    id("org.jetbrains.dokka")
     id("me.him188.kotlin-jvm-blocking-bridge")
     id("org.ajoberstar.grgit")
 }
 
+tasks.register<Jar>("dokkaJavadocJar") {
+    group = "documentation"
+    dependsOn(tasks.dokkaJavadoc)
+    from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
+    archiveClassifier.set("javadoc")
+}
+
 setupMavenCentralPublication {
     artifact(tasks.kotlinSourcesJar)
+    artifact(tasks.getByName("dokkaJavadocJar"))
 }
 
 val miraiVersion = extra("miraiVersion") ?: "2.16.0"
