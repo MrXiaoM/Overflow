@@ -14,8 +14,8 @@
 
 当前 Overflow 正趋于稳定，欢迎各位测试。
 
-- **[用户手册: 快速开始](docs/UserManual.md)**
-- **[开发文档](docs/dev/README.md)**
+- **[用户手册: 快速开始](https://mirai.mrxiaom.top/docs/UserManual)**
+- **[开发文档](https://mirai.mrxiaom.top/docs/dev)**
 
 ## 兼容性说明
 
