@@ -42,6 +42,7 @@ import top.mrxiaom.overflow.event.UnsolvedOnebotEvent
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.message.OnebotMessages.string
 import top.mrxiaom.overflow.internal.utils.LoggerInFolder
 import java.io.File
 import kotlin.reflect.jvm.jvmName
@@ -117,7 +118,9 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
 
         channel.subscribeAlways<UnsolvedOnebotEvent>(priority = EventPriority.LOWEST) {
                 if (!isCancelled) {
-                    logger.warning("接收到来自协议端的未知事件 $messageRaw")
+                    if (json["post_type"]?.string?.equals("meta_event") == false) {
+                        logger.warning("接收到来自协议端的未知事件 $messageRaw")
+                    }
                 }
             }
 
