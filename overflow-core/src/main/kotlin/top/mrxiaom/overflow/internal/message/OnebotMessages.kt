@@ -3,7 +3,9 @@ package top.mrxiaom.overflow.internal.message
 
 import cn.evolvefield.onebot.sdk.entity.MsgId
 import cn.evolvefield.onebot.sdk.event.message.MessageEvent
+import cn.evolvefield.onebot.sdk.response.group.ForwardMsgResp
 import cn.evolvefield.onebot.sdk.util.CQCode
+import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonParser
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.*
@@ -411,11 +413,35 @@ internal object OnebotMessages {
 
                         "forward" -> {
                             val id = data["id"].string
-                            if (id.isNotEmpty()) {
-                                val nodes = Mirai.downloadForwardMessage(bot as Bot, id)
-                                val raw = RawForwardMessage(nodes)
-                                add(raw.render(ForwardMessage.DisplayStrategy))
+
+                            val nodes = run {
+                                val tryContent = kotlin.runCatching {
+                                    gson.fromJson(data.toString(), ForwardMsgResp::class.java)
+                                }.getOrNull()
+
+                                //尝试将合并转发消息块作为完整的含数据消息进行解析，
+                                //若报错则主动获取合并转发消息，否则将其中的数据构造为合并转发消息
+                                if (tryContent != null) {
+                                    return@run tryContent.message.map {
+                                        val msg = deserializeFromOneBot(bot, it.message)
+                                        ForwardMessage.Node(
+                                            it.sender!!.userId,
+                                            it.time,
+                                            it.sender!!.nickname.takeIf(String::isNotEmpty) ?: "QQ用户",
+                                            msg
+                                        )
+                                    }
+                                }
+
+                                if (id.isNotEmpty()) {
+                                    return@run Mirai.downloadForwardMessage(bot as Bot, id)
+                                }
+                                throw IllegalStateException("合并转发消息没有ID")
                             }
+
+
+                            val raw = RawForwardMessage(nodes)
+                            add(raw.render(ForwardMessage.DisplayStrategy))
                         }
 
                         "mface" -> {
