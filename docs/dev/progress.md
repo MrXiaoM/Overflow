@@ -104,6 +104,45 @@
 | 群精华消息移除事件      | MemberEssenceNoticeEvent.Delete | notice -> essence -> delete | ✅    |
 | 未处理的 Onebot 事件 | UnsolvedOnebotEvent             | *                           | ✅    |
 
+## 未实现事件
+
+这里会整理暂未实现的 mirai 事件。
+
+事件详细解释请见 [mirai 的 kdoc](https://kdoc.mirai.mamoe.net/2.16.0/mirai-core-api/net.mamoe.mirai.event.events/index.html)。
+
++ BeforeImageUploadEvent
++ BeforeShortVideoUploadEvent
++ BotAvatarChangedEvent
++ BotGroupPermissionChangeEvent
++ BotJoinGroupEvent
++ BotLeaveEvent
++ BotNickChangedEvent
++ BotOfflineEvent
++ BotReloginEvent
++ FriendAddEvent
++ FriendAvatarChangedEvent
++ FriendDeleteEvent
++ FriendInputStatusChangedEvent
++ FriendMessageSyncEvent
++ FriendNickChangedEvent
++ FriendRemarkChangeEvent
++ GroupAllowAnonymousChatEvent
++ GroupAllowConfessTalkEvent
++ GroupAllowMemberInviteEvent
++ GroupMessageSyncEvent
++ GroupNameChangeEvent
++ GroupTalkativeChangeEvent
++ GroupTempMessageSyncEvent
++ ImageUploadEvent
++ OtherClientMessageEvent
++ OtherClientOfflineEvent
++ OtherClientOnlineEvent
++ ShortVideoUploadEvent
++ SignEvent
++ StrangerAddEvent
++ StrangerMessageSyncEvent
++ StrangerRelationChangeEvent
+
 # 支持/扩展的 SPI
 
 + (已弃用)签名服务 `net.mamoe.mirai.internal.spi.EncryptService`

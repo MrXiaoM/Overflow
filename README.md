@@ -16,6 +16,7 @@
 
 - **[用户手册: 快速开始](https://mirai.mrxiaom.top/docs/UserManual)**
 - **[开发文档](https://mirai.mrxiaom.top/docs/dev)**
+- **[开发进度/具体的接口支持情况](https://mirai.mrxiaom.top/docs/dev/progress)**
 
 ## 兼容性说明
 
