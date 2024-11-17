@@ -38,8 +38,9 @@ internal class NotifyNoticeListener : EventListener<NotifyNoticeEvent> {
                 if (e.groupId == 0L) {
                     val operator = bot.getFriend(operatorId)
                         ?: throw IllegalStateException("好友 $operatorId 戳一戳事件 操作者不在好友列表内")
-                    val target = if (e.targetId == bot.id) bot.asFriend
-                    else throw IllegalStateException("好友 $operatorId 戳一戳事件 出现预料中的错误: 目标好友不是机器人")
+                    // val target = if (e.targetId == bot.id) bot.asFriend
+                    // else throw IllegalStateException("好友 $operatorId 戳一戳事件 出现预料中的错误: 目标好友不是机器人")
+                    val target = bot.asFriend // 有的 Onebot 实现不一定提供 target_id
                     // TODO: 戳一戳无法获取被戳一方的动作、后缀信息
                     bot.eventDispatcher.broadcastAsync(NudgeEvent(operator, target, operator, "拍了拍", ""))
                 } else {
