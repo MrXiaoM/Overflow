@@ -15,7 +15,7 @@ body:
         - 对照过 [Releases](https://github.com/MrXiaoM/Overflow/releases)，相关问题未在近期更新中解决
         - 搜索了已有的 [issues](https://github.com/MrXiaoM/Overflow/issues?q=is%3Aissue) 列表中有没相关的信息
         - 阅读了 [Overflow 的相关文档](https://github.com/MrXiaoM/Overflow/tree/main/docs)
-        - 已做过初步调查，确定该问题来自 Overflow，而不是来自 mirai、业务逻辑、插件，或 OpenShamrock 等 Onebot 实现。
+        - 已做过初步调查，确定该问题来自 Overflow，而不是来自 mirai、业务逻辑、插件，或 LLOnebot 等 Onebot 实现。
 
   - type: textarea
     id: issue-description
@@ -43,7 +43,9 @@ body:
     id: version-overflow
     attributes:
       label: Overflow 版本
-      description: "正式发布之前，版本号为 short commit hash，即启动信息显示的 2.16.0- 后面的7位字符，示例: fffffff"
+      description: |
+        开发版本的版本号为 short commit hash，即启动信息显示的 x.x.x.xxx- 后面的7位字符，示例: fffffff
+        正式版本的版本号为 x.x.x，如 1.0.0
     validations:
       required: true
 
@@ -53,7 +55,7 @@ body:
       label: 其他组件版本
       description: |
         如 mirai-console 版本 (如果有)
-        如 LLOnebot 等 Overflow 连接到的 Onebot 实现的版本
+        如 LLOnebot 等 Onebot 实现的版本
 
   - type: textarea
     id: journal-system
@@ -92,7 +94,7 @@ body:
 
         在发出 issue 前, 请确认
 
-        - 全部信息已经填写完毕, 特别是 「其他组件版本」
+        - 全部信息已经填写完毕, 特别是「其他组件版本」、「**网络日志**」
         - 报告中没有令人反感的语言
         - 「复现」的描述是否足够详细准确
-        - 若内容有你认为的敏感数据，请使用星号代替
+        - 若内容有你认为的敏感数据，请使用星号代替，但不要过度替换敏感数据造成阅读障碍
