@@ -58,8 +58,6 @@
 这是目前我能想到的最容易兼容所有 Onebot 实现的方法，  
 但是这有一个很明显的缺点，资源以Base64字符串形式存在变量里，难以释放。
 
-若使用 OpenShamrock，另请参见 [overflow-shamrock-ext](https://github.com/project-tRNA/overflow-shamrock-ext)
-
 [开发者上传资源解决方案](/docs/dev/README.md#资源相关消息说明)
 
 ## 已实现事件

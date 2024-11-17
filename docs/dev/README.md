@@ -125,4 +125,4 @@ val video = OverflowAPI.get().videoFromFile("https://xxxxx")
 // Base64: base64://b3ZlcmZsb3c=
 ```
 
-为了兼容 mirai 已有的部分插件等可能已停止更新的业务逻辑，Overflow 添加了 [FileService](https://github.com/MrXiaoM/Overflow/blob/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/spi/FileService.kt)，使用示例另请参见 [overflow-shamrock-ext](https://github.com/MrXiaoM/overflow-shamrock-ext)
+为了兼容 mirai 已有的部分插件等可能已停止更新的业务逻辑，Overflow 添加了 [FileService](https://github.com/MrXiaoM/Overflow/blob/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/spi/FileService.kt)，使用示例另请参见 [LocalFileService](https://github.com/MrXiaoM/LocalFileService)
