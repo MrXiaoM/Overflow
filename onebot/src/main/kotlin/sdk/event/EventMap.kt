@@ -33,6 +33,7 @@ object EventMap {
         "group_increase" to GroupIncreaseNoticeEvent::class,
         "group_ban" to GroupBanNoticeEvent::class,
         "group_recall" to GroupMsgDeleteNoticeEvent::class,
+        "group_name_change" to GroupNameChangeNoticeEvent::class,
         "notify" to NotifyNoticeEvent::class,
         "lucky_king" to GroupLuckyKingNoticeEvent::class,
         "honor" to GroupHonorChangeNoticeEvent::class,

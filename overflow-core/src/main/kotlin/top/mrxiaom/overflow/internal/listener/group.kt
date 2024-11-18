@@ -32,7 +32,7 @@ internal fun addGroupListeners() {
         GroupAdminNoticeListener(),
         GroupEssenceNoticeListener(),
         GroupCardChangeNoticeListener(),
-
+        GroupNameChangeListener()
     ).forEach(EventBus::addListener)
 }
 
@@ -366,6 +366,22 @@ internal class GroupCardChangeNoticeListener : EventListener<GroupCardChangeNoti
         val member = group.queryMember(e.userId) ?: return
         bot.eventDispatcher.broadcastAsync(MemberCardChangeEvent(
             e.cardOld, e.cardNew, member
+        ))
+    }
+}
+internal class GroupNameChangeListener : EventListener<GroupNameChangeNoticeEvent> {
+    override suspend fun onMessage(e: GroupNameChangeNoticeEvent) {
+        val bot = e.bot ?: return
+        if (bot.checkId(e.groupId) {
+                "%onebot 返回了异常的数值 group_id=%value"
+        }) return
+        val group = bot.group(e.groupId)
+        val origin = group.name
+        val new = e.name
+        group.impl.groupName = new
+        val operator = if (e.operatorId <= 0) null else group.queryMember(e.operatorId)
+        bot.eventDispatcher.broadcastAsync(GroupNameChangeEvent(
+                origin, new, group, operator
         ))
     }
 }
