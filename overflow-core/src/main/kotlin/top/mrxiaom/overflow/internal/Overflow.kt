@@ -93,7 +93,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         File(System.getProperty("overflow.config", "overflow.json"))
     }
     val defaultJob: Job? by lazy {
-        if (!miraiConsole) return@lazy null
+        if (!miraiConsole) return@lazy SupervisorJob()
         return@lazy MiraiConsole.job
     }
     val config: Config by lazy {
