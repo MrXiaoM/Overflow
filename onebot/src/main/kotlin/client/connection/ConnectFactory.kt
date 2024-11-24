@@ -3,10 +3,7 @@ package cn.evolvefield.onebot.client.connection
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.InetSocketAddress
@@ -24,7 +21,7 @@ import java.net.URI
  */
 class ConnectFactory private constructor(
     private val config: BotConfig,
-    parent: Job?,
+    private val parent: Job?,
     private val logger: Logger,
 ) {
     private val actionHandler: ActionHandler = ActionHandler(parent, logger)
@@ -96,8 +93,9 @@ class ConnectFactory private constructor(
 
     @JvmOverloads
     fun createProducer(
-        scope: CoroutineScope = CoroutineScope(CoroutineName("ConnectFactory"))
+        scope0: CoroutineScope = CoroutineScope(CoroutineName("ConnectFactory"))
     ): OneBotProducer {
+        val scope = if (parent == null) scope0 else scope0 + parent
         if (config.isInReverseMode) {
             val address = InetSocketAddress(config.reversedPort)
             return ReversedOneBotProducer(WSServer.create(scope, config, address, logger, actionHandler, config.token))
