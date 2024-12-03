@@ -130,7 +130,6 @@
 + GroupAllowConfessTalkEvent
 + GroupAllowMemberInviteEvent
 + GroupMessageSyncEvent
-+ GroupNameChangeEvent
 + GroupTalkativeChangeEvent
 + GroupTempMessageSyncEvent
 + ImageUploadEvent
