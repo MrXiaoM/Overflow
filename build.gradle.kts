@@ -33,7 +33,9 @@ if (File(rootProject.projectDir, ".git").exists()) {
 }
 commitHash.ext("commitHash")
 commitCount.ext("commitCount")
-val commit = "$commitCount-${commitHash.substring(0, 7)}"
+val commit =
+    if (commitHash == "local") "9999-local"
+    else "$commitCount-${commitHash.substring(0, 7)}"
 
 version = overflowVersion
 
