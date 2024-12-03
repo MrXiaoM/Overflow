@@ -208,6 +208,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 retryTimes = config.retryTimes,
                 retryWaitMills = config.retryWaitMills,
                 retryRestMills = config.retryRestMills,
+                heartbeatCheckSeconds = config.heartbeatCheckSeconds,
                 parentJob = job ?: defaultJob,
             ),
             printInfo = printInfo,
@@ -290,6 +291,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             retryTimes: Int,
             retryWaitMills: Long,
             retryRestMills: Long,
+            heartbeatCheckSeconds: Int,
             printInfo: Boolean,
             noPlatform: Boolean,
             useCQCode: Boolean,
@@ -308,6 +310,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                 retryTimes = retryTimes,
                 retryWaitMills = retryWaitMills,
                 retryRestMills = retryRestMills,
+                heartbeatCheckSeconds = heartbeatCheckSeconds,
                 parentJob = parentJob
             )
             return if (logger != null) {

@@ -23,4 +23,6 @@ data class Config(
     var retryWaitMills: Long = 5_000L,
     @SerialName("retry_rest_mills")
     var retryRestMills: Long = 60_000L,
+    @SerialName("heartbeat_check_seconds")
+    var heartbeatCheckSeconds: Int = 60,
 )

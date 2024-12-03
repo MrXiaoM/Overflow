@@ -42,11 +42,15 @@ class BotConfig(
     /**
      * 重连间隔 (毫秒)
      */
-    val retryWaitMills: Long = 5000L,
+    val retryWaitMills: Long = 5_000L,
     /**
      * 重连休息时间 (毫秒)
      */
-    val retryRestMills: Long = 60000L,
+    val retryRestMills: Long = 60_000L,
+    /**
+     * 心跳包检测时间 (秒)，设为0关闭检测
+     */
+    val heartbeatCheckSeconds: Int = 60,
     val parentJob: Job? = null
 ) {
     val isInReverseMode get() = reversedPort in 1..65535

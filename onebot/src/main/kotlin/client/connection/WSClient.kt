@@ -30,6 +30,10 @@ class WSClient(
     private var retryCount = 0
     private var scheduleClose = false
 
+    init {
+        connectionLostTimeout = Math.max(0, config.heartbeatCheckSeconds)
+    }
+
     @OptIn(InternalCoroutinesApi::class)
     private val connectDef = CompletableDeferred<Boolean>(config.parentJob).apply {
         invokeOnCompletion(

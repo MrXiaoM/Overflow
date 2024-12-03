@@ -60,6 +60,7 @@ class WSServer(
     val closeHandler = mutableListOf<() -> Unit>()
 
     init {
+        connectionLostTimeout = Math.max(0, config.heartbeatCheckSeconds)
         //等待测试
         setWebSocketFactory(object : WebSocketServerFactory by DefaultWebSocketServerFactory() {
             override fun close() {
