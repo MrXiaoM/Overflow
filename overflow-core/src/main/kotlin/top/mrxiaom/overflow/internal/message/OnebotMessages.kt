@@ -491,10 +491,10 @@ internal object OnebotMessages {
                         "file" -> { // OpenShamrock
                             //val sub = data["sub"].string
                             //val biz = data["biz"].int
-                            val size = data["size"]?.long ?: 0L
+                            val size = (data["size"] ?: data["file_size"])?.long ?: 0L
                             //val expire = data["expire"].int
-                            val name = data["name"]?.string ?: ""
-                            val id = data["id"].string
+                            val name = (data["name"] ?: data["file"])?.string ?: ""
+                            val id = (data["id"] ?: data["file_id"]).string
                             val url = data["url"].string
 
                             add(WrappedFileMessage(id, 0, name, size, url))
