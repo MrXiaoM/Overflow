@@ -8,13 +8,19 @@ import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.sdk.util.jsonObject
 import com.google.gson.JsonObject
+import net.mamoe.mirai.contact.NormalMember
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*
+import net.mamoe.mirai.message.data.FileMessage
+import net.mamoe.mirai.message.data.MessageChain
+import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.event.MemberEssenceNoticeEvent
 import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages.toMiraiMessage
 import top.mrxiaom.overflow.internal.message.data.IncomingSource
+import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
 import top.mrxiaom.overflow.internal.utils.bot
 import top.mrxiaom.overflow.internal.utils.group
 import top.mrxiaom.overflow.internal.utils.queryProfile
@@ -32,7 +38,9 @@ internal fun addGroupListeners() {
         GroupAdminNoticeListener(),
         GroupEssenceNoticeListener(),
         GroupCardChangeNoticeListener(),
-        GroupNameChangeListener()
+        GroupNameChangeListener(),
+        GroupUploadNoticeListener(),
+
     ).forEach(EventBus::addListener)
 }
 
@@ -49,35 +57,22 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
                 val member = e.sender?.wrapAsMember(group, json ?: JsonObject()) ?: return
 
                 val message = e.toMiraiMessage(bot)
-                val messageString = message.toString()
-                val messageSource = IncomingSource.group(
-                    bot = bot,
-                    ids = intArrayOf(e.messageId),
-                    internalIds = intArrayOf(e.messageId),
-                    isOriginalMessageInitialized = true,
-                    originalMessage = message,
-                    sender = member,
-                    time = (e.time / 1000).toInt()
-                )
-                val miraiMessage = messageSource.plus(message)
-                if (member.id == bot.id) {
-                    bot.logger.verbose("[SYNC] [${group.name}(${group.id})] <- $messageString")
-                    @Suppress("DEPRECATION") // TODO: 无法获取到哪个客户端发送的消息
-                    bot.eventDispatcher.broadcastAsync(GroupMessageSyncEvent(
-                        group, miraiMessage, member, member.nameCardOrNick, messageSource.time
-                    ))
-                } else {
-                    bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
-                    bot.eventDispatcher.broadcastAsync(GroupMessageEvent(
-                        member.nameCardOrNick, member.permission, member, miraiMessage, messageSource.time
-                    ))
+                // 使用 group_upload 事件接收群文件时，忽略接收群文件类型消息
+                if (bot.impl.config.useGroupUploadEventForFileMessage && (message.isEmpty() || message.any { it is FileMessage })) {
+                    group.emptyMessagesIdMap.put(member.id, e.messageId)
+                    return
                 }
+                receiveGroupMessage(bot, member, message, e.messageId, e.time)
             }
             "anonymous" -> {
                 val group = bot.group(e.groupId)
                 val member = e.anonymous?.wrapAsMember(group) ?: return
 
                 val message = e.toMiraiMessage(bot)
+                // 匿名成员不会发文件
+                if (bot.impl.config.useGroupUploadEventForFileMessage && (message.isEmpty() || message.any { it is FileMessage })) {
+                    return
+                }
                 val messageString = message.toString()
                 val messageSource = IncomingSource.group(
                     bot = bot,
@@ -100,6 +95,36 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
                 TODO("系统提示，如 管理员已禁止群内匿名聊天")
             }
         }
+    }
+
+    companion object {
+        internal fun receiveGroupMessage(bot: BotWrapper, member: NormalMember, message: MessageChain, messageId: Int, time: Long) {
+            val group = member.group
+            val messageString = message.toString()
+            val messageSource = IncomingSource.group(
+                bot = bot,
+                ids = intArrayOf(messageId),
+                internalIds = intArrayOf(messageId),
+                isOriginalMessageInitialized = true,
+                originalMessage = message,
+                sender = member,
+                time = (time / 1000).toInt()
+            )
+            val miraiMessage = messageSource.plus(message)
+            if (member.id == bot.id) {
+                bot.logger.verbose("[SYNC] [${group.name}(${group.id})] <- $messageString")
+                @Suppress("DEPRECATION") // TODO: 无法获取到哪个客户端发送的消息
+                bot.eventDispatcher.broadcastAsync(GroupMessageSyncEvent(
+                    group, miraiMessage, member, member.nameCardOrNick, messageSource.time
+                ))
+            } else {
+                bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCardOrNick}(${member.id}) -> $messageString")
+                bot.eventDispatcher.broadcastAsync(GroupMessageEvent(
+                    member.nameCardOrNick, member.permission, member, miraiMessage, messageSource.time
+                ))
+            }
+        }
+
     }
 }
 
@@ -383,5 +408,29 @@ internal class GroupNameChangeListener : EventListener<GroupNameChangeNoticeEven
         bot.eventDispatcher.broadcastAsync(GroupNameChangeEvent(
                 origin, new, group, operator
         ))
+    }
+}
+internal class GroupUploadNoticeListener : EventListener<GroupUploadNoticeEvent> {
+    override suspend fun onMessage(e: GroupUploadNoticeEvent) {
+        val bot = e.bot ?: return
+        val file = e.file ?: return
+        if (bot.checkId(e.groupId) {
+                "%onebot 返回了异常的数值 group_id=%value"
+        }) return
+        val group = bot.group(e.groupId)
+        val member = group.queryMember(e.userId)
+        if (member == null) {
+            bot.logger.warning("群文件上传事件找不到群员 ${e.groupId}:${e.userId}")
+            return
+        }
+        val messageId = group.emptyMessagesIdMap.remove(member.id)
+        if (messageId == null) {
+            bot.logger.warning("群文件上传事件找不到前置消息ID (来自群员 ${e.userId})")
+            return
+        }
+        val message = buildMessageChain {
+            add(WrappedFileMessage(file.id, file.busId.toInt(), file.name, file.size, file.url))
+        }
+        GroupMessageListener.receiveGroupMessage(bot, member, message, messageId, e.time)
     }
 }

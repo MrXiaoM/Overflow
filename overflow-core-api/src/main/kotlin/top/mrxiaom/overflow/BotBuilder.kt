@@ -24,6 +24,7 @@ public class BotBuilder private constructor(
     private var printInfo: Boolean = true,
     private var noPlatform: Boolean = false,
     private var useCQCode: Boolean = false,
+    private var useGroupUploadEventForFileMessage: Boolean = false,
     private var logger: Logger? = null,
     private var parentJob: Job? = null,
     private var configuration: BotConfiguration = BotConfiguration {
@@ -73,6 +74,15 @@ public class BotBuilder private constructor(
     }
 
     /**
+     * 设置 WebSocket 心跳检查时间
+     *
+     * 设为 0 关闭心跳检查
+     */
+    public fun heartbeatCheckSeconds(heartbeatCheckSeconds: Int): BotBuilder = apply {
+        this.heartbeatCheckSeconds = heartbeatCheckSeconds
+    }
+
+    /**
      * 禁止打印连接时额外状态信息
      *
      * 如 Overflow 版本、连接地址、Onebot 协议端版本等
@@ -101,6 +111,13 @@ public class BotBuilder private constructor(
      */
     public fun useCQCode(): BotBuilder = apply {
         this.useCQCode = true
+    }
+
+    /**
+     * 设置不接收群聊的 file 消息，使用 group_upload 事件作为群文件消息
+     */
+    public fun useGroupUploadEventForFileMessage(): BotBuilder = apply {
+        this.useGroupUploadEventForFileMessage = true;
     }
 
     /**
@@ -160,6 +177,7 @@ public class BotBuilder private constructor(
             printInfo = printInfo,
             noPlatform = noPlatform,
             useCQCode = useCQCode,
+            useGroupUploadEventForFileMessage = useGroupUploadEventForFileMessage,
             logger = logger,
             parentJob = parentJob,
             configuration = configuration,
@@ -197,6 +215,7 @@ interface IBotStarter {
         printInfo: Boolean,
         noPlatform: Boolean,
         useCQCode: Boolean,
+        useGroupUploadEventForFileMessage: Boolean,
         logger: Logger?,
         parentJob: Job?,
         configuration: BotConfiguration,

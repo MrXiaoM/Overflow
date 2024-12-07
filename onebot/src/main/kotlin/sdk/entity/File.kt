@@ -16,4 +16,6 @@ class File {
     var size = 0L
     @SerializedName("busid")
     var busId = 0L
+    @SerializedName("url")
+    var url = ""
 }

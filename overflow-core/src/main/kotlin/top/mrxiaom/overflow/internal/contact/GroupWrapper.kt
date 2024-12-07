@@ -54,6 +54,7 @@ internal class GroupWrapper(
         get() = gson.toJson(implJson)
     private var membersInternal: ContactList<MemberWrapper>? = null
     private var anonymousInternal: HashMap<String, AnonymousMemberWrapper> = hashMapOf()
+    internal val emptyMessagesIdMap: HashMap<Long, Int> = hashMapOf()
 
     val data: GroupInfoResp
         get() = impl

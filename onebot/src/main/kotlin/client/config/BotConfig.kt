@@ -51,6 +51,10 @@ class BotConfig(
      * 心跳包检测时间 (秒)，设为0关闭检测
      */
     val heartbeatCheckSeconds: Int = 60,
+    /**
+     * 是否不接收群聊的 file 消息，使用 group_upload 事件作为群文件消息
+     */
+    val useGroupUploadEventForFileMessage: Boolean = false,
     val parentJob: Job? = null
 ) {
     val isInReverseMode get() = reversedPort in 1..65535

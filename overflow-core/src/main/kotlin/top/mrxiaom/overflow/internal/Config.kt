@@ -25,4 +25,6 @@ data class Config(
     var retryRestMills: Long = 60_000L,
     @SerialName("heartbeat_check_seconds")
     var heartbeatCheckSeconds: Int = 60,
+    @SerialName("use_group_upload_event_for_file_message")
+    var useGroupUploadEventForFileMessage: Boolean = false,
 )
