@@ -112,7 +112,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
                     =============================================
                     
                       ▌ 初次使用 Overflow，请阅读用户手册:
-                      https://github.com/MrXiaoM/Overflow/blob/main/docs/README.md
+                      https://mirai.mrxiaom.top/docs/UserManual
                     
                       ▌ 部署各 Onebot 实现并连接到 Overflow 的教程：
                       https://wiki.mrxiaom.top/overflow
