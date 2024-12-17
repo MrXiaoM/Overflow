@@ -23,4 +23,13 @@ open class Event : JsonContainer() {
     var time: Long = 0
     @SerializedName("self_id")
     var selfId: Long = 0
+
+    /**
+     * 自动转换毫秒时间戳（如果是）为秒时间戳，
+     * 仅支持2000年以后的毫秒时间戳，2000年以前的认定为秒时间戳
+     */
+    fun timeInSecond(): Long {
+        return if (time < 946656000000L) time
+        else time / 1000L
+    }
 }

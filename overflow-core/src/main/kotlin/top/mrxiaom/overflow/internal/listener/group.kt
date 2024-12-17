@@ -62,7 +62,7 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
                     group.emptyMessagesIdMap.put(member.id, e.messageId)
                     return
                 }
-                receiveGroupMessage(bot, member, message, e.messageId, e.time)
+                receiveGroupMessage(bot, member, message, e.messageId, e.timeInSecond())
             }
             "anonymous" -> {
                 val group = bot.group(e.groupId)
@@ -81,7 +81,7 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
                     isOriginalMessageInitialized = true,
                     originalMessage = message,
                     sender = member,
-                    time = (e.time / 1000).toInt()
+                    time = e.timeInSecond().toInt()
                 )
                 val miraiMessage = messageSource.plus(message)
                 bot.logger.verbose("[${group.name}(${group.id})] ${member.nameCard}(${member.anonymousId}) -> $messageString")
@@ -98,7 +98,7 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
     }
 
     companion object {
-        internal fun receiveGroupMessage(bot: BotWrapper, member: NormalMember, message: MessageChain, messageId: Int, time: Long) {
+        internal fun receiveGroupMessage(bot: BotWrapper, member: NormalMember, message: MessageChain, messageId: Int, timeInSecond: Long) {
             val group = member.group
             val messageString = message.toString()
             val messageSource = IncomingSource.group(
@@ -108,7 +108,7 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
                 isOriginalMessageInitialized = true,
                 originalMessage = message,
                 sender = member,
-                time = (time / 1000).toInt()
+                time = timeInSecond.toInt()
             )
             val miraiMessage = messageSource.plus(message)
             if (member.id == bot.id) {
@@ -145,7 +145,7 @@ internal class GroupMessageRecallListener : EventListener<GroupMsgDeleteNoticeEv
             target.id,
             intArrayOf(e.msgId.toInt()),
             intArrayOf(e.msgId.toInt()),
-            (e.time / 1000).toInt(),
+            e.timeInSecond().toInt(),
             operator, group,
             target
         ))
@@ -431,6 +431,6 @@ internal class GroupUploadNoticeListener : EventListener<GroupUploadNoticeEvent>
         val message = buildMessageChain {
             add(WrappedFileMessage(file.id, file.busId.toInt(), file.name, file.size, file.url))
         }
-        GroupMessageListener.receiveGroupMessage(bot, member, message, messageId, e.time)
+        GroupMessageListener.receiveGroupMessage(bot, member, message, messageId, e.timeInSecond())
     }
 }

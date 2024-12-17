@@ -60,7 +60,7 @@ internal class NotifyNoticeListener : EventListener<NotifyNoticeEvent> {
 internal class UnsolvedEventListener : EventListener<UnsolvedEvent> {
     override suspend fun onMessage(e: UnsolvedEvent) {
         Overflow.scope.launch {
-            UnsolvedOnebotEvent(e.selfId, e.jsonString, e.time).broadcast()
+            UnsolvedOnebotEvent(e.selfId, e.jsonString, e.timeInSecond()).broadcast()
         }
     }
 }

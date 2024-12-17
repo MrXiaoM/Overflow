@@ -45,7 +45,7 @@ internal class GuildMessageListener : EventListener<GuildMessageEvent> {
                             "admin" -> MemberPermission.ADMINISTRATOR
                             else -> MemberPermission.MEMBER
                         },
-                        time = (e.time / 1000).toInt()
+                        time = e.timeInSecond().toInt()
                     ))
                 }
             }

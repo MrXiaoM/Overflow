@@ -45,7 +45,7 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                     sender = friend,
                     subject = friend,
                     target = bot,
-                    time = (e.time / 1000).toInt()
+                    time = e.timeInSecond().toInt()
                 )
                 val miraiMessage = messageSource.plus(message)
                 bot.logger.verbose("${friend.remarkOrNick}(${friend.id}) -> $messageString")
@@ -78,7 +78,7 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                     subject = member,
                     isOriginalMessageInitialized = true,
                     target = bot,
-                    time = (e.time / 1000).toInt()
+                    time = e.timeInSecond().toInt()
                 )
                 val miraiMessage = messageSource.plus(message)
                 bot.logger.verbose("[群临时消息] ${member.remarkOrNick}(${member.id}) -> $messageString")
@@ -104,7 +104,7 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                     sender = stranger,
                     subject = stranger,
                     target = bot,
-                    time = (e.time / 1000).toInt()
+                    time = e.timeInSecond().toInt()
                 )
                 val miraiMessage = messageSource.plus(message)
                 bot.logger.verbose("${stranger.remarkOrNick}(${stranger.id}) -> $messageString")
@@ -143,7 +143,7 @@ internal class FriendMessageRecallListener : EventListener<PrivateMsgDeleteNotic
             MessageRecallEvent.FriendRecall(bot,
             intArrayOf(e.msgId.toInt()),
             intArrayOf(e.msgId.toInt()),
-            (e.time / 1000).toInt(),
+            e.timeInSecond().toInt(),
             operatorId,
             friend
         ))
