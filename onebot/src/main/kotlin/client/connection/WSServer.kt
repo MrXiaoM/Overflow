@@ -83,7 +83,10 @@ class WSServer(
     }
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
-        if (handshake.resourceDescriptor != "/") return
+        if (handshake.resourceDescriptor != "/") {
+            conn.close(CloseFrame.NORMAL, "path ${handshake.resourceDescriptor} not found")
+            return
+        }
         if (token.isNotBlank()) {
             if (handshake.hasFieldValue("Authorization")) {
                 val param = handshake.getFieldValue("Authorization").run {
