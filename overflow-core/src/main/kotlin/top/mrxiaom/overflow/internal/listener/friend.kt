@@ -1,11 +1,11 @@
 @file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.listener
 
+import cn.evolvefield.onebot.client.handler.EventBus
+import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evolvefield.onebot.sdk.event.notice.friend.PrivateMsgDeleteNoticeEvent
 import cn.evolvefield.onebot.sdk.event.request.FriendAddRequestEvent
-import cn.evolvefield.onebot.client.handler.EventBus
-import cn.evolvefield.onebot.client.listener.EventListener
 import net.mamoe.mirai.contact.remarkOrNick
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.utils.MiraiInternalApi

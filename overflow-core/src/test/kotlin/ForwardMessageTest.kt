@@ -8,7 +8,6 @@ import net.mamoe.mirai.message.data.ForwardMessage
 import net.mamoe.mirai.message.data.MessageChain
 import org.junit.jupiter.api.Test
 import top.mrxiaom.overflow.contact.RemoteBot
-import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 
 class ForwardMessageTest {

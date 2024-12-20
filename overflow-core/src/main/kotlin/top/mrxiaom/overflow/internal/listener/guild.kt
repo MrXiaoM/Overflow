@@ -1,9 +1,9 @@
 package top.mrxiaom.overflow.internal.listener
 
-import cn.evolvefield.onebot.sdk.event.message.GuildMessageEvent
 import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.client.listener.EventListener
 import cn.evolvefield.onebot.sdk.entity.GuildSender
+import cn.evolvefield.onebot.sdk.event.message.GuildMessageEvent
 import net.mamoe.mirai.contact.MemberPermission
 import top.mrxiaom.overflow.event.LegacyGuildMessageEvent
 import top.mrxiaom.overflow.internal.message.OnebotMessages.toMiraiMessage

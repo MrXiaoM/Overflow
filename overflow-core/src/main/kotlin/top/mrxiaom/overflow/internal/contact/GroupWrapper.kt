@@ -4,9 +4,9 @@ package top.mrxiaom.overflow.internal.contact
 import cn.evolvefield.onebot.sdk.entity.Anonymous
 import cn.evolvefield.onebot.sdk.response.group.GroupInfoResp
 import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
-import cn.evolvefield.onebot.sdk.util.data
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import cn.evolvefield.onebot.sdk.util.JsonHelper.nullable
+import cn.evolvefield.onebot.sdk.util.data
 import cn.evolvefield.onebot.sdk.util.ignorable
 import cn.evolvefield.onebot.sdk.util.jsonObject
 import com.google.gson.JsonArray
@@ -25,7 +25,10 @@ import net.mamoe.mirai.event.events.GroupMessagePreSendEvent
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.spi.AudioToSilkService
-import net.mamoe.mirai.utils.*
+import net.mamoe.mirai.utils.DeprecatedSinceMirai
+import net.mamoe.mirai.utils.ExternalResource
+import net.mamoe.mirai.utils.MiraiInternalApi
+import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.contact.RemoteGroup
 import top.mrxiaom.overflow.contact.RemoteUser
@@ -42,6 +45,13 @@ import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.internal.utils.update
 import top.mrxiaom.overflow.internal.utils.wrapAsMember
 import top.mrxiaom.overflow.spi.FileService
+import kotlin.collections.HashMap
+import kotlin.collections.first
+import kotlin.collections.firstOrNull
+import kotlin.collections.hashMapOf
+import kotlin.collections.isNullOrEmpty
+import kotlin.collections.map
+import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
 
 @OptIn(MiraiInternalApi::class)
@@ -197,11 +207,12 @@ internal class GroupWrapper(
         val receipt = runCatching {
             val forward = messageChain.findForwardMessage()
             val messageIds = if (forward != null) {
-                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds(bot)
+                val data = OnebotMessages.sendForwardMessage(this, forward)
+                data.safeMessageIds(bot)
             } else {
                 val msg = Overflow.serializeMessage(bot, messageChain)
-                val response = bot.impl.sendGroupMsg(id, msg, false)
-                response.data.safeMessageIds(bot)
+                val data = bot.impl.sendGroupMsg(id, msg, false).data
+                data.safeMessageIds(bot)
             }
 
             OutgoingSource.group(

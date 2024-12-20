@@ -3,7 +3,6 @@ package top.mrxiaom.overflow.internal.message.data
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.contact.FileSupported
 import net.mamoe.mirai.contact.file.AbsoluteFile
-import net.mamoe.mirai.message.data.FileMessage
 import top.mrxiaom.overflow.message.data.FileMessageWithUrl
 
 @Serializable

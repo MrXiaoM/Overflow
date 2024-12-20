@@ -2,15 +2,18 @@
 
 package top.mrxiaom.overflow.internal
 
-import cn.evolvefield.onebot.sdk.action.ActionRaw
-import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
-import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import cn.evolvefield.onebot.client.connection.OneBotProducer
+import cn.evolvefield.onebot.sdk.action.ActionRaw
+import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.util.CQCode
+import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonParser
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.serialization.json.Json
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.*

@@ -1,9 +1,12 @@
 package top.mrxiaom.overflow.internal.contact
 
-import cn.evolvefield.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.client.core.Bot
-import cn.evolvefield.onebot.sdk.util.*
+import cn.evolvefield.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
+import cn.evolvefield.onebot.sdk.util.data
+import cn.evolvefield.onebot.sdk.util.ignorable
+import cn.evolvefield.onebot.sdk.util.jsonArray
+import cn.evolvefield.onebot.sdk.util.jsonObject
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject

@@ -69,11 +69,12 @@ internal class StrangerWrapper(
         val receipt = kotlin.runCatching {
             val forward = message.findForwardMessage()
             val messageIds = if (forward != null) {
-                OnebotMessages.sendForwardMessage(this, forward).safeMessageIds(bot)
+                val data = OnebotMessages.sendForwardMessage(this, forward)
+                data.safeMessageIds(bot)
             } else {
                 val msg = Overflow.serializeMessage(bot, message)
-                val response = bot.impl.sendPrivateMsg(id, msg, false)
-                response.data.safeMessageIds(bot)
+                val data = bot.impl.sendPrivateMsg(id, msg, false).data
+                data.safeMessageIds(bot)
             }
 
             return OutgoingSource.stranger(
