@@ -83,8 +83,14 @@ class WSServer(
     }
 
     override fun onOpen(conn: WebSocket, handshake: ClientHandshake) {
-        if (handshake.resourceDescriptor != "/") {
-            conn.close(CloseFrame.NORMAL, "path ${handshake.resourceDescriptor} not found")
+        val split = handshake.resourceDescriptor.split('?', limit=2).toMutableList().run {
+            if (!this[0].startsWith("/")) {
+                this[0] = "/" + this[0]
+            }
+            toList()
+        }
+        if (split[0] != "/") {
+            conn.close(CloseFrame.NORMAL, "path ${split[0]} not found")
             return
         }
         if (token.isNotBlank()) {
@@ -96,8 +102,8 @@ class WSServer(
                     conn.close(CloseFrame.NORMAL, "客户端提供的 token 错误")
                     return
                 }
-            } else if (handshake.resourceDescriptor.contains("access_token=")) {
-                val param = handshake.resourceDescriptor.substringAfter("access_token=").substringBefore("&")
+            } else if (split.size > 1 && split[1].contains("access_token=")) {
+                val param = split[1].substringAfter("access_token=").substringBefore("&")
                 if (param != token) {
                     conn.close(CloseFrame.NORMAL, "客户端提供的 token 错误")
                     return
