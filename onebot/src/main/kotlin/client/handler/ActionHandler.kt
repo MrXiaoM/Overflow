@@ -50,7 +50,7 @@ class ActionHandler(
      * @param params  请求参数
      * @return 请求结果
      */
-    suspend fun action(bot: Bot, action: ActionPath, params: JsonObject? = null, showWarning: Boolean = true): JsonObject {
+    suspend fun action(bot: Bot, action: ActionPath, params: JsonObject? = null, showWarning: Boolean = true, ignoreStatus: Boolean = false): JsonObject {
         if (!bot.channel.isOpen) {
             return JsonObject().apply {
                 addProperty("status", "failed")
@@ -63,7 +63,7 @@ class ActionHandler(
             apiCallbackMap[echo] = request
         }
         return try {
-            request.send(reqJson)
+            request.send(reqJson, ignoreStatus)
         } catch (e: Exception) {
             val message = "请求失败: [${action.path}] ${e.message}。如果你认为这是 Overflow 的问题，请带上 logs/onebot 中的日志来反馈。"
             if (showWarning) logger.warn(message) else logger.trace(message)

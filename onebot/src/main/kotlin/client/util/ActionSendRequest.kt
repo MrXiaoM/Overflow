@@ -2,6 +2,9 @@ package cn.evolvefield.onebot.client.util
 
 import cn.evolvefield.onebot.sdk.util.ignorable
 import cn.evolvefield.onebot.client.core.Bot
+import cn.evolvefield.onebot.sdk.util.ignorableArray
+import cn.evolvefield.onebot.sdk.util.ignorableObject
+import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -33,7 +36,7 @@ class ActionSendRequest(
      * @return Response json data
      */
     @Throws(TimeoutCancellationException::class, ActionFailedException::class)
-    suspend fun send(req: JsonObject): JsonObject {
+    suspend fun send(req: JsonObject, ignoreStatus: Boolean = false): JsonObject {
         val resp = mutex.withLock {
             kotlin.runCatching {
                 withTimeout(requestTimeout) {
@@ -43,27 +46,24 @@ class ActionSendRequest(
                 }
             }.onFailure { resp.cancel() }.getOrThrow()
         }
-        if (resp.get("status").asString == "failed") {
-            val extra = run {
-                req["params"]?.asJsonObject?.also { params ->
-                    params["message"]?.asJsonArray?.also { messages ->
-                        val extraFileTypes = messages.filter {
-                            listOf("image", "record", "video").contains(it.asJsonObject?.get("type")?.asString)
-                                    && it.asJsonObject?.has("file") == true
-                        }.mapNotNull {
-                            val file = it.asJsonObject!!["file"].asString
-                            if (file.startsWith("base64://")) {
-                                val bytes = Base64.getDecoder().decode(file.replace("base64://", ""))
-                                "msgFileType=${bytes.fileType}"
-                            } else null
-                        }
-                        if (extraFileTypes.isNotEmpty()) {
-                            return@run extraFileTypes.joinToString(", ")
-                        }
-                    }
+        if (resp.ignorable("status", if (ignoreStatus) "" else "failed") == "failed") {
+            val extra = runCatching {
+                val params = req.ignorableObject("params") { JsonObject() }
+                val messages = params.ignorableArray("message") { JsonArray() }
+                val extraFileTypes = messages.filter {
+                    listOf("image", "record", "video").contains(it.asJsonObject?.get("type")?.asString)
+                            && it.asJsonObject?.has("file") == true
+                }.mapNotNull {
+                    val file = it.asJsonObject!!["file"].asString
+                    if (file.startsWith("base64://")) {
+                        val bytes = Base64.getDecoder().decode(file.replace("base64://", ""))
+                        "msgFileType=${bytes.fileType}"
+                    } else null
                 }
-                ""
-            }
+                return@runCatching if (extraFileTypes.isNotEmpty()) {
+                    "; " + extraFileTypes.joinToString(", ")
+                } else ""
+            }.getOrElse { "" }
             throw ActionFailedException(
                 app = "${bot.appName} v${bot.appVersion}",
                 msg = "${resp.ignorable("message", "")}$extra",

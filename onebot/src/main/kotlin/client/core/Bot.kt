@@ -1015,7 +1015,7 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend inline fun <reified T : Any> customRequestData(action: ActionPath, params: JsonObject?): ActionData<T> {
-        val result = actionHandler.action(this, action, params)
+        val result = actionHandler.action(this, action, params, ignoreStatus = true)
         return result.withToken()
     }
     /**
@@ -1027,7 +1027,7 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend inline fun <reified T : Any> customRequestList(action: ActionPath, params: JsonObject?): ActionList<T> {
-        val result = actionHandler.action(this, action, params)
+        val result = actionHandler.action(this, action, params, ignoreStatus = true)
         return result.withToken()
     }
     /**
@@ -1039,7 +1039,7 @@ class Bot(
      */
     @JvmBlockingBridge
     suspend fun customRequestRaw(action: ActionPath, params: JsonObject?): ActionRaw {
-        val result = actionHandler.action(this, action, params)
+        val result = actionHandler.action(this, action, params, ignoreStatus = true)
         return result.withClass()
     }
     /**
@@ -1068,7 +1068,8 @@ class Bot(
         return actionHandler.action(
             bot = this,
             action = action,
-            params = params?.run { JsonParser.parseString(this).asJsonObject }
+            params = params?.run { JsonParser.parseString(this).asJsonObject },
+            ignoreStatus = true,
         )
     }
 
