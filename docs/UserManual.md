@@ -48,7 +48,6 @@ Overflow 主要配置文件为 `overflow.json`。
 
 **额外配置：**
 + 对于 **非QQ平台** 或者 **无法获得账号凭证** 的 Onebot 实现，请在 `overflow.json` 中开启 `no_platform`。
-+ Overflow 不支持 CQ 码，请在 Onebot 端使用`数组格式 (array)` (又称`消息段格式`) 消息。
 
 > **如何确定 Onebot 实现是否可以取得账号凭证？**  
 > 如果支持以下几个API，则说明该实现可以取得账号凭证

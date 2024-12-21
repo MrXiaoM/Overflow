@@ -15,7 +15,7 @@
 
 ## JDK要求
 
-Overflow 使用 JDK 1.8 编译，在以下环境可以正常编译。
+Overflow 的编译目标为 Java 1.8，在以下环境可以正常编译。
 
 | 操作系统           | JDK             | 架构    |
 |----------------|-----------------|-------|
@@ -34,7 +34,11 @@ Overflow 使用 JDK 1.8 编译，在以下环境可以正常编译。
 
 ## 调试
 
-使用 IntelliJ IDEA 打开此项目，运行配置中的 `RunConsoleKt` 可启动运行或调试，相应的 mirai 工作目录在 `overflow-core/run`
+使用 IntelliJ IDEA 打开此项目，在 Gradle 选项卡展开 `Overflow -> Tasks -> other`，双击执行 `runConsole` 即可运行 mirai-console。
+
+或者在终端执行 `gradlew runConsole` 也可以达到同样的效果。
+
+相应的 mirai 工作目录在 `./overflow-core/run`。
 
 ## mirai-console 兼容
 
