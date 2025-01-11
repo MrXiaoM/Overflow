@@ -1494,4 +1494,38 @@ class Bot(
         val result = actionHandler.action(this, action, params)
         return result.withToken()
     }
+
+    /**
+     * 好友戳一戳
+     *
+     * LLOnebot、NapCat
+     * @param userId 好友QQ号
+     * @return [ActionRaw]
+     */
+    suspend fun extFriendPoke(userId: Long): ActionRaw {
+        val action = ActionPathEnum.EXT_FRIEND_POKE
+        val params = JsonObject().apply {
+            addProperty("user_id", userId)
+        }
+        val result = actionHandler.action(this, action, params)
+        return result.withClass()
+    }
+
+    /**
+     * 群聊戳一戳
+     *
+     * LLOnebot、NapCat
+     * @param groupId 群号
+     * @param userId 好友QQ号
+     * @return [ActionRaw]
+     */
+    suspend fun extGroupPoke(groupId: Long, userId: Long): ActionRaw {
+        val action = ActionPathEnum.EXT_GROUP_POKE
+        val params = JsonObject().apply {
+            addProperty("group_id", groupId)
+            addProperty("user_id", userId)
+        }
+        val result = actionHandler.action(this, action, params)
+        return result.withClass()
+    }
 }

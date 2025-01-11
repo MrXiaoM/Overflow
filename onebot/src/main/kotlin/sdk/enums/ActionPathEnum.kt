@@ -312,6 +312,20 @@ enum class ActionPathEnum(
     EXT_GET_AVATAR("get_avatar"),
 
     /**
+     * 好友戳一戳
+     *
+     * 属于 LLOnebot, NapCat 扩展 API
+     */
+    EXT_FRIEND_POKE("friend_poke"),
+
+    /**
+     * 群聊戳一戳
+     *
+     * 属于 LLOnebot, NapCat 扩展 API
+     */
+    EXT_GROUP_POKE("group_poke"),
+
+    /**
      * 创建群文件夹
      */
     CREATE_GROUP_FILE_FOLDER("create_group_file_folder"),

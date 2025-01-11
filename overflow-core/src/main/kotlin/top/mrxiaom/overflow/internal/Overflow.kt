@@ -541,11 +541,23 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     }
 
     override suspend fun sendNudge(bot: Bot, nudge: Nudge, receiver: Contact): Boolean {
-        val msg = "[{\"type\":\"touch\",\"data\":{\"id\":${nudge.target.id}}}]"
+        val onebot = bot.asOnebot
+        when (onebot.appName.lowercase()) {
+            "llonebot", "napcat" -> {
+                if (receiver is Group) {
+                    onebot.impl.extGroupPoke(receiver.id, nudge.target.id)
+                } else {
+                    onebot.impl.extFriendPoke(receiver.id)
+                }
+                return true
+            }
+        }
+        // go-cqhttp
+        val msg = "[{\"type\":\"poke\",\"data\":{\"id\":${nudge.target.id}}}]"
         if (receiver is Group) {
-            bot.asOnebot.impl.sendGroupMsg(receiver.id, msg, false)
+            onebot.impl.sendGroupMsg(receiver.id, msg, false)
         } else {
-            bot.asOnebot.impl.sendPrivateMsg(receiver.id, msg, false)
+            onebot.impl.sendPrivateMsg(receiver.id, msg, false)
         }
         return true
     }
