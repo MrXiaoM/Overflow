@@ -10,10 +10,7 @@ import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.util.CQCode
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonParser
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.serialization.json.Json
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import net.mamoe.mirai.*
@@ -253,6 +250,22 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         } else {
             factory.createProducer()
         }
+
+        service.setBotConsumer {
+            logger.info("正在请求 Onebot 版本信息")
+            val versionInfo = it.getVersionInfo()
+            if (printInfo) {
+                logger.info("协议端版本信息\n${gson.toJson(versionInfo.getAsJsonObject("data"))}")
+            }
+            if (it.onebotVersion == 12) {
+                throw IllegalStateException("Overflow 暂不支持 Onebot 12")
+            }
+            val bot = it.wrap(configuration, workingDir)
+
+            bot.also {
+                it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot))
+            }
+        }
         
         val botImpl = service.awaitNewBotConnection()
         if (botImpl == null) {
@@ -273,18 +286,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             }
             return null
         }
-        val versionInfo = botImpl.getVersionInfo()
-        if (printInfo) {
-            logger.info("协议端版本信息\n${gson.toJson(versionInfo.getAsJsonObject("data"))}")
-        }
-        if (botImpl.onebotVersion == 12) {
-            throw IllegalStateException("Overflow 暂不支持 Onebot 12")
-        }
-        val bot = botImpl.wrap(configuration, workingDir)
-
-        return bot.also {
-            it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot))
-        }
+        return Bot.getInstanceOrNull(botImpl.id)
     }
 
     override val botStarter: IBotStarter = object : IBotStarter {

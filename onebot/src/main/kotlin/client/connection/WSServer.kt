@@ -51,6 +51,7 @@ class WSServer(
         }
     }
 
+    internal var botConsumer: suspend (Bot) -> Unit = {}
     private val bots: MutableList<Bot> = mutableListOf()
     //通过使Wrapper互不相等，使得当bot重新上线时，botChannel推送成功。
     private val botChannel = Channel<BotWrapper>()
@@ -114,13 +115,14 @@ class WSServer(
             }
         }
         logger.info("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 已连接 ┈━═☆")
-        runBlocking {
+        scope.launch {
             val bot = muteX.withLock {
                 Bot(conn, config, actionHandler).also { it.conn = conn }.apply {
                     connectDef.complete(this)
                 }
             }
             bots.add(bot)
+            botConsumer.invoke(bot)
             botChannel.send(BotWrapper(bot))
         }
     }
@@ -134,7 +136,7 @@ class WSServer(
             CloseCode.valueOf(code) ?: code
         )
         unlockMutex()
-        runBlocking {
+        scope.launch {
             muteX.withLock {
                 if (!bots.removeIf { it.conn == conn }) {
                     logger.warn("bot移除失败，这并不应该被发生。")

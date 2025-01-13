@@ -27,6 +27,7 @@ class WSClient(
     private val retryRestMills: Long = 60000L,
     header: Map<String, String> = mapOf(),
 ) : WebSocketClient(uri, header), IAdapter {
+    internal var botConsumer: suspend (Bot) -> Unit = {}
     private var retryCount = 0
     private var scheduleClose = false
 
@@ -42,8 +43,10 @@ class WSClient(
         ) { close() }
     }
 
-    fun createBot(): Bot {
-        return Bot(this, config, actionHandler)
+    suspend fun createBot(): Bot {
+        val bot = Bot(this, config, actionHandler)
+        botConsumer.invoke(bot)
+        return bot
     }
 
     suspend fun connectSuspend(): Boolean {
