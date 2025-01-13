@@ -19,7 +19,7 @@ class GroupFilesAdapter {
                 fileId = obj.string("file_id")
                 fileName = obj.string("file_name")
                 busid = obj.int("busid")
-                fileSize = obj.long("file_size")
+                fileSize = obj.long("file_size", "size") // NapCat: size
                 uploadTime = obj.long("upload_time")
                 deadTime = obj.long("dead_time")
                 modifyTime = obj.long("modify_time")

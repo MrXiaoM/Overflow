@@ -77,6 +77,13 @@ fun JsonObject.longFromString(key: String): Long {
 fun JsonObject.long(key: String): Long {
     return this[key]?.asLong ?: throw JsonParseException("Can`t find `$key`")
 }
+fun JsonObject.long(vararg keys: String): Long {
+    for (key in keys) {
+        val value = this[key]?.asLong
+        if (value != null) return value
+    }
+    throw JsonParseException("Can't find any of `${keys.joinToString(separator = "`, `")}`")
+}
 fun JsonObject.ignorable(key: String, def: Float): Float {
     return nullableFloat(key, def.nullable) ?: def
 }
