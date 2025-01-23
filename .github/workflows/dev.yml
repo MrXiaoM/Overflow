@@ -36,7 +36,7 @@ jobs:
           # 加上 VERSION_OVERRIDE 将会设为 -SNAPSHOT 版本
           ORG_GRADLE_PROJECT_VERSION_OVERRIDE: ${{ env.SHORT_SHA }}
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: overflow-core-all-${{ env.SHORT_SHA }}
           path: overflow-core-all/build/libs/*-all.jar
