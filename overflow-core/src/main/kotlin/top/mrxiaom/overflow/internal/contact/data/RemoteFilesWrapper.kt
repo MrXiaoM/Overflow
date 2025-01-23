@@ -108,8 +108,15 @@ internal class FolderWrapper(
     override suspend fun createFolder(name: String): AbsoluteFolder {
         if (name.isEmpty()) throw IllegalArgumentException("子目录名称不能为空")
         if (name.matches(Regex(":*?\"<>|"))) throw IllegalArgumentException("不能在非根目录下创建子目录")
-        contact.bot.impl.createGroupFileFolder(contact.id, name, id)
-        throw PermissionDeniedException("无法获取文件夹创建回执")
+        val result = contact.bot.impl.createGroupFileFolder(contact.id, name, id)
+        val data = result.data
+        if (data != null && data.folderId.isNotEmpty()) {
+            val time = currentTimeSeconds()
+            val folder = FolderWrapper(contact, this, data.folderId, name, time, time, contact.bot.id, 0)
+            folders.add(folder)
+            return folder
+        }
+        throw PermissionDeniedException("当前 Onebot 实现不支持获取文件夹创建回执")
     }
 
     @JavaFriendlyAPI
@@ -189,11 +196,19 @@ internal class FolderWrapper(
     ): AbsoluteFile {
         val result = impl.uploadGroupFile(contact.id, FileService.instance!!.upload(content), filepath, id)
         if (result.status == "ok") {
-            val newPath = absolutePath + filepath.removePrefix("/")
+            val data = result.data
+            val id = data?.fileId?.takeIf { it.isNotEmpty() }
             val name = filepath.substringAfterLast('/')
             val size = content.size
             val uploadTime = currentTimeSeconds()
-            return DummyFile(newPath, contact, name, this, size, uploadTime, contact.bot.id)
+            val md5 = content.md5
+            val sha1 = content.sha1
+            if (id != null) {
+                val file = FileWrapper(contact, this, id, name, md5, sha1, size, 0L, uploadTime, uploadTime, contact.bot.id, null)
+                files.add(file)
+                return file
+            }
+            return DummyFile(contact, this, name, md5, sha1, size, uploadTime, contact.bot.id)
         }
         throw PermissionDeniedException("文件上传失败，详见网络日志 (logs/onebot)")
     }
@@ -312,10 +327,11 @@ internal class FileWrapper(
  * 在实现获取文件发送回执之前的临时实现
  */
 internal class DummyFile(
-    override val absolutePath: String,
     override val contact: FileSupported,
-    override val name: String,
     override val parent: AbsoluteFolder?,
+    override val name: String,
+    override val md5: ByteArray,
+    override val sha1: ByteArray,
     override val size: Long,
     override val uploadTime: Long,
     override val uploaderId: Long
@@ -326,8 +342,15 @@ internal class DummyFile(
     override val isFile: Boolean = true
     override val isFolder: Boolean = false
     override val lastModifiedTime: Long = uploadTime
-    override val md5: ByteArray = byteArrayOf()
-    override val sha1: ByteArray = byteArrayOf()
+    override val absolutePath: String
+        get() {
+            val parent = parent
+            return when {
+                parent == null || this.id == "/" -> "/"
+                parent.parent == null || parent.id == "/" -> "/$name"
+                else -> "${parent.absolutePath}/$name"
+            }
+        }
 
     override suspend fun delete(): Boolean = false
     override suspend fun exists(): Boolean = true

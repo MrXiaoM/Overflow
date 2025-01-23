@@ -19,7 +19,9 @@ import cn.evolvefield.onebot.sdk.response.misc.*
 import cn.evolvefield.onebot.sdk.util.*
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.handler.ActionHandler
+import cn.evolvefield.onebot.sdk.response.ext.CreateGroupFileFolderResp
 import cn.evolvefield.onebot.sdk.response.ext.GetFileResp
+import cn.evolvefield.onebot.sdk.response.ext.UploadGroupFileResp
 import com.google.gson.*
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import org.java_websocket.WebSocket
@@ -796,10 +798,10 @@ class Bot(
      * @param file    本地文件路径
      * @param name    储存名称
      * @param folder  父目录ID
-     * @return [ActionRaw]
+     * @return [ActionData] of [UploadGroupFileResp]
      */
     @JvmBlockingBridge
-    suspend fun uploadGroupFile(groupId: Long, file: String, name: String, folder: String): ActionRaw {
+    suspend fun uploadGroupFile(groupId: Long, file: String, name: String, folder: String): ActionData<UploadGroupFileResp> {
         val action = ActionPathEnum.UPLOAD_GROUP_FILE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
@@ -807,7 +809,7 @@ class Bot(
         params.addProperty("name", name)
         params.addProperty("folder", folder)
         val result = actionHandler.action(this, action, params)
-        return result.withClass()
+        return result.withToken()
     }
 
     /**
@@ -818,17 +820,17 @@ class Bot(
      * @param groupId 群号
      * @param file    本地文件路径
      * @param name    储存名称
-     * @return [ActionRaw]
+     * @return [ActionData] of [UploadGroupFileResp]
      */
     @JvmBlockingBridge
-    suspend fun uploadGroupFile(groupId: Long, file: String, name: String): ActionRaw {
+    suspend fun uploadGroupFile(groupId: Long, file: String, name: String): ActionData<UploadGroupFileResp> {
         val action = ActionPathEnum.UPLOAD_GROUP_FILE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("file", file)
         params.addProperty("name", name)
         val result = actionHandler.action(this, action, params)
-        return result.withClass()
+        return result.withToken()
     }
 
     /**
@@ -976,7 +978,7 @@ class Bot(
         return result.withToken()
     }
 
-    suspend fun createGroupFileFolder(groupId: Long, name: String, parentId: String): ActionRaw {
+    suspend fun createGroupFileFolder(groupId: Long, name: String, parentId: String): ActionData<CreateGroupFileFolderResp> {
         val action = ActionPathEnum.CREATE_GROUP_FILE_FOLDER
         val params = JsonObject().apply {
             addProperty("group_id", groupId)
@@ -984,7 +986,7 @@ class Bot(
             addProperty("parent_id", parentId)
         }
         val result = actionHandler.action(this, action, params)
-        return result.withClass()
+        return result.withToken()
     }
 
     /**
