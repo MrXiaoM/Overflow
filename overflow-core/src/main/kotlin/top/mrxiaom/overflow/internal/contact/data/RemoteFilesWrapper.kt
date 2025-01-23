@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.firstOrNull
+import net.mamoe.mirai.contact.FileSupported
 import net.mamoe.mirai.contact.PermissionDeniedException
 import net.mamoe.mirai.contact.file.AbsoluteFile
 import net.mamoe.mirai.contact.file.AbsoluteFileFolder
@@ -186,8 +187,15 @@ internal class FolderWrapper(
         content: ExternalResource,
         callback: ProgressionCallback<AbsoluteFile, Long>?
     ): AbsoluteFile {
-        impl.uploadGroupFile(contact.id, FileService.instance!!.upload(content), filepath, id)
-        throw PermissionDeniedException("没有任何方法获取文件发送回执")
+        val result = impl.uploadGroupFile(contact.id, FileService.instance!!.upload(content), filepath, id)
+        if (result.status == "ok") {
+            val newPath = absolutePath + filepath.removePrefix("/")
+            val name = filepath.substringAfterLast('/')
+            val size = content.size
+            val uploadTime = currentTimeSeconds()
+            return DummyFile(newPath, contact, name, this, size, uploadTime, contact.bot.id)
+        }
+        throw PermissionDeniedException("文件上传失败，详见网络日志 (logs/onebot)")
     }
 
     override fun toString(): String = "AbsoluteFolder(name=$name, absolutePath=$absolutePath, id=$id)"
@@ -298,4 +306,40 @@ internal class FileWrapper(
         result = 31 * result + md5.contentHashCode()
         return result
     }
+}
+
+/**
+ * 在实现获取文件发送回执之前的临时实现
+ */
+internal class DummyFile(
+    override val absolutePath: String,
+    override val contact: FileSupported,
+    override val name: String,
+    override val parent: AbsoluteFolder?,
+    override val size: Long,
+    override val uploadTime: Long,
+    override val uploaderId: Long
+): AbsoluteFile {
+    override val expiryTime: Long = 0L
+    override val id: String
+        get() = throw IllegalStateException("很不幸，Onebot 没有提供获取文件上传回执的方法，刚上传的文件获取到的回执无法使用")
+    override val isFile: Boolean = true
+    override val isFolder: Boolean = false
+    override val lastModifiedTime: Long = uploadTime
+    override val md5: ByteArray = byteArrayOf()
+    override val sha1: ByteArray = byteArrayOf()
+
+    override suspend fun delete(): Boolean = false
+    override suspend fun exists(): Boolean = true
+    override suspend fun getUrl(): String? {
+        throw IllegalStateException("很不幸，Onebot 没有提供获取文件上传回执的方法，刚上传的文件获取到的回执无法使用")
+    }
+    override suspend fun moveTo(folder: AbsoluteFolder): Boolean = false
+    override suspend fun refresh(): Boolean = false
+    override suspend fun refreshed(): AbsoluteFile? = null
+    override suspend fun renameTo(newName: String): Boolean = false
+    override fun toMessage(): FileMessage {
+        throw IllegalStateException("很不幸，Onebot 没有提供获取文件上传回执的方法，刚上传的文件获取到的回执无法使用")
+    }
+    override fun toString(): String = "DummyFile(name=$name, absolutePath=$absolutePath, id=DUMMY)"
 }
