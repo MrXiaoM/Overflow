@@ -229,7 +229,7 @@ internal class FileWrapper(
     override val lastModifiedTime: Long,
     override val uploadTime: Long,
     override val uploaderId: Long,
-    val busid: Int,
+    val busid: Int?,
 ) : AbsoluteFile {
     internal val impl = contact.bot.impl
     override val isFile: Boolean = true

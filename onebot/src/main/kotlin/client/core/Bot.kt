@@ -996,12 +996,12 @@ class Bot(
      * @return [ActionData] of [GroupFileUrlResp]
      */
     @JvmBlockingBridge
-    suspend fun getGroupFileUrl(groupId: Long, fileId: String, busid: Int): ActionData<GroupFileUrlResp> {
+    suspend fun getGroupFileUrl(groupId: Long, fileId: String, busid: Int?): ActionData<GroupFileUrlResp> {
         val action = ActionPathEnum.GET_GROUP_FILE_URL
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("file_id", fileId)
-        params.addProperty("busid", busid)
+        if (busid != null) params.addProperty("busid", busid)
         val result = actionHandler.action(this, action, params)
         return result.withToken()
     }
@@ -1435,12 +1435,12 @@ class Bot(
      * @return [ActionRaw]
      */
     @JvmBlockingBridge
-    suspend fun deleteGroupFile(groupId: Long, fileId: String, busid: Int): ActionRaw {
+    suspend fun deleteGroupFile(groupId: Long, fileId: String, busid: Int?): ActionRaw {
         val action = ActionPathEnum.DELETE_GROUP_FILE
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.addProperty("file_id", fileId)
-        params.addProperty("busid", busid)
+        if (busid != null) params.addProperty("busid", busid)
         val result = actionHandler.action(this, action, params)
         return result.withClass()
     }
