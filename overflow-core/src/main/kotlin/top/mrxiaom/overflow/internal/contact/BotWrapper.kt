@@ -244,6 +244,9 @@ internal class BotWrapper private constructor(
             val json = result.json.data ?: JsonObject()
             val loginInfo = result.data ?: throw IllegalStateException("无法获取机器人账号信息")
             return (net.mamoe.mirai.Bot.getInstanceOrNull(id) as? BotWrapper)?.apply {
+                if (implBot.channel.isOpen) {
+                    throw IllegalStateException("一个账号 ($id) 只允许接入一条连接")
+                }
                 implBot = newBot
                 updateContacts()
             } ?: run {
