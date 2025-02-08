@@ -38,8 +38,8 @@ dependencies {
 
     testImplementation("com.google.code.gson:gson:2.10.1")
     testImplementation("org.java-websocket:Java-WebSocket:1.5.7")
-    testImplementation("net.mamoe:mirai-console")
-    testImplementation("net.mamoe:mirai-console-terminal")
+    testImplementation("net.mamoe:mirai-console:$miraiVersion")
+    testImplementation("net.mamoe:mirai-console-terminal:$miraiVersion")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 
