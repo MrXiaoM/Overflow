@@ -1,10 +1,7 @@
 package cn.evolvefield.onebot.sdk.response.group
 
 import com.google.gson.annotations.SerializedName
-import lombok.Data
-import lombok.NoArgsConstructor
 
-@Data
 class GroupHonorInfoResp {
     @SerializedName("group_id")
     var groupId = 0L
@@ -24,8 +21,6 @@ class GroupHonorInfoResp {
     /**
      * 活跃天数
      */
-    @Data
-    @NoArgsConstructor
     class CurrentTalkative {
         @SerializedName("user_id")
         var userId = 0L
@@ -43,8 +38,6 @@ class GroupHonorInfoResp {
     /**
      * 其它荣耀
      */
-    @Data
-    @NoArgsConstructor
     class OtherHonor {
         @SerializedName("user_id")
         var userId = 0L

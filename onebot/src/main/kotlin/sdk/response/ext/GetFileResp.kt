@@ -1,13 +1,7 @@
 package cn.evolvefield.onebot.sdk.response.ext
 
 import com.google.gson.annotations.SerializedName
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.NoArgsConstructor
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 class GetFileResp  {
     @SerializedName("file")
     var file: String = ""

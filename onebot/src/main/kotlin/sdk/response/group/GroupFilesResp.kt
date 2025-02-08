@@ -3,9 +3,7 @@ package cn.evolvefield.onebot.sdk.response.group
 import cn.evolvefield.onebot.sdk.util.json.GroupFilesAdapter
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
-import lombok.Data
 
-@Data
 class GroupFilesResp {
 
     var files: List<Files>? = null
@@ -15,7 +13,6 @@ class GroupFilesResp {
     /**
      * 群文件
      */
-    @Data
     @JsonAdapter(GroupFilesAdapter.Files::class)
     class Files {
         var fileId = ""
@@ -36,7 +33,6 @@ class GroupFilesResp {
     /**
      * 群文件夹
      */
-    @Data
     class Folders {
         @SerializedName("folder_id")
         var folderId = ""

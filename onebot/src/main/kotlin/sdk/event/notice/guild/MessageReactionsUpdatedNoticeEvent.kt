@@ -2,17 +2,7 @@ package cn.evolvefield.onebot.sdk.event.notice.guild
 
 import cn.evolvefield.onebot.sdk.event.notice.NoticeEvent
 import com.google.gson.annotations.SerializedName
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.EqualsAndHashCode
-import lombok.NoArgsConstructor
-import lombok.experimental.SuperBuilder
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@SuperBuilder(toBuilder = true)
-@EqualsAndHashCode(callSuper = true)
 class MessageReactionsUpdatedNoticeEvent : NoticeEvent() {
     /**
      * 频道ID
@@ -35,7 +25,6 @@ class MessageReactionsUpdatedNoticeEvent : NoticeEvent() {
     @SerializedName("current_reactions")
     var currentReactions: List<ReactionInfo> = mutableListOf()
 
-    @Data
     class ReactionInfo {
         /**
          * 表情ID

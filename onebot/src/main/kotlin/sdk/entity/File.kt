@@ -1,12 +1,10 @@
 package cn.evolvefield.onebot.sdk.entity
 
 import com.google.gson.annotations.SerializedName
-import lombok.Data
 
 /**
  * 文件实体
  */
-@Data
 class File {
     @SerializedName("id")
     var id = ""

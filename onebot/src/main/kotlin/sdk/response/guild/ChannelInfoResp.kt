@@ -1,9 +1,7 @@
 package cn.evolvefield.onebot.sdk.response.guild
 
 import com.google.gson.annotations.SerializedName
-import lombok.Data
 
-@Data
 class ChannelInfoResp {
     /**
      * 所属频道ID
@@ -56,7 +54,6 @@ class ChannelInfoResp {
     @SerializedName("slow_modes")
     var slowModes: List<SlowModeInfo> = mutableListOf()
 
-    @Data
     class SlowModeInfo {
         /**
          * 慢速模式Key

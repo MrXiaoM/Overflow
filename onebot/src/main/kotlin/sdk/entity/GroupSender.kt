@@ -1,9 +1,7 @@
 package cn.evolvefield.onebot.sdk.entity
 
 import com.google.gson.annotations.SerializedName
-import lombok.Data
 
-@Data
 class GroupSender {
     @SerializedName("user_id")
     var userId = ""

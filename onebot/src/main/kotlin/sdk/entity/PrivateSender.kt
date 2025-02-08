@@ -2,9 +2,7 @@ package cn.evolvefield.onebot.sdk.entity
 
 import cn.evolvefield.onebot.sdk.util.json.MessageEventAdapter
 import com.google.gson.annotations.JsonAdapter
-import lombok.Data
 
-@Data
 @JsonAdapter(MessageEventAdapter.PrivateSenderAdapter::class)
 class PrivateSender {
     var userId = 0L

@@ -3,17 +3,7 @@ package cn.evolvefield.onebot.sdk.event.notice.guild
 import cn.evolvefield.onebot.sdk.event.notice.NoticeEvent
 import cn.evolvefield.onebot.sdk.response.guild.ChannelInfoResp
 import com.google.gson.annotations.SerializedName
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.EqualsAndHashCode
-import lombok.NoArgsConstructor
-import lombok.experimental.SuperBuilder
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@SuperBuilder(toBuilder = true)
-@EqualsAndHashCode(callSuper = true)
 class ChannelDestroyedNoticeEvent : NoticeEvent() {
     /**
      * 频道ID

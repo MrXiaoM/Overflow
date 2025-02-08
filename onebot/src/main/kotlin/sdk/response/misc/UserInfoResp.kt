@@ -1,13 +1,7 @@
 package cn.evolvefield.onebot.sdk.response.misc
 
 import com.google.gson.annotations.SerializedName
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.NoArgsConstructor
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 class UserInfoResp {
 
     @SerializedName("user_id")
@@ -64,7 +58,6 @@ class UserInfoResp {
     @SerializedName("cookie")
     var cookie: ByteArray = byteArrayOf()
 
-    @Data
     class VipInfo {
         /**
          * QQ_VIP,
@@ -85,7 +78,6 @@ class UserInfoResp {
         var templateId= 0L
     }
 
-    @Data
     class Location {
         var city = ""
         var company = ""

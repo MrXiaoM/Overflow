@@ -2,9 +2,7 @@ package cn.evolvefield.onebot.sdk.response.guild
 
 import cn.evolvefield.onebot.sdk.entity.GuildSender
 import com.google.gson.annotations.SerializedName
-import lombok.Data
 
-@Data
 class GetGuildMsgResp {
     @SerializedName("guild_id")
     var guildId = ""

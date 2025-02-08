@@ -2,15 +2,7 @@ package cn.evolvefield.onebot.sdk.event.notice.group
 
 import cn.evolvefield.onebot.sdk.event.notice.NoticeEvent
 import com.google.gson.annotations.SerializedName
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.EqualsAndHashCode
-import lombok.NoArgsConstructor
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 class GroupAdminNoticeEvent : NoticeEvent() {
     /**
      * set、unset

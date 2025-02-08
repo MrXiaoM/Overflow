@@ -1,9 +1,7 @@
 package cn.evolvefield.onebot.sdk.response.group
 
 import com.google.gson.annotations.SerializedName
-import lombok.Data
 
-@Data
 class GroupAtAllRemainResp {
     /**
      * 是否可以 @全体成员

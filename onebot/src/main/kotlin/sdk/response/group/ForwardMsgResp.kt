@@ -3,14 +3,10 @@ package cn.evolvefield.onebot.sdk.response.group
 import cn.evolvefield.onebot.sdk.util.json.ForwardMsgAdapter
 import com.google.gson.annotations.JsonAdapter
 import com.google.gson.annotations.SerializedName
-import lombok.AllArgsConstructor
-import lombok.Data
 
 /**
  * @author MrXiaoM
  */
-@Data
-@AllArgsConstructor
 @JsonAdapter(ForwardMsgAdapter::class)
 class ForwardMsgResp {
     /**
@@ -20,8 +16,6 @@ class ForwardMsgResp {
     /**
      * 消息节点
      */
-    @Data
-    @AllArgsConstructor
     class Node {
         var time = 0
         var messageType = ""
@@ -36,8 +30,6 @@ class ForwardMsgResp {
     /**
      * 消息发送者
      */
-    @Data
-    @AllArgsConstructor
     class Sender {
         @SerializedName("user_id")
         var userId = 0L

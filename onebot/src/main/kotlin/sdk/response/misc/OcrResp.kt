@@ -1,9 +1,7 @@
 package cn.evolvefield.onebot.sdk.response.misc
 
 import com.google.gson.annotations.SerializedName
-import lombok.Data
 
-@Data
 class OcrResp {
     @SerializedName("texts")
     var texts: List<TextDetection> = mutableListOf()
@@ -11,7 +9,6 @@ class OcrResp {
     @SerializedName("language")
     var language: String = ""
 
-    @Data
     class TextDetection {
         /**
          * 文本

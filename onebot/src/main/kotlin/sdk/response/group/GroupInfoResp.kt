@@ -1,15 +1,7 @@
 package cn.evolvefield.onebot.sdk.response.group
 
 import com.google.gson.annotations.SerializedName
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.EqualsAndHashCode
-import lombok.NoArgsConstructor
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 class GroupInfoResp : GroupDataResp() {
     @SerializedName("group_memo")
     var groupMemo = ""

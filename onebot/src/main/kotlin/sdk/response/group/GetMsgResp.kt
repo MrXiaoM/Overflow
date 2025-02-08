@@ -3,11 +3,7 @@ package cn.evolvefield.onebot.sdk.response.group
 import cn.evolvefield.onebot.sdk.entity.Sender
 import cn.evolvefield.onebot.sdk.util.json.MsgAdapter
 import com.google.gson.annotations.JsonAdapter
-import lombok.AllArgsConstructor
-import lombok.Data
 
-@Data
-@AllArgsConstructor
 @JsonAdapter(MsgAdapter::class)
 class GetMsgResp {
     var messageId = 0

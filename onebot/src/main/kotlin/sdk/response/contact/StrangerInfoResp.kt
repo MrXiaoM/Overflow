@@ -2,11 +2,7 @@ package cn.evolvefield.onebot.sdk.response.contact
 
 import com.google.gson.JsonObject
 import com.google.gson.annotations.SerializedName
-import lombok.AllArgsConstructor
-import lombok.Data
 
-@Data
-@AllArgsConstructor
 class StrangerInfoResp {
     /**
      * QQ 号

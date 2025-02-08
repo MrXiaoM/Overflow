@@ -21,7 +21,6 @@ tasks.test {
 }
 
 dependencies {
-    implementation("org.projectlombok:lombok:1.18.26")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("org.jetbrains:annotations:24.0.1")
     implementation("org.slf4j:slf4j-api:2.0.5")
@@ -30,7 +29,6 @@ dependencies {
     implementation("org.java-websocket:Java-WebSocket:1.5.7")
 
     annotationProcessor("org.java-websocket:Java-WebSocket:1.5.7")
-    annotationProcessor("org.projectlombok:lombok:1.18.26")
     testCompileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
     testImplementation("ch.qos.logback:logback-classic:1.4.14")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")

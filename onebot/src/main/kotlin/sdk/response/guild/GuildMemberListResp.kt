@@ -1,9 +1,7 @@
 package cn.evolvefield.onebot.sdk.response.guild
 
 import com.google.gson.annotations.SerializedName
-import lombok.Data
 
-@Data
 class GuildMemberListResp {
     /**
      * 成员列表
@@ -23,7 +21,6 @@ class GuildMemberListResp {
     @SerializedName("next_token")
     var nextToken = ""
 
-    @Data
     class GuildMemberInfo {
         /**
          * 成员ID

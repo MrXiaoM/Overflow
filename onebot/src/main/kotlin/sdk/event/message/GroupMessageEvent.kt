@@ -4,17 +4,7 @@ import cn.evolvefield.onebot.sdk.entity.Anonymous
 import cn.evolvefield.onebot.sdk.entity.GroupSender
 import cn.evolvefield.onebot.sdk.util.json.MessageEventAdapter
 import com.google.gson.annotations.JsonAdapter;
-import lombok.AllArgsConstructor
-import lombok.Data
-import lombok.EqualsAndHashCode
-import lombok.NoArgsConstructor
-import lombok.experimental.SuperBuilder
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-@SuperBuilder(toBuilder = true)
-@EqualsAndHashCode(callSuper = true)
 @JsonAdapter(MessageEventAdapter::class)
 class GroupMessageEvent : MessageEvent() {
     var messageId: Int = 0

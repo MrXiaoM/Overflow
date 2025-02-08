@@ -1,9 +1,7 @@
 package cn.evolvefield.onebot.sdk.response.group
 
 import com.google.gson.annotations.SerializedName
-import lombok.Data
 
-@Data
 class GetHistoryMsgResp {
     /**
      * 发送时间
@@ -54,7 +52,6 @@ class GetHistoryMsgResp {
     /**
      * sender信息
      */
-    @Data
     class Sender {
         @SerializedName("user_id")
         var userId = 0L
