@@ -34,10 +34,8 @@ setupMavenCentralPublication {
 }
 
 dependencies {
-    implementation(platform("net.mamoe:mirai-bom:$miraiVersion"))
-
-    implementation("net.mamoe:mirai-core-api")
-    implementation("net.mamoe:mirai-core-utils")
+    implementation("net.mamoe:mirai-core-api:$miraiVersion")
+    implementation("net.mamoe:mirai-core-utils:$miraiVersion")
 
     implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
 

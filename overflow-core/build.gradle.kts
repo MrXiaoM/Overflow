@@ -21,11 +21,9 @@ setupMavenCentralPublication {
 val miraiVersion = extra("miraiVersion") ?: "2.16.0"
 
 dependencies {
-    implementation(platform("net.mamoe:mirai-bom:$miraiVersion"))
-
-    compileOnly("net.mamoe:mirai-console")
-    implementation("net.mamoe:mirai-core-api")
-    implementation("net.mamoe:mirai-core-utils")
+    compileOnly("net.mamoe:mirai-console:$miraiVersion")
+    implementation("net.mamoe:mirai-core-api:$miraiVersion")
+    implementation("net.mamoe:mirai-core-utils:$miraiVersion")
     implementation("org.java-websocket:Java-WebSocket:1.5.7")
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
