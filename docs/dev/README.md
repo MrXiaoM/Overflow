@@ -2,7 +2,7 @@
 
 # 开发版使用说明
 
-由于当前项目进度缓慢，将来可能有越来越多人有开发需求，故暂时将包发布到了 Sonatype 快照仓库。如需在开发环境中使用 Overflow，添加以下仓库
+目前 Overflow 的开发版本发布到了 Sonatype 快照仓库。目前仅推荐使用发布在 Maven Central 中的正式版本，如有开发版本需要，请添加仓库：
 
 ```kotlin
 repositories {
@@ -10,11 +10,11 @@ repositories {
 }
 ```
 快照仓库中依赖版本的格式为 `major.minor.patch.commits-shortHash-SNAPSHOT`，  
-示例：`0.9.9.481-d59fa60-SNAPSHOT`，详见 [#92](https://github.com/MrXiaoM/Overflow/issues/92)
+示例：`0.9.9.481-d59fa60-SNAPSHOT`，详见 [#92](https://github.com/MrXiaoM/Overflow/issues/92)。
 
-你可以在 [官网](https://mirai.mrxiaom.top/#get-started) 或者 [仓库 maven-metadata.xml](https://s01.oss.sonatype.org/content/repositories/snapshots/top/mrxiaom/mirai/overflow-core/maven-metadata.xml) 查询已发布的开发版本列表  
+你可以在 [官网](https://mirai.mrxiaom.top/#get-started) 或者 [仓库 maven-metadata.xml](https://s01.oss.sonatype.org/content/repositories/snapshots/top/mrxiaom/mirai/overflow-core/maven-metadata.xml) 查询已发布的开发版本列表。  
 
-正式发行版可在 [Maven Central](https://central.sonatype.com/search?q=g%3Atop.mrxiaom.mirai) 上查询版本号
+正式发行版可在 [Maven Central](https://central.sonatype.com/search?q=g%3Atop.mrxiaom.mirai) 上查询版本号。
 
 # 在 mirai-console 中开发
 
@@ -53,6 +53,9 @@ dependencies {
 # 在 mirai-core 中开发
 
 将依赖 `net.mamoe:mirai-core` 替换为 `top.mrxiaom.mirai:overflow-core` 即可。
+
+> 对于在开发版 `1.0.3.555-2d95d66-SNAPSHOT` 以前的旧版本 (包括正式版 `1.0.3`)，  
+> 需要补足依赖 `net.mamoe:mirai-core-api-jvm:2.16.0` 和 `net.mamoe:mirai-core-utils-jvm:2.16.0`。
 
 ```kotlin
 dependencies {
