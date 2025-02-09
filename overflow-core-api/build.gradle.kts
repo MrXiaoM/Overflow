@@ -34,10 +34,10 @@ setupMavenCentralPublication {
 }
 
 dependencies {
-    implementation("net.mamoe:mirai-core-api:$miraiVersion")
-    implementation("net.mamoe:mirai-core-utils:$miraiVersion")
+    api("net.mamoe:mirai-core-api:$miraiVersion")
+    api("net.mamoe:mirai-core-utils:$miraiVersion")
 
-    implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
+    api("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
 
-    implementation("org.slf4j:slf4j-api:2.0.5")
+    api("org.slf4j:slf4j-api:2.0.5")
 }

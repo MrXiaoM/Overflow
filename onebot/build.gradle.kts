@@ -21,12 +21,12 @@ tasks.test {
 }
 
 dependencies {
-    implementation("com.google.code.gson:gson:2.10.1")
+    api("com.google.code.gson:gson:2.10.1")
+    api("org.slf4j:slf4j-api:2.0.5")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
+    api("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
+    api("org.java-websocket:Java-WebSocket:1.5.7")
     implementation("org.jetbrains:annotations:24.0.1")
-    implementation("org.slf4j:slf4j-api:2.0.5")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")
-    implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
-    implementation("org.java-websocket:Java-WebSocket:1.5.7")
 
     annotationProcessor("org.java-websocket:Java-WebSocket:1.5.7")
     testCompileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:1.6.4")

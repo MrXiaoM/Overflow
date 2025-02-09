@@ -22,13 +22,13 @@ val miraiVersion = extra("miraiVersion") ?: "2.16.0"
 
 dependencies {
     compileOnly("net.mamoe:mirai-console:$miraiVersion")
-    implementation("net.mamoe:mirai-core-api:$miraiVersion")
-    implementation("net.mamoe:mirai-core-utils:$miraiVersion")
-    implementation("org.java-websocket:Java-WebSocket:1.5.7")
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
+    api("net.mamoe:mirai-core-api:$miraiVersion")
+    api("net.mamoe:mirai-core-utils:$miraiVersion")
+    api("org.java-websocket:Java-WebSocket:1.5.7")
+    api("com.google.code.gson:gson:2.10.1")
+    api("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
 
-    fun netty(s: String): Dependency? = implementation("io.netty:netty-$s:4.1.90.Final")
+    fun netty(s: String): Dependency? = api("io.netty:netty-$s:4.1.90.Final")
     netty("codec-http")
     netty("codec-socks")
     netty("transport")
