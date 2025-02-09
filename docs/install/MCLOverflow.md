@@ -1,4 +1,6 @@
-# *nux 安装教程
+# 通过 MCL 命令行安装
+
+# unix 安装教程
 
 在 Linux/MacOS/Termux 下安装 Overflow。
 
