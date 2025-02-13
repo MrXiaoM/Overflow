@@ -228,6 +228,16 @@ internal object OnebotMessages {
         }
     }
 
+    internal fun serializeForwardNodeMessage(bot: RemoteBot, appName: String, node: ForwardMessage.Node): Any {
+        if (appName.contains("napcat")) {
+            val forward = node.messageChain.findForwardMessage()
+            if (forward != null) {
+                return serializeForwardNodes(bot, forward.nodeList)
+            }
+        }
+        return JsonParser.parseString(serializeToOneBotJson(bot, node.messageChain))
+    }
+
     /**
      * 将转发消息节点转换为可供 Onebot 发送的列表
      *
@@ -237,7 +247,7 @@ internal object OnebotMessages {
     internal fun serializeForwardNodes(bot: RemoteBot, nodeList: List<ForwardMessage.Node>): List<Map<String, Any>> {
         val appName = bot.appName.lowercase()
         return nodeList.map {
-            val message = JsonParser.parseString(serializeToOneBotJson(bot, it.messageChain))
+            val message = serializeForwardNodeMessage(bot, appName, it)
             mutableMapOf(
                 "type" to "node",
                 "data" to mutableMapOf(
