@@ -911,14 +911,40 @@ class Bot(
      *
      * @param groupId 群号
      * @param msg     自定义转发消息
+     * @param source  转发来源（标题 `XXX的聊天记录`）
+     * @param summary 转发总概述（底部的 `查看XX条转发消息`）
+     * @param preview 转发预览（中间的 `人名: 消息`）
+     * @param prompt  在消息列表看到的纯文字外显（`[转发消息]`）
+     *
      * [参考文档](https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91)
      * @return [ActionData]
      */
-    suspend fun sendGroupForwardMsg(groupId: Long, msg: List<Map<String, Any>>): ActionData<MsgId> {
+    suspend fun sendGroupForwardMsg(
+        groupId: Long,
+        msg: List<Map<String, Any>>,
+        // NapCat: 转发消息外显
+        source: String? = null,
+        summary: String? = null,
+        preview: List<String>? = null,
+        prompt: String? = null
+    ): ActionData<MsgId> {
         val action = ActionPathEnum.SEND_GROUP_FORWARD_MSG
         val params = JsonObject()
         params.addProperty("group_id", groupId)
         params.add("messages", msg.toJsonArray())
+        // NapCat: 转发消息外显
+        if (source != null) params.addProperty("source", source)
+        if (summary != null) params.addProperty("summary", summary)
+        if (prompt != null) params.addProperty("prompt", prompt)
+        if (preview != null) {
+            val array = JsonArray()
+            for (line in preview) {
+                array.add(JsonObject().apply {
+                    addProperty("text", line)
+                })
+            }
+            params.add("news", array)
+        }
 
         val result = actionHandler.action(this, action, params)
         return result.withToken()
@@ -1171,14 +1197,40 @@ class Bot(
      *
      * @param userId 目标用户
      * @param msg    自定义转发消息
+     * @param source  转发来源（标题 `XXX的聊天记录`）
+     * @param summary 转发总概述（底部的 `查看XX条转发消息`）
+     * @param preview 转发预览（中间的 `人名: 消息`）
+     * @param prompt  在消息列表看到的纯文字外显（`[转发消息]`）
+     *
      * [参考文档](https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91)
      * @return [ActionData]
      */
-    suspend fun sendPrivateForwardMsg(userId: Long, msg: List<Map<String, Any>>): ActionData<MsgId> {
+    suspend fun sendPrivateForwardMsg(
+        userId: Long,
+        msg: List<Map<String, Any>>,
+        // NapCat: 转发消息外显
+        source: String? = null,
+        summary: String? = null,
+        preview: List<String>? = null,
+        prompt: String? = null
+    ): ActionData<MsgId> {
         val action = ActionPathEnum.SEND_PRIVATE_FORWARD_MSG
         val params = JsonObject()
         params.addProperty("user_id", userId)
         params.add("messages", msg.toJsonArray())
+        // NapCat: 转发消息外显
+        if (source != null) params.addProperty("source", source)
+        if (summary != null) params.addProperty("summary", summary)
+        if (prompt != null) params.addProperty("prompt", prompt)
+        if (preview != null) {
+            val array = JsonArray()
+            for (line in preview) {
+                array.add(JsonObject().apply {
+                    addProperty("text", line)
+                })
+            }
+            params.add("news", array)
+        }
 
         val result = actionHandler.action(this, action, params)
         return result.withToken()
