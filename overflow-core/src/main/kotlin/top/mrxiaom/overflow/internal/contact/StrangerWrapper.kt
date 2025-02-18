@@ -66,9 +66,9 @@ internal class StrangerWrapper(
 
         val messageChain = message.toMessageChain()
         var throwable: Throwable? = null
-        val receipt = kotlin.runCatching {
+        val messageIds = kotlin.runCatching {
             val forward = message.findForwardMessage()
-            val messageIds = if (forward != null) {
+            if (forward != null) {
                 val data = OnebotMessages.sendForwardMessage(this, forward)
                 data.safeMessageIds(bot)
             } else {
@@ -76,8 +76,11 @@ internal class StrangerWrapper(
                 val data = bot.impl.sendPrivateMsg(id, msg, false).data
                 data.safeMessageIds(bot)
             }
-
-            return OutgoingSource.stranger(
+        }.onFailure {
+            throwable = it
+            bot.logger.warning(it)
+        }.getOrElse { intArrayOf() }
+        val receipt = OutgoingSource.stranger(
                 bot = bot,
                 ids = messageIds,
                 internalIds = messageIds,
@@ -87,12 +90,11 @@ internal class StrangerWrapper(
                 target = this,
                 time = currentTimeSeconds().toInt()
             ).receipt(this)
-        }.onFailure { throwable = it }.getOrNull()
         StrangerMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
         bot.logger.verbose("Stranger($id) <- $messageChain")
 
-        return receipt ?: throw throwable!!
+        return receipt
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {

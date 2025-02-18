@@ -69,9 +69,9 @@ internal class FriendWrapper(
 
         val messageChain = message.toMessageChain()
         var throwable: Throwable? = null
-        val receipt = runCatching {
+        val messageIds = runCatching {
             val forward = messageChain.findForwardMessage()
-            val messageIds = if (forward != null) {
+            if (forward != null) {
                 val data = OnebotMessages.sendForwardMessage(this, forward)
                 data.safeMessageIds(bot)
             } else {
@@ -79,8 +79,11 @@ internal class FriendWrapper(
                 val data = bot.impl.sendPrivateMsg(id, msg, false).data
                 data.safeMessageIds(bot)
             }
-
-            OutgoingSource.friend(
+        }.onFailure {
+            throwable = it
+            bot.logger.warning(it)
+        }.getOrElse { intArrayOf() }
+        val receipt = OutgoingSource.friend(
                 bot = bot,
                 ids = messageIds,
                 internalIds = messageIds,
@@ -90,12 +93,11 @@ internal class FriendWrapper(
                 target = this@FriendWrapper,
                 time = currentTimeSeconds().toInt()
             ).receipt(this)
-        }.onFailure { throwable = it }.getOrNull()
         FriendMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
         bot.logger.verbose("Friend($id) <- $messageChain")
 
-        return receipt ?: throw throwable!!
+        return receipt
     }
 
     override suspend fun uploadAudio(resource: ExternalResource): OfflineAudio {

@@ -204,9 +204,9 @@ internal class GroupWrapper(
 
         val messageChain = message.toMessageChain()
         var throwable: Throwable? = null
-        val receipt = runCatching {
+        val messageIds = runCatching {
             val forward = messageChain.findForwardMessage()
-            val messageIds = if (forward != null) {
+            if (forward != null) {
                 val data = OnebotMessages.sendForwardMessage(this, forward)
                 data.safeMessageIds(bot)
             } else {
@@ -214,8 +214,12 @@ internal class GroupWrapper(
                 val data = bot.impl.sendGroupMsg(id, msg, false).data
                 data.safeMessageIds(bot)
             }
+        }.onFailure {
+            throwable = it
+            bot.logger.warning(it)
+        }.getOrElse { intArrayOf() }
 
-            OutgoingSource.group(
+        val receipt = OutgoingSource.group(
                 bot = bot,
                 ids = messageIds,
                 internalIds = messageIds,
@@ -225,12 +229,11 @@ internal class GroupWrapper(
                 target = this,
                 time = currentTimeSeconds().toInt()
             ).receipt(this)
-        }.onFailure { throwable = it }.getOrNull()
         GroupMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
         bot.logger.verbose("Group($id) <- $messageChain")
 
-        return receipt ?: throw throwable!!
+        return receipt
     }
 
     override suspend fun setEssenceMessage(source: MessageSource): Boolean {

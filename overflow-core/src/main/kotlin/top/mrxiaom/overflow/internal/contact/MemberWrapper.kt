@@ -161,9 +161,9 @@ internal class MemberWrapper(
 
         val messageChain = message.toMessageChain()
         var throwable: Throwable? = null
-        val receipt = runCatching {
+        val messageIds = runCatching {
             val forward = message.findForwardMessage()
-            val messageIds = if (forward != null) {
+            if (forward != null) {
                 val data = OnebotMessages.sendForwardMessage(this, forward)
                 data.safeMessageIds(bot)
             } else {
@@ -171,7 +171,11 @@ internal class MemberWrapper(
                 val data = bot.impl.sendPrivateMsg(id, msg, false).data
                 data.safeMessageIds(bot)
             }
-            OutgoingSource.temp(
+        }.onFailure {
+            throwable = it
+            bot.logger.warning(it)
+        }.getOrElse { intArrayOf() }
+        val receipt = OutgoingSource.temp(
                 bot = bot,
                 ids = messageIds,
                 internalIds = messageIds,
@@ -181,12 +185,11 @@ internal class MemberWrapper(
                 target = this,
                 time = currentTimeSeconds().toInt()
             ).receipt(this)
-        }.onFailure { throwable = it }.getOrNull()
         GroupTempMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
         bot.logger.verbose("Member(${group.id}:$id) <- $messageChain")
 
-        return receipt ?: throw throwable!!
+        return receipt
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {
