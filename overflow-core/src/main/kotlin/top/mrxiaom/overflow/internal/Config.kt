@@ -27,4 +27,13 @@ data class Config(
     var heartbeatCheckSeconds: Int = 60,
     @SerialName("use_group_upload_event_for_file_message")
     var useGroupUploadEventForFileMessage: Boolean = false,
+    @SerialName("resource_cache")
+    var resourceCache: CacheConfig = CacheConfig(),
+)
+@Serializable
+data class CacheConfig (
+    @SerialName("enabled")
+    var enabled: Boolean = false,
+    @SerialName("keep_duration_hours")
+    var keepDurationHours: Long = 168L,
 )

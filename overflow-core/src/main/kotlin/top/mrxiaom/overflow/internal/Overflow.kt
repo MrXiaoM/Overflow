@@ -35,6 +35,7 @@ import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.OverflowAPI.Companion.logger
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
+import top.mrxiaom.overflow.internal.cache.MessageCache
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.BotWrapper.Companion.wrap
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
@@ -47,14 +48,14 @@ import top.mrxiaom.overflow.internal.listener.addFriendListeners
 import top.mrxiaom.overflow.internal.listener.addGroupListeners
 import top.mrxiaom.overflow.internal.listener.addGuildListeners
 import top.mrxiaom.overflow.internal.message.OnebotMessages
-import top.mrxiaom.overflow.internal.message.data.OfflineMessageSourceImpl
-import top.mrxiaom.overflow.internal.message.data.WrappedFileMessage
+import top.mrxiaom.overflow.internal.message.data.*
 import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin
 import top.mrxiaom.overflow.internal.utils.wrapAsOtherClientInfo
 import top.mrxiaom.overflow.spi.MediaURLService
 import top.mrxiaom.overflow.spi.MediaURLService.Companion.queryImageUrl
 import java.io.File
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration
 
 internal val OverflowAPI.scope: CoroutineScope
     get() = this as Overflow
@@ -329,6 +330,27 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
     }
 
+    fun resolveResourceDownload(messageChain: MessageChain) {
+        if (!MessageCache.enabled) return
+        for (message in messageChain) {
+            if (message is WrappedImage) {
+                MessageCache.scheduleDownload(message)
+                continue
+            }
+            if (message is WrappedAudio) {
+                MessageCache.scheduleDownload(message)
+                continue
+            }
+            if (message is WrappedVideo) {
+                MessageCache.scheduleDownload(message)
+                continue
+            }
+        }
+        if (MessageCache.keepDuration != Duration.INFINITE) {
+            launch { MessageCache.checkClean() }
+        }
+    }
+
     override fun imageFromFile(file: String): Image = OnebotMessages.imageFromFile(file)
     override fun audioFromFile(file: String): Audio = OnebotMessages.audioFromFile(file)
     override fun videoFromFile(file: String): ShortVideo = OnebotMessages.videoFromFile(file)
@@ -357,6 +379,12 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     @JvmBlockingBridge
     override suspend fun deserializeMessageFromCQCode(bot: Bot, message: String): MessageChain? {
         return OnebotMessages.deserializeMessageFromCQCode(bot.asRemoteBot, message, null)
+    }
+
+    override fun configureMessageCache(enabled: Boolean?, saveDir: File?, keepDuration: Duration?) {
+        if (enabled != null) MessageCache.enabled = enabled
+        if (saveDir != null) MessageCache.saveDir = saveDir
+        if (keepDuration != null) MessageCache.keepDuration = keepDuration
     }
 
     override suspend fun queryProfile(bot: Bot, targetId: Long): UserProfile {

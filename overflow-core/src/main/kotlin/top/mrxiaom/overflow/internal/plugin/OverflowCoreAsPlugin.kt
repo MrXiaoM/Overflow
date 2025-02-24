@@ -16,6 +16,7 @@ import net.mamoe.mirai.console.internal.data.builtins.AutoLoginConfig
 import net.mamoe.mirai.console.permission.Permission
 import net.mamoe.mirai.console.permission.PermissionId
 import net.mamoe.mirai.console.plugin.Plugin
+import net.mamoe.mirai.console.plugin.PluginManager
 import net.mamoe.mirai.console.plugin.PluginManager.INSTANCE.description
 import net.mamoe.mirai.console.plugin.description.PluginDependency
 import net.mamoe.mirai.console.plugin.description.PluginDescription
@@ -30,6 +31,7 @@ import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.EventCancelledException
 import net.mamoe.mirai.utils.MiraiLogger
+import net.mamoe.mirai.utils.resolveMkdir
 import net.mamoe.mirai.utils.weeksToMillis
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.framing.CloseFrame
@@ -43,10 +45,13 @@ import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.string
+import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin.TheDescription.id
 import top.mrxiaom.overflow.internal.utils.LoggerInFolder
 import java.io.File
 import kotlin.reflect.jvm.jvmName
 import kotlin.system.exitProcess
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
 
 @Suppress("PluginMainServiceNotConfigured", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
@@ -100,13 +105,27 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
 
     @OptIn(ConsoleExperimentalApi::class, ConsoleFrontEndImplementation::class)
     fun onEnable() {
-        if (Overflow.instance.config.noLogDoNotReportIfYouSwitchThisOn) {
+        val overflow = Overflow.instance
+        val config = overflow.config
+        if (config.noLogDoNotReportIfYouSwitchThisOn) {
             miraiLogger = MiraiLogger.Factory.create(Overflow::class, "Onebot")
             miraiLogger.warning("你已开启 no_log，开启该选项后将不接受漏洞反馈。")
         } else {
             miraiLogger = LoggerInFolder(Overflow::class, "Onebot", File("logs/onebot"), 1.weeksToMillis)
         }
         oneBotLogger = net.mamoe.mirai.console.internal.logging.externalbind.slf4j.SLF4JAdapterLogger(miraiLogger)
+
+        config.resourceCache.apply {
+            overflow.configureMessageCache(
+                enabled = enabled,
+                saveDir = PluginManager.pluginsDataFolder
+                    .resolve("$id/cache")
+                    .also { if (enabled && !it.exists()) it.mkdirs() },
+                keepDuration = keepDurationHours
+                    .takeIf { it > 0 }?.hours
+                    ?: Duration.INFINITE
+            )
+        }
 
         channel = GlobalEventChannel
             .parentScope(MiraiConsole.INSTANCE)
@@ -196,7 +215,6 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 }.also {
                     if (token != null) it.token(token)
                     if (!platform) it.noPlatform()
-                    val config = Overflow.instance.config
                     it.retryTimes(config.retryTimes)
                     it.retryWaitMills(config.retryWaitMills)
                     it.retryRestMills(config.retryRestMills)

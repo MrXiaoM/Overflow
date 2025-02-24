@@ -43,7 +43,7 @@ internal class WrappedImageProtocol : InternalImageProtocol {
 @Serializable
 @MiraiExperimentalApi
 internal data class WrappedImage(
-    val url: String,
+    var url: String,
     override val imageType: ImageType,
     override val size: Long,
     override val width: Int,
@@ -58,7 +58,8 @@ internal data class WrappedImage(
         } else url
         "[overflow:image,url=$fileString]"
     }
-    override val imageId: String = url
+    override val imageId: String
+        get() = url
 
     override fun contentToString(): String = if (isEmoji) {
         "[动画表情]"

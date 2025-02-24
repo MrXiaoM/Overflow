@@ -15,7 +15,7 @@ import java.util.*
 @Serializable
 @SerialName(WrappedAudio.SERIAL_NAME)
 internal data class WrappedAudio(
-    val url: String,
+    var url: String,
     override val length: Long,
 ): OnlineAudio, OfflineAudio {
     private val _stringValue: String by lazy(LazyThreadSafetyMode.NONE) {

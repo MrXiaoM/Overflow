@@ -7,6 +7,8 @@ import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiLogger
 import top.mrxiaom.overflow.contact.RemoteBot
+import java.io.File
+import kotlin.time.Duration
 
 val Overflow: OverflowAPI
     get() = OverflowAPI.get()
@@ -76,6 +78,14 @@ interface OverflowAPI {
      */
     @JvmBlockingBridge
     suspend fun deserializeMessageFromCQCode(bot: Bot, message: String): MessageChain?
+
+    /**
+     * 配置消息自动缓存选项，传入 null 的值不会被修改
+     * @param enabled 是否启用媒体消息（图片、语音、视频）缓存。
+     * @param saveDir 缓存文件夹路径。
+     * @param keepDuration 缓存文件保存时间。在收到消息时，文件将会自动清理。
+     */
+    fun configureMessageCache(enabled: Boolean? = null, saveDir: File? = null, keepDuration: Duration? = null)
 
     companion object {
         public val logger = MiraiLogger.Factory.create(OverflowAPI::class, "Overflow")

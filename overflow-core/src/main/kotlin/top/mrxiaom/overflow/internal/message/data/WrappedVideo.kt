@@ -18,9 +18,9 @@ import java.util.*
 @Serializable
 @SerialName(WrappedVideo.SERIAL_NAME)
 internal data class WrappedVideo(
-    val file: String,
-    override val filename: String = if (file.startsWith("base64://")) "base64" else file.substringAfterLast("/"),
-    override val videoId: String = filename,
+    var file: String,
+    override var filename: String = if (file.startsWith("base64://")) "base64" else file.substringAfterLast("/"),
+    override var videoId: String = filename,
 ) : OnlineShortVideo {
     private val _stringValue: String by lazy(LazyThreadSafetyMode.NONE) {
         val fileString = if (urlForDownload.startsWith("base64://") && urlForDownload.length > 32) {
