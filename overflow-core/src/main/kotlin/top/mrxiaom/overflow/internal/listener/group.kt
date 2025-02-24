@@ -281,7 +281,7 @@ internal class GroupBanNoticeListener : EventListener<GroupBanNoticeEvent> {
                 origin = origin,
                 new = mute,
                 group = group,
-                operator = operator
+                operator = operator?.takeIf { operator.id != bot.id }
             ))
             return
         }
@@ -314,12 +314,12 @@ internal class GroupBanNoticeListener : EventListener<GroupBanNoticeEvent> {
                 bot.eventDispatcher.broadcastAsync(MemberMuteEvent(
                     member = member,
                     durationSeconds = e.duration.toInt(),
-                    operator = operator
+                    operator = operator?.takeIf { operator.id != bot.id }
                 ))
             } else {
                 bot.eventDispatcher.broadcastAsync(MemberUnmuteEvent(
                     member = member,
-                    operator = operator
+                    operator = operator?.takeIf { operator.id != bot.id }
                 ))
             }
         }
