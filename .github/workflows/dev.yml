@@ -21,6 +21,10 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: Setup Java 11
         uses: actions/setup-java@v3
         with:
@@ -29,9 +33,7 @@ jobs:
       - name: Get short SHA
         run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
       - name: Build Package
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: :overflow-core-all:shadowJar
+        run: ./gradlew :overflow-core-all:shadowJar
         env:
           # 加上 VERSION_OVERRIDE 将会设为 -SNAPSHOT 版本
           ORG_GRADLE_PROJECT_VERSION_OVERRIDE: ${{ env.SHORT_SHA }}
