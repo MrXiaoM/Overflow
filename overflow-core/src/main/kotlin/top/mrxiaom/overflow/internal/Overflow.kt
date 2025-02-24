@@ -72,6 +72,11 @@ internal fun ActionRaw.check(failMsg: String): Boolean {
 @OptIn(MiraiExperimentalApi::class, MiraiInternalApi::class, LowLevelApi::class)
 class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override val coroutineContext: CoroutineContext = CoroutineName("overflow")
+        .apply {
+            job.invokeOnCompletion {
+                MessageCache.cancelSchedule()
+            }
+        }
     override val BotFactory: BotFactory
         get() = BotFactoryImpl
     override var FileCacheStrategy: FileCacheStrategy = net.mamoe.mirai.utils.FileCacheStrategy.PlatformDefault

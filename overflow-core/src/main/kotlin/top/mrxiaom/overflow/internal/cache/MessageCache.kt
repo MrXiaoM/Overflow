@@ -24,6 +24,10 @@ internal object MessageCache {
     private val downloadQueue = ConcurrentLinkedQueue<Download>()
     private val lock = Object()
 
+    internal fun cancelSchedule() {
+        downloadQueue.clear()
+    }
+
     internal fun scheduleDownload(image: WrappedImage) {
         if (!enabled) return
         val url = image.url
