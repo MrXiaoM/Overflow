@@ -132,6 +132,7 @@ internal class MemberWrapper(
             "durationSeconds 必须要大于0."
         }
         checkBotPermissionHigherThanThis("禁言")
+        impl.shutUpTimestamp = currentTimeSeconds() + durationSeconds
         if (bot.impl.setGroupBan(group.id, id, durationSeconds)
             .check("禁言群成员 $id")) {
             group.updateMember(id)
@@ -140,6 +141,7 @@ internal class MemberWrapper(
 
     override suspend fun unmute() {
         checkBotPermissionHigherThanThis("解除禁言")
+        impl.shutUpTimestamp = 0
         if (bot.impl.setGroupBan(group.id, id, 0)
             .check("解除禁言群成员 $id")) {
             group.updateMember(id)
