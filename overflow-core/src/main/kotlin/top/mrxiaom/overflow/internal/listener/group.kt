@@ -101,6 +101,7 @@ internal class GroupMessageListener : EventListener<GroupMessageEvent> {
         internal fun receiveGroupMessage(bot: BotWrapper, member: NormalMember, message: MessageChain, messageId: Int, timeInSecond: Long) {
             val group = member.group
             val messageString = message.toString()
+            Overflow.instance.resolveResourceDownload(message)
             val messageSource = IncomingSource.group(
                 bot = bot,
                 ids = intArrayOf(messageId),

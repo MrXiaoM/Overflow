@@ -35,6 +35,7 @@ internal class FriendMessageListener : EventListener<PrivateMessageEvent> {
                     return
                 }
                 val message = e.toMiraiMessage(bot)
+                Overflow.instance.resolveResourceDownload(message)
                 val messageString = message.toString()
                 val messageSource = IncomingSource.friend(
                     bot = bot,

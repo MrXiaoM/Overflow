@@ -6,6 +6,7 @@ import cn.evolvefield.onebot.sdk.entity.GuildSender
 import cn.evolvefield.onebot.sdk.event.message.GuildMessageEvent
 import net.mamoe.mirai.contact.MemberPermission
 import top.mrxiaom.overflow.event.LegacyGuildMessageEvent
+import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages.toMiraiMessage
 import top.mrxiaom.overflow.internal.utils.bot
 
@@ -22,6 +23,7 @@ internal class GuildMessageListener : EventListener<GuildMessageEvent> {
         when (e.subType) {
             "channel" -> {
                 val message = e.toMiraiMessage(bot)
+                Overflow.instance.resolveResourceDownload(message)
                 val messageString = message.toString()
 
                 if (e.sender.userId == bot.id) {

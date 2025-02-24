@@ -469,6 +469,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override suspend fun downloadForwardMessage(bot: Bot, resourceId: String): List<ForwardMessage.Node> {
         return bot.asOnebot.impl.getForwardMsg(resourceId).data?.message?.map {
             val msg = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, it.message)
+            resolveResourceDownload(msg)
             ForwardMessage.Node(
                 it.sender!!.userId,
                 it.time,
