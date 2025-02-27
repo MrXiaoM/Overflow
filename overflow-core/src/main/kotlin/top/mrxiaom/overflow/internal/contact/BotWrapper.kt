@@ -36,14 +36,11 @@ import top.mrxiaom.overflow.internal.data.StrangerInfoImpl
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.utils.*
-import top.mrxiaom.overflow.internal.utils.LoggerInFolder
-import top.mrxiaom.overflow.internal.utils.asCoroutineExceptionHandler
-import top.mrxiaom.overflow.internal.utils.subLogger
-import top.mrxiaom.overflow.internal.utils.update
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
+@Suppress("MemberVisibilityCanBePrivate")
 @OptIn(MiraiInternalApi::class, LowLevelApi::class)
 internal class BotWrapper private constructor(
     private var implBot: Bot,
@@ -66,7 +63,6 @@ internal class BotWrapper private constructor(
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
     private var otherClientsInternal: ContactList<OtherClientWrapper>? = null
     private var strangersInternal: ContactList<StrangerWrapper> = ContactList()
-
 
     suspend fun updateLoginInfo() {
         loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("刷新机器人信息失败")
@@ -234,7 +230,7 @@ internal class BotWrapper private constructor(
         implBot.channel.send(message)
     }
 
-    suspend fun sendMessage(contact: CanSendMessage, messageChain: MessageChain): Pair<IntArray, Throwable?> {
+    suspend fun sendMessageCommon(contact: CanSendMessage, messageChain: MessageChain): Pair<IntArray, Throwable?> {
         var throwable: Throwable? = null
         val messageIds = runCatching {
             if (contact !is Contact) {
@@ -251,8 +247,10 @@ internal class BotWrapper private constructor(
             }
         }.onFailure {
             throwable = it
-            logger.warning(it)
         }.getOrElse { intArrayOf() }
+        if (throwable != null) {
+            logger.warning(throwable)
+        }
         return messageIds to throwable
     }
 

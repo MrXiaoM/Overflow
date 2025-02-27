@@ -29,12 +29,9 @@ import top.mrxiaom.overflow.internal.check
 import top.mrxiaom.overflow.internal.contact.data.EmptyMemberActive
 import top.mrxiaom.overflow.internal.contact.data.MemberActiveWrapper
 import top.mrxiaom.overflow.internal.message.OnebotMessages
-import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.internal.message.data.OutgoingSource
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.tempMsg
 import top.mrxiaom.overflow.internal.scope
-import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
@@ -164,9 +161,14 @@ internal class MemberWrapper(
             throw EventCancelledException("消息发送已被取消")
 
         val messageChain = message.toMessageChain()
-        val (messageIds, throwable) = bot.sendMessage(this, messageChain)
+        val (messageIds, throwable) = bot.sendMessageCommon(this, messageChain)
         val receipt = tempMsg(messageIds, messageChain).receipt(this)
-        GroupTempMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
+        GroupTempMessagePostSendEvent(
+            target = this,
+            message = messageChain,
+            exception = throwable,
+            receipt = receipt.takeIf { throwable == null }
+        ).broadcast()
 
         bot.logger.verbose("Member(${group.id}:$id) <- $messageChain")
 
@@ -174,7 +176,9 @@ internal class MemberWrapper(
     }
 
     override suspend fun sendToOnebot(message: String): MsgId? {
-        val resp = bot.impl.sendPrivateMsg(id, message, false)
+        val resp = bot.impl.sendPrivateMsg(id, message, false) {
+            throwExceptions(true)
+        }
         return resp.data
     }
 

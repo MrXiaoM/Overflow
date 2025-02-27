@@ -65,9 +65,14 @@ internal class FriendWrapper(
             throw EventCancelledException("消息发送已被取消")
 
         val messageChain = message.toMessageChain()
-        val (messageIds, throwable) = bot.sendMessage(this, messageChain)
+        val (messageIds, throwable) = bot.sendMessageCommon(this, messageChain)
         val receipt = friendMsg(messageIds, messageChain).receipt(this)
-        FriendMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
+        FriendMessagePostSendEvent(
+            target = this,
+            message = messageChain,
+            exception = throwable,
+            receipt = receipt.takeIf { throwable == null }
+        ).broadcast()
 
         bot.logger.verbose("Friend($id) <- $messageChain")
 
@@ -75,7 +80,9 @@ internal class FriendWrapper(
     }
 
     override suspend fun sendToOnebot(message: String): MsgId? {
-        val resp = bot.impl.sendPrivateMsg(id, message, false)
+        val resp = bot.impl.sendPrivateMsg(id, message, false) {
+            throwExceptions(true)
+        }
         return resp.data
     }
 

@@ -29,8 +29,6 @@ import net.mamoe.mirai.spi.AudioToSilkService
 import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.currentTimeSeconds
-import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.contact.RemoteGroup
 import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.contact.Updatable
@@ -39,20 +37,11 @@ import top.mrxiaom.overflow.internal.contact.data.AnnouncementsWrapper.Companion
 import top.mrxiaom.overflow.internal.contact.data.EssencesWrapper.Companion.fetchEssences
 import top.mrxiaom.overflow.internal.contact.data.RemoteFilesWrapper.Companion.fetchFiles
 import top.mrxiaom.overflow.internal.message.OnebotMessages
-import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.internal.message.data.OutgoingSource
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.groupMsg
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
-import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.internal.utils.update
 import top.mrxiaom.overflow.internal.utils.wrapAsMember
 import top.mrxiaom.overflow.spi.FileService
-import kotlin.collections.HashMap
-import kotlin.collections.first
-import kotlin.collections.firstOrNull
-import kotlin.collections.hashMapOf
-import kotlin.collections.isNullOrEmpty
-import kotlin.collections.map
 import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
 
@@ -203,11 +192,18 @@ internal class GroupWrapper(
     override suspend fun sendMessage(message: Message): MessageReceipt<Group> {
         if (GroupMessagePreSendEvent(this, message).broadcast().isCancelled)
             throw EventCancelledException("消息发送已被取消")
+        if (isBotMuted)
+            throw BotIsBeingMutedException(this, message)
 
         val messageChain = message.toMessageChain()
-        val (messageIds, throwable) = bot.sendMessage(this, messageChain)
+        val (messageIds, throwable) = bot.sendMessageCommon(this, messageChain)
         val receipt = groupMsg(messageIds, messageChain).receipt(this)
-        GroupMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
+        GroupMessagePostSendEvent(
+            target = this,
+            message = messageChain,
+            exception = throwable,
+            receipt = receipt.takeIf { throwable == null }
+        ).broadcast()
 
         bot.logger.verbose("Group($id) <- $messageChain")
 
@@ -215,7 +211,9 @@ internal class GroupWrapper(
     }
 
     override suspend fun sendToOnebot(message: String): MsgId? {
-        val resp = bot.impl.sendGroupMsg(id, message, false)
+        val resp = bot.impl.sendGroupMsg(id, message, false) {
+            throwExceptions(true)
+        }
         return resp.data
     }
 

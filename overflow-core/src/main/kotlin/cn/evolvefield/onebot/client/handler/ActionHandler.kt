@@ -1,6 +1,5 @@
 package cn.evolvefield.onebot.client.handler
 
-import cn.evolvefield.onebot.sdk.action.ActionPath
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.util.ActionFailedException
 import cn.evolvefield.onebot.client.util.ActionSendRequest
@@ -70,7 +69,8 @@ class ActionHandler(
             val throwExceptions = context.throwExceptions
             if (throwExceptions == true) throw t
 
-            val message = "请求失败: [${action}] ${t.message}。如果你认为这是 Overflow 的问题，请带上 logs/onebot 中的日志来反馈。"
+            val error = if (t is ActionFailedException) t.message else "[$action] ${t.message}"
+            val message = "请求失败: $error。如果你认为这是 Overflow 的问题，请带上 logs/onebot 中的日志来反馈。"
             if (throwExceptions == false) {
                 logger.warn(message)
             } else { // throwExceptions == null

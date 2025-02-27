@@ -20,16 +20,11 @@ import net.mamoe.mirai.message.data.ShortVideo
 import net.mamoe.mirai.message.data.toMessageChain
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.currentTimeSeconds
-import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.internal.message.OnebotMessages
-import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.internal.message.data.OutgoingSource
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.strangerMsg
-import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
@@ -67,9 +62,14 @@ internal class StrangerWrapper(
             throw EventCancelledException("消息发送已被取消")
 
         val messageChain = message.toMessageChain()
-        val (messageIds, throwable) = bot.sendMessage(this, messageChain)
+        val (messageIds, throwable) = bot.sendMessageCommon(this, messageChain)
         val receipt = strangerMsg(messageIds, messageChain).receipt(this)
-        StrangerMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
+        StrangerMessagePostSendEvent(
+            target = this,
+            message = messageChain,
+            exception = throwable,
+            receipt = receipt.takeIf { throwable == null }
+        ).broadcast()
 
         bot.logger.verbose("Stranger($id) <- $messageChain")
 
@@ -77,7 +77,9 @@ internal class StrangerWrapper(
     }
 
     override suspend fun sendToOnebot(message: String): MsgId? {
-        val resp = bot.impl.sendPrivateMsg(id, message, false)
+        val resp = bot.impl.sendPrivateMsg(id, message, false) {
+            throwExceptions(true)
+        }
         return resp.data
     }
 

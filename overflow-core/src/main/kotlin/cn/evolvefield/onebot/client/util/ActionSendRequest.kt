@@ -67,6 +67,7 @@ class ActionSendRequest(
                 } else ""
             }.getOrElse { "" }
             throw ActionFailedException(
+                action = context.action,
                 app = "${bot.appName} v${bot.appVersion}",
                 msg = "${resp.ignorable("message", "")}$extra",
                 json = resp
