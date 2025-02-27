@@ -43,6 +43,7 @@ Overflow 主要配置文件为 `overflow.json`。
 + [cnlimiter/onebot-mirai](https://github.com/cnlimiter/onebot-mirai) mirai 转 Onebot，相当于可以实现 mirai 接龙
 + [LLOneBot/LLOneBot](https://wiki.mrxiaom.top/overflow/lloneBot) 在 QQNT 客户端中装载插件实现 Onebot
 + [NapNeko/NapCatQQ](https://napneko.github.io/zh-CN/guide/getting-started) 使用无头 QQNT 客户端实现 Onebot
++ [ProtocolScience/AstralGocq](https://github.com/ProtocolScience/AstralGocq) 基于原版 gocq 的协议二次开发版
 
 除此之外，你还可以到 [Onebot 生态](https://onebot.dev/ecosystem.html#onebot-%E5%AE%9E%E7%8E%B0-1) 中寻找更多的 Onebot 11 实现，Overflow 基本可以连接到它们。
 
