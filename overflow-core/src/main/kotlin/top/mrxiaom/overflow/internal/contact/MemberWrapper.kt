@@ -2,6 +2,7 @@
 package top.mrxiaom.overflow.internal.contact
 
 import cn.evolvefield.onebot.sdk.entity.Anonymous
+import cn.evolvefield.onebot.sdk.entity.MsgId
 import cn.evolvefield.onebot.sdk.response.group.GroupMemberInfoResp
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonElement
@@ -31,6 +32,7 @@ import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource.tempMsg
 import top.mrxiaom.overflow.internal.scope
 import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
@@ -41,7 +43,7 @@ internal class MemberWrapper(
     override val group: GroupWrapper,
     internal var impl: GroupMemberInfoResp,
     internal var implJson: JsonElement,
-) : NormalMember, RemoteUser, Updatable {
+) : NormalMember, RemoteUser, Updatable, CanSendMessage {
     override val onebotData: String
         get() = gson.toJson(implJson)
     override val bot: BotWrapper = group.bot
@@ -162,36 +164,18 @@ internal class MemberWrapper(
             throw EventCancelledException("消息发送已被取消")
 
         val messageChain = message.toMessageChain()
-        var throwable: Throwable? = null
-        val messageIds = runCatching {
-            val forward = message.findForwardMessage()
-            if (forward != null) {
-                val data = OnebotMessages.sendForwardMessage(this, forward)
-                data.safeMessageIds(bot)
-            } else {
-                val msg = Overflow.serializeMessage(bot, message)
-                val data = bot.impl.sendPrivateMsg(id, msg, false).data
-                data.safeMessageIds(bot)
-            }
-        }.onFailure {
-            throwable = it
-            bot.logger.warning(it)
-        }.getOrElse { intArrayOf() }
-        val receipt = OutgoingSource.temp(
-                bot = bot,
-                ids = messageIds,
-                internalIds = messageIds,
-                isOriginalMessageInitialized = true,
-                originalMessage = message.toMessageChain(),
-                sender = bot,
-                target = this,
-                time = currentTimeSeconds().toInt()
-            ).receipt(this)
+        val (messageIds, throwable) = bot.sendMessage(this, messageChain)
+        val receipt = tempMsg(messageIds, messageChain).receipt(this)
         GroupTempMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
         bot.logger.verbose("Member(${group.id}:$id) <- $messageChain")
 
         return receipt
+    }
+
+    override suspend fun sendToOnebot(message: String): MsgId? {
+        val resp = bot.impl.sendPrivateMsg(id, message, false)
+        return resp.data
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {

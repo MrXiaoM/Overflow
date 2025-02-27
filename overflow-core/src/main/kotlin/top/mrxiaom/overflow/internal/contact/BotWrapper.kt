@@ -1,6 +1,7 @@
 package top.mrxiaom.overflow.internal.contact
 
 import cn.evolvefield.onebot.client.core.Bot
+import cn.evolvefield.onebot.sdk.entity.MsgId
 import cn.evolvefield.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import cn.evolvefield.onebot.sdk.util.data
@@ -33,6 +34,8 @@ import top.mrxiaom.overflow.internal.contact.data.FallbackFriendGroups
 import top.mrxiaom.overflow.internal.data.FriendInfoImpl
 import top.mrxiaom.overflow.internal.data.StrangerInfoImpl
 import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
+import top.mrxiaom.overflow.internal.utils.*
 import top.mrxiaom.overflow.internal.utils.LoggerInFolder
 import top.mrxiaom.overflow.internal.utils.asCoroutineExceptionHandler
 import top.mrxiaom.overflow.internal.utils.subLogger
@@ -231,6 +234,28 @@ internal class BotWrapper private constructor(
         implBot.channel.send(message)
     }
 
+    suspend fun sendMessage(contact: CanSendMessage, messageChain: MessageChain): Pair<IntArray, Throwable?> {
+        var throwable: Throwable? = null
+        val messageIds = runCatching {
+            if (contact !is Contact) {
+                throw IllegalArgumentException("'contact' is not implemented 'net.mamoe.mirai.Contact'")
+            }
+            val forward = messageChain.findForwardMessage()
+            if (forward != null) {
+                val data = OnebotMessages.sendForwardMessage(contact, forward)
+                data.safeMessageIds(this)
+            } else {
+                val msg = Overflow.instance.serializeMessage(this, messageChain)
+                val data = contact.sendToOnebot(msg)
+                data.safeMessageIds(this)
+            }
+        }.onFailure {
+            throwable = it
+            logger.warning(it)
+        }.getOrElse { intArrayOf() }
+        return messageIds to throwable
+    }
+
     override fun toString(): String = "Bot($id)"
 
     companion object {
@@ -290,4 +315,8 @@ internal class BotWrapper private constructor(
                 }
             }
     }
+}
+
+interface CanSendMessage {
+    suspend fun sendToOnebot(message: String): MsgId?
 }

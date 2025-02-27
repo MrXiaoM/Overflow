@@ -1,6 +1,7 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
+import cn.evolvefield.onebot.sdk.entity.MsgId
 import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonElement
@@ -27,6 +28,7 @@ import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource.strangerMsg
 import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
@@ -35,7 +37,7 @@ internal class StrangerWrapper(
     override val bot: BotWrapper,
     internal var impl: StrangerInfoResp,
     internal var implJson: JsonElement,
-) : Stranger, RemoteUser {
+) : Stranger, RemoteUser, CanSendMessage {
     override val onebotData: String
         get() = gson.toJson(implJson)
     override val id: Long = impl.userId
@@ -65,36 +67,18 @@ internal class StrangerWrapper(
             throw EventCancelledException("消息发送已被取消")
 
         val messageChain = message.toMessageChain()
-        var throwable: Throwable? = null
-        val messageIds = kotlin.runCatching {
-            val forward = message.findForwardMessage()
-            if (forward != null) {
-                val data = OnebotMessages.sendForwardMessage(this, forward)
-                data.safeMessageIds(bot)
-            } else {
-                val msg = Overflow.serializeMessage(bot, message)
-                val data = bot.impl.sendPrivateMsg(id, msg, false).data
-                data.safeMessageIds(bot)
-            }
-        }.onFailure {
-            throwable = it
-            bot.logger.warning(it)
-        }.getOrElse { intArrayOf() }
-        val receipt = OutgoingSource.stranger(
-                bot = bot,
-                ids = messageIds,
-                internalIds = messageIds,
-                isOriginalMessageInitialized = true,
-                originalMessage = message.toMessageChain(),
-                sender = bot,
-                target = this,
-                time = currentTimeSeconds().toInt()
-            ).receipt(this)
+        val (messageIds, throwable) = bot.sendMessage(this, messageChain)
+        val receipt = strangerMsg(messageIds, messageChain).receipt(this)
         StrangerMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
         bot.logger.verbose("Stranger($id) <- $messageChain")
 
         return receipt
+    }
+
+    override suspend fun sendToOnebot(message: String): MsgId? {
+        val resp = bot.impl.sendPrivateMsg(id, message, false)
+        return resp.data
     }
 
     override suspend fun uploadImage(resource: ExternalResource): Image {

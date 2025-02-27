@@ -1,6 +1,7 @@
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 package top.mrxiaom.overflow.internal.contact
 
+import cn.evolvefield.onebot.sdk.entity.MsgId
 import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonElement
@@ -19,15 +20,11 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.spi.AudioToSilkService
 import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
-import net.mamoe.mirai.utils.currentTimeSeconds
-import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.internal.message.OnebotMessages
-import top.mrxiaom.overflow.internal.message.OnebotMessages.findForwardMessage
-import top.mrxiaom.overflow.internal.message.data.OutgoingSource
+import top.mrxiaom.overflow.internal.message.data.OutgoingSource.friendMsg
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
-import top.mrxiaom.overflow.internal.utils.safeMessageIds
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
@@ -35,7 +32,7 @@ internal class FriendWrapper(
     override val bot: BotWrapper,
     internal var impl: FriendInfoResp,
     internal var implJson: JsonElement,
-) : Friend, RemoteUser {
+) : Friend, RemoteUser, CanSendMessage {
     override val onebotData: String
         get() = gson.toJson(implJson)
     override val id: Long = impl.userId
@@ -68,36 +65,18 @@ internal class FriendWrapper(
             throw EventCancelledException("消息发送已被取消")
 
         val messageChain = message.toMessageChain()
-        var throwable: Throwable? = null
-        val messageIds = runCatching {
-            val forward = messageChain.findForwardMessage()
-            if (forward != null) {
-                val data = OnebotMessages.sendForwardMessage(this, forward)
-                data.safeMessageIds(bot)
-            } else {
-                val msg = Overflow.serializeMessage(bot, messageChain)
-                val data = bot.impl.sendPrivateMsg(id, msg, false).data
-                data.safeMessageIds(bot)
-            }
-        }.onFailure {
-            throwable = it
-            bot.logger.warning(it)
-        }.getOrElse { intArrayOf() }
-        val receipt = OutgoingSource.friend(
-                bot = bot,
-                ids = messageIds,
-                internalIds = messageIds,
-                isOriginalMessageInitialized = true,
-                originalMessage = messageChain,
-                sender = bot,
-                target = this@FriendWrapper,
-                time = currentTimeSeconds().toInt()
-            ).receipt(this)
+        val (messageIds, throwable) = bot.sendMessage(this, messageChain)
+        val receipt = friendMsg(messageIds, messageChain).receipt(this)
         FriendMessagePostSendEvent(this, messageChain, throwable, receipt).broadcast()
 
         bot.logger.verbose("Friend($id) <- $messageChain")
 
         return receipt
+    }
+
+    override suspend fun sendToOnebot(message: String): MsgId? {
+        val resp = bot.impl.sendPrivateMsg(id, message, false)
+        return resp.data
     }
 
     override suspend fun uploadAudio(resource: ExternalResource): OfflineAudio {

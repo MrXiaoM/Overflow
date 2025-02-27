@@ -12,6 +12,11 @@ import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
+import net.mamoe.mirai.utils.currentTimeSeconds
+import top.mrxiaom.overflow.internal.contact.FriendWrapper
+import top.mrxiaom.overflow.internal.contact.GroupWrapper
+import top.mrxiaom.overflow.internal.contact.MemberWrapper
+import top.mrxiaom.overflow.internal.contact.StrangerWrapper
 
 @OptIn(MiraiExperimentalApi::class)
 internal fun MessageSerializers.registerMessageSourceSerializers() {
@@ -53,6 +58,19 @@ internal object OutgoingSource {
         target: Group,
         time: Int
     ): ToGroup = ToGroup(bot, ids, internalIds, isOriginalMessageInitialized, originalMessage, sender, target, time)
+    internal fun GroupWrapper.groupMsg(
+        messageIds: IntArray,
+        messageChain: MessageChain
+    ): ToGroup = group(
+        bot = bot,
+        ids = messageIds,
+        internalIds = messageIds,
+        isOriginalMessageInitialized = true,
+        originalMessage = messageChain,
+        sender = bot,
+        target = this,
+        time = currentTimeSeconds().toInt()
+    )
     internal fun friend(
         bot: Bot,
         ids: IntArray,
@@ -63,6 +81,19 @@ internal object OutgoingSource {
         target: Friend,
         time: Int
     ): ToFriend = ToFriend(bot, ids, internalIds, isOriginalMessageInitialized, originalMessage, sender, target, time)
+    internal fun FriendWrapper.friendMsg(
+        messageIds: IntArray,
+        messageChain: MessageChain
+    ): ToFriend = friend(
+        bot = bot,
+        ids = messageIds,
+        internalIds = messageIds,
+        isOriginalMessageInitialized = true,
+        originalMessage = messageChain,
+        sender = bot,
+        target = this,
+        time = currentTimeSeconds().toInt()
+    )
     internal fun temp(
         bot: Bot,
         ids: IntArray,
@@ -73,6 +104,19 @@ internal object OutgoingSource {
         target: Member,
         time: Int
     ): ToTemp = ToTemp(bot, ids, internalIds, isOriginalMessageInitialized, originalMessage, sender, target, time)
+    internal fun MemberWrapper.tempMsg(
+        messageIds: IntArray,
+        messageChain: MessageChain
+    ): ToTemp = temp(
+        bot = bot,
+        ids = messageIds,
+        internalIds = messageIds,
+        isOriginalMessageInitialized = true,
+        originalMessage = messageChain,
+        sender = bot,
+        target = this,
+        time = currentTimeSeconds().toInt()
+    )
     internal fun stranger(
         bot: Bot,
         ids: IntArray,
@@ -83,6 +127,19 @@ internal object OutgoingSource {
         target: Stranger,
         time: Int
     ): ToStranger = ToStranger(bot, ids, internalIds, isOriginalMessageInitialized, originalMessage, sender, target, time)
+    internal fun StrangerWrapper.strangerMsg(
+        messageIds: IntArray,
+        messageChain: MessageChain
+    ): ToStranger = stranger(
+        bot = bot,
+        ids = messageIds,
+        internalIds = messageIds,
+        isOriginalMessageInitialized = true,
+        originalMessage = messageChain,
+        sender = bot,
+        target = this,
+        time = currentTimeSeconds().toInt()
+    )
     internal fun <C : Contact> OnlineMessageSource.Outgoing.receipt(contact: C): MessageReceipt<C> {
         @Suppress("DEPRECATION_ERROR")
         return MessageReceipt(this, contact)
