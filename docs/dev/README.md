@@ -89,7 +89,7 @@ val bot2 = BotBuilder.reversed(3002)
 
 # 向 Onebot 发送自定义 action
 
-预设的 action 类型列表另请参见 [ActionPathEnum.java](https://github.com/MrXiaoM/Overflow/blob/main/onebot/src/main/java/cn/evole/onebot/sdk/enums/ActionPathEnum.java) (以下应当填写的是字符串 path 的值)
+预设的 action 类型列表另请参见 [ActionPathEnum.kt](https://github.com/MrXiaoM/Overflow/blob/main/overflow-core/src/main/kotlin/cn/evolvefield/onebot/sdk/enums/ActionPathEnum.kt) (以下应当填写的是字符串 path 的值)
 
 相关文档：
 + [go-cqhttp API](https://docs.go-cqhttp.org/api)
