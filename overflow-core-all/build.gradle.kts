@@ -13,7 +13,6 @@ tasks.test {
 }
 
 dependencies {
-    api(project(":onebot"))
     api(project(":overflow-core-api"))
     api(project(":overflow-core"))
     testCompileOnly("net.mamoe:mirai-core-api:2.16.0")

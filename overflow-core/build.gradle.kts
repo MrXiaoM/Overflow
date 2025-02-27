@@ -24,6 +24,8 @@ dependencies {
     compileOnly("net.mamoe:mirai-console:$miraiVersion")
     api("net.mamoe:mirai-core-api:$miraiVersion")
     api("net.mamoe:mirai-core-utils:$miraiVersion")
+    api("com.google.code.gson:gson:2.10.1")
+    api("org.slf4j:slf4j-api:2.0.5")
     api("org.java-websocket:Java-WebSocket:1.5.7")
     api("com.google.code.gson:gson:2.10.1")
     api("me.him188:kotlin-jvm-blocking-bridge-runtime:3.0.0-180.1")
@@ -33,14 +35,15 @@ dependencies {
     netty("codec-socks")
     netty("transport")
 
-    api(project(":onebot"))
     api(project(":overflow-core-api"))
 
     testImplementation("com.google.code.gson:gson:2.10.1")
     testImplementation("org.java-websocket:Java-WebSocket:1.5.7")
     testImplementation("net.mamoe:mirai-console:$miraiVersion")
     testImplementation("net.mamoe:mirai-console-terminal:$miraiVersion")
+    testImplementation("ch.qos.logback:logback-classic:1.4.14")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    testImplementation(kotlin("test"))
 }
 
 tasks.test {
