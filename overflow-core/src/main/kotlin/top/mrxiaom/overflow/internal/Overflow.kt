@@ -22,6 +22,7 @@ import net.mamoe.mirai.data.MemberInfo
 import net.mamoe.mirai.data.StrangerInfo
 import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.event.Event
+import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.internal.event.EventChannelToEventDispatcherAdapter
 import net.mamoe.mirai.internal.event.InternalEventMechanism
@@ -51,6 +52,7 @@ import top.mrxiaom.overflow.internal.listener.addGuildListeners
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.*
 import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin
+import top.mrxiaom.overflow.internal.utils.group
 import top.mrxiaom.overflow.internal.utils.wrapAsOtherClientInfo
 import top.mrxiaom.overflow.spi.MediaURLService
 import top.mrxiaom.overflow.spi.MediaURLService.Companion.queryImageUrl
@@ -629,7 +631,12 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         accept: Boolean
     ) {
         newInviteJoinGroupRequestFlagMap[eventId]?.also {
-            bot.asOnebot.impl.setGroupAddRequest(it, "invite", accept, "")
+            val resp = bot.asOnebot.impl.setGroupAddRequest(it, "invite", accept, "")
+            if (accept && resp.status == "ok") {
+                val group = bot.asOnebot.group(groupId)
+                val invitor = group.queryMember(invitorId) ?: return
+                BotJoinGroupEvent.Invite(invitor).broadcast()
+            }
         }
     }
     //========== Bot Invited Join Group Request 邀请机器人加群请求 END =============
