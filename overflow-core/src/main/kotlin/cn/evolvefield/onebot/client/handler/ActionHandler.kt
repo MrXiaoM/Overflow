@@ -8,6 +8,7 @@ import cn.evolvefield.onebot.sdk.util.nullableString
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Job
 import org.slf4j.Logger
+import top.mrxiaom.overflow.action.ActionContext
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -46,11 +47,11 @@ class ActionHandler(
 
     /**
      * @param bot     Session
-     * @param action  请求路径
+     * @param context 请求上下文
      * @param params  请求参数
      * @return 请求结果
      */
-    suspend fun action(bot: Bot, action: ActionPath, params: JsonObject? = null, showWarning: Boolean = true, ignoreStatus: Boolean = false): JsonObject {
+    suspend fun action(bot: Bot, context: ActionContext, params: JsonObject? = null): JsonObject {
         if (!bot.channel.isOpen) {
             return JsonObject().apply {
                 addProperty("status", "failed")
@@ -58,21 +59,29 @@ class ActionHandler(
                 addProperty("message", "WebSocket channel is not opened")
             }
         }
-        val request = ActionSendRequest(bot, parent, logger, bot.channel, timeout)
+        val action = context.action
+        val request = ActionSendRequest(bot, context, parent, logger, bot.channel, timeout)
         val reqJson = generateReqJson(action, params) { echo ->
             apiCallbackMap[echo] = request
         }
         return try {
-            request.send(reqJson, ignoreStatus)
-        } catch (e: Exception) {
-            val message = "请求失败: [${action.path}] ${e.message}。如果你认为这是 Overflow 的问题，请带上 logs/onebot 中的日志来反馈。"
-            if (showWarning) logger.warn(message) else logger.trace(message)
-            logger.trace("Stacktrace: ", e)
-            if (e is ActionFailedException) e.json
+            request.send(reqJson)
+        } catch (t: Throwable) {
+            val throwExceptions = context.throwExceptions
+            if (throwExceptions == true) throw t
+
+            val message = "请求失败: [${action}] ${t.message}。如果你认为这是 Overflow 的问题，请带上 logs/onebot 中的日志来反馈。"
+            if (throwExceptions == false) {
+                logger.warn(message)
+            } else { // throwExceptions == null
+                logger.trace(message)
+            }
+            logger.trace("Stacktrace: ", t)
+            if (t is ActionFailedException) t.json
             else JsonObject().apply {
                 addProperty("status", "failed")
                 addProperty("retcode", -1)
-                addProperty("message", e.message ?: "")
+                addProperty("message", t.message ?: "")
             }
         }
     }
@@ -86,12 +95,12 @@ class ActionHandler(
      * @return 请求数据结构
      */
     private fun generateReqJson(
-        action: ActionPath,
+        action: String,
         params: JsonObject?,
         block: (String) -> Unit = {}
     ): JsonObject {
         val json = JsonObject()
-        json.addProperty("action", action.path)
+        json.addProperty("action", action)
         if (params != null) json.add("params", params)
         val echoLong = echo++
         json.addProperty("echo", echoLong)

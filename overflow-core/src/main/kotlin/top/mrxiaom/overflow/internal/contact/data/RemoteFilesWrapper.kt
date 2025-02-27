@@ -29,7 +29,9 @@ internal class RemoteFilesWrapper(
 ) : RemoteFiles {
     companion object {
         internal suspend fun GroupWrapper.fetchFiles(): RemoteFilesWrapper {
-            val data = bot.impl.getGroupRootFiles(id, false).data
+            val data = bot.impl.getGroupRootFiles(id) {
+                showWarning(false)
+            }.data
 
             val root = FolderWrapper(
                 this, null, "/", "/", 0, 0, 0, data?.files?.size ?: 0
@@ -137,9 +139,13 @@ internal class FolderWrapper(
         return contact.bot.impl.run {
             val id = this@FolderWrapper.id
             if (id == "/") {
-                getGroupRootFiles(contact.id, false).data
+                getGroupRootFiles(contact.id) {
+                    showWarning(false)
+                }.data
             } else {
-                getGroupFilesByFolder(contact.id, id, false).data
+                getGroupFilesByFolder(contact.id, id) {
+                    showWarning(false)
+                }.data
             }
         }
     }

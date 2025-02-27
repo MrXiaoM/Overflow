@@ -11,6 +11,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.java_websocket.WebSocket
 import org.slf4j.Logger
+import top.mrxiaom.overflow.action.ActionContext
 import java.util.*
 
 /**
@@ -25,6 +26,7 @@ import java.util.*
  */
 class ActionSendRequest(
     private val bot: Bot,
+    private val context: ActionContext,
     parent: Job?,
     private val logger: Logger,
     private val channel: WebSocket,
@@ -36,7 +38,7 @@ class ActionSendRequest(
      * @return Response json data
      */
     @Throws(TimeoutCancellationException::class, ActionFailedException::class)
-    suspend fun send(req: JsonObject, ignoreStatus: Boolean = false): JsonObject {
+    suspend fun send(req: JsonObject): JsonObject {
         val resp = mutex.withLock {
             kotlin.runCatching {
                 withTimeout(requestTimeout) {
@@ -46,7 +48,7 @@ class ActionSendRequest(
                 }
             }.onFailure { resp.cancel() }.getOrThrow()
         }
-        if (resp.ignorable("status", if (ignoreStatus) "" else "failed") == "failed") {
+        if (resp.ignorable("status", if (context.ignoreStatus) "" else "failed") == "failed") {
             val extra = runCatching {
                 val params = req.ignorableObject("params") { JsonObject() }
                 val messages = params.ignorableArray("message") { JsonArray() }
