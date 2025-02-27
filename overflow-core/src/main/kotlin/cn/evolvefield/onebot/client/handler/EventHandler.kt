@@ -6,18 +6,38 @@ import top.mrxiaom.overflow.internal.utils.bot
 import kotlin.reflect.KClass
 import kotlin.reflect.safeCast
 
-internal class Handler<T : Event>(
+internal abstract class Handler<T : Event>(
     val type: KClass<T>,
-    private val condition: ((T) -> Boolean)?,
-    private val block: suspend BotWrapper.(T) -> Unit
 ) {
     suspend fun onReceive(event: Event) {
         val e = type.safeCast(event)
         if (e != null) {
-            val bot = e.bot ?: return
-            if (condition?.invoke(e) != false) {
-                block.invoke(bot, e)
-            }
+            receive(e)
+        }
+    }
+
+    abstract suspend fun receive(e: T)
+}
+internal class BotHandler<T : Event>(
+    type: KClass<T>,
+    private val condition: ((T) -> Boolean)?,
+    private val block: suspend BotWrapper.(T) -> Unit
+): Handler<T>(type) {
+    override suspend fun receive(e: T) {
+        val bot = e.bot ?: return
+        if (condition?.invoke(e) != false) {
+            block.invoke(bot, e)
+        }
+    }
+}
+internal class NormalHandler<T : Event>(
+    type: KClass<T>,
+    private val condition: ((T) -> Boolean)?,
+    private val block: suspend (T) -> Unit
+): Handler<T>(type) {
+    override suspend fun receive(e: T) {
+        if (condition?.invoke(e) != false) {
+            block.invoke(e)
         }
     }
 }

@@ -2,6 +2,7 @@
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evolvefield.onebot.client.handler.EventBus.listen
+import cn.evolvefield.onebot.client.handler.EventBus.listenNormally
 import cn.evolvefield.onebot.sdk.event.UnsolvedEvent
 import cn.evolvefield.onebot.sdk.event.notice.NotifyNoticeEvent
 import kotlinx.coroutines.launch
@@ -36,7 +37,7 @@ internal fun addBotListeners() {
             bot.eventDispatcher.broadcastAsync(NudgeEvent(operator, target, group, "拍了拍", ""))
         }
     }
-    listen<UnsolvedEvent> { e ->
+    listenNormally<UnsolvedEvent> { e ->
         // 未处理 Onebot 事件
         Overflow.scope.launch {
             UnsolvedOnebotEvent(e.selfId, e.jsonString, e.timeInSecond()).broadcast()

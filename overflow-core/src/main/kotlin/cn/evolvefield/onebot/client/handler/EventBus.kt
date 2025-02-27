@@ -23,18 +23,28 @@ object EventBus {
         list.add(handler)
     }
     internal inline fun <reified T : Event> listen(noinline block: suspend BotWrapper.(T) -> Unit) {
-        addListener(Handler(T::class, null, block))
+        addListener(BotHandler(T::class, null, block))
+    }
+    internal inline fun <reified T : Event> listenNormally(noinline block: suspend (T) -> Unit) {
+        addListener(NormalHandler(T::class, null, block))
     }
     internal inline fun <reified T : Event> listen(subType: String, noinline block: suspend BotWrapper.(T) -> Unit) {
-        val field = T::class.declaredMemberProperties
-            .firstOrNull { it.name == "subType" }
-        if (field == null) {
-            logger.warn("无法注册 " + T::class.java.name + ": 找不到 subType")
-            return
-        }
-        addListener(Handler(T::class, field.check(subType), block))
+        val field = T::class.property("subType") ?: return
+        addListener(BotHandler(T::class, field.check(subType), block))
     }
-
+    internal inline fun <reified T : Event> listenNormally(subType: String, noinline block: suspend (T) -> Unit) {
+        val field = T::class.property("subType") ?: return
+        addListener(NormalHandler(T::class, field.check(subType), block))
+    }
+    private fun <T : Any> KClass<T>.property(name: String): KProperty1<T, *>? {
+        val field = declaredMemberProperties
+            .firstOrNull { it.name == name }
+        if (field == null) {
+            logger.warn("无法注册 " + java.name + ": 找不到 subType")
+            return null
+        }
+        return field
+    }
     private fun <T : Any> KProperty1<T, *>.check(subType: String): (T) -> Boolean {
         return { get(it)?.toString() == subType }
     }
