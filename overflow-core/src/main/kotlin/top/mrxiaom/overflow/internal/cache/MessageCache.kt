@@ -136,11 +136,11 @@ internal object MessageCache {
 
     fun doClean() {
         if (keepDuration == Duration.INFINITE) return
-        val files = listOf(
+        val files = listOfNotNull(
             saveDir.resolve("images").listFiles(),
             saveDir.resolve("audios").listFiles(),
             saveDir.resolve("videos").listFiles()
-        ).filterNotNull().flatMap { it.filter { it.isFile } }
+        ).flatMap { list -> list.filter { it.isFile } }
         val now = System.currentTimeMillis()
         for (file in files) {
             val time = now - file.lastModified()

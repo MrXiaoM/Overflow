@@ -274,9 +274,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             }
             val bot = it.wrap(configuration, workingDir)
 
-            bot.also {
-                it.eventDispatcher.broadcastAsync(BotOnlineEvent(bot))
-            }
+            bot.eventDispatcher.broadcastAsync(BotOnlineEvent(bot))
         }
         
         val botImpl = service.awaitNewBotConnection()

@@ -19,6 +19,7 @@ internal sealed class MessageRefiner
  *
  * https://github.com/cssxsh/mirai-hibernate-plugin/blob/8f425db01629ff84900b53b1bf86c741ef7f81be/src/main/kotlin/xyz/cssxsh/mirai/hibernate/MiraiHibernateRecorder.kt
  */
+@Suppress("unused")
 internal object LightMessageRefiner : MessageRefiner() {
     /**
      * 去除 [MessageChain] 携带的内部标识

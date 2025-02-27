@@ -59,7 +59,7 @@ internal class EssencesWrapper(
         @OptIn(MiraiInternalApi::class)
         internal suspend fun GroupWrapper.fetchEssencesList(page: Int = 0): List<EssenceMessageRecord> {
             if (bot.noPlatform) return listOf()
-            return bot.impl.getEssenceMsgList(id, page).data?.map {
+            return bot.impl.getEssenceMsgList(id, page).data.map {
                 EssenceMessageRecord(
                     this, queryMember(it.senderId), it.senderId, it.senderNick, it.senderTime.toInt(),
                     queryMember(it.operatorId), it.operatorId, it.operatorNick, it.operatorTime.toInt()
@@ -75,7 +75,7 @@ internal class EssencesWrapper(
                         }
                     }.build(bot.id, MessageSourceKind.GROUP)
                 }
-            } ?: listOf()
+            }
         }
         internal suspend fun GroupWrapper.fetchEssences(): EssencesWrapper {
             return EssencesWrapper(this, fetchEssencesList())

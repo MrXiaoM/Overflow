@@ -1,6 +1,5 @@
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.event.events.GroupMessageEvent
-import net.mamoe.mirai.event.syncFromEvent
 import org.junit.jupiter.api.Test
 import top.mrxiaom.overflow.BotBuilder
 

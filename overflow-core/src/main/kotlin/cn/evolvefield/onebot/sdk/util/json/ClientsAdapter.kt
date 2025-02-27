@@ -6,7 +6,6 @@ import cn.evolvefield.onebot.sdk.util.ignorable
 import cn.evolvefield.onebot.sdk.util.long
 import cn.evolvefield.onebot.sdk.util.string
 import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import java.lang.reflect.Type
 

@@ -7,9 +7,11 @@ import cn.evolvefield.onebot.client.util.OnebotException
 import cn.evolvefield.onebot.sdk.util.ignorable
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeoutOrNull
 import org.slf4j.Logger
 
 interface IAdapter {

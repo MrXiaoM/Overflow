@@ -3,10 +3,13 @@ package cn.evolvefield.onebot.client.connection
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeout
 import org.java_websocket.WebSocket
 import org.java_websocket.WebSocketServerFactory
 import org.java_websocket.framing.CloseFrame

@@ -3,7 +3,6 @@ package cn.evolvefield.onebot.sdk.util.json
 import cn.evolvefield.onebot.sdk.response.group.GroupFilesResp
 import cn.evolvefield.onebot.sdk.util.*
 import com.google.gson.JsonDeserializationContext
-import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
 import java.lang.reflect.Type
 

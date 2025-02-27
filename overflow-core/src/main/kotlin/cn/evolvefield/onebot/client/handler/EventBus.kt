@@ -24,7 +24,6 @@ object EventBus {
     }
     internal inline fun <reified T : Event> listen(noinline block: suspend BotWrapper.(T) -> Unit) {
         addListener(Handler(T::class, null, block))
-        logger.info("已注册 " + T::class.java.name)
     }
     internal inline fun <reified T : Event> listen(subType: String, noinline block: suspend BotWrapper.(T) -> Unit) {
         val field = T::class.declaredMemberProperties
@@ -34,7 +33,6 @@ object EventBus {
             return
         }
         addListener(Handler(T::class, field.check(subType), block))
-        logger.info("已注册 " + T::class.java.name + " -> $subType")
     }
 
     private fun <T : Any> KProperty1<T, *>.check(subType: String): (T) -> Boolean {

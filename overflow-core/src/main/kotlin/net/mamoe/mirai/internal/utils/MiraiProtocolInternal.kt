@@ -19,7 +19,7 @@ import net.mamoe.mirai.utils.toUHexString
     "该操作在 overflow 中无效",
     level = DeprecationLevel.ERROR
 )
-@Suppress("DEPRECATION_ERROR")
+@Suppress("DEPRECATION_ERROR", "unused")
 @OptIn(MiraiInternalApi::class)
 internal class MiraiProtocolInternal(
     var apkId: String,

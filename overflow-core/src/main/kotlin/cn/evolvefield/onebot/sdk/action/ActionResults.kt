@@ -2,7 +2,7 @@ package cn.evolvefield.onebot.sdk.action
 
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName
-import java.util.LinkedList
+import java.util.*
 
 open class JsonContainer {
     internal lateinit var element: JsonElement

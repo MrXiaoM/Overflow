@@ -5,7 +5,6 @@ import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import kotlinx.coroutines.*
 import org.java_websocket.client.WebSocketClient
-import org.java_websocket.framing.CloseFrame
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.Logger
 import java.net.URI

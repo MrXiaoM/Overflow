@@ -117,7 +117,7 @@ public class BotBuilder private constructor(
      * 设置不接收群聊的 file 消息，使用 group_upload 事件作为群文件消息
      */
     public fun useGroupUploadEventForFileMessage(): BotBuilder = apply {
-        this.useGroupUploadEventForFileMessage = true;
+        this.useGroupUploadEventForFileMessage = true
     }
 
     /**

@@ -31,7 +31,6 @@ import net.mamoe.mirai.event.EventPriority
 import net.mamoe.mirai.event.GlobalEventChannel
 import net.mamoe.mirai.event.events.EventCancelledException
 import net.mamoe.mirai.utils.MiraiLogger
-import net.mamoe.mirai.utils.resolveMkdir
 import net.mamoe.mirai.utils.weeksToMillis
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.framing.CloseFrame

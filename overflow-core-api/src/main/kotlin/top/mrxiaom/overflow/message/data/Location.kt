@@ -4,8 +4,10 @@ package top.mrxiaom.overflow.message.data
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.message.code.CodableMessage
-import net.mamoe.mirai.message.code.internal.appendStringAsMiraiCode
-import net.mamoe.mirai.message.data.*
+import net.mamoe.mirai.message.data.AbstractPolymorphicMessageKey
+import net.mamoe.mirai.message.data.ConstrainSingle
+import net.mamoe.mirai.message.data.MessageContent
+import net.mamoe.mirai.message.data.MessageKey
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.safeCast
 

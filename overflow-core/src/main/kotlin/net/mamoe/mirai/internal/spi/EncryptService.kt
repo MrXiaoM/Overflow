@@ -6,7 +6,7 @@
  *
  * https://github.com/mamoe/mirai/blob/dev/LICENSE
  */
-@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE", "DEPRECATION_ERROR")
+@file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE", "DEPRECATION_ERROR", "unused")
 
 package net.mamoe.mirai.internal.spi
 

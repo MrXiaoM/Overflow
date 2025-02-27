@@ -14,10 +14,6 @@ import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.internal.contact.*
-import top.mrxiaom.overflow.internal.contact.FriendWrapper
-import top.mrxiaom.overflow.internal.contact.GroupWrapper
-import top.mrxiaom.overflow.internal.contact.MemberWrapper
-import top.mrxiaom.overflow.internal.contact.StrangerWrapper
 
 @OptIn(MiraiExperimentalApi::class)
 internal fun MessageSerializers.registerMessageSourceSerializers() {

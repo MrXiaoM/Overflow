@@ -2,7 +2,9 @@ package cn.evolvefield.onebot.sdk.util.json
 
 import cn.evolvefield.onebot.sdk.response.group.GetMsgResp
 import cn.evolvefield.onebot.sdk.util.*
-import com.google.gson.*
+import com.google.gson.JsonDeserializationContext
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import java.lang.reflect.Type
 
 class MsgAdapter : JsonDeserializerKt<GetMsgResp> {

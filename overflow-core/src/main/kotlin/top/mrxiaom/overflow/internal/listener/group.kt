@@ -57,7 +57,7 @@ internal fun addGroupListeners() {
         val message = e.toMiraiMessage(bot)
         // 使用 group_upload 事件接收群文件时，忽略接收群文件类型消息
         if (bot.impl.config.useGroupUploadEventForFileMessage && (message.isEmpty() || message.any { it is FileMessage })) {
-            group.emptyMessagesIdMap.put(member.id, e.messageId)
+            group.emptyMessagesIdMap[member.id] = e.messageId
             return@listen
         }
         receiveGroupMessage(member, message, e.messageId, e.time())
