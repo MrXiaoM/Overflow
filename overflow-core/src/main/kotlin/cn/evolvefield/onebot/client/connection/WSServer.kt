@@ -5,8 +5,6 @@ import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.java_websocket.WebSocket
@@ -35,9 +33,8 @@ class WSServer(
     override val actionHandler: ActionHandler,
     private val token: String
 ) : WebSocketServer(address), IAdapter {
-    //    private var bot: Bot? = null
-    data class BotWrapper(
-        val bot:Bot
+    data class ConnectionBox(
+        val bot: Bot
     ) {
         private val hashCode by lazy {
             random.nextInt()
@@ -53,8 +50,8 @@ class WSServer(
 
     internal var botConsumer: suspend (Bot) -> Unit = {}
     private val bots: MutableList<Bot> = mutableListOf()
-    //通过使Wrapper互不相等，使得当bot重新上线时，botChannel推送成功。
-    private val botChannel = Channel<BotWrapper>()
+    // 通过使 ConnectionBox 互不相等，使得当 bot 重新上线时，botChannel 推送成功。
+    private val botChannel = Channel<ConnectionBox>()
     private val muteX = Mutex()
     val connectDef = CompletableDeferred<Bot>(config.parentJob)
 
@@ -65,8 +62,8 @@ class WSServer(
         //等待测试
         setWebSocketFactory(object : WebSocketServerFactory by DefaultWebSocketServerFactory() {
             override fun close() {
-                for (i in closeHandler) {
-                    i()
+                for (handler in closeHandler) {
+                    handler()
                 }
             }
         })
@@ -123,7 +120,7 @@ class WSServer(
             }
             bots.add(bot)
             botConsumer.invoke(bot)
-            botChannel.send(BotWrapper(bot))
+            botChannel.send(ConnectionBox(bot))
         }
     }
 
