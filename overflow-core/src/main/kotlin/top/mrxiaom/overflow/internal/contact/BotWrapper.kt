@@ -142,7 +142,7 @@ internal class BotWrapper private constructor(
         get() = gson.toJson(json)
     override val id: Long
         get() = loginInfo.userId
-
+    override val bot: BotWrapper get() = this
     override val logger: MiraiLogger = configuration.botLoggerSupplier(this)
     override val coroutineContext: CoroutineContext =
         CoroutineName("Bot.$id")

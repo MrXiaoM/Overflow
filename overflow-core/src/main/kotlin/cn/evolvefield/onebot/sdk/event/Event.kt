@@ -24,4 +24,6 @@ open class Event : JsonContainer() {
         return if (time < 946656000000L) time
         else time / 1000L
     }
+
+    fun time(): Int = timeInSecond().toInt()
 }

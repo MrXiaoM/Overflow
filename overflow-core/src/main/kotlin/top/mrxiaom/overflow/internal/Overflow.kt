@@ -5,6 +5,7 @@ package top.mrxiaom.overflow.internal
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.connection.ConnectFactory
 import cn.evolvefield.onebot.client.connection.OneBotProducer
+import cn.evolvefield.onebot.client.handler.EventBus
 import cn.evolvefield.onebot.sdk.action.ActionRaw
 import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.util.CQCode
@@ -170,6 +171,8 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         if (_instance != null) throw IllegalStateException("Overflow 被重复实例化")
         _instance = this
         _MiraiInstance.set(this)
+
+        EventBus.clear()
         addGroupListeners()
         addFriendListeners()
         addGuildListeners()

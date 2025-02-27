@@ -1,119 +1,79 @@
 package cn.evolvefield.onebot.client.handler
 
+import cn.evolvefield.onebot.client.util.ListenerUtils
 import cn.evolvefield.onebot.sdk.event.Event
 import cn.evolvefield.onebot.sdk.event.UnsolvedEvent
-import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
-import cn.evolvefield.onebot.client.listener.EventListener
-import cn.evolvefield.onebot.client.listener.message
-import cn.evolvefield.onebot.client.util.ListenerUtils
 import cn.evolvefield.onebot.sdk.util.JsonHelper.applyJson
+import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
+import cn.evolvefield.onebot.sdk.util.ignorable
 import com.google.gson.JsonParser
+import net.mamoe.mirai.utils.currentTimeSeconds
 import org.slf4j.LoggerFactory
-import java.util.concurrent.ConcurrentHashMap
+import top.mrxiaom.overflow.internal.contact.BotWrapper
+import kotlin.reflect.KClass
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
 
-/**
- * Project: onebot-client
- * Author: cnlimiter
- * Date: 2023/3/19 15:45
- * Description:
- */
-@Suppress("unused")
 object EventBus {
-    private val log = LoggerFactory.getLogger(EventBus::class.java)
-    //存储监听器对象
-    private val listeners: MutableList<EventListener<out Event>> = ArrayList()
-    //缓存类型与监听器的关系
-    private val cache: MutableMap<Class<out Event>, List<EventListener<out Event>>> = ConcurrentHashMap()
+    private val logger = LoggerFactory.getLogger(EventBus::class.java)
+    private val handlers: MutableMap<KClass<*>, MutableList<Handler<*>>> = hashMapOf()
 
-    fun addListener(listener: EventListener<out Event>) {
-        listeners.add(listener)
+    internal fun addListener(handler: Handler<out Event>) {
+        val list = handlers.getOrPut(handler.type) { mutableListOf() }
+        list.add(handler)
+    }
+    internal inline fun <reified T : Event> listen(noinline block: suspend BotWrapper.(T) -> Unit) {
+        addListener(Handler(T::class, null, block))
+        logger.info("已注册 " + T::class.java.name)
+    }
+    internal inline fun <reified T : Event> listen(subType: String, noinline block: suspend BotWrapper.(T) -> Unit) {
+        val field = T::class.declaredMemberProperties
+            .firstOrNull { it.name == "subType" }
+        if (field == null) {
+            logger.warn("无法注册 " + T::class.java.name + ": 找不到 subType")
+            return
+        }
+        addListener(Handler(T::class, field.check(subType), block))
+        logger.info("已注册 " + T::class.java.name + " -> $subType")
     }
 
-    fun stop() {
-        cache.clear()
-        listeners.clear()
+    private fun <T : Any> KProperty1<T, *>.check(subType: String): (T) -> Boolean {
+        return { get(it)?.toString() == subType }
     }
 
-    /**
-     * 执行任务
-     */
+    fun clear() {
+        handlers.clear()
+    }
+
     suspend fun onReceive(message: String) {
-        val (bean, executes) = matchBeanAndExecutes(message)
+        val (bean, executes) = matchHandlers(message)
         if (executes.isEmpty()) return
-        for (eventListener in executes) {
-            eventListener.message(bean) //调用监听方法
+        for (handler in executes) {
+            handler.onReceive(bean) //调用监听方法
         }
     }
 
-    private fun matchBeanAndExecutes(
+    private fun matchHandlers(
         message: String
-    ): Pair<Event, List<EventListener<out Event>>> {
+    ): Pair<Event, List<Handler<*>>> {
         val messageType = ListenerUtils[message] // 获取消息对应的实体类型
         val json = JsonParser.parseString(message).asJsonObject
-        if (messageType == null) {
-            val bean = UnsolvedEvent().also { it.jsonString = message }
-            val executes = getExecutes(UnsolvedEvent::class.java)
-            bean.postType = json["post_type"].asString
-            bean.time = json["time"].asLong
-            bean.selfId = json["self_id"].asLong
+        if (messageType != null) {
+            val bean = gson.fromJson(message, messageType.java) // 将消息反序列化为对象
             bean.applyJson(json)
-            return bean to executes
-        } else {
-            val bean = gson.fromJson(message, messageType) // 将消息反序列化为对象
-            bean.applyJson(json)
-            log.debug(String.format("接收到上报消息内容：%s", bean.toString()))
-            val executes = getExecutes(messageType)
-            if (executes.isEmpty()) { // 如果该事件未被监听，将其定为 UnsolvedEvent
-                val newBean = UnsolvedEvent().also { it.jsonString = message }
-                val newExecutes = getExecutes(UnsolvedEvent::class.java)
-                newBean.postType = json["post_type"].asString
-                newBean.time = json["time"].asLong
-                newBean.selfId = json["self_id"].asLong
-                return newBean to newExecutes
-            } else {
+            logger.debug(String.format("接收到上报消息内容：%s", bean.toString()))
+            val executes = handlers[messageType] ?: emptyList()
+            if (executes.isNotEmpty()) {
                 return bean to executes
             }
         }
-    }
-
-    private fun getExecutes(type: Class<out Event>): List<EventListener<out Event>> {
-        val list = cache[type]
-        return if (list.isNullOrEmpty()) {
-            getMethod(type).also {
-                cache[type] = it
-            }
-        } else list
-    }
-
-    /**
-     * 获取能处理消息类型的处理器
-     *
-     * @param messageType
-     * @return
-     */
-    private fun getMethod(messageType: Class<out Event>): List<EventListener<out Event>> {
-        val eventListeners: MutableList<EventListener<out Event>> = ArrayList()
-        for (eventListener in listeners) {
-            try {
-                if (eventListener.javaClass.declaredMethods.none {
-                        it.name == "onMessage" && it.parameterTypes.any { par -> messageType == par }
-                    }) continue  //不支持则跳过
-
-                eventListeners.add(eventListener) //开启后添加入当前类型的插件
-            } catch (e: Exception) {
-                log.error(e.localizedMessage)
-            }
-        }
-        return eventListeners
-    }
-
-    val listenerList: List<EventListener<out Event>>
-        get() = listeners
-
-    /**
-     * 清除类型缓存
-     */
-    fun cleanCache() {
-        cache.clear()
+        // 如果该事件未被监听，将其定为 UnsolvedEvent
+        val bean = UnsolvedEvent().also { it.jsonString = message }
+        val executes = handlers[UnsolvedEvent::class] ?: emptyList()
+        bean.postType = json.ignorable("post_type", "")
+        bean.time = json.ignorable("time", currentTimeSeconds())
+        bean.selfId = json.ignorable("self_id", 0L)
+        bean.applyJson(json)
+        return bean to executes
     }
 }

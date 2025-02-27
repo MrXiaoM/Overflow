@@ -13,6 +13,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
+import top.mrxiaom.overflow.internal.contact.*
 import top.mrxiaom.overflow.internal.contact.FriendWrapper
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
 import top.mrxiaom.overflow.internal.contact.MemberWrapper
@@ -199,48 +200,30 @@ internal object OutgoingSource {
 }
 
 internal object IncomingSource {
-    internal fun group(
-        bot: Bot,
-        ids: IntArray,
-        internalIds: IntArray,
-        isOriginalMessageInitialized: Boolean,
+    internal fun BotWrapper.groupMsg(
+        messageIds: IntArray,
         originalMessage: MessageChain,
         sender: Member,
         time: Int
-    ): FromGroup = FromGroup(bot, ids, internalIds, isOriginalMessageInitialized, originalMessage, sender, time)
-    internal fun friend(
-        bot: Bot,
-        ids: IntArray,
-        internalIds: IntArray,
-        isOriginalMessageInitialized: Boolean,
+    ): FromGroup = FromGroup(bot, messageIds, messageIds, true, originalMessage, sender, time)
+    internal fun BotWrapper.friendMsg(
+        messageIds: IntArray,
         originalMessage: MessageChain,
         sender: Friend,
-        subject: Friend,
-        target: ContactOrBot,
         time: Int
-    ): FromFriend = FromFriend(bot, ids, internalIds, isOriginalMessageInitialized, originalMessage, sender, subject, target, time)
-    internal fun temp(
-        bot: Bot,
-        ids: IntArray,
-        internalIds: IntArray,
-        isOriginalMessageInitialized: Boolean,
+    ): FromFriend = FromFriend(bot, messageIds, messageIds, true, originalMessage, sender, sender, bot, time)
+    internal fun BotWrapper.tempMsg(
+        messageIds: IntArray,
         originalMessage: MessageChain,
         sender: Member,
-        subject: Member,
-        target: ContactOrBot,
         time: Int
-    ): FromTemp = FromTemp(bot, ids, internalIds, isOriginalMessageInitialized, originalMessage, sender, subject, target, time)
-    internal fun stranger(
-        bot: Bot,
-        ids: IntArray,
-        internalIds: IntArray,
-        isOriginalMessageInitialized: Boolean,
+    ): FromTemp = FromTemp(bot, messageIds, messageIds, true, originalMessage, sender, sender, bot, time)
+    internal fun BotWrapper.strangerMsg(
+        messageIds: IntArray,
         originalMessage: MessageChain,
         sender: Stranger,
-        subject: Stranger,
-        target: ContactOrBot,
         time: Int
-    ): FromStranger = FromStranger(bot, ids, internalIds, isOriginalMessageInitialized, originalMessage, sender, subject, target, time)
+    ): FromStranger = FromStranger(bot, messageIds, messageIds, true, originalMessage, sender, sender, bot, time)
 
     @Serializable(FromGroup.Serializer::class)
     class FromGroup(
