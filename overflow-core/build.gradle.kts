@@ -54,7 +54,10 @@ tasks {
     register<JavaExec>("runConsole") {
         mainClass.set("RunConsoleKt")
         workingDir = File(project.projectDir, "run")
-        classpath = sourceSets.test.get().runtimeClasspath
+        classpath = sourceSets.test.get().runtimeClasspath.filter {
+            val path = it.absolutePath.replace("\\", "/")
+            !path.contains("ch.qos.logback/logback-")
+        }
         standardInput = System.`in`
     }
 }
