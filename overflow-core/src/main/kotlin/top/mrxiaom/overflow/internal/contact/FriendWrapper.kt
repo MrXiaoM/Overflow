@@ -37,6 +37,7 @@ internal class FriendWrapper(
         get() = gson.toJson(implJson)
     override val id: Long = impl.userId
     override val nick: String = impl.nickname
+    override val qLevel: Int = impl.qqLevel
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})Friend/$id")
     override val friendGroup: FriendGroup = bot.friendGroups.fallbackFriendGroup
     override var remark: String
