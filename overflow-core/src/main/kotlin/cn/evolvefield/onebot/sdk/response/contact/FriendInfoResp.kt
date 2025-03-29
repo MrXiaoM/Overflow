@@ -11,4 +11,10 @@ class FriendInfoResp  {
     var remark = ""
     @SerializedName("sex")
     var sex = "unknown"
+    @SerializedName("age")
+    var age = 0
+    @SerializedName("email")
+    var email = ""
+    @SerializedName("level")
+    var level = 0
 }
