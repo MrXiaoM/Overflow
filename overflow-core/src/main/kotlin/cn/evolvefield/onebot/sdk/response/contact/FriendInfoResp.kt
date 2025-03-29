@@ -9,7 +9,7 @@ class FriendInfoResp  {
     var nickname = ""
     @SerializedName(value = "remark", alternate = ["user_remark"])
     var remark = ""
-    @SerializedName(value = "qqLevel")
+    @SerializedName(value = "level")
     var qqLevel = 0
     @SerializedName("sex")
     var sex = "unknown"
