@@ -23,6 +23,8 @@ class GroupMemberInfoResp {
     var lastSentTime = 0
     @SerializedName("level")
     var level = 0
+    @SerializedName("qq_level")
+    var qqLevel = 0
     @SerializedName("role")
     var role = "member"
     @SerializedName("unfriendly")

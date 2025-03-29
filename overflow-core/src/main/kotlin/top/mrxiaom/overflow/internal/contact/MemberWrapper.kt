@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.contact.active.MemberActive
+import net.mamoe.mirai.data.UserProfile
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.EventCancelledException
 import net.mamoe.mirai.event.events.GroupTempMessagePostSendEvent
@@ -28,6 +29,7 @@ import top.mrxiaom.overflow.contact.Updatable
 import top.mrxiaom.overflow.internal.check
 import top.mrxiaom.overflow.internal.contact.data.EmptyMemberActive
 import top.mrxiaom.overflow.internal.contact.data.MemberActiveWrapper
+import top.mrxiaom.overflow.internal.data.UserProfileImpl
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.receipt
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.tempMsg
@@ -65,6 +67,19 @@ internal class MemberWrapper(
     }
     override fun avatarUrl(spec: AvatarSpec): String {
         return avatar ?: super.avatarUrl(spec)
+    }
+
+    override suspend fun queryProfile(): UserProfile {
+        val reference = super.queryProfile()
+        return UserProfileImpl(
+            age = Math.max(reference.age, impl.age),
+            email = reference.email,
+            friendGroupId = reference.friendGroupId,
+            nickname = nick,
+            qLevel = Math.max(reference.qLevel, impl.qqLevel),
+            sex = reference.sex,
+            sign = reference.sign
+        )
     }
 
     override val active: MemberActiveWrapper = MemberActiveWrapper(this)
