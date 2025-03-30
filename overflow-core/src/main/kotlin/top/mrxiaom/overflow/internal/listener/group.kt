@@ -214,6 +214,7 @@ internal fun addGroupListeners() {
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId)
             ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+        member.impl.title = e.titleNew
         MemberSpecialTitleChangeEvent(
             origin = e.titleOld,
             new = e.titleNew,
@@ -258,7 +259,7 @@ internal fun addGroupListeners() {
                 bot.logger.warning("无法找到群 ${e.groupId} 的成员(操作者) ${e.operatorId}")
                 return@listen
             }
-            val member = group.queryMember(e.userId)
+            val member = group.updateMember(e.userId)
             if (member == null) {
                 bot.logger.warning("无法找到群 ${e.groupId} 的成员 ${e.userId}")
                 return@listen
@@ -300,7 +301,7 @@ internal fun addGroupListeners() {
                 bot.logger.warning("无法找到群 ${e.groupId} 的成员(操作者) ${e.operatorId}")
                 return@listen
             }
-            val member = group.queryMember(e.userId)
+            val member = group.updateMember(e.userId)
             if (member == null) {
                 bot.logger.warning("无法找到群 ${e.groupId} 的成员 ${e.userId}")
                 return@listen
@@ -353,6 +354,7 @@ internal fun addGroupListeners() {
         // 群名片变更通知
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId) ?: return@listen
+        member.impl.card = e.cardNew
         bot.eventDispatcher.broadcastAsync(MemberCardChangeEvent(
             e.cardOld, e.cardNew, member
         ))
