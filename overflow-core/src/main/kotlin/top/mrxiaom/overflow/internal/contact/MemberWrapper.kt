@@ -98,8 +98,12 @@ internal class MemberWrapper(
             if (id != bot.id) {
                 group.checkBotPermission(MemberPermission.ADMINISTRATOR)
             }
-            Overflow.scope.launch {
-                bot.impl.setGroupCard(impl.groupId, id, value)
+            if (impl.card != value) {
+                impl.card = value
+                Overflow.scope.launch {
+                    bot.impl.setGroupCard(impl.groupId, id, value)
+                    group.updateMember(id)
+                }
             }
         }
     override val nick: String
@@ -115,8 +119,13 @@ internal class MemberWrapper(
     override var specialTitle: String
         get() = impl.title
         set(value) {
-            Overflow.scope.launch {
-                bot.impl.setGroupSpecialTitle(impl.groupId, id, value, -1)
+            group.checkBotPermission(MemberPermission.OWNER)
+            if (impl.title != value) {
+                impl.title = value
+                Overflow.scope.launch {
+                    bot.impl.setGroupSpecialTitle(impl.groupId, id, value, -1)
+                    group.updateMember(id)
+                }
             }
         }
     override suspend fun kick(message: String, block: Boolean) {
