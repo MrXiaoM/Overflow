@@ -132,16 +132,20 @@ val video = OverflowAPI.get().videoFromFile("https://xxxxx")
 
 # 群聊表情回应
 
-本功能目前支持 AstralGocq 和 Lagrange，需要 `Group` 和 `MessageSource`，用法如下：
+本功能目前支持 LLOnebot、NapCat、AstralGocq 和 Lagrange，需要 `Group` 和 `MessageSource`，用法如下：
 ```kotlin
 val icon = "127874" // 表情ID
 val msgId = source.ids[0]
 group.asRemoteGroup.setMsgReaction(msgId, icon, true)
 ```
+> 注: LLOnebot 和 NapCat 无法设置 `enable=false`
 
-关于表情ID，你可以从桌面版 QQNT 的数据文件夹中找到，以 Windows 为例，表情数据文件在这里。
+关于表情ID，你可以通过[官方Bot文档](https://bot.q.qq.com/wiki/develop/api-v2/openapi/emoji/model.html#EmojiType)找到，你也可以从桌面版 QQNT 的数据文件夹中找到，以 Windows 为例，表情数据文件在这里。
 ```
 文档/Tencent Files/nt_qq/global/nt_data/Emoji/emoji-resource/face_config.json
 ```
+
 + 对于QQ自带表情，取其中的 `QSid`。例如，表情 `/赞` 是 `76`
 + 对于Emoji表情，取其中的 `QCid`。例如，表情 `👀` 是 `128064`
+
+官方Bot文档的表情没有 QQNT 客户端的多，请自行取舍表情获取方法。

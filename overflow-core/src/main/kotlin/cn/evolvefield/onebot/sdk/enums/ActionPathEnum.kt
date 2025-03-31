@@ -328,9 +328,16 @@ enum class ActionPathEnum(
     /**
      * 群聊消息小表情反应设置
      *
-     * 属于 AstralGocq 扩展 API
+     * 属于 AstralGocq, Lagrange 扩展 API
      */
     EXT_SET_GROUP_REACTION("set_group_reaction"),
+
+    /**
+     * 设置表情回复
+     *
+     * 属于 LLOnebot, NapCat 扩展 API
+     */
+    EXT_SET_MSG_EMOJI_LIKE("set_msg_emoji_like"),
 
     /**
      * 创建群文件夹

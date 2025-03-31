@@ -1,6 +1,7 @@
 package cn.evolvefield.onebot.client.core
 
 import cn.evolvefield.onebot.client.config.BotConfig
+import cn.evolvefield.onebot.client.core.Bot.Companion.build
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.sdk.action.ActionData
 import cn.evolvefield.onebot.sdk.action.ActionList
@@ -2158,15 +2159,34 @@ class Bot(
                     addProperty("icon_type", if (icon.length > 3) 2 else 1)
                     addProperty("enable", enable)
                 }
-                "lagrange" -> { // Lagrange
+                "lagrange.onebot" -> { // Lagrange
                     addProperty("group_id", groupId)
                     addProperty("message_id", messageId)
                     addProperty("code", icon)
                     addProperty("is_add", enable)
                 }
+                else -> throw IllegalStateException("这个接口只能在 AstralGocq 或 Lagrange 执行")
             }
         }
         val result = actionHandler.action(this, action, params)
         return result.withToken()
+    }
+
+    suspend fun extSetMsgEmojiLike(
+        messageId: Int,
+        emojiId: String,
+        context: Context = {},
+    ): ActionRaw {
+        val action = context.build(ActionPathEnum.EXT_SET_MSG_EMOJI_LIKE)
+        val params = JsonObject().apply {
+            when (appName.lowercase()) {
+                "napcat.onebot" -> addProperty("message_id", messageId)
+                "llonebot" -> addProperty("message_id", messageId.toString())
+                else -> throw IllegalStateException("这个接口只能在 NapCat 或 LLOnebot 执行")
+            }
+            addProperty("emoji_id", emojiId)
+        }
+        val result = actionHandler.action(this, action, params)
+        return result.withClass()
     }
 }

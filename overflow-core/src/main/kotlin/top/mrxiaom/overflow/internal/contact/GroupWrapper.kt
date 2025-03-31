@@ -235,8 +235,17 @@ internal class GroupWrapper(
 
     @JvmBlockingBridge
     override suspend fun setMsgReaction(messageId: Int, icon: String, enable: Boolean) {
-        // Lagrange 在这块什么也不返回，所以忽略返回结果
-        bot.impl.extGroupReaction(id, messageId, icon, enable)
+        when (bot.appName.lowercase()) {
+            "llonebot", "napcat.onebot" -> {
+                if (enable) bot.impl.extSetMsgEmojiLike(messageId, icon)
+            }
+            "go-cqhttp", "lagrange.onebot" -> {
+                bot.impl.extGroupReaction(id, messageId, icon, enable)
+            }
+            else -> {
+                bot.logger.warning("暂不支持在 ${bot.appName} 使用消息回应功能")
+            }
+        }
     }
 
     override suspend fun setEssenceMessage(source: MessageSource): Boolean {
