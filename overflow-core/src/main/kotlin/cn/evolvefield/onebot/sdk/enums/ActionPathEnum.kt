@@ -326,6 +326,13 @@ enum class ActionPathEnum(
     EXT_GROUP_POKE("group_poke"),
 
     /**
+     * 群聊消息小表情反应设置
+     *
+     * 属于 AstralGocq 扩展 API
+     */
+    EXT_SET_GROUP_REACTION("set_group_reaction"),
+
+    /**
      * 创建群文件夹
      */
     CREATE_GROUP_FILE_FOLDER("create_group_file_folder"),

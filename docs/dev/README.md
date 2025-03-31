@@ -129,3 +129,19 @@ val video = OverflowAPI.get().videoFromFile("https://xxxxx")
 ```
 
 为了兼容 mirai 已有的部分插件等可能已停止更新的业务逻辑，Overflow 添加了 [FileService](https://github.com/MrXiaoM/Overflow/blob/main/overflow-core-api/src/main/kotlin/top/mrxiaom/overflow/spi/FileService.kt)，使用示例另请参见 [LocalFileService](https://github.com/MrXiaoM/LocalFileService)
+
+# 群聊表情回应
+
+本功能目前支持 AstralGocq 和 Lagrange，需要 `Group` 和 `MessageSource`，用法如下：
+```kotlin
+val icon = "127874" // 表情ID
+val msgId = source.ids[0]
+group.asRemoteGroup.setMsgReaction(msgId, icon, true)
+```
+
+关于表情ID，你可以从桌面版 QQNT 的数据文件夹中找到，以 Windows 为例，表情数据文件在这里。
+```
+文档/Tencent Files/nt_qq/global/nt_data/Emoji/emoji-resource/face_config.json
+```
++ 对于QQ自带表情，取其中的 `QSid`。例如，表情 `/赞` 是 `76`
++ 对于Emoji表情，取其中的 `QCid`。例如，表情 `👀` 是 `128064`

@@ -233,6 +233,12 @@ internal class GroupWrapper(
         return resp.data
     }
 
+    @JvmBlockingBridge
+    override suspend fun setMsgReaction(messageId: Int, icon: String, enable: Boolean) {
+        // Lagrange 在这块什么也不返回，所以忽略返回结果
+        bot.impl.extGroupReaction(id, messageId, icon, enable)
+    }
+
     override suspend fun setEssenceMessage(source: MessageSource): Boolean {
         checkBotPermission(MemberPermission.ADMINISTRATOR)
         bot.impl.setEssenceMsg(source.ids[0])

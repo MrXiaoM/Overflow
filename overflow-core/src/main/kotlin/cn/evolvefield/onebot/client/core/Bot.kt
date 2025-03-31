@@ -17,6 +17,7 @@ import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.sdk.response.contact.UnidirectionalFriendListResp
 import cn.evolvefield.onebot.sdk.response.ext.CreateGroupFileFolderResp
 import cn.evolvefield.onebot.sdk.response.ext.GetFileResp
+import cn.evolvefield.onebot.sdk.response.ext.SetGroupReactionResp
 import cn.evolvefield.onebot.sdk.response.ext.UploadGroupFileResp
 import cn.evolvefield.onebot.sdk.response.group.*
 import cn.evolvefield.onebot.sdk.response.guild.*
@@ -2139,5 +2140,33 @@ class Bot(
         }
         val result = actionHandler.action(this, action, params)
         return result.withClass()
+    }
+
+    suspend fun extGroupReaction(
+        groupId: Long,
+        messageId: Int,
+        icon: String,
+        enable: Boolean,
+        context: Context = {},
+    ): ActionData<SetGroupReactionResp> {
+        val action = context.build(ActionPathEnum.EXT_SET_GROUP_REACTION)
+        val params = JsonObject().apply {
+            when (appName.lowercase()) {
+                "go-cqhttp" -> { // astral
+                    addProperty("message_id", messageId)
+                    addProperty("icon_id", icon)
+                    addProperty("icon_type", if (icon.length > 3) 2 else 1)
+                    addProperty("enable", enable)
+                }
+                "lagrange" -> { // Lagrange
+                    addProperty("group_id", groupId)
+                    addProperty("message_id", messageId)
+                    addProperty("code", icon)
+                    addProperty("is_add", enable)
+                }
+            }
+        }
+        val result = actionHandler.action(this, action, params)
+        return result.withToken()
     }
 }

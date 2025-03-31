@@ -1,15 +1,28 @@
 package top.mrxiaom.overflow.contact
 
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
+import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.ContactList
+import net.mamoe.mirai.contact.Group
 import net.mamoe.mirai.contact.NormalMember
 import net.mamoe.mirai.contact.announcement.Announcements
+import kotlin.jvm.Throws
 
 interface RemoteGroup {
     @JvmBlockingBridge
     suspend fun updateGroupMemberList(): ContactList<NormalMember>
     @JvmBlockingBridge
     suspend fun updateAnnouncements(): Announcements
+
+    /**
+     * 设置群消息反应表情
+     *
+     * @param messageId 消息ID，可通过 `MessageSource.ids[0]` 取得
+     * @param icon 图标ID，详见 Overflow 开发文档
+     * @param enable 添加或取消反应表情
+     */
+    @JvmBlockingBridge
+    suspend fun setMsgReaction(messageId: Int, icon: String, enable: Boolean)
 
     companion object {
         /**
