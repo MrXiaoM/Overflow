@@ -1478,9 +1478,27 @@ class Bot(
             ignoreStatus(true)
         },
     ): JsonObject {
+        return customRequest(
+            params = params,
+            context = context.build(action),
+        )
+    }
+
+    /**
+     * 自定义请求
+     *
+     * @param params  请求参数 json
+     * @param context Onebot 主动操作的上下文
+     * @return [JsonObject]
+     */
+    @JvmBlockingBridge
+    suspend fun customRequest(
+        params: String?,
+        context: ActionContext,
+    ): JsonObject {
         return actionHandler.action(
             bot = this,
-            context = context.build(action),
+            context = context,
             params = params?.run { JsonParser.parseString(this).asJsonObject },
         )
     }

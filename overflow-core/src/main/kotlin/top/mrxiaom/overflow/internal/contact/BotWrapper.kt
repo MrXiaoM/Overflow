@@ -26,6 +26,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.supervisorJob
 import net.mamoe.mirai.utils.*
 import org.java_websocket.framing.CloseFrame
+import top.mrxiaom.overflow.action.ActionContext
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.contact.Updatable
@@ -220,6 +221,11 @@ internal class BotWrapper private constructor(
     @JvmBlockingBridge
     override suspend fun executeAction(actionPath: String, params: String?): String {
         return impl.customRequest(actionPath, params).toString()
+    }
+
+    @JvmBlockingBridge
+    override suspend fun executeAction(context: ActionContext, params: String?): String {
+        return impl.customRequest(params, context).toString()
     }
 
     override fun sendRawWebSocketMessage(message: String) {
