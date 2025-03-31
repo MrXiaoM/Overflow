@@ -40,7 +40,7 @@ object EventBus {
         val field = declaredMemberProperties
             .firstOrNull { it.name == name }
         if (field == null) {
-            logger.warn("无法注册 " + java.name + ": 找不到 subType")
+            logger.warn("无法注册 ${java.name}: 找不到 $name")
             return null
         }
         return field
