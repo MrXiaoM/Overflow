@@ -1,6 +1,7 @@
 @file:Suppress("INVISIBLE_MEMBER")
 import org.ajoberstar.grgit.Grgit
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.Locale
 
 plugins {
     kotlin("jvm") version "1.8.0" apply false
@@ -53,6 +54,9 @@ allprojects {
     version = rootProject.version
 
     repositories {
+        if (Locale.getDefault().country == "CN") {
+            maven("https://mirrors.huaweicloud.com/repository/maven/")
+        }
         mavenCentral()
     }
 
