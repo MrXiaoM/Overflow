@@ -19,10 +19,20 @@ import net.mamoe.mirai.console.permission.PermissionService
 import net.mamoe.mirai.console.plugin.name
 import net.mamoe.mirai.console.plugin.version
 import net.mamoe.mirai.console.util.*
+import net.mamoe.mirai.contact.remarkOrNick
 import net.mamoe.mirai.utils.MiraiExperimentalApi
+import org.java_websocket.client.WebSocketClient
+import org.java_websocket.framing.CloseFrame
+import org.java_websocket.server.WebSocketServer
+import top.mrxiaom.overflow.BotBuilder
 import top.mrxiaom.overflow.BuildConstants
 import top.mrxiaom.overflow.contact.RemoteBot.Companion.asRemoteBot
 import top.mrxiaom.overflow.internal.Overflow
+import top.mrxiaom.overflow.internal.asOnebot
+import top.mrxiaom.overflow.internal.message.OnebotMessages
+import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin.WebSocketType
+import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin.oneBotLogger
+import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin.startWithConfig
 import java.lang.management.ManagementFactory
 import java.lang.management.MemoryMXBean
 import java.lang.management.MemoryUsage
@@ -32,6 +42,156 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 internal object BuiltInCommands {
+    object OverflowCommand : CompositeCommand(
+        owner = OverflowCoreAsPlugin,
+        primaryName = "overflow",
+        secondaryNames = arrayOf(),
+    ) {
+
+        @SubCommand
+        @Description("查看在线 Bot 列表")
+        suspend fun CommandSender.bots() {
+            sendMessage(Bot.instances.joinToString { it.id.toString() })
+        }
+        @SubCommand
+        @Description("查看 Bot")
+        suspend fun CommandSender.bot(id: Long) {
+            val bot = Bot.findInstance(id)
+            if (bot == null) {
+                sendMessage("bot 不存在")
+                return
+            }
+            sendMessage("id=${bot.id}, nick=${bot.nick}")
+        }
+        @SubCommand
+        @Description("重新连接 Onebot")
+        suspend fun CommandSender.reconnect(
+            @Name("QQ号") qq: Long? = null
+        ) {
+            if (Bot.instances.isEmpty()) startWithConfig()
+            else Bot.instances.filter { qq == null || it.id == qq }.forEach {
+                when (val channel = it.asOnebot.impl.channel) {
+                    is WebSocketClient -> channel.reconnectBlocking()
+                    is WebSocketServer -> channel.close(CloseFrame.NORMAL, "主动关闭 (重连)")
+                }
+            }
+            sendMessage("重新连接执行完成")
+        }
+
+        @SubCommand
+        @Description("通过 WebSocket 连接到多个 Onebot 实现 (实验性)")
+        suspend fun CommandSender.connect(
+            @Name("WS类型") wsType: WebSocketType,
+            @Name("正向地址或反向端口") hostOrPort: String,
+            @Name("是否为QQ平台") platform: Boolean = true,
+            @Name("连接令牌") token: String? = null
+        ) {
+            val finalBot = when (wsType) {
+                WebSocketType.POSITIVE -> BotBuilder.positive(hostOrPort)
+                WebSocketType.REVERSED -> BotBuilder.reversed(hostOrPort.toIntOrNull()?.takeIf { it in 0..65535 } ?: return)
+            }.also {
+                val config = Overflow.instance.config
+                if (token != null) it.token(token)
+                if (!platform) it.noPlatform()
+                it.retryTimes(config.retryTimes)
+                it.retryWaitMills(config.retryWaitMills)
+                it.retryRestMills(config.retryRestMills)
+                it.overrideLogger(oneBotLogger)
+            }.connect()
+
+            if (finalBot != null) {
+                sendMessage("${finalBot.id} 登录成功，昵称为 ${finalBot.nick}")
+            } else {
+                sendMessage("登录失败，详见控制台日志")
+            }
+        }
+
+        @SubCommand
+        @Description("调用API")
+        suspend fun CommandSender.exec(
+            @Name("API请求路径") apiPath: String,
+            @Name("请求参数") params : String?,
+            @Name("发送回应") showRet : Boolean = true
+        ) {
+            val bot = (bot ?: Bot.instances.firstOrNull())?.asRemoteBot ?: return Unit.also {
+                sendMessage("至少有一个Bot在线才能执行该命令")
+            }
+            val ret = bot.executeAction(apiPath,params)
+            if (showRet) {
+                sendMessage(ret)
+            }
+        }
+
+        @SubCommand
+        @Description("获取群聊列表")
+        suspend fun CommandSender.groups(
+            @Name("详细") details: Boolean = false
+        ) {
+            val bot = (bot ?: Bot.instances.firstOrNull()) ?: return Unit.also {
+                sendMessage("至少有一个Bot在线才能执行该命令")
+            }
+            if (!details) {
+                sendMessage("${bot.id} 的群数量: ${bot.groups.size}")
+            } else {
+                sendMessage("共  ${bot.groups.size} 个群: " +
+                        bot.groups.joinToString(", ") { "[${it.id}:${it.name}]" }
+                )
+            }
+        }
+
+        @SubCommand
+        @Description("发送群消息")
+        suspend fun CommandSender.group(
+            @Name("群号") groupId: Long,
+            @Name("消息") vararg message: String
+        ) {
+            val bot = (bot ?: Bot.instances.firstOrNull()) ?: return Unit.also {
+                sendMessage("至少有一个Bot在线才能执行该命令")
+            }
+            val group = bot.groups[groupId] ?: return Unit.also {
+                sendMessage("找不到群 $groupId")
+            }
+            // TODO: 用更简洁的方法反序列化消息
+            val messageChain = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, message.joinToString(" "))
+            group.sendMessage(messageChain)
+            sendMessage("消息发送成功")
+        }
+
+        @SubCommand
+        @Description("获取群聊列表")
+        suspend fun CommandSender.friends(
+            @Name("详细") details: Boolean = false
+        ) {
+            val bot = (bot ?: Bot.instances.firstOrNull()) ?: return Unit.also {
+                sendMessage("至少有一个Bot在线才能执行该命令")
+            }
+            if (!details) {
+                sendMessage("${bot.id} 的好友数量: ${bot.friends.size}")
+            } else {
+                sendMessage("${bot.id} 共有 ${bot.friends.size} 个好友: " +
+                        bot.friends.joinToString(", ") { "[${it.id}:${it.remarkOrNick}]" }
+                )
+            }
+        }
+
+        @SubCommand
+        @Description("发送好友消息")
+        suspend fun CommandSender.friend(
+            @Name("好友QQ") friendId: Long,
+            @Name("消息") vararg message: String
+        ) {
+            val bot = (bot ?: Bot.instances.firstOrNull()) ?: return Unit.also {
+                sendMessage("至少有一个Bot在线才能执行该命令")
+            }
+            val friend = bot.friends[friendId] ?: return Unit.also {
+                sendMessage("找不到好友 $friendId")
+            }
+            // TODO: 用更简洁的方法反序列化消息
+            val messageChain = OnebotMessages.deserializeFromOneBot(bot.asRemoteBot, message.joinToString(" "))
+            friend.sendMessage(messageChain)
+            sendMessage("消息发送成功")
+        }
+    }
     object StatusCommand : SimpleCommand(
         ConsoleCommandOwner, "status", "states", "状态",
         description = "获取 Mirai Console 运行状态"
