@@ -66,22 +66,38 @@ internal class GroupWrapper(
     override suspend fun updateAnnouncements(): Announcements {
         return announcements.also { it.update() }
     }
+
+    /**
+     * 请求刷新并获取群员信息。
+     */
     internal suspend fun updateMember(userId: Long): MemberWrapper? {
         val result = bot.impl.getGroupMemberInfo(id, userId, false)
         val data = result.data ?: return null
         return updateMember(data, result.json.data ?: JsonObject())
     }
+
+    /**
+     * 通过指定的 GroupMemberInfoResp 刷新并获取群员信息。
+     */
     internal fun updateMember(member: GroupMemberInfoResp, json: JsonElement): MemberWrapper {
         return (members[member.userId] ?: MemberWrapper(this, member, json).also { members.delegate.add(it) }).apply {
             impl = member
         }
     }
+
+    /**
+     * 刷新并获取匿名成员信息
+     */
     internal fun updateAnonymous(member: Anonymous): AnonymousMemberWrapper {
         return (anonymousInternal[member.flag] ?: AnonymousMemberWrapper(this, member).also { anonymousInternal[member.flag] = it }).apply {
             impl = member
         }
     }
 
+    /**
+     * 获取群员信息，或者刷新群员信息。
+     * 仅在找不到群员信息时请求刷新。
+     */
     internal suspend fun queryMember(userId: Long): MemberWrapper? {
         if (userId == bot.id) return botAsMember
         return members[userId] ?: run {
