@@ -70,7 +70,8 @@ internal fun PrivateSender.wrapAsFriend(bot: BotWrapper, json: JsonElement): Fri
     return bot.updateFriend(FriendWrapper(bot, FriendInfoResp().also {
         it.userId = userId
         it.nickname = nickname
-        it.remark = ""
+        it.sex = sex
+        it.age = age
     }, json))
 }
 
@@ -81,9 +82,13 @@ internal fun StrangerInfoResp.wrapAsStranger(bot: BotWrapper, json: JsonElement)
 internal fun PrivateSender.wrapAsStranger(bot: BotWrapper, json: JsonElement): StrangerWrapper {
     val id = userId
     val nick = nickname
+    val priSex = sex
+    val priAge = age
     return StrangerInfoResp().apply {
         userId = id
         nickname = nick
+        sex = priSex
+        age = priAge
     }.wrapAsStranger(bot, json)
 }
 
