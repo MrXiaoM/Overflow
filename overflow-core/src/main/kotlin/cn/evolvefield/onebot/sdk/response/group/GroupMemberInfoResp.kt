@@ -22,7 +22,7 @@ class GroupMemberInfoResp {
     @SerializedName("last_sent_time")
     var lastSentTime = 0
     @SerializedName("level")
-    var level = 0
+    var level = "0"
     @SerializedName("qq_level")
     var qqLevel = 0
     @SerializedName("role")
@@ -37,4 +37,7 @@ class GroupMemberInfoResp {
     var cardChangeable = true
     @SerializedName("shut_up_timestamp")
     var shutUpTimestamp = 0L
+
+    val levelInt: Int
+        get() = level.toIntOrNull() ?: 0
 }

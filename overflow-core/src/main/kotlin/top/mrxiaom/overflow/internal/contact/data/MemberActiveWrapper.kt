@@ -29,7 +29,7 @@ internal class MemberActiveWrapper(
             return rankInternal
         }
     override val temperature: Int
-        get() = member.impl.level
+        get() = member.impl.levelInt
     override suspend fun queryMedal(): MemberMedalInfo {
         return member.group.active.queryMemberMedal(uid = member.id)
     }
