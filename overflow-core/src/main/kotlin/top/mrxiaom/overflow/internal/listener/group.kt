@@ -3,6 +3,7 @@ package top.mrxiaom.overflow.internal.listener
 
 import cn.evolvefield.onebot.client.handler.EventBus.listen
 import cn.evolvefield.onebot.sdk.event.message.GroupMessageEvent
+import cn.evolvefield.onebot.sdk.event.notice.NotifyNoticeEvent
 import cn.evolvefield.onebot.sdk.event.notice.group.*
 import cn.evolvefield.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.sdk.util.jsonObject
@@ -207,20 +208,21 @@ internal fun addGroupListeners() {
         // 管理员已同意邀请入群
         bot.eventDispatcher.broadcastAsync(MemberJoinEvent.Invite(member, invitor))
     }
-    listen<GroupTitleChangeNoticeEvent> { e ->
+    listen<NotifyNoticeEvent>("title") { e ->
         if (checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")
             || checkId(e.userId, "%onebot 返回了异常的数值 user_id=%value")) return@listen
         // 群头衔变更通知
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId)
             ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
-        member.impl.title = e.titleNew
-        MemberSpecialTitleChangeEvent(
-            origin = e.titleOld,
-            new = e.titleNew,
+        val titleOld = member.impl.title
+        member.impl.title = e.title
+        bot.eventDispatcher.broadcastAsync(MemberSpecialTitleChangeEvent(
+            origin = titleOld,
+            new = e.title,
             member = member,
             operator = group.owner // 目前只有群主可以更改群头衔
-        )
+        ))
     }
     suspend fun BotWrapper.checkGroupBan(e: GroupBanNoticeEvent): Pair<GroupWrapper, MemberWrapper?>? {
         if (bot.checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")) return null

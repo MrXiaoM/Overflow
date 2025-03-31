@@ -11,6 +11,8 @@ class NotifyNoticeEvent : NoticeEvent() {
     var targetId = 0L
     @SerializedName("group_id")
     var groupId = 0L
+    @SerializedName("title")
+    val title = ""
     val realOperatorId: Long
         get() = operatorId.takeIf { it > 0 } ?: userId
 }
