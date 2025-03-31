@@ -49,12 +49,7 @@ internal fun GroupSender.wrapAsMember(group: Group, json: JsonElement): MemberWr
         it.userId = userId.toLong()
         it.nickname = nickname
         it.card = card
-        it.sex = sex
-        it.age = age
-        it.area = area
-        it.level = level.toIntOrNull() ?: 0
         it.role = role
-        it.title = title
     }.wrapAsMember(group, json)
 }
 
