@@ -52,8 +52,7 @@ internal fun addGroupListeners() {
         if (checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")) return@listen
         // 普通群消息
         val group = bot.group(e.groupId)
-        val json = e.json.jsonObject?.get("sender") as? JsonObject
-        val member = e.sender?.wrapAsMember(group, json ?: JsonObject()) ?: return@listen
+        val member = e.sender?.wrapAsMember(group) ?: return@listen
 
         val message = e.toMiraiMessage(bot)
         // 使用 group_upload 事件接收群文件时，忽略接收群文件类型消息

@@ -43,14 +43,14 @@ internal fun GroupMemberInfoResp.wrapAsMember(group: Group, json: JsonElement): 
     return (group as GroupWrapper).updateMember(this, json)
 }
 
-internal fun GroupSender.wrapAsMember(group: Group, json: JsonElement): MemberWrapper {
-    return GroupMemberInfoResp().also {
-        it.groupId = group.id
-        it.userId = userId.toLong()
+internal suspend fun GroupSender.wrapAsMember(group: GroupWrapper): MemberWrapper? {
+    val member = group.queryMember(userId.toLong())
+    member?.impl?.also {
         it.nickname = nickname
         it.card = card
         it.role = role
-    }.wrapAsMember(group, json)
+    }
+    return member
 }
 
 internal fun Anonymous.wrapAsMember(group: Group): AnonymousMemberWrapper {
