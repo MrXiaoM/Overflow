@@ -14,6 +14,8 @@ import cn.evolvefield.onebot.sdk.event.notice.guild.ChannelCreatedNoticeEvent
 import cn.evolvefield.onebot.sdk.event.notice.guild.ChannelDestroyedNoticeEvent
 import cn.evolvefield.onebot.sdk.event.notice.guild.ChannelUpdateNoticeEvent
 import cn.evolvefield.onebot.sdk.event.notice.guild.MessageReactionsUpdatedNoticeEvent
+import cn.evolvefield.onebot.sdk.event.notice.misc.GroupMsgEmojiLikeNotice
+import cn.evolvefield.onebot.sdk.event.notice.misc.GroupReactionNotice
 import cn.evolvefield.onebot.sdk.event.notice.misc.ReceiveOfflineFilesNoticeEvent
 import cn.evolvefield.onebot.sdk.event.request.FriendAddRequestEvent
 import cn.evolvefield.onebot.sdk.event.request.GroupAddRequestEvent
@@ -54,6 +56,11 @@ object ListenerUtils {
         "friend_recall" to PrivateMsgDeleteNoticeEvent::class,
         "essence" to GroupEssenceNoticeEvent::class,
         "offline_file" to ReceiveOfflineFilesNoticeEvent::class,
+
+        // LLOnebot, NapCat
+        "group_msg_emoji_like" to GroupMsgEmojiLikeNotice::class,
+        // Lagrange
+        "reaction" to GroupReactionNotice::class,
 
         "channel_created" to ChannelCreatedNoticeEvent::class,
         "channel_destroyed" to ChannelDestroyedNoticeEvent::class,

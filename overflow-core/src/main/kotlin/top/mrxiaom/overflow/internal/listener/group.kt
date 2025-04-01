@@ -5,6 +5,8 @@ import cn.evolvefield.onebot.client.handler.EventBus.listen
 import cn.evolvefield.onebot.sdk.event.message.GroupMessageEvent
 import cn.evolvefield.onebot.sdk.event.notice.NotifyNoticeEvent
 import cn.evolvefield.onebot.sdk.event.notice.group.*
+import cn.evolvefield.onebot.sdk.event.notice.misc.GroupMsgEmojiLikeNotice
+import cn.evolvefield.onebot.sdk.event.notice.misc.GroupReactionNotice
 import cn.evolvefield.onebot.sdk.event.request.GroupAddRequestEvent
 import cn.evolvefield.onebot.sdk.util.jsonObject
 import com.google.gson.JsonObject
@@ -16,6 +18,7 @@ import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.buildMessageChain
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.event.MemberEssenceNoticeEvent
+import top.mrxiaom.overflow.event.MessageReactionEvent
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
@@ -370,6 +373,48 @@ internal fun addGroupListeners() {
         val operator = if (e.operatorId <= 0) null else group.queryMember(e.operatorId)
         bot.eventDispatcher.broadcastAsync(GroupNameChangeEvent(
                 origin, new, group, operator
+        ))
+    }
+    listen<GroupMsgEmojiLikeNotice> { e ->
+        if (checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")
+            || checkId(e.userId, "%onebot 返回了异常的数值 user_id=%value")) return@listen
+        // 消息表情回应通知（LLOnebot, NapCat）
+        val group = bot.group(e.groupId)
+        val member = group.queryMember(e.userId) ?: return@listen
+        val operator = if (member.id == bot.id) null else member
+        // TODO: 接口中没有提及是添加还是删除，可能要开一张缓存表来记录
+        for (like in e.likes) {
+            bot.eventDispatcher.broadcastAsync(MessageReactionEvent(
+                bot = bot,
+                group = group,
+                messageId = e.messageId,
+                operator = operator,
+                reaction = like.emojiId,
+                count = like.count,
+                operation = true, // TODO
+            ))
+        }
+    }
+    listen<GroupReactionNotice> { e ->
+        if (checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")
+            || checkId(e.operatorId, "%onebot 返回了异常的数值 operator_id=%value")) return@listen
+        // 消息表情回应通知（Lagrange）
+        val group = bot.group(e.groupId)
+        val member = group.queryMember(e.operatorId) ?: return@listen
+        val operation = when(e.subType) {
+            "add" -> true
+            "remove" -> false
+            else -> return@listen
+        }
+        val operator = if (member.id == bot.id) null else member
+        bot.eventDispatcher.broadcastAsync(MessageReactionEvent(
+            bot = bot,
+            group = group,
+            messageId = e.messageId,
+            operator = operator,
+            reaction = e.code,
+            count = e.count,
+            operation = operation,
         ))
     }
 }
