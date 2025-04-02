@@ -117,21 +117,9 @@ enum class ActionPathEnum(
      */
     GET_GROUP_HONOR_INFO("get_group_honor_info"),
     /**
-     * 检查是否可以发送图片
-     */
-    CAN_SEND_IMAGE("can_send_image"),
-    /**
-     * 检查是否可以发送语音
-     */
-    CAN_SEND_RECORD("can_send_record"),
-    /**
      * 设置群头像
      */
     SET_GROUP_PORTRAIT("set_group_portrait"),
-    /**
-     * 检查链接安全性
-     */
-    CHECK_URL_SAFELY("check_url_safely"),
     /**
      * 发送群公告
      */
@@ -152,10 +140,6 @@ enum class ActionPathEnum(
      * 群组匿名用户禁言
      */
     SET_GROUP_ANONYMOUS_BAN("set_group_anonymous_ban"),
-    /**
-     * 下载文件到缓存目录
-     */
-    DOWNLOAD_FILE("download_file"),
     /**
      * 发送合并转发 (群)
      */
@@ -181,42 +165,6 @@ enum class ActionPathEnum(
      */
     GET_ESSENCE_MSG_LIST("get_essence_msg_list"),
     /**
-     * 获取频道系统内BOT的资料
-     */
-    GET_GUILD_SERVICE_PROFILE("get_guild_service_profile"),
-    /**
-     * 获取频道列表
-     */
-    GET_GUILD_LIST("get_guild_list"),
-    /**
-     * 获取频道消息
-     */
-    GET_GUILD_MSG("get_guild_msg"),
-    /**
-     * 通过访客获取频道元数据
-     */
-    GET_GUILD_META_BY_GUEST("get_guild_meta_by_guest"),
-    /**
-     * 获取子频道列表
-     */
-    GET_GUILD_CHANNEL_LIST("get_guild_channel_list"),
-    /**
-     * 获取频道成员列表
-     */
-    GET_GUILD_MEMBER_LIST("get_guild_member_list"),
-    /**
-     * 单独获取频道成员信息
-     */
-    GET_GUILD_MEMBER_PROFILE("get_guild_member_profile"),
-    /**
-     * 发送信息到子频道
-     */
-    SEND_GUILD_CHANNEL_MSG("send_guild_channel_msg"),
-    /**
-     * 获取话题频道帖子
-     */
-    GET_TOPIC_CHANNEL_FEEDS("get_topic_channel_feeds"),
-    /**
      * 发送合并转发 (私聊)
      */
     SEND_PRIVATE_FORWARD_MSG("send_private_forward_msg"),
@@ -225,41 +173,17 @@ enum class ActionPathEnum(
      */
     SET_QQ_PROFILE("set_qq_profile"),
     /**
-     * 获取中文分词
-     */
-    GET_WORD_SLICES(".get_word_slices"),
-    /**
      * 获取当前账号在线客户端列表
      */
     GET_ONLINE_CLIENTS("_get_online_clients"),
-    /**
-     * 图片 OCR
-     */
-    OCR_IMAGE("ocr_image"),
     /**
      * 合并转发
      */
     SEND_FORWARD_MSG("send_forward_msg"),
     /**
-     * 上传私聊文件
-     */
-    UPLOAD_PRIVATE_FILE("upload_private_file"),
-    /**
      * 群打卡
      */
     SEND_GROUP_SIGN("send_group_sign"),
-    /**
-     * 获取单向好友列表
-     */
-    GET_UNIDIRECTIONAL_FRIEND_LIST("get_unidirectional_friend_list"),
-    /**
-     * 删除单向好友
-     */
-    DELETE_UNIDIRECTIONAL_FRIEND("delete_unidirectional_friend"),
-    /**
-     * 获取运行状态
-     */
-    GET_STATUS("get_status"),
     /**
      * 获取版本信息
      */
@@ -280,10 +204,6 @@ enum class ActionPathEnum(
      * 获取 Cookie 和 CSRF Token
      */
     GET_CREDENTIALS("get_credentials"),
-    /**
-     * 获取用户资料卡
-     */
-    GET_USER_INFO("get_user_info"),
     /**
      * 删除群文件
      */

@@ -1,27 +1,22 @@
 package cn.evolvefield.onebot.client.core
 
 import cn.evolvefield.onebot.client.config.BotConfig
-import cn.evolvefield.onebot.client.core.Bot.Companion.build
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.sdk.action.ActionData
 import cn.evolvefield.onebot.sdk.action.ActionList
 import cn.evolvefield.onebot.sdk.action.ActionPath
 import cn.evolvefield.onebot.sdk.action.ActionRaw
 import cn.evolvefield.onebot.sdk.entity.Anonymous
-import cn.evolvefield.onebot.sdk.entity.GuildMsgId
 import cn.evolvefield.onebot.sdk.entity.MsgId
 import cn.evolvefield.onebot.sdk.enums.ActionPathEnum
-import cn.evolvefield.onebot.sdk.event.message.GroupMessageEvent
 import cn.evolvefield.onebot.sdk.response.contact.FriendInfoResp
 import cn.evolvefield.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
-import cn.evolvefield.onebot.sdk.response.contact.UnidirectionalFriendListResp
 import cn.evolvefield.onebot.sdk.response.ext.CreateGroupFileFolderResp
 import cn.evolvefield.onebot.sdk.response.ext.GetFileResp
 import cn.evolvefield.onebot.sdk.response.ext.SetGroupReactionResp
 import cn.evolvefield.onebot.sdk.response.ext.UploadGroupFileResp
 import cn.evolvefield.onebot.sdk.response.group.*
-import cn.evolvefield.onebot.sdk.response.guild.*
 import cn.evolvefield.onebot.sdk.response.misc.*
 import cn.evolvefield.onebot.sdk.util.*
 import com.google.gson.*
@@ -94,30 +89,6 @@ class Bot(
     }
 
     /**
-     * 发送消息
-     *
-     * @param event      [GroupMessageEvent]
-     * @param msg        要发送的内容
-     * @param autoEscape 消息内容是否作为纯文本发送 ( 即不解析 CQ 码 ) , 只在 message 字段是字符串时有效
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionData] of [MsgId]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun sendMsg(
-        event: GroupMessageEvent,
-        msg: String,
-        autoEscape: Boolean,
-        context: Context = {},
-    ): ActionData<MsgId> {
-        when (event.messageType) {
-            "private" -> return sendPrivateMsg(event.userId, msg, autoEscape, context)
-            "group" -> return sendGroupMsg(event.groupId, msg, autoEscape, context)
-        }
-        throw IllegalArgumentException("无效的 messageType=${event.messageType}")
-    }
-
-    /**
      * 发送私聊消息
      *
      * @param userId     对方 QQ 号
@@ -165,177 +136,6 @@ class Bot(
         params.addProperty("group_id", groupId)
         params.addMessage("message", msg)
         params.addProperty("auto_escape", autoEscape)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-
-    /**
-     * 获取频道成员列表
-     * 由于频道人数较多(数万), 请尽量不要全量拉取成员列表, 这将会导致严重的性能问题
-     * 尽量使用 getGuildMemberProfile 接口代替全量拉取
-     * nextToken 为空的情况下, 将返回第一页的数据, 并在返回值附带下一页的 token
-     *
-     * @param guildId   频道ID
-     * @param nextToken 翻页Token
-     * @param context   Onebot 主动操作的上下文
-     * @return [ActionData] of [GuildMemberListResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getGuildMemberList(
-        guildId: String,
-        nextToken: String,
-        context: Context = {},
-    ): ActionData<GuildMemberListResp> {
-        val action = context.build(ActionPathEnum.GET_GUILD_LIST)
-        val params = JsonObject()
-        params.addProperty("guild_id", guildId)
-        params.addProperty("next_token", nextToken)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-
-    /**
-     * 发送信息到子频道
-     *
-     * @param guildId   频道 ID
-     * @param channelId 子频道 ID
-     * @param msg       要发送的内容，请使用CQ码或json数组消息
-     * @param context   Onebot 主动操作的上下文
-     * @return [ActionData] of [GuildMsgId]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun sendGuildMsg(
-        guildId: String,
-        channelId: String,
-        msg: String,
-        context: Context = {},
-    ): ActionData<GuildMsgId> {
-        val action = context.build(ActionPathEnum.SEND_GUILD_CHANNEL_MSG)
-        val params = JsonObject()
-        params.addProperty("guild_id", guildId)
-        params.addProperty("channel_id", channelId)
-        params.addMessage("message", msg)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-
-    /**
-     * 获取频道消息
-     *
-     * @param guildMsgId 频道 ID
-     * @param noCache    是否使用缓存
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionData] of [GetGuildMsgResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getGuildMsg(
-        guildMsgId: String,
-        noCache: Boolean,
-        context: Context = {},
-    ): ActionData<GetGuildMsgResp> {
-        val action = context.build(ActionPathEnum.GET_GUILD_MSG)
-        val params = JsonObject()
-        params.addProperty("message_id", guildMsgId)
-        params.addProperty("no_cache", noCache)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-    /**
-     * 获取频道系统内 BOT 的资料
-     *
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionData] of [GuildServiceProfileResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getGuildServiceProfile(
-        context: Context = {},
-    ): ActionData<GuildServiceProfileResp> {
-        val action = context.build(ActionPathEnum.GET_GUILD_SERVICE_PROFILE)
-        val result = actionHandler.action(this, action)
-        return result.withToken()
-    }
-    /**
-     * 获取频道列表
-     *
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionList] of [GuildListResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getGuildList(
-        context: Context = {},
-    ): ActionList<GuildListResp> {
-        val action = context.build(ActionPathEnum.GET_GUILD_LIST)
-        val result = actionHandler.action(this, action)
-        return result.withToken()
-    }
-
-    /**
-     * 通过访客获取频道元数据
-     *
-     * @param guildId 频道 ID
-     * @param context Onebot 主动操作的上下文
-     * @return [ActionData] of [GuildMetaByGuestResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getGuildMetaByGuest(
-        guildId: String,
-        context: Context = {},
-    ): ActionData<GuildMetaByGuestResp> {
-        val action = context.build(ActionPathEnum.GET_GUILD_META_BY_GUEST)
-        val params = JsonObject()
-        params.addProperty("guild_id", guildId)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-
-    /**
-     * 获取子频道列表
-     *
-     * @param guildId 频道 ID
-     * @param noCache 是否无视缓存
-     * @param context Onebot 主动操作的上下文
-     * @return [ActionList] of [ChannelInfoResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getGuildChannelList(
-        guildId: String,
-        noCache: Boolean,
-        context: Context = {},
-    ): ActionList<ChannelInfoResp> {
-        val action = context.build(ActionPathEnum.GET_GUILD_CHANNEL_LIST)
-        val params = JsonObject()
-        params.addProperty("guild_id", guildId)
-        params.addProperty("no_cache", noCache)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-
-    /**
-     * 单独获取频道成员信息
-     *
-     * @param guildId 频道ID
-     * @param userId  用户ID
-     * @param context Onebot 主动操作的上下文
-     * @return [ActionData] of [GuildMemberProfileResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getGuildMemberProfile(
-        guildId: String,
-        userId: String,
-        context: Context = {},
-    ): ActionData<GuildMemberProfileResp> {
-        val action = context.build(ActionPathEnum.GET_GUILD_MEMBER_PROFILE)
-        val params = JsonObject()
-        params.addProperty("guild_id", guildId)
-        params.addProperty("user_id", userId)
         val result = actionHandler.action(this, action, params)
         return result.withToken()
     }
@@ -907,38 +707,6 @@ class Bot(
     }
 
     /**
-     * 检查是否可以发送图片
-     *
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionData] of [BooleanResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun canSendImage(
-        context: Context = {},
-    ): ActionData<BooleanResp> {
-        val action = context.build(ActionPathEnum.CAN_SEND_IMAGE)
-        val result = actionHandler.action(this, action)
-        return result.withToken()
-    }
-
-    /**
-     * 检查是否可以发送语音
-     *
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionData] of [BooleanResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun canSendRecord(
-        context: Context = {},
-    ): ActionData<BooleanResp> {
-        val action = context.build(ActionPathEnum.CAN_SEND_RECORD)
-        val result = actionHandler.action(this, action)
-        return result.withToken()
-    }
-
-    /**
      * 设置群头像
      * 目前这个API在登录一段时间后因cookie失效而失效, 请考虑后使用
      *
@@ -963,27 +731,6 @@ class Bot(
         params.addProperty("cache", cache)
         val result = actionHandler.action(this, action, params)
         return result.withClass()
-    }
-
-    /**
-     * 检查链接安全性
-     * 安全等级, 1: 安全 2: 未知 3: 危险
-     *
-     * @param url     需要检查的链接
-     * @param context Onebot 主动操作的上下文
-     * @return [ActionData] of [CheckUrlSafelyResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun checkUrlSafely(
-        url: String,
-        context: Context = {},
-    ): ActionData<CheckUrlSafelyResp> {
-        val action = context.build(ActionPathEnum.CHECK_URL_SAFELY)
-        val params = JsonObject()
-        params.addProperty("url", url)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
     }
 
     /**
@@ -1084,34 +831,6 @@ class Bot(
     }
 
     /**
-     * 上传群文件
-     * 在不提供 folder 参数的情况下默认上传到根目录
-     * 只能上传本地文件, 需要上传 http 文件的话请先下载到本地
-     *
-     * @param groupId 群号
-     * @param file    本地文件路径
-     * @param name    储存名称
-     * @param context Onebot 主动操作的上下文
-     * @return [ActionData] of [UploadGroupFileResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun uploadGroupFile(
-        groupId: Long,
-        file: String,
-        name: String,
-        context: Context = {},
-    ): ActionData<UploadGroupFileResp> {
-        val action = context.build(ActionPathEnum.UPLOAD_GROUP_FILE)
-        val params = JsonObject()
-        params.addProperty("group_id", groupId)
-        params.addProperty("file", file)
-        params.addProperty("name", name)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-
-    /**
      * 群组匿名用户禁言
      *
      * @param groupId   群号
@@ -1165,51 +884,6 @@ class Bot(
         return result.withClass()
     }
 
-    /**
-     * 调用 go-cqhttp 下载文件
-     *
-     * @param url         链接地址
-     * @param threadCount 下载线程数
-     * @param headers     自定义请求头
-     * @param context     Onebot 主动操作的上下文
-     * @return [ActionData] of [DownloadFileResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun downloadFile(
-        url: String,
-        threadCount: Int,
-        headers: String,
-        context: Context = {},
-    ): ActionData<DownloadFileResp> {
-        val action = context.build(ActionPathEnum.DOWNLOAD_FILE)
-        val params = JsonObject()
-        params.addProperty("url", url)
-        params.addProperty("thread_count", threadCount)
-        params.addProperty("headers", headers)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-
-    /**
-     * 调用 go-cqhttp 下载文件
-     *
-     * @param url        链接地址
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionData] of [DownloadFileResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun downloadFile(
-        url: String,
-        context: Context = {},
-    ): ActionData<DownloadFileResp> {
-        val action = context.build(ActionPathEnum.DOWNLOAD_FILE)
-        val params = JsonObject()
-        params.addProperty("url", url)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
     /**
      * 发送合并转发 (群)
      *
@@ -1668,33 +1342,6 @@ class Bot(
         return result.withToken()
     }
     /**
-     * 发送合并转发
-     *
-     * @param event      事件
-     * @param msg        自定义转发消息
-     * @param context    Onebot 主动操作的上下文
-     * [参考文档](https://docs.go-cqhttp.org/cqcode/#%E5%90%88%E5%B9%B6%E8%BD%AC%E5%8F%91)
-     * @return [ActionData]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun sendForwardMsg(
-        event: GroupMessageEvent,
-        msg: List<Map<String, Any>>,
-        context: Context = {},
-    ): ActionData<MsgId> {
-        val action = context.build(ActionPathEnum.SEND_FORWARD_MSG)
-        val params = JsonObject()
-        when (event.messageType) {
-            "private" -> params.addProperty("user_id", event.userId)
-            "group" -> params.addProperty("group_id", event.groupId)
-        }
-        params.add("messages", msg.toJsonArray())
-
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-    /**
      * 上传合并转发
      *
      * @param msg     自定义转发消息
@@ -1721,25 +1368,6 @@ class Bot(
         val result = actionHandler.action(this, action, params)
         return result.withToken()
     }
-    /**
-     * 获取中文分词
-     *
-     * @param content 内容
-     * @param context Onebot 主动操作的上下文
-     * @return [ActionData] of [WordSlicesResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getWordSlices(
-        content: String,
-        context: Context = {},
-    ): ActionData<WordSlicesResp> {
-        val action = context.build(ActionPathEnum.GET_WORD_SLICES)
-        val params = JsonObject()
-        params.addProperty("content", content)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
 
     /**
      * 获取当前账号在线客户端列表
@@ -1762,52 +1390,6 @@ class Bot(
     }
 
     /**
-     * 图片 OCR
-     *
-     * @param image      图片ID
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionData] of [OcrResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun ocrImage(
-        image: String,
-        context: Context = {},
-    ): ActionData<OcrResp> {
-        val action = context.build(ActionPathEnum.OCR_IMAGE)
-        val params = JsonObject()
-        params.addProperty("image", image)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-
-    /**
-     * 私聊发送文件
-     *
-     * @param userId     目标用户
-     * @param file       本地文件路径
-     * @param name       文件名
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionRaw]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun uploadPrivateFile(
-        userId: Long,
-        file: String,
-        name: String,
-        context: Context = {},
-    ): ActionRaw {
-        val action = context.build(ActionPathEnum.UPLOAD_PRIVATE_FILE)
-        val params = JsonObject()
-        params.addProperty("user_id", userId)
-        params.addProperty("file", file)
-        params.addProperty("name", name)
-        val result = actionHandler.action(this, action, params)
-        return result.withClass()
-    }
-
-    /**
      * 群打卡
      *
      * @param groupId 群号
@@ -1825,57 +1407,6 @@ class Bot(
         params.addProperty("group_id", groupId)
         val result = actionHandler.action(this, action, params)
         return result.withClass()
-    }
-
-    /**
-     * 删除单向好友
-     *
-     * @param userId  QQ号
-     * @param context Onebot 主动操作的上下文
-     * @return [ActionRaw]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun deleteUnidirectionalFriend(
-        userId: Long,
-        context: Context = {},
-    ): ActionRaw {
-        val action = context.build(ActionPathEnum.DELETE_UNIDIRECTIONAL_FRIEND)
-        val params = JsonObject()
-        params.addProperty("user_id", userId)
-        val result = actionHandler.action(this, action, params)
-        return result.withClass()
-    }
-
-    /**
-     * 获取单向好友列表
-     *
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionList] of [UnidirectionalFriendListResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getUnidirectionalFriendList(
-        context: Context = {},
-    ): ActionList<UnidirectionalFriendListResp> {
-        val action = context.build(ActionPathEnum.GET_UNIDIRECTIONAL_FRIEND_LIST)
-        val result = actionHandler.action(this, action)
-        return result.withToken()
-    }
-
-    /**
-     * 获取运行状态
-     *
-     * @param context    Onebot 主动操作的上下文
-     * @return [JsonObject]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getStatus(
-        context: Context = {}
-    ): JsonObject {
-        val action = context.build(ActionPathEnum.GET_STATUS)
-        return actionHandler.action(this, action)
     }
 
     /**
@@ -1969,29 +1500,6 @@ class Bot(
         val action = context.build(ActionPathEnum.GET_CREDENTIALS)
         val params = JsonObject()
         params.addProperty("domain", domain)
-        val result = actionHandler.action(this, action, params)
-        return result.withToken()
-    }
-
-    /**
-     * 获取用户资料卡
-     *
-     * @param userId     QQ号
-     * @param noCache    是否不使用缓存（使用缓存可能更新不及时，但响应更快）
-     * @param context    Onebot 主动操作的上下文
-     * @return [ActionData] of [UserInfoResp]
-     */
-    @JvmBlockingBridge
-    @JvmOverloads
-    suspend fun getUserInfo(
-        userId: Long,
-        noCache: Boolean,
-        context: Context = {},
-    ): ActionData<UserInfoResp> {
-        val action = context.build(ActionPathEnum.GET_USER_INFO)
-        val params = JsonObject()
-        params.addProperty("user_id", userId)
-        params.addProperty("refresh", noCache)
         val result = actionHandler.action(this, action, params)
         return result.withToken()
     }
