@@ -204,7 +204,7 @@ internal class MemberWrapper(
     }
 
     override suspend fun sendToOnebot(message: String): MsgId? {
-        val resp = bot.impl.sendPrivateMsg(id, message, false) {
+        val resp = bot.impl.sendPrivateMsg(id, group.id, message, false) {
             throwExceptions(true)
         }
         return resp.data

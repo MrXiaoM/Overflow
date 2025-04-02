@@ -92,6 +92,7 @@ class Bot(
      * 发送私聊消息
      *
      * @param userId     对方 QQ 号
+     * @param groupId    主动发起临时会话时的来源群号 (可选，机器人本身必须是管理员/群主)
      * @param msg        要发送的内容，请使用CQ码或json数组消息
      * @param autoEscape 消息内容是否作为纯文本发送 ( 即不解析 CQ 码 ) , 只在 message 字段是字符串时有效
      * @param context    Onebot 主动操作的上下文
@@ -101,6 +102,7 @@ class Bot(
     @JvmOverloads
     suspend fun sendPrivateMsg(
         userId: Long,
+        groupId: Long?,
         msg: String,
         autoEscape: Boolean,
         context: Context = {},
@@ -108,6 +110,7 @@ class Bot(
         val action = context.build(ActionPathEnum.SEND_PRIVATE_MSG)
         val params = JsonObject()
         params.addProperty("user_id", userId)
+        if (groupId != null) params.addProperty("group_id", groupId)
         params.addMessage("message", msg)
         params.addProperty("auto_escape", autoEscape)
         val result = actionHandler.action(this, action, params)
