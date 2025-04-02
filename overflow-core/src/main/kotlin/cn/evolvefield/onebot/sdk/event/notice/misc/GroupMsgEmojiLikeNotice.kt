@@ -2,7 +2,7 @@ package cn.evolvefield.onebot.sdk.event.notice.misc
 
 import cn.evolvefield.onebot.sdk.event.notice.NoticeEvent
 import com.google.gson.annotations.SerializedName
-import java.util.LinkedList
+import java.util.*
 
 class GroupMsgEmojiLikeNotice : NoticeEvent() {
     @SerializedName("group_id")

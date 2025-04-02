@@ -48,7 +48,6 @@ import top.mrxiaom.overflow.internal.data.asOnebot
 import top.mrxiaom.overflow.internal.listener.addBotListeners
 import top.mrxiaom.overflow.internal.listener.addFriendListeners
 import top.mrxiaom.overflow.internal.listener.addGroupListeners
-import top.mrxiaom.overflow.internal.listener.addGuildListeners
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.*
 import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin
@@ -177,7 +176,6 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         EventBus.clear()
         addGroupListeners()
         addFriendListeners()
-        addGuildListeners()
         addBotListeners()
 
         // 暂定禁止 mirai-console 的终端用户须知，它可能已不适用于 Overflow
@@ -579,10 +577,10 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         }
         // go-cqhttp
         val msg = "[{\"type\":\"poke\",\"data\":{\"id\":${nudge.target.id}}}]"
-        if (receiver is Group) {
-            onebot.impl.sendGroupMsg(receiver.id, msg, false)
-        } else {
-            onebot.impl.sendPrivateMsg(receiver.id, msg, false)
+        when (receiver) {
+            is Group -> onebot.impl.sendGroupMsg(receiver.id, msg, false)
+            is Member -> onebot.impl.sendPrivateMsg(receiver.id, receiver.group.id, msg, false)
+            is Friend -> onebot.impl.sendPrivateMsg(receiver.id, null, msg, false)
         }
         return true
     }

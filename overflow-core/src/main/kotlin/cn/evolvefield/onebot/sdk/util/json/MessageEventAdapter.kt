@@ -2,7 +2,6 @@ package cn.evolvefield.onebot.sdk.util.json
 
 import cn.evolvefield.onebot.sdk.entity.PrivateSender
 import cn.evolvefield.onebot.sdk.event.message.GroupMessageEvent
-import cn.evolvefield.onebot.sdk.event.message.GuildMessageEvent
 import cn.evolvefield.onebot.sdk.event.message.MessageEvent
 import cn.evolvefield.onebot.sdk.event.message.PrivateMessageEvent
 import cn.evolvefield.onebot.sdk.util.*
@@ -25,7 +24,6 @@ class MessageEventAdapter : JsonDeserializerKt<MessageEvent> {
         return when (messageType) {
             "group" -> obj.groupMessage(subType)
             "private" -> obj.privateMessage(subType)
-            "guild" -> obj.guildMessage(subType)
             else -> null
         }?.apply {
             postType = obj.string("post_type")
@@ -53,14 +51,6 @@ class MessageEventAdapter : JsonDeserializerKt<MessageEvent> {
         sender = fromJson("sender")!!
         groupId = ignorable("group_id", sender.groupId)
         fromNick = ignorable("from_nick", sender.nickname)
-    }
-    private fun JsonObject.guildMessage(subType: String): MessageEvent = GuildMessageEvent().apply {
-        this.subType = subType
-        messageId = string("message_id")
-        guildId = string("guild_id")
-        channelId = string("channel_id")
-        selfTinyId = string("self_tiny_id")
-        sender = fromJson("sender")!!
     }
 
     class PrivateSenderAdapter : JsonDeserializer<PrivateSender> {
