@@ -10,6 +10,7 @@ import net.mamoe.mirai.message.data.MessageChain
  *
  * 在正式确定频道接口之前，可使用此事件接收频道消息
  */
+@Deprecated("腾讯自己都不积极维护频道了，没必要支持了")
 public class LegacyGuildMessageEvent(
     /**
      * 接收消息的机器人
