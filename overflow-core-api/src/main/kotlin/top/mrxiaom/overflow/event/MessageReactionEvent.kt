@@ -2,7 +2,6 @@ package top.mrxiaom.overflow.event
 
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.Group
-import net.mamoe.mirai.contact.Member
 import net.mamoe.mirai.contact.NormalMember
 import net.mamoe.mirai.event.AbstractEvent
 import net.mamoe.mirai.event.events.BotEvent

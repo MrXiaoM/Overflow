@@ -8,8 +8,6 @@ import cn.evolvefield.onebot.sdk.event.notice.group.*
 import cn.evolvefield.onebot.sdk.event.notice.misc.GroupMsgEmojiLikeNotice
 import cn.evolvefield.onebot.sdk.event.notice.misc.GroupReactionNotice
 import cn.evolvefield.onebot.sdk.event.request.GroupAddRequestEvent
-import cn.evolvefield.onebot.sdk.util.jsonObject
-import com.google.gson.JsonObject
 import net.mamoe.mirai.contact.NormalMember
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*

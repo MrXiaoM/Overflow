@@ -23,7 +23,6 @@ import net.mamoe.mirai.utils.ExternalResource
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.contact.RemoteUser
-import top.mrxiaom.overflow.internal.asOnebot
 import top.mrxiaom.overflow.internal.data.UserProfileImpl
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 import top.mrxiaom.overflow.internal.message.data.OutgoingSource.friendMsg

@@ -1,8 +1,6 @@
 package top.mrxiaom.overflow.contact
 
-import net.mamoe.mirai.Bot
 import net.mamoe.mirai.contact.User
-import kotlin.jvm.Throws
 
 interface RemoteUser {
     val onebotData: String

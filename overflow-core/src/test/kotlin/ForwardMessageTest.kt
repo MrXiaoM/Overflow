@@ -7,6 +7,7 @@ import kotlinx.serialization.json.JsonObject
 import net.mamoe.mirai.message.data.ForwardMessage
 import net.mamoe.mirai.message.data.MessageChain
 import org.junit.jupiter.api.Test
+import top.mrxiaom.overflow.action.ActionContext
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.internal.message.OnebotMessages
 
@@ -20,6 +21,10 @@ class ForwardMessageTest {
             get() = false
 
         override suspend fun executeAction(actionPath: String, params: String?): String {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun executeAction(context: ActionContext, params: String?): String {
             TODO("Not yet implemented")
         }
 

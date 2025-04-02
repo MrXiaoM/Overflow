@@ -154,8 +154,7 @@ internal class BotWrapper private constructor(
                     logger.info { "Bot cancelled" + throwable?.message?.let { ": $it" }.orEmpty() }
 
                     kotlin.runCatching {
-                        val bot = bot
-                        if (bot is BotWrapper && bot.impl.channel.isOpen) {
+                        if (bot.impl.channel.isOpen) {
                             bot.close()
                         }
                     }.onFailure {
