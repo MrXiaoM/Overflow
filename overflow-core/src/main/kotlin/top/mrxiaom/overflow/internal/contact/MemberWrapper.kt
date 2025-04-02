@@ -141,13 +141,23 @@ internal class MemberWrapper(
 
     override suspend fun modifyAdmin(operation: Boolean) {
         checkBotPermissionHighest("设置管理员")
+        val failedInfo = "Failed to grant administrator privileges to member ${id} in group ${impl.groupId}: msg=the number of administrators is already full"
+        val adminCount = group.members.count { it.permission == MemberPermission.ADMINISTRATOR }
+        //管理最大人数可能随着QQ运营策略变动，网上信息杂乱难以查到当前准确值，不确定的先设为999不影响逻辑。不过其实只需要后面的判定就可以了，这里如果信息更新不准确可能会误判
+        val maxCount = when (group.impl.maxMemberCount) {
+            //3000 -> 30?
+            //2000 -> 20?
+            //1000 -> 15?
+            500 -> 15
+            else -> 999
+        }
+        if (adminCount >= maxCount) throw IllegalStateException(failedInfo)
         if (bot.impl.setGroupAdmin(impl.groupId, id, operation)
             .check("设置 $id 在群聊 ${group.id} 的管理员状态为 $operation")) {
-            impl.role = if (operation) "admin" else "member"
+            queryUpdate()
+            if (permission != MemberPermission.ADMINISTRATOR) throw IllegalStateException(failedInfo)
         }
-        if (permission != MemberPermission.ADMINISTRATOR) {
-            throw IllegalStateException("Failed to grant administrator privileges to member ${id} in group ${impl.groupId}: msg=please check if the number of administrators is full")
-        }
+        else throw IllegalStateException("Error: onebot setGroupAdmin check failed")
     }
 
     override suspend fun mute(durationSeconds: Int) {
