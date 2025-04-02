@@ -143,7 +143,7 @@ internal class MemberWrapper(
         checkBotPermissionHighest("设置管理员")
         val count = group.members.count { it.permission == MemberPermission.ADMINISTRATOR }
         if (count >= 15) {
-            throw IllegalStateException("最多可设置15名管理员")
+            throw IllegalStateException("Failed to grant administrator privileges to member ${id} in group ${impl.groupId}")
         }
         if (bot.impl.setGroupAdmin(impl.groupId, id, operation)
             .check("设置 $id 在群聊 ${group.id} 的管理员状态为 $operation")) {
