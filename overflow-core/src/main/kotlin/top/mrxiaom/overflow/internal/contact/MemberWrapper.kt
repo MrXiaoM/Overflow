@@ -141,13 +141,12 @@ internal class MemberWrapper(
 
     override suspend fun modifyAdmin(operation: Boolean) {
         checkBotPermissionHighest("设置管理员")
-        val count = group.members.count { it.permission == MemberPermission.ADMINISTRATOR }
-        if (count >= 15) {
-            throw IllegalStateException("Failed to grant administrator privileges to member ${id} in group ${impl.groupId}: msg=the number of administrators is already full")
-        }
         if (bot.impl.setGroupAdmin(impl.groupId, id, operation)
             .check("设置 $id 在群聊 ${group.id} 的管理员状态为 $operation")) {
             impl.role = if (operation) "admin" else "member"
+        }
+        if (permission != MemberPermission.ADMINISTRATOR) {
+            throw IllegalStateException("Failed to grant administrator privileges to member ${id} in group ${impl.groupId}: msg=please check if the number of administrators is full")
         }
     }
 
