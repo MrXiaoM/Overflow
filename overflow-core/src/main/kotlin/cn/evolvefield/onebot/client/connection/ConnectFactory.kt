@@ -19,7 +19,7 @@ import java.net.URI
  *
  * @param config 配置
  */
-class ConnectFactory private constructor(
+internal class ConnectFactory private constructor(
     private val config: BotConfig,
     private val parent: Job?,
     private val logger: Logger,

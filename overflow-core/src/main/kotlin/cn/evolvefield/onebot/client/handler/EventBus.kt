@@ -53,17 +53,9 @@ object EventBus {
         handlers.clear()
     }
 
-    suspend fun onReceive(message: String) {
-        val (bean, executes) = matchHandlers(message)
-        if (executes.isEmpty()) return
-        for (handler in executes) {
-            handler.onReceive(bean) //调用监听方法
-        }
-    }
-
-    private fun matchHandlers(
+    internal fun matchHandlers(
         message: String
-    ): Pair<Event, List<Handler<*>>> {
+    ): EventHolder {
         val messageType = ListenerUtils[message] // 获取消息对应的实体类型
         val json = JsonParser.parseString(message).asJsonObject
         if (messageType != null) {
@@ -72,16 +64,16 @@ object EventBus {
             logger.debug(String.format("接收到上报消息内容：%s", bean.toString()))
             val executes = handlers[messageType] ?: emptyList()
             if (executes.isNotEmpty()) {
-                return bean to executes
+                return EventHolder(bean, executes)
             }
         }
-        // 如果该事件未被监听，将其定为 UnsolvedEvent
+        // 如果该事件未被监听，或者未定义事件类，将其定为 UnsolvedEvent
         val bean = UnsolvedEvent().also { it.jsonString = message }
         val executes = handlers[UnsolvedEvent::class] ?: emptyList()
         bean.postType = json.ignorable("post_type", "")
         bean.time = json.ignorable("time", currentTimeSeconds())
         bean.selfId = json.ignorable("self_id", 0L)
         bean.applyJson(json)
-        return bean to executes
+        return EventHolder(bean, executes)
     }
 }

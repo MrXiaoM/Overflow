@@ -27,7 +27,7 @@ import java.util.*
  * @param channel        [WebSocket]
  * @param requestTimeout Request Timeout
  */
-class ActionSendRequest(
+internal class ActionSendRequest(
     private val bot: Bot,
     private val context: ActionContext,
     parent: Job?,

@@ -55,6 +55,12 @@ class BotConfig(
      * 是否不接收群聊的 file 消息，使用 group_upload 事件作为群文件消息
      */
     val useGroupUploadEventForFileMessage: Boolean = false,
+    /**
+     * 是否抛弃所有在Bot成功连接之前传入的事件。
+     *
+     * 比如 go-cqhttp 会在连接之后，在 Overflow 获取到 Bot 信息之前，推送以前未收到的消息。如果开启此项，则丢弃这些消息
+     */
+    val dropEventsBeforeConnected: Boolean = true,
     val parentJob: Job? = null
 ) {
     val isInReverseMode get() = reversedPort in 1..65535

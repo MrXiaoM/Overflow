@@ -29,6 +29,8 @@ data class Config(
     var useGroupUploadEventForFileMessage: Boolean = false,
     @SerialName("resource_cache")
     var resourceCache: CacheConfig = CacheConfig(),
+    @SerialName("drop_events_before_connected")
+    var dropEventsBeforeConnected: Boolean = true,
 )
 @Serializable
 data class CacheConfig (

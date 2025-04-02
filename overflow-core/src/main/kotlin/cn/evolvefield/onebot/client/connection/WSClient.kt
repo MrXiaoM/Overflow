@@ -3,6 +3,7 @@ package cn.evolvefield.onebot.client.connection
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
+import cn.evolvefield.onebot.client.handler.EventHolder
 import kotlinx.coroutines.*
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
@@ -15,7 +16,7 @@ import java.net.URI
  * Date: 2023/4/4 2:20
  * Description:
  */
-class WSClient(
+internal class WSClient(
     override val scope: CoroutineScope,
     private val config: BotConfig,
     uri: URI,
@@ -27,6 +28,7 @@ class WSClient(
     header: Map<String, String> = mapOf(),
 ) : WebSocketClient(uri, header), IAdapter {
     internal var botConsumer: suspend (Bot) -> Unit = {}
+    override val eventsHolder: MutableMap<Long, MutableList<EventHolder>> = mutableMapOf()
     private var retryCount = 0
     private var scheduleClose = false
 
@@ -43,7 +45,7 @@ class WSClient(
     }
 
     suspend fun createBot(): Bot {
-        val bot = Bot(this, config, actionHandler)
+        val bot = Bot(this, this, config, actionHandler)
         botConsumer.invoke(bot)
         return bot
     }

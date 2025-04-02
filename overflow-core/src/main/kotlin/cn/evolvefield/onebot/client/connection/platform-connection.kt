@@ -4,14 +4,14 @@ import cn.evolvefield.onebot.client.core.Bot
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration
 
-interface OneBotProducer {
+internal interface OneBotProducer {
     fun invokeOnClose(block: () -> Unit)
     fun close()
     fun setBotConsumer(consumer: suspend (Bot) -> Unit)
     suspend fun awaitNewBotConnection(duration: Duration = Duration.INFINITE): Bot?
 }
 
-class PositiveOneBotProducer(
+internal class PositiveOneBotProducer(
     private val client: WSClient
 ): OneBotProducer {
     override fun invokeOnClose(block: () -> Unit) = TODO("客户端暂不支持断线重连")
@@ -31,7 +31,7 @@ class PositiveOneBotProducer(
     }
 }
 
-class ReversedOneBotProducer(
+internal class ReversedOneBotProducer(
     private val server: WSServer
 ): OneBotProducer {
     override fun invokeOnClose(block: () -> Unit) {

@@ -2,6 +2,7 @@ package cn.evolvefield.onebot.client.connection
 
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.client.handler.EventBus
+import cn.evolvefield.onebot.client.handler.EventHolder
 import cn.evolvefield.onebot.client.util.ActionSendRequest
 import cn.evolvefield.onebot.client.util.OnebotException
 import cn.evolvefield.onebot.sdk.util.ignorable
@@ -12,12 +13,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
+import net.mamoe.mirai.Bot
 import org.slf4j.Logger
 
-interface IAdapter {
+internal interface IAdapter {
     val scope: CoroutineScope
     val actionHandler: ActionHandler
     val logger: Logger
+    val eventsHolder: MutableMap<Long, MutableList<EventHolder>>
 
     fun onReceiveMessage(message: String) {
         try {
@@ -27,15 +30,19 @@ interface IAdapter {
 
                 if (json.has(API_RESULT_KEY)) { // 接口回调
                     actionHandler.onReceiveActionResp(json)
-                } else scope.launch { // 处理事件
-                    mutex.withLock {
-                        withTimeoutOrNull(processTimeout) {
-                            runCatching {
-                                EventBus.onReceive(message)
-                            }.onFailure {
-                                logger.error("处理 Onebot 事件时出现异常: ", it)
+                } else {
+                    val holder = EventBus.matchHandlers(message)
+                    val botId = holder.event.selfId
+                    if (Bot.findInstance(botId) == null) {
+                        val list = eventsHolder[botId] ?: run {
+                            mutableListOf<EventHolder>().also {
+                                eventsHolder[botId] = it
                             }
-                        } ?: throw IllegalStateException("事件处理超时: $message")
+                        }
+                        list.add(holder)
+                        return
+                    } else scope.launch { // 处理事件
+                        handleEvent(holder)
                     }
                 }
             }
@@ -43,6 +50,26 @@ interface IAdapter {
             logger.error("Json语法错误: {}", message)
         } catch (e: OnebotException) {
             logger.error("解析异常: {}", e.info)
+        }
+    }
+
+    fun afterLoginInfoFetch(bot: cn.evolvefield.onebot.client.core.Bot) {
+        val events = eventsHolder.remove(bot.id) ?: return
+        if (bot.config.dropEventsBeforeConnected) return
+        for (holder in events) scope.launch {
+            handleEvent(holder)
+        }
+    }
+
+    private suspend fun handleEvent(holder: EventHolder) { // 处理事件
+        mutex.withLock {
+            withTimeoutOrNull(processTimeout) {
+                runCatching {
+                    holder.onReceive()
+                }.onFailure {
+                    logger.error("处理 Onebot 事件时出现异常: ", it)
+                }
+            } ?: throw IllegalStateException("事件处理超时: ${holder.event.json}")
         }
     }
 

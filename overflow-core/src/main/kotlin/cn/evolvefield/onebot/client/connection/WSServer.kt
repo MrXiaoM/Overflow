@@ -3,6 +3,7 @@ package cn.evolvefield.onebot.client.connection
 import cn.evolvefield.onebot.client.config.BotConfig
 import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
+import cn.evolvefield.onebot.client.handler.EventHolder
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -28,7 +29,7 @@ import kotlin.time.Duration
  * Description:
  */
 val random = Random(System.currentTimeMillis())
-class WSServer(
+internal class WSServer(
     override val scope: CoroutineScope,
     private val config: BotConfig,
     address: InetSocketAddress,
@@ -52,6 +53,7 @@ class WSServer(
     }
 
     internal var botConsumer: suspend (Bot) -> Unit = {}
+    override val eventsHolder: MutableMap<Long, MutableList<EventHolder>> = mutableMapOf()
     private val bots: MutableList<Bot> = mutableListOf()
     // 通过使 ConnectionBox 互不相等，使得当 bot 重新上线时，botChannel 推送成功。
     private val botChannel = Channel<ConnectionBox>()
@@ -117,7 +119,7 @@ class WSServer(
         logger.info("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 已连接 ┈━═☆")
         scope.launch {
             val bot = muteX.withLock {
-                Bot(conn, config, actionHandler).also { it.conn = conn }.apply {
+                Bot(conn, this@WSServer, config, actionHandler).also { it.conn = conn }.apply {
                     connectDef.complete(this)
                 }
             }

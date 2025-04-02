@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap
  * Date: 2022/9/14 15:05
  * Version: 1.0
  */
-class ActionHandler(
+internal class ActionHandler(
     private val parent: Job?,
     private val logger: Logger
 ) {

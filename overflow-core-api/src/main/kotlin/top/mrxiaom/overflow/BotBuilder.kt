@@ -25,6 +25,7 @@ public class BotBuilder private constructor(
     private var noPlatform: Boolean = false,
     private var useCQCode: Boolean = false,
     private var useGroupUploadEventForFileMessage: Boolean = false,
+    private var dropEventsBeforeConnected: Boolean = true,
     private var logger: Logger? = null,
     private var parentJob: Job? = null,
     private var configuration: BotConfiguration = BotConfiguration {
@@ -121,6 +122,15 @@ public class BotBuilder private constructor(
     }
 
     /**
+     * 是否保留所有在Bot成功连接之前传入的事件。
+     *
+     * 比如 go-cqhttp 会在连接之后，在 Overflow 获取到 Bot 信息之前，推送以前未收到的消息。如果不开启此项，则这些消息会被抛弃，反之会在瞬时接收到很多消息
+     */
+    public fun keepEventsBeforeConnected(): BotBuilder = apply {
+        this.dropEventsBeforeConnected = false
+    }
+
+    /**
      * 覆写用于 Onebot 的日志记录器
      */
     public fun overrideLogger(logger: Logger): BotBuilder = apply {
@@ -178,6 +188,7 @@ public class BotBuilder private constructor(
             noPlatform = noPlatform,
             useCQCode = useCQCode,
             useGroupUploadEventForFileMessage = useGroupUploadEventForFileMessage,
+            dropEventsBeforeConnected = dropEventsBeforeConnected,
             logger = logger,
             parentJob = parentJob,
             configuration = configuration,
@@ -216,6 +227,7 @@ interface IBotStarter {
         noPlatform: Boolean,
         useCQCode: Boolean,
         useGroupUploadEventForFileMessage: Boolean,
+        dropEventsBeforeConnected: Boolean,
         logger: Logger?,
         parentJob: Job?,
         configuration: BotConfiguration,

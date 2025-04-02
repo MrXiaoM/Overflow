@@ -1,6 +1,7 @@
 package cn.evolvefield.onebot.client.core
 
 import cn.evolvefield.onebot.client.config.BotConfig
+import cn.evolvefield.onebot.client.connection.IAdapter
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.sdk.action.ActionData
 import cn.evolvefield.onebot.sdk.action.ActionList
@@ -20,6 +21,7 @@ import cn.evolvefield.onebot.sdk.response.group.*
 import cn.evolvefield.onebot.sdk.response.misc.*
 import cn.evolvefield.onebot.sdk.util.*
 import com.google.gson.*
+import kotlinx.coroutines.launch
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
 import org.java_websocket.WebSocket
 import top.mrxiaom.overflow.action.ActionContext
@@ -45,8 +47,9 @@ typealias Context = ActionContext.Builder.() -> Unit
  * @param actionHandler              [ActionHandler]
  */
 @Suppress("unused")
-class Bot(
+internal class Bot(
     internal var conn: WebSocket,
+    internal val adapter: IAdapter,
     val config: BotConfig,
     val actionHandler: ActionHandler
 ) {
@@ -537,7 +540,10 @@ class Bot(
         val action = context.build(ActionPathEnum.GET_LOGIN_INFO)
         val result = actionHandler.action(this, action)
         return result.withToken<ActionData<LoginInfoResp>>().also {
-            it.data?.userId?.also { id -> idInternal = id }
+            it.data?.userId?.also { id ->
+                idInternal = id
+                adapter.afterLoginInfoFetch(this@Bot)
+            }
         }
     }
 
