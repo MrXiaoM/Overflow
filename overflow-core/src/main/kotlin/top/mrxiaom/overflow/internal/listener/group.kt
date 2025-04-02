@@ -254,6 +254,7 @@ internal fun addGroupListeners() {
                 bot.logger.warning("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
                 return@listen
             }
+            group.botAsMember.impl.shutUpTimestamp = e.timeInSecond() + e.duration
             bot.eventDispatcher.broadcastAsync(BotMuteEvent(
                 durationSeconds = e.duration.toInt(),
                 operator = operator
@@ -297,6 +298,7 @@ internal fun addGroupListeners() {
                 bot.logger.warning("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
                 return@listen
             }
+            group.botAsMember.impl.shutUpTimestamp = 0L
             bot.eventDispatcher.broadcastAsync(BotUnmuteEvent(
                 operator = operator
             ))
