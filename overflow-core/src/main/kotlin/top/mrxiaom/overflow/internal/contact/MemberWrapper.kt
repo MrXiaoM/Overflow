@@ -139,25 +139,25 @@ internal class MemberWrapper(
         }
     }
 
+    /**
+     * 给予或移除群成员的管理员权限.
+     *
+     * 此操作需要Bot为[群主][MemberPermission.OWNER].
+     * @param operation true表示给予，false表示移除.
+     * @throws IllegalStateException 当管理员人数已满或oneBot端返回 failed 时.
+     */
     override suspend fun modifyAdmin(operation: Boolean) {
         checkBotPermissionHighest("设置管理员")
-        val failedInfo = "Failed to grant administrator privileges to member ${id} in group ${impl.groupId}: msg=the number of administrators is already full"
-        val adminCount = group.members.count { it.permission == MemberPermission.ADMINISTRATOR }
-        //管理最大人数可能随着QQ运营策略变动，网上信息杂乱难以查到当前准确值，不确定的先设为999不影响逻辑。不过其实只需要后面的判定就可以了，这里如果信息更新不准确可能会误判
-        val maxCount = when (group.impl.maxMemberCount) {
-            //3000 -> 30?
-            //2000 -> 20?
-            //1000 -> 15?
-            500 -> 15
-            else -> 999
-        }
-        if (adminCount >= maxCount) throw IllegalStateException(failedInfo)
+        val failedGrant = "Failed to grant administrator privileges to member ${id} in group ${impl.groupId}: msg=the number of administrators is already full"
         if (bot.impl.setGroupAdmin(impl.groupId, id, operation)
             .check("设置 $id 在群聊 ${group.id} 的管理员状态为 $operation")) {
-            queryUpdate()
-            if (permission != MemberPermission.ADMINISTRATOR) throw IllegalStateException(failedInfo)
+            impl.role = if (operation) "admin" else "member"
+            if (operation) {
+                queryUpdate()
+            if (permission != MemberPermission.ADMINISTRATOR) throw IllegalStateException(failedGrant)
+            }
         }
-        else throw IllegalStateException("Error: onebot setGroupAdmin check failed")
+        else throw IllegalStateException("Error: onebot setGroupAdmin check failed in group ${impl.groupId}: memberId=${id}, operation=${operation}")
     }
 
     override suspend fun mute(durationSeconds: Int) {
