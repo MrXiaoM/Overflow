@@ -154,7 +154,7 @@ internal class MemberWrapper(
             impl.role = if (operation) "admin" else "member"
             if (operation) {
                 queryUpdate()
-            if (permission != MemberPermission.ADMINISTRATOR) throw IllegalStateException(failedGrant)
+                if (permission != MemberPermission.ADMINISTRATOR) throw IllegalStateException(failedGrant)
             }
         }
         else throw IllegalStateException("Error: onebot setGroupAdmin check failed in group ${impl.groupId}: memberId=${id}, operation=${operation}")
