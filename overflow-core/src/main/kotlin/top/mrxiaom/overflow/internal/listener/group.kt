@@ -8,6 +8,7 @@ import cn.evolvefield.onebot.sdk.event.notice.group.*
 import cn.evolvefield.onebot.sdk.event.notice.misc.GroupMsgEmojiLikeNotice
 import cn.evolvefield.onebot.sdk.event.notice.misc.GroupReactionNotice
 import cn.evolvefield.onebot.sdk.event.request.GroupAddRequestEvent
+import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.NormalMember
 import net.mamoe.mirai.contact.nameCardOrNick
 import net.mamoe.mirai.event.events.*
@@ -321,19 +322,37 @@ internal fun addGroupListeners() {
             || checkId(e.userId, "%onebot 返回了异常的数值 user_id=%value")) return@listen
         // 设置/取消管理员通知
         val group = bot.group(e.groupId)
-        val member = group.queryMember(e.userId) ?: return@listen
-        val origin = member.permission
+        val isBot = e.userId == bot.id
+        val member = if (isBot) {
+            group.botAsMember
+        } else {
+            group.queryMember(e.userId) ?: return@listen
+        }
+        val origin: MemberPermission
+        val new: MemberPermission
         when (e.subType) {
-            "set" -> member.impl.role = "admin"
-            "unset" -> member.impl.role = "member"
+            "set" -> {
+                member.impl.role = "admin"
+                origin = MemberPermission.MEMBER
+                new = MemberPermission.ADMINISTRATOR
+            }
+            "unset" -> {
+                member.impl.role = "member"
+                origin = MemberPermission.ADMINISTRATOR
+                new = MemberPermission.MEMBER
+            }
+            else -> return@listen
         }
-        if (origin != member.permission) {
-            bot.eventDispatcher.broadcastAsync(MemberPermissionChangeEvent(
-                member = member,
-                origin = origin,
-                new = member.permission
-            ))
-        }
+        val event = if (isBot) BotGroupPermissionChangeEvent(
+            group = group,
+            origin = origin,
+            new = new
+        ) else MemberPermissionChangeEvent(
+            member = member,
+            origin = origin,
+            new = new
+        )
+        bot.eventDispatcher.broadcastAsync(event)
     }
     listen<GroupEssenceNoticeEvent> { e ->
         if (checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")

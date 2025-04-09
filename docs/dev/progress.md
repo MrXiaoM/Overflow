@@ -113,7 +113,6 @@
 + BeforeImageUploadEvent
 + BeforeShortVideoUploadEvent
 + BotAvatarChangedEvent
-+ BotGroupPermissionChangeEvent
 + BotJoinGroupEvent
 + BotLeaveEvent
 + BotNickChangedEvent
