@@ -233,7 +233,7 @@ internal fun addGroupListeners() {
     listen<GroupBanNoticeEvent>("ban") { e ->
         val (group, operator) = checkGroupBan(e) ?: return@listen
         // 禁言通知
-        if (e.userId == 0L && e.duration == -1L) { // 全员禁言
+        if (e.userId == 0L) { // 全员禁言
             val origin = group.settings.isMuteAll
             group.settings.muteAll = true
             if (operator == null && e.operatorId != bot.id) {
@@ -277,7 +277,7 @@ internal fun addGroupListeners() {
     listen<GroupBanNoticeEvent>("lift_ban") { e ->
         val (group, operator) = checkGroupBan(e) ?: return@listen
         // 解除禁言通知
-        if (e.userId == 0L && e.duration == -1L) { // 全员禁言
+        if (e.userId == 0L) { // 全员禁言
             val origin = group.settings.isMuteAll
             group.settings.muteAll = false
             if (operator == null && e.operatorId != bot.id) {
