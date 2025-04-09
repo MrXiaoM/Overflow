@@ -20,6 +20,7 @@ import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.contact.announcement.Announcements
 import net.mamoe.mirai.contact.roaming.RoamingMessages
 import net.mamoe.mirai.event.broadcast
+import net.mamoe.mirai.event.events.BotLeaveEvent
 import net.mamoe.mirai.event.events.EventCancelledException
 import net.mamoe.mirai.event.events.GroupMessagePostSendEvent
 import net.mamoe.mirai.event.events.GroupMessagePreSendEvent
@@ -28,6 +29,7 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.spi.AudioToSilkService
 import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.ExternalResource
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.contact.RemoteGroup
 import top.mrxiaom.overflow.contact.RemoteUser
@@ -197,11 +199,14 @@ internal class GroupWrapper(
         return members[id]
     }
 
+    @OptIn(MiraiExperimentalApi::class)
     override suspend fun quit(): Boolean {
         if (botAsMember.isOwner()) {
             throw IllegalStateException("机器人是群主，无法退群")
         }
         bot.impl.setGroupLeave(id, false)
+        bot.groups.remove(id)
+        bot.eventDispatcher.broadcastAsync(BotLeaveEvent.Active(this))
         return true
     }
 
