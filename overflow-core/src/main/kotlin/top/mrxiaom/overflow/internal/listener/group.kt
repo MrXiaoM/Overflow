@@ -1,4 +1,4 @@
-@file:OptIn(MiraiInternalApi::class)
+@file:OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evolvefield.onebot.client.handler.EventBus.listen
@@ -15,6 +15,7 @@ import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.message.data.FileMessage
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.buildMessageChain
+import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.event.MemberEssenceNoticeEvent
 import top.mrxiaom.overflow.event.MessageReactionEvent
@@ -163,14 +164,19 @@ internal fun addGroupListeners() {
             || checkId(e.userId, "%onebot 返回了异常的数值 user_id=%value")
         ) return null
         val group = bot.group(e.groupId)
-        val member = group.queryMember(e.userId)
-            ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+        val member = if (e.userId == bot.id) {
+            group.botAsMember
+        } else {
+            group.queryMember(e.userId)
+                ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+        }
         return group to member
     }
     listen<GroupDecreaseNoticeEvent>("leave") { e ->
-        val (_, member) = checkDecreaseNotice(e) ?: return@listen
+        val (group, member) = checkDecreaseNotice(e) ?: return@listen
         // 主动退群
         bot.eventDispatcher.broadcastAsync(MemberLeaveEvent.Quit(member))
+        group.members.remove(member.id)
     }
     listen<GroupDecreaseNoticeEvent>("kick") { e ->
         val (group, member) = checkDecreaseNotice(e) ?: return@listen
@@ -182,11 +188,17 @@ internal fun addGroupListeners() {
                 operator = group.queryMember(e.operatorId)
             )
         )
+        group.members.remove(member.id)
     }
     listen<GroupDecreaseNoticeEvent>("kick_me") { e ->
-        val (_, _) = checkDecreaseNotice(e) ?: return@listen
+        val (group, _) = checkDecreaseNotice(e) ?: return@listen
+        if (bot.checkId(e.operatorId, "%onebot 返回了异常的数值 operator_id=%value")) return@listen
         // 登录号被踢
-        // Mirai没有这个Event
+        val operator = group.queryMember(e.operatorId)
+        if (operator != null) {
+            bot.eventDispatcher.broadcastAsync(BotLeaveEvent.Kick(operator))
+            bot.groups.remove(e.groupId)
+        }
     }
 
     suspend fun BotWrapper.checkGroupIncrease(e: GroupIncreaseNoticeEvent): Pair<GroupWrapper, MemberWrapper>? {
