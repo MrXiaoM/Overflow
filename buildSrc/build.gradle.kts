@@ -1,10 +1,17 @@
+import java.util.*
+
 plugins {
     `kotlin-dsl`
 }
 
 repositories {
-    mavenLocal()
-    google()
+    if (Locale.getDefault().country == "CN") {
+        Properties().apply {
+            rootDir.parentFile
+                .resolve("gradle.properties")
+                .reader().use(::load)
+        }["mirror.repo"]?.also(::maven)
+    }
     mavenCentral()
     gradlePluginPortal()
 }
