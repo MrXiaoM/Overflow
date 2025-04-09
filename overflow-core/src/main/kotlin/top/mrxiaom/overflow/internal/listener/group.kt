@@ -172,7 +172,7 @@ internal fun addGroupListeners() {
         // 主动退群
         bot.eventDispatcher.broadcastAsync(MemberLeaveEvent.Quit(member))
     }
-    listen<GroupDecreaseNoticeEvent>("leave") { e ->
+    listen<GroupDecreaseNoticeEvent>("kick") { e ->
         val (group, member) = checkDecreaseNotice(e) ?: return@listen
         // 成员被踢
         if (bot.checkId(e.operatorId, "%onebot 返回了异常的数值 operator_id=%value")) return@listen
