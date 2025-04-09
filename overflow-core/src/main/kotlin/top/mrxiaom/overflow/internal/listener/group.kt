@@ -328,18 +328,14 @@ internal fun addGroupListeners() {
         } else {
             group.queryMember(e.userId) ?: return@listen
         }
-        val origin: MemberPermission
-        val new: MemberPermission
-        when (e.subType) {
+        val (origin, new) = when (e.subType) {
             "set" -> {
                 member.impl.role = "admin"
-                origin = MemberPermission.MEMBER
-                new = MemberPermission.ADMINISTRATOR
+                MemberPermission.MEMBER to MemberPermission.ADMINISTRATOR
             }
             "unset" -> {
                 member.impl.role = "member"
-                origin = MemberPermission.ADMINISTRATOR
-                new = MemberPermission.MEMBER
+                MemberPermission.ADMINISTRATOR to MemberPermission.MEMBER
             }
             else -> return@listen
         }
