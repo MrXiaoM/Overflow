@@ -10,6 +10,11 @@ var commitHash = extra("commitHash") ?: "local"
 var commitCount: Int? = extra("commitCount")
 val miraiVersion = extra("miraiVersion") ?: "2.16.0"
 
+kotlin {
+    optInForAllSourceSets("net.mamoe.mirai.utils.MiraiExperimentalApi")
+    optInForAllSourceSets("net.mamoe.mirai.utils.MiraiInternalApi")
+}
+
 buildConfig {
     className("BuildConstants")
     packageName("top.mrxiaom.overflow")

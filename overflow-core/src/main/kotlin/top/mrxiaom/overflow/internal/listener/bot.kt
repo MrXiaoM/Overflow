@@ -1,4 +1,3 @@
-@file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evolvefield.onebot.client.handler.EventBus.listen
@@ -8,7 +7,6 @@ import cn.evolvefield.onebot.sdk.event.notice.NotifyNoticeEvent
 import kotlinx.coroutines.launch
 import net.mamoe.mirai.event.broadcast
 import net.mamoe.mirai.event.events.NudgeEvent
-import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.event.UnsolvedOnebotEvent
 import top.mrxiaom.overflow.internal.contact.BotWrapper

@@ -1,6 +1,5 @@
 package top.mrxiaom.overflow.internal.message.data
 
-
 import cn.evolvefield.onebot.client.util.fileType
 import kotlinx.serialization.Serializable
 import net.mamoe.mirai.Bot
@@ -8,15 +7,11 @@ import net.mamoe.mirai.contact.Contact
 import net.mamoe.mirai.message.data.Image
 import net.mamoe.mirai.message.data.ImageType
 import net.mamoe.mirai.message.data.InternalImageProtocol
-import net.mamoe.mirai.utils.MiraiExperimentalApi
-import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.internal.utils.base64Length
 import top.mrxiaom.overflow.internal.utils.lengthToString
 import java.util.*
 
-@OptIn(MiraiInternalApi::class)
 internal class WrappedImageProtocol : InternalImageProtocol {
-    @OptIn(MiraiExperimentalApi::class)
     override fun createImage(
         imageId: String,
         size: Long,
@@ -41,7 +36,6 @@ internal class WrappedImageProtocol : InternalImageProtocol {
     }
 }
 @Serializable
-@MiraiExperimentalApi
 internal data class WrappedImage(
     var url: String,
     override val imageType: ImageType,

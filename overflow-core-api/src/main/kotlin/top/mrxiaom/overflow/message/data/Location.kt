@@ -8,7 +8,6 @@ import net.mamoe.mirai.message.data.AbstractPolymorphicMessageKey
 import net.mamoe.mirai.message.data.ConstrainSingle
 import net.mamoe.mirai.message.data.MessageContent
 import net.mamoe.mirai.message.data.MessageKey
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.safeCast
 
 /**
@@ -41,7 +40,6 @@ public data class Location(
     public override fun toString(): String = "[overflow:location,lon=$lat,lat=$lon,title=$title,content=$content]"
     public override fun contentToString(): String = _contentValue
 
-    @MiraiExperimentalApi
     override fun appendMiraiCodeTo(builder: StringBuilder) {
         builder.append("[mirai:location:").append(lat).append(",")
             .append(lon).append(",")

@@ -1,4 +1,3 @@
-@file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.utils
 
 import cn.evolvefield.onebot.sdk.entity.Anonymous
@@ -14,7 +13,6 @@ import cn.evolvefield.onebot.sdk.util.data
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import net.mamoe.mirai.contact.*
-import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.hexToBytes
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.internal.contact.*
@@ -92,7 +90,6 @@ internal fun PrivateSender.wrapAsStranger(bot: BotWrapper, json: JsonElement): S
     }.wrapAsStranger(bot, json)
 }
 
-@OptIn(MiraiInternalApi::class)
 internal fun ClientsResp.Clients.wrapAsOtherClientInfo(): OtherClientInfo {
     val platform = Platform.getByTerminalId(loginPlatform.toInt())
     return OtherClientInfo(appId.toInt(), platform, deviceName, deviceKind)

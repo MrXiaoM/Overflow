@@ -20,7 +20,6 @@ import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.spi.AudioToSilkService
 import net.mamoe.mirai.utils.ExternalResource
-import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.internal.data.UserProfileImpl
@@ -74,7 +73,6 @@ internal class FriendWrapper(
         )
     }
 
-    @OptIn(MiraiInternalApi::class)
     override suspend fun sendMessage(message: Message): MessageReceipt<Friend> {
         if (FriendMessagePreSendEvent(this, message).broadcast().isCancelled)
             throw EventCancelledException("消息发送已被取消")

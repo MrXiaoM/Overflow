@@ -8,7 +8,6 @@ import net.mamoe.mirai.message.data.AbstractPolymorphicMessageKey
 import net.mamoe.mirai.message.data.ConstrainSingle
 import net.mamoe.mirai.message.data.MessageContent
 import net.mamoe.mirai.message.data.MessageKey
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.safeCast
 
 /**
@@ -33,7 +32,6 @@ public data class ContactRecommend(
     public override fun toString(): String = "[overflow:contact,$contactType,$id]"
     public override fun contentToString(): String = _contentValue
 
-    @MiraiExperimentalApi
     override fun appendMiraiCodeTo(builder: StringBuilder) {
         builder.append("[mirai:contact:").append(contactType.name.lowercase()).append(",").append(id).append("]")
     }

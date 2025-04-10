@@ -1,4 +1,3 @@
-@file:OptIn(MiraiInternalApi::class)
 package top.mrxiaom.overflow.internal.contact.data
 
 import kotlinx.coroutines.currentCoroutineContext
@@ -9,7 +8,6 @@ import net.mamoe.mirai.contact.MemberPermission
 import net.mamoe.mirai.contact.active.*
 import net.mamoe.mirai.contact.checkBotPermission
 import net.mamoe.mirai.data.GroupHonorType
-import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.check
 import top.mrxiaom.overflow.internal.contact.GroupWrapper
 

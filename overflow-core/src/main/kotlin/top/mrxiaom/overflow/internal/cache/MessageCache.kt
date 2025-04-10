@@ -1,7 +1,6 @@
 package top.mrxiaom.overflow.internal.cache
 
 import kotlinx.coroutines.launch
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import top.mrxiaom.overflow.OverflowAPI
 import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.data.WrappedAudio
@@ -16,7 +15,6 @@ import java.util.function.Consumer
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(MiraiExperimentalApi::class)
 internal object MessageCache {
     var enabled = false
     var saveDir: File = File("./cache")

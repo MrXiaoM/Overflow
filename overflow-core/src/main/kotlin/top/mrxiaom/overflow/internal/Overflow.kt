@@ -72,7 +72,6 @@ internal fun ActionRaw.check(failMsg: String): Boolean {
     return retCode == 0
 }
 
-@OptIn(MiraiExperimentalApi::class, MiraiInternalApi::class, LowLevelApi::class)
 class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
     override val coroutineContext: CoroutineContext = CoroutineName("overflow")
     override val BotFactory: BotFactory

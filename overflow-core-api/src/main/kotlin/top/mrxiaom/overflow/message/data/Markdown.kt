@@ -6,7 +6,6 @@ import kotlinx.serialization.Serializable
 import net.mamoe.mirai.message.code.CodableMessage
 import net.mamoe.mirai.message.code.internal.appendStringAsMiraiCode
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import net.mamoe.mirai.utils.safeCast
 
 /**
@@ -25,7 +24,6 @@ public data class Markdown(
     public override fun toString(): String = "[overflow:markdown,$content]"
     public override fun contentToString(): String = content
 
-    @MiraiExperimentalApi
     override fun appendMiraiCodeTo(builder: StringBuilder) {
         builder.append("[mirai:markdown:").appendStringAsMiraiCode(content).append("]")
     }

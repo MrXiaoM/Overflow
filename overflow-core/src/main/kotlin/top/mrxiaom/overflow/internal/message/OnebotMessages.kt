@@ -17,8 +17,6 @@ import net.mamoe.mirai.internal.message.data.MarketFaceImpl
 import net.mamoe.mirai.internal.network.protocol.data.proto.ImMsgBody
 import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.MiraiExperimentalApi
-import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.OverflowAPI.Companion.logger
 import top.mrxiaom.overflow.contact.RemoteBot
 import top.mrxiaom.overflow.internal.asOnebot
@@ -33,7 +31,6 @@ import top.mrxiaom.overflow.spi.ExtendedMessageSerializerService.Companion.seria
  * Json 数组消息 (Onebot) 与 [MessageChain] (mirai) 的序列化与反序列化
  */
 internal object OnebotMessages {
-    @OptIn(MiraiExperimentalApi::class)
     internal fun registerSerializers() = MessageSerializers.apply {
         registerSerializer(At::class, At.serializer())
         registerSerializer(Dice::class, Dice.serializer())
@@ -326,7 +323,6 @@ internal object OnebotMessages {
      *
      * @see deserializeFromOneBot
      */
-    @OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
     internal suspend fun deserializeFromOneBotJson(bot: RemoteBot, json: JsonArray, source: MessageSource? = null): MessageChain {
         return buildMessageChain {
             if (source != null) add(source)

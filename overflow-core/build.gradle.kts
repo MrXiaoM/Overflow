@@ -6,6 +6,14 @@ plugins {
     id("org.ajoberstar.grgit")
 }
 
+kotlin {
+    optInForAllSourceSets("net.mamoe.mirai.utils.MiraiExperimentalApi")
+    optInForAllSourceSets("net.mamoe.mirai.utils.MiraiInternalApi")
+    optInForAllSourceSets("net.mamoe.mirai.LowLevelApi")
+    optInForAllSourceSets("net.mamoe.mirai.console.ConsoleFrontEndImplementation")
+    optInForAllSourceSets("net.mamoe.mirai.console.util.ConsoleExperimentalApi")
+}
+
 tasks.register<Jar>("dokkaJavadocJar") {
     group = "documentation"
     dependsOn(tasks.dokkaJavadoc)

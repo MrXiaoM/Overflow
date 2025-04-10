@@ -14,7 +14,6 @@ import net.mamoe.mirai.contact.active.ActiveHonorInfo
 import net.mamoe.mirai.contact.active.ActiveRecord
 import net.mamoe.mirai.utils.CheckableResponseA
 import net.mamoe.mirai.utils.JsonStruct
-import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.loadAs
 import top.mrxiaom.overflow.internal.contact.BotWrapper
 import top.mrxiaom.overflow.internal.utils.httpGet
@@ -507,7 +506,6 @@ internal fun GroupActiveData.MostActive.toActiveRecord(group: Group): ActiveReco
     )
 }
 
-@OptIn(MiraiInternalApi::class)
 @Suppress("INVISIBLE_MEMBER")
 internal fun GroupActiveData.ActiveInfo.toActiveChart(): ActiveChart {
     return ActiveChart(

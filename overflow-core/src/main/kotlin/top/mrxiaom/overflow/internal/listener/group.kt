@@ -1,4 +1,3 @@
-@file:OptIn(MiraiInternalApi::class, MiraiExperimentalApi::class)
 package top.mrxiaom.overflow.internal.listener
 
 import cn.evolvefield.onebot.client.handler.EventBus.listen
@@ -15,8 +14,6 @@ import net.mamoe.mirai.event.events.*
 import net.mamoe.mirai.message.data.FileMessage
 import net.mamoe.mirai.message.data.MessageChain
 import net.mamoe.mirai.message.data.buildMessageChain
-import net.mamoe.mirai.utils.MiraiExperimentalApi
-import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.event.MemberEssenceNoticeEvent
 import top.mrxiaom.overflow.event.MessageReactionEvent
 import top.mrxiaom.overflow.internal.Overflow

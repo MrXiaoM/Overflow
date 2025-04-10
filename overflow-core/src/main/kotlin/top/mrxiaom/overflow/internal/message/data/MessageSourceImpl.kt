@@ -1,4 +1,3 @@
-@file:OptIn(MiraiInternalApi::class)
 @file:Suppress("SERIALIZER_TYPE_INCOMPATIBLE")
 package top.mrxiaom.overflow.internal.message.data
 
@@ -10,12 +9,9 @@ import net.mamoe.mirai.internal.message.MessageSourceSerializerImpl
 import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.MessageSerializers
 import net.mamoe.mirai.message.data.*
-import net.mamoe.mirai.utils.MiraiExperimentalApi
-import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.internal.contact.*
 
-@OptIn(MiraiExperimentalApi::class)
 internal fun MessageSerializers.registerMessageSourceSerializers() {
     registerSerializer(MessageSource::class, MessageSource.serializer())
     registerSerializer(OfflineMessageSourceImpl::class, OfflineMessageSourceImpl.serializer())

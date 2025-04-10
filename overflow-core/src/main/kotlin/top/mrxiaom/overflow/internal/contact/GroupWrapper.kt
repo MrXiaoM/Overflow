@@ -29,8 +29,6 @@ import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.spi.AudioToSilkService
 import net.mamoe.mirai.utils.DeprecatedSinceMirai
 import net.mamoe.mirai.utils.ExternalResource
-import net.mamoe.mirai.utils.MiraiExperimentalApi
-import net.mamoe.mirai.utils.MiraiInternalApi
 import top.mrxiaom.overflow.contact.RemoteGroup
 import top.mrxiaom.overflow.contact.RemoteUser
 import top.mrxiaom.overflow.contact.Updatable
@@ -47,7 +45,6 @@ import top.mrxiaom.overflow.spi.FileService
 import kotlin.collections.set
 import kotlin.coroutines.CoroutineContext
 
-@OptIn(MiraiInternalApi::class)
 internal class GroupWrapper(
     override val bot: BotWrapper,
     internal var impl: GroupInfoResp,
@@ -199,7 +196,6 @@ internal class GroupWrapper(
         return members[id]
     }
 
-    @OptIn(MiraiExperimentalApi::class)
     override suspend fun quit(): Boolean {
         if (botAsMember.isOwner()) {
             throw IllegalStateException("机器人是群主，无法退群")

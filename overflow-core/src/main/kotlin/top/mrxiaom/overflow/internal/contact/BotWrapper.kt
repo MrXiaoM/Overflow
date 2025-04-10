@@ -13,7 +13,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import kotlinx.coroutines.*
 import me.him188.kotlin.jvm.blocking.bridge.JvmBlockingBridge
-import net.mamoe.mirai.LowLevelApi
 import net.mamoe.mirai.Mirai
 import net.mamoe.mirai.contact.*
 import net.mamoe.mirai.event.EventChannel
@@ -42,7 +41,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
 @Suppress("MemberVisibilityCanBePrivate")
-@OptIn(MiraiInternalApi::class, LowLevelApi::class)
 internal class BotWrapper private constructor(
     private var implBot: Bot,
     defLoginInfo: LoginInfoResp,

@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.reflect.KClass
 
-
 @Suppress("INVISIBLE_MEMBER")
 internal fun MiraiLogger.subLogger(name: String): MiraiLogger {
     return net.mamoe.mirai.internal.utils.subLoggerImpl(this, name)
@@ -81,7 +80,6 @@ internal class LoggerInFolder @JvmOverloads constructor(
  *
  * @see PlatformLogger 查看格式信息
  */
-@OptIn(MiraiInternalApi::class)
 internal class WithFileLogger(
     val logger: MiraiLogger,
     file: File

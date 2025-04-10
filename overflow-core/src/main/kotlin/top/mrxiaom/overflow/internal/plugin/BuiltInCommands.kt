@@ -1,10 +1,8 @@
-@file:OptIn(ConsoleFrontEndImplementation::class, ConsoleExperimentalApi::class, MiraiExperimentalApi::class)
 @file:Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 
 package top.mrxiaom.overflow.internal.plugin
 
 import net.mamoe.mirai.Bot
-import net.mamoe.mirai.console.ConsoleFrontEndImplementation
 import net.mamoe.mirai.console.MiraiConsole
 import net.mamoe.mirai.console.MiraiConsoleImplementation
 import net.mamoe.mirai.console.command.*
@@ -18,9 +16,11 @@ import net.mamoe.mirai.console.internal.pluginManagerImpl
 import net.mamoe.mirai.console.permission.PermissionService
 import net.mamoe.mirai.console.plugin.name
 import net.mamoe.mirai.console.plugin.version
-import net.mamoe.mirai.console.util.*
+import net.mamoe.mirai.console.util.emptyLine
+import net.mamoe.mirai.console.util.renderMUNum
+import net.mamoe.mirai.console.util.renderMemoryUsageNumber
+import net.mamoe.mirai.console.util.sendAnsiMessage
 import net.mamoe.mirai.contact.remarkOrNick
-import net.mamoe.mirai.utils.MiraiExperimentalApi
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.framing.CloseFrame
 import org.java_websocket.server.WebSocketServer

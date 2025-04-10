@@ -21,7 +21,6 @@ import net.mamoe.mirai.message.MessageReceipt
 import net.mamoe.mirai.message.action.MemberNudge
 import net.mamoe.mirai.message.data.*
 import net.mamoe.mirai.utils.ExternalResource
-import net.mamoe.mirai.utils.MiraiInternalApi
 import net.mamoe.mirai.utils.currentTimeSeconds
 import top.mrxiaom.overflow.Overflow
 import top.mrxiaom.overflow.contact.RemoteUser
@@ -37,7 +36,6 @@ import top.mrxiaom.overflow.internal.scope
 import top.mrxiaom.overflow.spi.FileService
 import kotlin.coroutines.CoroutineContext
 
-@OptIn(MiraiInternalApi::class)
 internal class MemberWrapper(
     override val group: GroupWrapper,
     internal var impl: GroupMemberInfoResp,
@@ -192,7 +190,6 @@ internal class MemberWrapper(
         return sendMessage(PlainText(message))
     }
 
-    @OptIn(MiraiInternalApi::class)
     override suspend fun sendMessage(message: Message): MessageReceipt<NormalMember> {
         if (GroupTempMessagePreSendEvent(this, message).broadcast().isCancelled)
             throw EventCancelledException("消息发送已被取消")
