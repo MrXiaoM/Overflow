@@ -46,7 +46,9 @@ internal suspend fun GroupSender.wrapAsMember(group: GroupWrapper): MemberWrappe
     member?.impl?.also {
         it.nickname = nickname
         it.card = card
-        it.role = role
+        if (it.role.isEmpty()) {
+            it.role = role // sender.role 可能不可信 #139
+        }
     }
     return member
 }
