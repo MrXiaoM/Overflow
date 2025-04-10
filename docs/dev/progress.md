@@ -113,9 +113,9 @@
 + BeforeImageUploadEvent
 + BeforeShortVideoUploadEvent
 + BotAvatarChangedEvent
-+ BotGroupPermissionChangeEvent 【有限支持，当发生群转让时，此事件和MemberPermissionChangeEvent均不会触发】
-+ BotJoinGroupEvent 【有限支持，某些情况不会触发，此时BotInvitedJoinGroupRequestEvent也可能不触发，例如：群人数<50时】
-+ BotLeaveEvent 【有限支持，当Bot在其它设备主动退群或群解散时不会触发】
++ BotGroupPermissionChangeEvent （有限支持：当发生群转让时，此事件和 MemberPermissionChangeEvent 均不会触发）
++ BotJoinGroupEvent （有限支持：某些情况不会触发，此时 BotInvitedJoinGroupRequestEvent 也可能不触发，例如：群人数小于 50 时）
++ BotLeaveEvent （有限支持：当 Bot 在其它设备主动退群或群解散时不会触发）
 + BotNickChangedEvent
 + BotOfflineEvent
 + BotReloginEvent
