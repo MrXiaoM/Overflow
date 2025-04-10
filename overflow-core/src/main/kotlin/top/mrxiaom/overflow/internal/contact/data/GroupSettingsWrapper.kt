@@ -30,11 +30,16 @@ internal class GroupSettingsWrapper(
     override val isAutoApproveEnabled: Boolean
         get() = false // TODO: Not yet implemented
 
-    override var isMuteAll: Boolean
+    internal var muteAll: Boolean
         get() = group.impl.groupAllShut == -1
+        set(value) {
+            group.impl.groupAllShut = if (value) -1 else 0
+        }
+    override var isMuteAll: Boolean
+        get() = muteAll
         set(value) = runBlocking {
             group.checkBotPermission(MemberPermission.ADMINISTRATOR)
-            group.impl.groupAllShut = if (value) -1 else 0
+            muteAll = value
             group.bot.impl.setGroupWholeBan(group.id, value)
         }
 }
