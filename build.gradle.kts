@@ -3,8 +3,8 @@ import org.ajoberstar.grgit.Grgit
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.8.0" apply false
-    kotlin("plugin.serialization") version "1.8.0" apply false
+    // kotlin("jvm") moved to `buildSrc/build.gradle.kts`
+    kotlin("plugin.serialization") version prop("kotlin.version") apply false
     id("org.jetbrains.dokka") version "1.8.10" apply false
     id("com.github.johnrengelman.shadow") version "7.0.0" apply false
     id("com.github.gmazzo.buildconfig") version "3.1.0" apply false
@@ -16,7 +16,7 @@ plugins {
     id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
 }
 
-Helper.rootProj = rootProject
+Helper.proj = rootProject
 group = "top.mrxiaom.mirai"
 
 val overflowVersion = "1.0.4".ext("overflowVersion")
