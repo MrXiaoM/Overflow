@@ -202,21 +202,35 @@ internal fun addGroupListeners() {
         if (bot.checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")
             || bot.checkId(e.userId, "%onebot 返回了异常的数值 user_id=%value")) return null
         val group = bot.group(e.groupId)
-        val member = group.queryMember(e.userId)
-            ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+        val member = if (e.userId == bot.id) {
+            group.botAsMember
+        } else {
+            group.queryMember(e.userId)
+                ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
+        }
         return group to member
     }
     listen<GroupIncreaseNoticeEvent>("approve") { e ->
-        val (_, member) = checkGroupIncrease(e) ?: return@listen
+        val (group, member) = checkGroupIncrease(e) ?: return@listen
         // 管理员已同意入群
-        bot.eventDispatcher.broadcastAsync(MemberJoinEvent.Active(member))
+        if (member.id == bot.id) {
+            bot.eventDispatcher.broadcastAsync(BotJoinGroupEvent.Active(group))
+        } else {
+            bot.eventDispatcher.broadcastAsync(MemberJoinEvent.Active(member))
+        }
     }
     listen<GroupIncreaseNoticeEvent>("invite") { e ->
         val (group, member) = checkGroupIncrease(e) ?: return@listen
         val invitor = group.queryMember(e.operatorId)
             ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
         // 管理员已同意邀请入群
-        bot.eventDispatcher.broadcastAsync(MemberJoinEvent.Invite(member, invitor))
+        if (member.id == bot.id) {
+            if (bot.inviteHandledGroups.contains(group.id)) return@listen
+            bot.inviteHandledGroups.add(group.id)
+            bot.eventDispatcher.broadcastAsync(BotJoinGroupEvent.Invite(invitor))
+        } else {
+            bot.eventDispatcher.broadcastAsync(MemberJoinEvent.Invite(member, invitor))
+        }
     }
     listen<NotifyNoticeEvent>("title") { e ->
         if (checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")

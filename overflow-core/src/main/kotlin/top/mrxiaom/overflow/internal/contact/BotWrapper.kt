@@ -62,6 +62,7 @@ internal class BotWrapper private constructor(
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
     private var otherClientsInternal: ContactList<OtherClientWrapper>? = null
     private var strangersInternal: ContactList<StrangerWrapper> = ContactList()
+    internal val inviteHandledGroups = mutableSetOf<Long>()
 
     suspend fun updateLoginInfo() {
         loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("刷新机器人信息失败")
