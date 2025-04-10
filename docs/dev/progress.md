@@ -142,6 +142,13 @@
 + StrangerMessageSyncEvent
 + StrangerRelationChangeEvent
 
+## 不支持的类属性
+
+这里整理已经探查到的、暂未完全支持的 mirai 中类的属性。
+
++  net.mamoe.mirai.contact.GroupSettings.isMuteAll （群聊全员禁言状态，由于 go-cqhttp、NapCat、LLOnebot 的接口不返回全员禁言状态，目前只能用缺省的 false 作为该值的初始值，在Bot启动后未曾修改全员禁言状态时该值可能不正确）
++  待补充...
+
 # 支持/扩展的 SPI
 
 + (已弃用)签名服务 `net.mamoe.mirai.internal.spi.EncryptService`
