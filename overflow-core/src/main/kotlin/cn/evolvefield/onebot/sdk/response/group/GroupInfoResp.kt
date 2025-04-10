@@ -3,6 +3,8 @@ package cn.evolvefield.onebot.sdk.response.group
 import com.google.gson.annotations.SerializedName
 
 class GroupInfoResp : GroupDataResp() {
+    @SerializedName("group_all_shut") // NapCat，全员禁言，-1 开启，0 关闭
+    var groupAllShut = 0
     @SerializedName("group_memo")
     var groupMemo = ""
     @SerializedName("group_create_time")
