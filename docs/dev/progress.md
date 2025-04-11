@@ -87,11 +87,14 @@
 | 机器人被禁言           | BotMuteEvent                    | notice -> group_ban -> ban          | ✅    |
 | 群员被解除禁言          | MemberUnmuteEvent               | notice -> group_ban -> lift_ban     | ✅    |
 | 机器人被解除禁言         | BotUnmuteEvent                  | notice -> group_ban -> lift_ban     | ✅    |
-| 群群员禁言状态更改        | GroupAllMuteEvent               | notice -> group_ban                 | ✅    |
-| 主动入群被同意          | MemberJoinEvent.Active          | notice -> group_increase -> approve | ✅    |
-| 被邀请入群被同意         | MemberJoinEvent.Active          | notice -> group_increase -> invite  | ✅    |
+| 群全员禁言状态更改        | GroupAllMuteEvent               | notice -> group_ban                 | ✅    |
+| 成员已主动入群          | MemberJoinEvent.Active          | notice -> group_increase -> approve | ✅    |
+| 成员已被邀请入群         | MemberJoinEvent.Invite          | notice -> group_increase -> invite  | ✅    |
+| 机器人已主动入群          | BotJoinGroupEvent.Active          | notice -> group_increase -> approve | ✅    |
+| 机器人已被邀请入群         | BotJoinGroupEvent.Invite          | notice -> group_increase -> invite  | ✅    |
 | 群成员主动退群          | MemberLeaveEvent.Quit           | notice -> group_decrease -> leave   | ✅    |
 | 群成员被踢出群聊         | MemberLeaveEvent.Kick           | notice -> group_decrease -> kick    | ✅    |
+| 机器人被踢出群聊         | BotLeaveEvent.Kick           | notice -> group_decrease -> kick    | ✅    |
 | *Coming soon...* | -                               | -                                   | ❔    |
 
 扩展事件类型  
@@ -114,8 +117,9 @@
 + BeforeShortVideoUploadEvent
 + BotAvatarChangedEvent
 + BotGroupPermissionChangeEvent （有限支持：当发生群转让时，此事件和 MemberPermissionChangeEvent 均不会触发）
-+ BotJoinGroupEvent （有限支持：某些情况不会触发，此时 BotInvitedJoinGroupRequestEvent 也可能不触发，例如：群人数小于 50 时）
-+ BotLeaveEvent （有限支持：当 Bot 在其它设备主动退群或群解散时不会触发）
++ BotJoinGroupEvent.Retrieve
++ BotLeaveEvent.Disband 
++ BotLeaveEvent.Active （有限支持：当 Bot 在其它设备主动退群时不触发）
 + BotNickChangedEvent
 + BotOfflineEvent
 + BotReloginEvent
@@ -142,11 +146,11 @@
 + StrangerMessageSyncEvent
 + StrangerRelationChangeEvent
 
-## 不支持的类属性
+## 不完全支持的类属性
 
 这里整理已经探查到的、暂未完全支持的 mirai 中类的属性。
 
-+  net.mamoe.mirai.contact.GroupSettings.isMuteAll （群聊全员禁言状态，由于 go-cqhttp、NapCat、LLOnebot 的接口不返回全员禁言状态，目前只能用缺省的 false 作为该值的初始值，在Bot启动后未曾修改全员禁言状态时该值可能不正确）
++  net.mamoe.mirai.contact.GroupSettings.isMuteAll （群全员禁言状态，在 go-cqhttp、LLOnebot 中接口不返回全员禁言状态，只能用缺省的 false 作为该值的初始值，Bot 启动后初始值可能不正确）
 +  待补充...
 
 # 支持/扩展的 SPI
