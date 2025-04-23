@@ -11,6 +11,10 @@ val gradleProperties = rootDir.parentFile
 val prop = Properties().apply {
     gradleProperties.reader().use(::load)
 }
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
 buildConfig {
     className("BuildConstants")
     useKotlinOutput()
