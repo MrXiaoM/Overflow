@@ -20,6 +20,8 @@ class MavenPublishingPlugin implements Plugin<Project> {
             target.logger.warn('maven-publish-publish requires be applied on root project.')
             rootProject.apply plugin: MavenPublishingPlugin.class
             return
+        } else {
+            rootProject.apply plugin: 'java-base'
         }
 
         def cacheRepoLocation = rootProject.layout.buildDirectory.get()
