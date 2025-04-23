@@ -5,6 +5,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    if: github.repository == 'MrXiaoM/Overflow'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -20,9 +21,10 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
       - name: Publish Package
-        run: ./gradlew publishMavenPublicationToSonatypeRepository closeAndReleaseSonatypeStagingRepository
+        run: |
+          ./gradlew cleanMavenPublishingStage build publishAllPublicationsToMavenStageRepository
+          ./gradlew publishToMavenCentral
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
-          ORG_GRADLE_PROJECT_MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          ORG_GRADLE_PROJECT_MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_PUBLISH_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PUBLISH_ACCOUNT }}

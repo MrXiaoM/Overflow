@@ -12,6 +12,7 @@ jobs:
       contents: write
       packages: write
     runs-on: ubuntu-latest
+    if: github.repository == 'MrXiaoM/Overflow'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
