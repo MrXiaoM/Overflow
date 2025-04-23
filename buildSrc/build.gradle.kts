@@ -30,8 +30,8 @@ dependencies {
     api(gradleKotlinDsl())
     api("com.google.code.gson:gson:2.10.1")
 
-    compileOnly("org.apache.httpcomponents:httpclient:4.5.13")
-    compileOnly("org.apache.httpcomponents:httpmime:4.5.13")
+    api("org.apache.httpcomponents:httpclient:4.5.13")
+    api("org.apache.httpcomponents:httpmime:4.5.13")
 
     api("org.jetbrains.kotlin", "kotlin-gradle-plugin", prop["kotlin.version"].toString()) {
         exclude("org.jetbrains.kotlin", "kotlin-stdlib")
