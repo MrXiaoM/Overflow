@@ -66,7 +66,10 @@ public class UploadToMavenCentral {
             throw new Exception("HTTP " + statusCode);
         } else {
             String deploymentId = EntityUtils.toString(response.getEntity());
+            System.out.println("========================================");
+            System.out.println("UPLOAD SUCCESS");
             System.out.println("Deployment ID: " + deploymentId);
+            System.out.println("========================================");
         }
         httpclient.close();
     }
