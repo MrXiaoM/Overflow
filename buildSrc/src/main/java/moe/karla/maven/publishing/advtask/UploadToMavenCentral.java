@@ -5,6 +5,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 
 import java.io.File;
 import java.io.InputStream;
@@ -33,9 +34,9 @@ public class UploadToMavenCentral {
 
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
 
-        HttpPost httpPost = new HttpPost(
-                "https://central.sonatype.com/api/v1/publisher/upload?publishingType=" + publishingType + "&name=" + URLEncoder.encode(publishingName, StandardCharsets.UTF_8)
-        );
+        String url = "https://central.sonatype.com/api/v1/publisher/upload?publishingType=" + publishingType + "&name=" + URLEncoder.encode(publishingName, StandardCharsets.UTF_8);
+        HttpPost httpPost = new HttpPost(url);
+        System.out.println("POST " + url);
         httpPost.addHeader("Authorization", "Bearer " + Base64.getEncoder().encodeToString(
                 getUserPassword()
         ));
@@ -47,8 +48,9 @@ public class UploadToMavenCentral {
         );
 
         HttpResponse response = httpclient.execute(httpPost);
-        if (response.getStatusLine().getStatusCode() / 100 != 2) {
-            System.err.println("HTTP Post Exited with " + response.getStatusLine().getStatusCode());
+        int statusCode = response.getStatusLine().getStatusCode();
+        if (statusCode / 100 != 2) {
+            System.err.println("HTTP Post Exited with " + statusCode);
             if (response.getEntity() != null) {
                 InputStream content = response.getEntity().getContent();
                 if (content != null) {
@@ -61,7 +63,10 @@ public class UploadToMavenCentral {
                     }
                 }
             }
-            throw new Exception("540");
+            throw new Exception("HTTP " + statusCode);
+        } else {
+            String deploymentId = EntityUtils.toString(response.getEntity());
+            System.out.println("Deployment ID: " + deploymentId);
         }
         httpclient.close();
     }
