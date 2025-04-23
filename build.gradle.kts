@@ -69,12 +69,3 @@ allprojects {
         }
     }
 }
-tasks.register("deleteOutdatedArtifacts") {
-    group = "publishing"
-    val auth = findProperty("MAVEN_AUTHORIZATION")?.toString()
-    if (auth == null) {
-        println("OSS authorization not found, skipping delete outdated artifacts")
-    } else {
-        deleteOutdatedArtifacts(rootProject.projectDir, auth)
-    }
-}
