@@ -4,11 +4,9 @@ import moe.karla.maven.publishing.advtask.UploadToMavenCentral
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Zip
 
-import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.regex.Pattern
 
@@ -51,50 +49,6 @@ class MavenPublishingPlugin implements Plugin<Project> {
                     break
                 }
             }
-            if (ext.scmUrl == null || ext.scmUrl.isEmpty()) {
-                ext.scmUrl = ext.url
-            }
-            if (ext.scmConnection == null || ext.scmConnection.isEmpty()) {
-                ext.scmConnection = "scm:git:" + ext.url
-            }
-            if (ext.scmDeveloperConnection == null || ext.scmDeveloperConnection.isEmpty()) {
-                ext.scmDeveloperConnection = "scm:git:" + ext.url
-            }
-            if (ext.developers == null || ext.developers.isEmpty()) {
-                def output = new ByteArrayOutputStream()
-
-                rootProject.exec {
-                    commandLine = ['git', 'log', '--format=%an<%ae>', 'HEAD']
-                    standardOutput = output
-                }.assertNormalExitValue()
-
-                def lastCommitAuthor = output.toString().trim()
-                def matcher = Pattern.compile("(.+)<(.+)>").matcher(lastCommitAuthor)
-
-                if (matcher.matches()) {
-                    ext.developer(matcher.group(1), matcher.group(2))
-                } else {
-                    throw new RuntimeException("Failed to resolve developer information from last commit with " + lastCommitAuthor)
-                }
-            }
-            if (ext.licenses == null || ext.licenses.isEmpty()) {
-                def licenseFile = rootProject.file('LICENSE')
-                String name = 'UNLICENSE'
-                if (licenseFile.exists()) {
-                    def firstLine = Files.readAllLines(licenseFile.toPath())
-                            .stream()
-                            .map { it.trim() }
-                            .filter { !it.isEmpty() }
-                            .findFirst()
-                    if (firstLine.present) {
-                        name = firstLine.present
-                    }
-                }
-
-                ext.license(name, ext.url)
-            }
-
-
             rootProject.allprojects {
                 if (ext.automaticSourcesAndJavadoc) {
                     apply plugin: PublishingStubsSetupPlugin.class
@@ -102,44 +56,7 @@ class MavenPublishingPlugin implements Plugin<Project> {
 
                 pluginManager.withPlugin('maven-publish') {
                     def currentProject = project
-                    if (currentProject.description == null || currentProject.description.isEmpty()) {
-                        currentProject.description = currentProject.name
-                    }
-
                     def publishing = currentProject.extensions.findByName('publishing') as PublishingExtension
-                    publishing.publications.withType(MavenPublication.class).configureEach {
-                        pom {
-                            name.set(artifactId)
-                            description.set(currentProject.description)
-
-                            url.set(ext.url)
-                            licenses {
-                                ext.licenses.forEach { lInfo ->
-                                    license {
-                                        name.set(lInfo.name)
-                                        url.set(lInfo.url)
-                                    }
-                                }
-                            }
-                            developers {
-                                ext.developers.forEach { dInfo ->
-                                    developer {
-                                        name.set(dInfo.name)
-                                        email.set(dInfo.email)
-                                        if (dInfo.organization != null) organization.set(dInfo.organization)
-                                        if (dInfo.organizationUrl != null) organization.set(dInfo.organizationUrl)
-                                    }
-                                }
-                            }
-                            scm {
-                                url.set(ext.scmUrl)
-                                connection.set(ext.scmConnection)
-                                developerConnection.set(ext.scmDeveloperConnection)
-                            }
-                        }
-                    }
-
-
                     publishing.repositories {
                         maven {
                             name = 'MavenStage'
