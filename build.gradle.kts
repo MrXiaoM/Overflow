@@ -1,6 +1,7 @@
 @file:Suppress("INVISIBLE_MEMBER")
 import org.ajoberstar.grgit.Grgit
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import moe.karla.maven.publishing.MavenPublishingExtension.PublishingType
 
 plugins {
     // kotlin("jvm") moved to `buildSrc/build.gradle.kts`
@@ -48,8 +49,7 @@ println("Commit: $commit")
 println("Version: $version")
 
 mavenPublishing {
-    publishingType = moe.karla.maven.publishing.MavenPublishingExtension.PublishingType.USER_MANAGED
-
+    publishingType = PublishingType.AUTOMATIC
     url = "https://github.com/MrXiaoM/Overflow"
 }
 

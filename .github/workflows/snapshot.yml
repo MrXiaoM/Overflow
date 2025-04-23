@@ -1,10 +1,10 @@
-name: Publish Snapshots
+name: Publish to Central Snapshots
 on:
   push:
-    branches: [ "main", "migrate-to-central-portal" ]
+    branches: [ "main" ]
     paths-ignore:
       - '*.md'
-  workflow_dispatch:
+
 permissions:
   contents: write
 jobs:
@@ -16,7 +16,6 @@ jobs:
     if: github.repository == 'MrXiaoM/Overflow'
     env:
       ORG_GRADLE_PROJECT_IS_SNAPSHOT: true
-      ORG_GRADLE_PROJECT_OVERRIDE_VERSION: '0.9.0-SNAPSHOT'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
