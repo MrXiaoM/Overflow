@@ -89,8 +89,9 @@ class MavenPublishingPlugin implements Plugin<Project> {
             group = 'publishing'
             dependsOn(packBundleTask)
             inputs.files(packBundleTask.get().outputs.files)
-
-            UploadToMavenCentral.execute(rootProject.name, ext.publishingType.name(), packBundleTask.get().outputs.files.singleFile)
+            doFirst {
+                UploadToMavenCentral.execute(rootProject.name, ext.publishingType.name(), packBundleTask.get().outputs.files.singleFile)
+            }
         }
     }
 }
