@@ -40,17 +40,9 @@ jobs:
           SECRETS_TO_CHECK: ${{ secrets.SIGNING_PRIVATE_KEY }}
       - name: Publish Package
         if: ${{ env.SECRETS_LENGTH > 0 }}
-        run: ./gradlew cleanMavenPublishingStage build publishAllPublicationsToMavenStageRepository
+        run: ./gradlew build publishAllPublicationsToCentralSnapshotsRepository
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: tmp
-          path: build/tmp/*
-          if-no-files-found: error
-      - name: Upload to Central Portal
-        run: ./gradlew publishToMavenCentral
-        env:
-          MAVEN_PUBLISH_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PUBLISH_ACCOUNT }}
+          MAVEN_SNAPSHOTS_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_SNAPSHOTS_TOKEN: ${{ secrets.OSSRH_TOKEN }}

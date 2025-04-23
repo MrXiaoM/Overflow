@@ -60,6 +60,18 @@ class MavenPublishingPlugin implements Plugin<Project> {
                             name = 'MavenStage'
                             url = cacheRepoLocation.toURI()
                         }
+                        def user = System.getenv("MAVEN_SNAPSHOTS_USERNAME")
+                        def token = System.getenv("MAVEN_SNAPSHOTS_TOKEN")
+                        if (user != null && token != null) {
+                            maven {
+                                name = 'CentralSnapshots'
+                                url = 'https://central.sonatype.com/repository/maven-snapshots/'
+                                credentials {
+                                    username = user
+                                    password = token
+                                }
+                            }
+                        }
                     }
                 }
             }
