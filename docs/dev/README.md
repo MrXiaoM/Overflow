@@ -4,15 +4,20 @@
 
 目前 Overflow 的开发版本发布到了 Sonatype 快照仓库。目前仅推荐使用发布在 Maven Central 中的正式版本，如有开发版本需要，请添加仓库：
 
+> 开发版本快照仓库已从 s01 迁移到 Central Snapshots，详见 [#148](https://github.com/MrXiaoM/Overflow/pull/148)
+
 ```kotlin
 repositories {
+    // 631 及以后的版本，使用这个仓库。根据 Central 的规则，版本仅保留90天
+    maven("https://central.sonatype.com/repository/maven-snapshots/")
+    // 631 之前的版本，使用这个仓库。但这个仓库会在 2025年6月30日 停止服务，请尽快使用新仓库
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 ```
 快照仓库中依赖版本的格式为 `major.minor.patch.commits-shortHash-SNAPSHOT`，  
 示例：`0.9.9.481-d59fa60-SNAPSHOT`，详见 [#92](https://github.com/MrXiaoM/Overflow/issues/92)。
 
-你可以在 [官网](https://mirai.mrxiaom.top/#get-started) 或者 [仓库 maven-metadata.xml](https://s01.oss.sonatype.org/content/repositories/snapshots/top/mrxiaom/mirai/overflow-core/maven-metadata.xml) 查询已发布的开发版本列表。  
+你可以在 [官网](https://mirai.mrxiaom.top/#get-started) 或者 [仓库 maven-metadata.xml](https://central.sonatype.com/repository/maven-snapshots//top/mrxiaom/mirai/overflow-core/maven-metadata.xml) 查询已发布的开发版本列表。  
 
 正式发行版可在 [Maven Central](https://central.sonatype.com/search?q=g%3Atop.mrxiaom.mirai) 上查询版本号。
 
