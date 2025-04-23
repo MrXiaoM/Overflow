@@ -1,9 +1,9 @@
 package moe.karla.maven.publishing.advtask;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 
 import java.io.File;
@@ -29,13 +29,12 @@ public class UploadToMavenCentral {
         return (mavenPublishUser + ":" + mavenPublishPassword).getBytes(StandardCharsets.UTF_8);
     }
 
-    public static void main(String[] args) throws Throwable {
+    public static void execute(String publishingType, String publishingName, File bundle) throws Throwable {
 
-        HttpClient httpclient = HttpClientBuilder.create().build();
+        CloseableHttpClient httpclient = HttpClientBuilder.create().build();
 
         HttpPost httpPost = new HttpPost(
-                "https://central.sonatype.com/api/v1/publisher/upload?publishingType=" + System.getenv("MAVEN_PUBLISH_PUBLISHING_TYPE")
-                        + "&name=" + URLEncoder.encode(System.getenv("MAVEN_PUBLISH_PUBLISHING_NAME"), "UTF-8")
+                "https://central.sonatype.com/api/v1/publisher/upload?publishingType=" + publishingType + "&name=" + URLEncoder.encode(publishingName, StandardCharsets.UTF_8)
         );
         httpPost.addHeader("Authorization", "Bearer " + Base64.getEncoder().encodeToString(
                 getUserPassword()
@@ -43,7 +42,7 @@ public class UploadToMavenCentral {
 
         httpPost.setEntity(
                 MultipartEntityBuilder.create()
-                        .addBinaryBody("bundle", new File(args[0]))
+                        .addBinaryBody("bundle", bundle)
                         .build()
         );
 
@@ -62,7 +61,8 @@ public class UploadToMavenCentral {
                     }
                 }
             }
-            System.exit(540);
+            throw new Exception("540");
         }
+        httpclient.close();
     }
 }

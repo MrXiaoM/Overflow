@@ -4,10 +4,8 @@ import moe.karla.maven.publishing.advtask.UploadToMavenCentral
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.tasks.JavaExec
 import org.gradle.api.tasks.bundling.Zip
 
-import java.nio.file.Paths
 import java.util.regex.Pattern
 
 class MavenPublishingPlugin implements Plugin<Project> {
@@ -86,51 +84,13 @@ class MavenPublishingPlugin implements Plugin<Project> {
         ]
         def externalTaskConfiguration = rootProject.configurations.create('mavenPublishingExternalModuleClasspath')
         dependencies.forEach { externalTaskConfiguration.dependencies.add(rootProject.dependencies.create(it)) }
-        def jarMe = findJarMe()
 
-        rootProject.tasks.register('publishToMavenCentral', JavaExec.class) {
+        rootProject.tasks.register('publishToMavenCentral') {
             group = 'publishing'
             dependsOn(packBundleTask)
             inputs.files(packBundleTask.get().outputs.files)
 
-            classpath = externalTaskConfiguration
-            if (jarMe != null) {
-                classpath = classpath + rootProject.files(jarMe)
-            }
-            mainClass.set('moe.karla.maven.publishing.advtask.UploadToMavenCentral')
-
-            args(packBundleTask.get().outputs.files.singleFile.absolutePath)
-
-            environment('MAVEN_PUBLISH_USER',
-                    System.getenv('MAVEN_PUBLISH_USER')
-                            ?: rootProject.findProperty('maven.publish.user')
-                            ?: System.getProperty('maven.publish.user')
-                            ?: ''
-            )
-            environment('MAVEN_PUBLISH_PASSWORD',
-                    System.getenv('MAVEN_PUBLISH_PASSWORD')
-                            ?: rootProject.findProperty('maven.publish.password')
-                            ?: System.getProperty('maven.publish.password')
-                            ?: ''
-            )
-
-            doFirst {
-                environment('MAVEN_PUBLISH_PUBLISHING_NAME', rootProject.name)
-                environment('MAVEN_PUBLISH_PUBLISHING_TYPE', ext.publishingType.name())
-            }
+            UploadToMavenCentral.execute(rootProject.name, ext.publishingType.name(), packBundleTask.get().outputs.files.singleFile)
         }
-    }
-
-    static File findJarMe() {
-        def pd = UploadToMavenCentral.class.protectionDomain
-        if (pd == null) return null
-        def cs = pd.codeSource
-        if (cs == null) return null
-        def loc = cs.location
-        if (loc == null) return null
-        if (loc.protocol == "file") {
-            return Paths.get(loc.toURI()).toFile()
-        }
-        return null
     }
 }
