@@ -1,6 +1,7 @@
 @file:Suppress("INVISIBLE_MEMBER")
 import org.ajoberstar.grgit.Grgit
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import moe.karla.maven.publishing.MavenPublishingExtension.PublishingType
 
 plugins {
     // kotlin("jvm") moved to `buildSrc/build.gradle.kts`
@@ -11,9 +12,7 @@ plugins {
     id("me.him188.kotlin-jvm-blocking-bridge") version "3.0.0-180.1" apply false
     id("org.ajoberstar.grgit") version "5.2.2" apply false
 
-    signing
-    `maven-publish`
-    id("io.github.gradle-nexus.publish-plugin") version "2.0.0"
+    id("moe.karla.maven-publishing")
 }
 
 Helper.proj = rootProject
@@ -42,11 +41,17 @@ version = overflowVersion
 if (findProperty("IS_SNAPSHOT") == "true") {
     version = "$version.$commit-SNAPSHOT"
 }
+findProperty("OVERRIDE_VERSION")?.also { version = it }
 
 println("Mirai version: $miraiVersion")
 println("Overflow version: $overflowVersion")
 println("Commit: $commit")
 println("Version: $version")
+
+mavenPublishing {
+    publishingType = PublishingType.AUTOMATIC
+    url = "https://github.com/MrXiaoM/Overflow"
+}
 
 allprojects {
     group = rootProject.group
@@ -61,25 +66,6 @@ allprojects {
             options.encoding = "UTF-8"
             sourceCompatibility = javaVersion
             targetCompatibility = javaVersion
-        }
-    }
-}
-tasks.register("deleteOutdatedArtifacts") {
-    group = "publishing"
-    val auth = findProperty("MAVEN_AUTHORIZATION")?.toString()
-    if (auth == null) {
-        println("OSS authorization not found, skipping delete outdated artifacts")
-    } else {
-        deleteOutdatedArtifacts(rootProject.projectDir, auth)
-    }
-}
-nexusPublishing {
-    repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-            username.set(findProperty("MAVEN_USERNAME")?.toString())
-            password.set(findProperty("MAVEN_PASSWORD")?.toString())
         }
     }
 }

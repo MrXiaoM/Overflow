@@ -1,9 +1,10 @@
-name: Publish Snapshots
+name: Publish to Central Snapshots
 on:
   push:
     branches: [ "main" ]
     paths-ignore:
       - '*.md'
+
 permissions:
   contents: write
 jobs:
@@ -12,6 +13,9 @@ jobs:
       contents: write
       packages: write
     runs-on: ubuntu-latest
+    if: github.repository == 'MrXiaoM/Overflow'
+    env:
+      ORG_GRADLE_PROJECT_IS_SNAPSHOT: true
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -35,11 +39,9 @@ jobs:
           SECRETS_TO_CHECK: ${{ secrets.SIGNING_PRIVATE_KEY }}
       - name: Publish Package
         if: ${{ env.SECRETS_LENGTH > 0 }}
-        run: ./gradlew publishMavenPublicationToSonatypeRepository closeAndReleaseSonatypeStagingRepository
+        run: ./gradlew build publishAllPublicationsToCentralSnapshotsRepository
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
-          ORG_GRADLE_PROJECT_MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          ORG_GRADLE_PROJECT_MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          # 加上 IS_SNAPSHOT 将会设为 -SNAPSHOT 版本
-          ORG_GRADLE_PROJECT_IS_SNAPSHOT: true
+          MAVEN_SNAPSHOTS_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_SNAPSHOTS_TOKEN: ${{ secrets.OSSRH_TOKEN }}
