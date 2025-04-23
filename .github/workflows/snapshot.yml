@@ -4,6 +4,7 @@ on:
     branches: [ "main" ]
     paths-ignore:
       - '*.md'
+  workflow_dispatch:
 permissions:
   contents: write
 jobs:
@@ -45,3 +46,4 @@ jobs:
           MAVEN_PUBLISH_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PUBLISH_ACCOUNT }}
           # 加上 IS_SNAPSHOT 将会设为 -SNAPSHOT 版本
           ORG_GRADLE_PROJECT_IS_SNAPSHOT: true
+          ORG_GRADLE_PROJECT_OVERRIDE_VERSION: '0.9.9-SNAPSHOT'

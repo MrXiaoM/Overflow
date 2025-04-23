@@ -40,6 +40,7 @@ version = overflowVersion
 if (findProperty("IS_SNAPSHOT") == "true") {
     version = "$version.$commit-SNAPSHOT"
 }
+findProperty("OVERRIDE_VERSION")?.also { version = it }
 
 println("Mirai version: $miraiVersion")
 println("Overflow version: $overflowVersion")
