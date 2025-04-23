@@ -1,6 +1,6 @@
 package moe.karla.maven.publishing
 
-import moe.karla.maven.publishing.signsetup.SignSetupConfiguration
+import moe.karla.maven.publishing.advtask.UploadToMavenCentral
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
@@ -22,14 +22,9 @@ class MavenPublishingPlugin implements Plugin<Project> {
             return
         }
 
-        rootProject.allprojects {
-            apply plugin: SigningSetupPlugin.class
-        }
-
         def cacheRepoLocation = rootProject.layout.buildDirectory.get()
                 .dir('maven-publishing-stage')
                 .asFile
-
 
         def ext = rootProject.extensions.create('mavenPublishing', MavenPublishingExtension.class)
         rootProject.afterEvaluate {
@@ -41,7 +36,7 @@ class MavenPublishingPlugin implements Plugin<Project> {
                     standardOutput = output
                 }.assertNormalExitValue()
 
-                def remote = output.toString().trim();
+                def remote = output.toString().trim()
 
                 while (true) {
                     def githubMatcher = Pattern.compile("(?:git@github.com:|https://github.com/)(.+)(?:\\.git)?").matcher(remote)
@@ -71,7 +66,7 @@ class MavenPublishingPlugin implements Plugin<Project> {
                     standardOutput = output
                 }.assertNormalExitValue()
 
-                def lastCommitAuthor = output.toString().trim();
+                def lastCommitAuthor = output.toString().trim()
                 def matcher = Pattern.compile("(.+)<(.+)>").matcher(lastCommitAuthor)
 
                 if (matcher.matches()) {
@@ -174,7 +169,6 @@ class MavenPublishingPlugin implements Plugin<Project> {
         dependencies.forEach { externalTaskConfiguration.dependencies.add(rootProject.dependencies.create(it)) }
         def jarMe = findJarMe()
 
-
         rootProject.tasks.register('publishToMavenCentral', JavaExec.class) {
             group = 'publishing'
             dependsOn(packBundleTask)
@@ -209,7 +203,7 @@ class MavenPublishingPlugin implements Plugin<Project> {
     }
 
     static File findJarMe() {
-        def pd = SignSetupConfiguration.class.protectionDomain
+        def pd = UploadToMavenCentral.class.protectionDomain
         if (pd == null) return null
         def cs = pd.codeSource
         if (cs == null) return null

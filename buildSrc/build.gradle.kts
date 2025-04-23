@@ -55,13 +55,5 @@ gradlePlugin {
             description = "Publishing your software to Maven Central"
             tags.set(listOf("signing", "publishing"))
         }
-        register("publishing-signing") {
-            id = "moe.karla.signing-setup"
-            implementationClass = "moe.karla.maven.publishing.SigningSetupPlugin"
-
-            displayName = "Gradle Signing Setup"
-            description = "Fast setup your publications signing"
-            tags.set(listOf("signing", "publishing"))
-        }
     }
 }
