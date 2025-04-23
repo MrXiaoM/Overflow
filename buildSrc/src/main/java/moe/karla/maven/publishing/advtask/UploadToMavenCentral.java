@@ -30,7 +30,7 @@ public class UploadToMavenCentral {
         return (mavenPublishUser + ":" + mavenPublishPassword).getBytes(StandardCharsets.UTF_8);
     }
 
-    public static void execute(String publishingType, String publishingName, File bundle) throws Throwable {
+    public static void execute(String publishingName, String publishingType, File bundle) throws Throwable {
 
         CloseableHttpClient httpclient = HttpClientBuilder.create().build();
 
