@@ -20,11 +20,18 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - name: Publish Package
-        run: |
-          ./gradlew cleanMavenPublishingStage build publishAllPublicationsToMavenStageRepository
-          ./gradlew publishToMavenCentral
+      - name: Publish Package to Stage Repository
+        run: ./gradlew cleanMavenPublishingStage build publishAllPublicationsToMavenStageRepository
         env:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.SIGNING_PRIVATE_KEY }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.SIGNING_PASSWORD }}
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tmp
+          path: build/tmp/*
+          if-no-files-found: error
+      - name: Upload to Central Portal
+        run: ./gradlew publishToMavenCentral
+        env:
           MAVEN_PUBLISH_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PUBLISH_ACCOUNT }}
