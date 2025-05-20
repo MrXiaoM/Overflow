@@ -57,7 +57,16 @@ data class ActionContext(
             context.ignoreStatus = flag
         }
 
-        fun build(): ActionContext = context
+        /**
+         * 构建一个新的 ActionContext
+         */
+        fun build(): ActionContext {
+            return ActionContext(
+                action = context.action,
+                throwExceptions = context.throwExceptions,
+                ignoreStatus = context.ignoreStatus
+            )
+        }
 
         companion object {
             fun create(action: String): Builder = Builder(action)
