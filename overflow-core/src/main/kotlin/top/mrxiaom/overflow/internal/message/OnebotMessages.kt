@@ -220,8 +220,8 @@ internal object OnebotMessages {
         val bot = contact.bot.asOnebot
         val nodes = serializeForwardNodes(bot, forward.nodeList)
         return when (contact) {
-            is Group -> bot.impl.sendGroupForwardMsg(contact.id, nodes, forward.source, forward.summary, forward.preview, forward.brief).data
-            else -> bot.impl.sendPrivateForwardMsg(contact.id, nodes, forward.source, forward.summary, forward.preview, forward.brief).data
+            is Group -> bot.impl.sendGroupForwardMsg(contact.id, nodes, forward.title, forward.summary, forward.preview, forward.brief).data
+            else -> bot.impl.sendPrivateForwardMsg(contact.id, nodes, forward.title, forward.summary, forward.preview, forward.brief).data
         }
     }
 
