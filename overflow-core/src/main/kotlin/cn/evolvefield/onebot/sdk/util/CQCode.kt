@@ -50,7 +50,7 @@ object CQCode {
             })
         }
         fun String.decode(): String {
-            return replace("&amp", "&")
+            return replace("&amp;", "&")
                 .replace("&#91;", "[")
                 .replace("&#93;", "]")
         }
