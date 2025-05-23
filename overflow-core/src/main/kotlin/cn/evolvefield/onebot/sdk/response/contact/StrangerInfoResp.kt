@@ -32,13 +32,30 @@ class StrangerInfoResp {
     /**
      * 等级
      */
-    @SerializedName("level")
+    @SerializedName("level", alternate = ["qqLevel", "qq_level"])
     var level = 0
     /**
      * 在线天数？我猜的（
      */
     @SerializedName("login_days")
     var loginDays = 0
+
+    /**
+     * 好友分组ID（NapCat）
+     */
+    @SerializedName("categoryId")
+    var friendGroupId = 0
+    /**
+     * 个性签名（NapCat、LLOnebot）
+     */
+    @SerializedName("longNick", alternate = ["long_nick"])
+    var sign = ""
+    /**
+     * 电子邮箱（NapCat）
+     */
+    @SerializedName("eMail")
+    var email = ""
+
     @SerializedName("ext")
     var ext = JsonObject()
 }

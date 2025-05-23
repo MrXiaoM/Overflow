@@ -406,7 +406,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
             "female" -> UserProfile.Sex.FEMALE
             else -> UserProfile.Sex.UNKNOWN
         }
-        return UserProfileImpl(data.age, "", 0, data.nickname, data.level, sex, "")
+        return UserProfileImpl(data.age, data.email, data.friendGroupId, data.nickname, data.level, sex, data.sign)
     }
 
     override suspend fun getOnlineOtherClientsList(bot: Bot, mayIncludeSelf: Boolean): List<OtherClientInfo> {
