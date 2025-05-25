@@ -225,8 +225,6 @@ internal fun addGroupListeners() {
             ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.operatorId}")
         // 管理员已同意邀请入群
         if (member.id == bot.id) {
-            if (bot.inviteHandledGroups.contains(group.id)) return@listen
-            bot.inviteHandledGroups.add(group.id)
             bot.eventDispatcher.broadcastAsync(BotJoinGroupEvent.Invite(invitor))
         } else {
             bot.eventDispatcher.broadcastAsync(MemberJoinEvent.Invite(member, invitor))

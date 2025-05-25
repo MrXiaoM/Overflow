@@ -612,14 +612,6 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         newInviteJoinGroupRequest.get(eventId)?.also {
             val onebot = bot.asOnebot
             val resp = onebot.impl.setGroupAddRequest(it, "invite", accept, "")
-            if (accept && resp.status == "ok") {
-                val group = onebot.group(groupId)
-                val invitor = group.queryMember(invitorId) ?: return
-                if (!onebot.inviteHandledGroups.contains(groupId)) {
-                    onebot.inviteHandledGroups.add(groupId)
-                    onebot.eventDispatcher.broadcastAsync(BotJoinGroupEvent.Invite(invitor))
-                }
-            }
         }
     }
     //========== Bot Invited Join Group Request 邀请机器人加群请求 END =============
