@@ -61,7 +61,9 @@ internal suspend fun BotWrapper.group(groupId: Long): GroupWrapper {
     return getGroup(groupId) as? GroupWrapper ?: kotlin.run {
         val result = impl.getGroupInfo(groupId, false)
         val data = result.data ?: throw IllegalStateException("无法取得群 $groupId 的信息")
-        updateGroup(GroupWrapper(this, data, result.json.data ?: JsonObject()))
+        val group = GroupWrapper(this, data, result.json.data ?: JsonObject())
+        group.updateGroupMemberList()
+        updateGroup(group)
     }
 }
 

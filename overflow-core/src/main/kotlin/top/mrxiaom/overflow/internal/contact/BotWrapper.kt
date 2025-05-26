@@ -84,7 +84,11 @@ internal class BotWrapper private constructor(
             val json = groupsJson.firstOrNull { groupJson ->
                 groupJson.jsonObject?.ignorable("group_id", 0L) == group.groupId
             } ?: JsonObject()
-            GroupWrapper(this, group, json)
+            GroupWrapper(this, group, json).also {
+                if (!groupsInternal.contains(it.id)) {
+                    it.updateGroupMemberList()
+                }
+            }
         }
         groupsInternal.update(groupsList) { impl = it.impl }
         logger.verbose("${groups.size} groups loaded.")
