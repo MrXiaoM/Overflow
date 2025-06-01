@@ -56,10 +56,11 @@ internal class StrangerWrapper(
     }
 
     override suspend fun sendMessage(message: Message): MessageReceipt<Stranger> {
-        if (StrangerMessagePreSendEvent(this, message).broadcast().isCancelled)
+        val event = StrangerMessagePreSendEvent(this, message)
+        if (event.broadcast().isCancelled)
             throw EventCancelledException("消息发送已被取消")
 
-        val messageChain = message.toMessageChain()
+        val messageChain = event.message.toMessageChain()
         val (messageIds, throwable) = bot.sendMessageCommon(this, messageChain)
         val receipt = strangerMsg(messageIds, messageChain).receipt(this)
         StrangerMessagePostSendEvent(

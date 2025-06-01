@@ -191,10 +191,11 @@ internal class MemberWrapper(
     }
 
     override suspend fun sendMessage(message: Message): MessageReceipt<NormalMember> {
-        if (GroupTempMessagePreSendEvent(this, message).broadcast().isCancelled)
+        val event = GroupTempMessagePreSendEvent(this, message)
+        if (event.broadcast().isCancelled)
             throw EventCancelledException("消息发送已被取消")
 
-        val messageChain = message.toMessageChain()
+        val messageChain = event.message.toMessageChain()
         val (messageIds, throwable) = bot.sendMessageCommon(this, messageChain)
         val receipt = tempMsg(messageIds, messageChain).receipt(this)
         GroupTempMessagePostSendEvent(
