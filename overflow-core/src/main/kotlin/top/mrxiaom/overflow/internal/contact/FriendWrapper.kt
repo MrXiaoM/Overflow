@@ -74,10 +74,11 @@ internal class FriendWrapper(
     }
 
     override suspend fun sendMessage(message: Message): MessageReceipt<Friend> {
-        if (FriendMessagePreSendEvent(this, message).broadcast().isCancelled)
+        val event = FriendMessagePreSendEvent(this, message)
+        if (event.broadcast().isCancelled)
             throw EventCancelledException("消息发送已被取消")
 
-        val messageChain = message.toMessageChain()
+        val messageChain = event.message.toMessageChain()
         val (messageIds, throwable) = bot.sendMessageCommon(this, messageChain)
         val receipt = friendMsg(messageIds, messageChain).receipt(this)
         FriendMessagePostSendEvent(

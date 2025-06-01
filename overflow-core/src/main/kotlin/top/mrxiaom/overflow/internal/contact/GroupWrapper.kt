@@ -207,12 +207,13 @@ internal class GroupWrapper(
     }
 
     override suspend fun sendMessage(message: Message): MessageReceipt<Group> {
-        if (GroupMessagePreSendEvent(this, message).broadcast().isCancelled)
+        val event = GroupMessagePreSendEvent(this, message)
+        if (event.broadcast().isCancelled)
             throw EventCancelledException("消息发送已被取消")
         if (isBotMuted)
             throw BotIsBeingMutedException(this, message)
 
-        val messageChain = message.toMessageChain()
+        val messageChain = event.message.toMessageChain()
         val (messageIds, throwable) = bot.sendMessageCommon(this, messageChain)
         val receipt = groupMsg(messageIds, messageChain).receipt(this)
         GroupMessagePostSendEvent(
