@@ -8,10 +8,7 @@
 
 ```kotlin
 repositories {
-    // 631 及以后的版本，使用这个仓库。根据 Central 的规则，版本仅保留90天
     maven("https://central.sonatype.com/repository/maven-snapshots/")
-    // 631 之前的版本，使用这个仓库。但这个仓库会在 2025年6月30日 停止服务，请尽快使用新仓库
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
 }
 ```
 快照仓库中依赖版本的格式为 `major.minor.patch.commits-shortHash-SNAPSHOT`，  
@@ -90,8 +87,6 @@ val bot2 = BotBuilder.reversed(3002)
 // connect() 返回值为 null 时登录失败
 ```
 
-多 Bot 支持当前为实验性功能，可能不稳定，**请勿**在生产环境中连接多个实例。  
-
 # 向 Onebot 发送自定义 action
 
 预设的 action 类型列表另请参见 [ActionPathEnum.kt](https://github.com/MrXiaoM/Overflow/blob/main/overflow-core/src/main/kotlin/cn/evolvefield/onebot/sdk/enums/ActionPathEnum.kt) (以下应当填写的是字符串 path 的值)
@@ -120,9 +115,10 @@ remoteGroup.updateGroupMemberList() // suspend
 
 # 资源相关消息说明
 
-正如[用户手册](/docs/UserManual.md#资源相关消息说明)所说，为减少运行内存占用，你可以使用以下方法来上传图片、语音、短视频来减少其造成的资源占用
+正如[项目进度文档](/docs/dev/progress.md#资源相关消息说明)所说，为减少运行内存占用，你可以使用以下方法来上传图片、语音、短视频来减少其造成的资源占用
 
 ```kotlin
+// 我们更推荐你使用 LocalFileService 代替，或自行实现 FileService 服务，以对业务逻辑造成尽可能低的影响
 val image = OverflowAPI.get().imageFromFile("https://xxxxx")
 val audio = OverflowAPI.get().audioFromFile("https://xxxxx")
 val video = OverflowAPI.get().videoFromFile("https://xxxxx")

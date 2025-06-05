@@ -24,6 +24,9 @@
 }
 ```
 ## 第一步. 加仓库
+
+> 如果不需要开发版本，可以忽略这一步
+
 在 `maven_repo` 中加入快照仓库地址，添加完成后如下
 
 ```json5
@@ -31,7 +34,7 @@
   // ...
   "maven_repo": [
     "https://maven.aliyun.com/repository/public",
-    "https://s01.oss.sonatype.org/content/repositories/snapshots"
+    "https://central.sonatype.com/repository/maven-snapshots"
   ],
   // ...
 }
@@ -46,5 +49,5 @@
 快照仓库中 Overflow 版本号的格式为 `major.minor.patch.commits-shortHash-SNAPSHOT`，  
 例如：`0.9.9.481-d59fa60-SNAPSHOT`，详见 #92
 
-你可以在 [这里](https://s01.oss.sonatype.org/content/repositories/snapshots/top/mrxiaom/mirai/overflow-core/) 查询已发布到快照仓库的开发版本列表。  
+你可以在 [这里](https://central.sonatype.com/repository/maven-snapshots/top/mrxiaom/mirai/overflow-core/maven-metadata.xml) 查询已发布到快照仓库的开发版本列表。  
 你可以在 [这里](https://central.sonatype.com/search?q=g%3Atop.mrxiaom.mirai) 查询所有正式版本列表。

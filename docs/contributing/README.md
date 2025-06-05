@@ -4,12 +4,11 @@
 
 本仓库包含以下模块
 
-| 模块                | 说明              |
-|-------------------|-----------------|
-| onebot            | Onebot SDK 和客户端 |
-| overflow-core-api | overflow 核心 api |
-| overflow-core     | overflow 核心实现   |
-| overflow-core-all | 上述模块的集合，用于生产环境  |
+| 模块                | 说明                               |
+|-------------------|----------------------------------|
+| overflow-core-api | overflow 核心 api                  |
+| overflow-core     | overflow 核心实现，以及 Onebot SDK 和客户端 |
+| overflow-core-all | 上述模块的集合，用于生产环境                   |
 
 以下为开发者须知，阅读以更快地进入开发状态，避免错误。
 
