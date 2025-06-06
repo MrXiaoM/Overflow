@@ -3,9 +3,11 @@ plugins {
     id("com.github.johnrengelman.shadow")
 }
 
+java.withJavadocJar() // Dummy javadoc
 setupMavenCentralPublication {
     artifact(tasks.shadowJar)
     artifact(tasks.kotlinSourcesJar)
+    artifact(tasks.getByName("javadocJar"))
 }
 
 tasks.test {
