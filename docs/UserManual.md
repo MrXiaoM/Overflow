@@ -17,8 +17,9 @@ Overflow 的用途是替换 mirai-core 协议实现，连接 Onebot 标准的实
 + **方法三：** [编辑 MCL 的 config.json](/docs/install/MCL.md)
 + **方法四：** [替换 mirai-core 类库](/docs/install/Raw.md) (较简单)
 + **方法五：** [使用已修改的MCL安装](/docs/install/MCLOverflow.md) (适用于 Linux/MacOS/**Termux**/Windows)
++ **方法六：** 通过 Docker 安装［[Github](https://github.com/sdjnmxd/overflow-docker) | [DockerHub](https://hub.docker.com/r/sdjnmxd/overflow)］ (第三方 Docker 部署方案)
 
-**注意:** MCL 无法使用 sonatype snapshots 仓库获取包，故 MCL 安装方法全部不可用，详见 [iTXTech/mirai-console-loader #192](https://github.com/iTXTech/mirai-console-loader/pull/192)。
+**注意:** MCL 无法使用 sonatype snapshots 仓库获取包，故 MCL 安装开发版本的方法全部不可用，详见 [iTXTech/mirai-console-loader #192](https://github.com/iTXTech/mirai-console-loader/pull/192)。
 
 按以上任意一种方法安装好后，请往下看进行进一步配置。
 
