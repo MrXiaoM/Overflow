@@ -490,7 +490,7 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         groupCode: Long,
         ownerId: Long
     ): Sequence<MemberInfo> {
-        return bot.asOnebot.impl.getGroupMemberList(groupUin).data.map { it.asMirai }.asSequence()
+        return bot.asOnebot.impl.getGroupMemberList(groupCode).data.map { it.asMirai }.asSequence()
     }
 
     @LowLevelApi
