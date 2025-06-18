@@ -493,6 +493,11 @@ class Overflow : IMirai, CoroutineScope, LowLevelApiAccessor, OverflowAPI {
         return bot.asOnebot.impl.getGroupMemberList(groupCode).data.map { it.asMirai }.asSequence()
     }
 
+    override fun getUin(contactOrBot: ContactOrBot): Long {
+        // 对于 Onebot 实现，不需要重新计算群 uin (#161)
+        return contactOrBot.id
+    }
+
     @LowLevelApi
     override suspend fun muteAnonymousMember(
         bot: Bot,
