@@ -4,6 +4,7 @@ import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.sdk.util.ignorable
 import cn.evolvefield.onebot.sdk.util.ignorableArray
 import cn.evolvefield.onebot.sdk.util.ignorableObject
+import cn.evolvefield.onebot.sdk.util.nullableInt
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CompletableDeferred
@@ -45,7 +46,12 @@ internal class ActionSendRequest(
         val resp = mutex.withLock {
             kotlin.runCatching {
                 withTimeout(requestTimeout) {
-                    logger.debug("[Send] --> {}", req.toString())
+                    val echo = req.nullableInt("echo", null)
+                    if (echo != null) {
+                        logger.debug("[Send][$echo] --> {}", req.toString())
+                    } else {
+                        logger.debug("[Send] --> {}", req.toString())
+                    }
                     channel.send(req.toString())
                     resp.await()
                 }

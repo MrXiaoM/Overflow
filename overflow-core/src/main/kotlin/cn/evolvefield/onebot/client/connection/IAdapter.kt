@@ -6,6 +6,7 @@ import cn.evolvefield.onebot.client.handler.EventHolder
 import cn.evolvefield.onebot.client.util.ActionSendRequest
 import cn.evolvefield.onebot.client.util.OnebotException
 import cn.evolvefield.onebot.sdk.util.ignorable
+import cn.evolvefield.onebot.sdk.util.nullableInt
 import com.google.gson.JsonParser
 import com.google.gson.JsonSyntaxException
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +27,12 @@ internal interface IAdapter {
         try {
             val json = JsonParser.parseString(message).asJsonObject
             if (json.ignorable(META_EVENT, "") != HEART_BEAT) { // 过滤心跳
-                logger.debug("[Recv] <-- {}", json.toString())
+                val echo = json.nullableInt("echo", null)
+                if (echo != null) {
+                    logger.debug("[Recv][$echo] <-- {}", json.toString())
+                } else {
+                    logger.debug("[Recv] <-- {}", json.toString())
+                }
 
                 if (json.has(API_RESULT_KEY)) { // 接口回调
                     actionHandler.onReceiveActionResp(json)
