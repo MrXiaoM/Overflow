@@ -54,6 +54,7 @@ internal class GroupWrapper(
         get() = gson.toJson(implJson)
     private var membersInternal: ContactList<MemberWrapper>? = null
     private var anonymousInternal: HashMap<String, AnonymousMemberWrapper> = hashMapOf()
+    private val kickedMembers: HashMap<Long, MemberWrapper> = hashMapOf()
     internal val emptyMessagesIdMap: HashMap<Long, Int> = hashMapOf()
 
     val data: GroupInfoResp
@@ -121,6 +122,18 @@ internal class GroupWrapper(
             if (membersList != null) update(membersList) { setImpl(it.impl) }
             membersInternal = this
         }
+    }
+
+    internal fun markKicked(member: MemberWrapper) {
+        kickedMembers[member.id] = member
+    }
+
+    internal fun markJoined(member: MemberWrapper) {
+        kickedMembers.remove(member.id)
+    }
+
+    internal fun getMemberOrKicked(id: Long): MemberWrapper? {
+        return kickedMembers.remove(id) ?: members[id]
     }
 
     override val coroutineContext: CoroutineContext = CoroutineName("(Bot/${bot.id})Group/$id")

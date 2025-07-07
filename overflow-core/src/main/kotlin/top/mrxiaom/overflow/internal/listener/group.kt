@@ -164,7 +164,7 @@ internal fun addGroupListeners() {
         val member = if (e.userId == bot.id) {
             group.botAsMember
         } else {
-            group.queryMember(e.userId)
+            group.getMemberOrKicked(e.userId)
                 ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
         }
         return group to member
@@ -208,6 +208,7 @@ internal fun addGroupListeners() {
             group.queryMember(e.userId)
                 ?: throw IllegalStateException("无法找到群 ${e.groupId} 的成员 ${e.userId}")
         }
+        group.markJoined(member)
         return group to member
     }
     listen<GroupIncreaseNoticeEvent>("approve") { e ->

@@ -133,6 +133,7 @@ internal class MemberWrapper(
         }
         if (bot.impl.setGroupKick(impl.groupId, id, block)
             .check("将 $id 移出群聊 ${group.id}")) {
+            group.markKicked(this)
             group.members.remove(id)
         }
     }
