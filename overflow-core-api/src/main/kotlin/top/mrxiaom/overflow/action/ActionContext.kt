@@ -42,6 +42,7 @@ data class ActionContext(
          * - `false` 的效果，与 `showWarning=true` 一致
          * @see ActionContext.throwExceptions
          */
+        @Deprecated("请使用 throwExceptions 代替")
         fun showWarning(flag: Boolean) {
             if (flag) {
                 context.throwExceptions = false

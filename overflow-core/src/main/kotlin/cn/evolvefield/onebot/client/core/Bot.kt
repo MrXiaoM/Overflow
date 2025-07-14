@@ -1428,7 +1428,7 @@ internal class Bot(
     @JvmOverloads
     suspend fun getVersionInfo(
         context: Context = {
-            showWarning(false)
+            throwExceptions(null)
         },
     ): JsonObject {
         val action11 = context.build(ActionPathEnum.GET_VERSION_INFO)
