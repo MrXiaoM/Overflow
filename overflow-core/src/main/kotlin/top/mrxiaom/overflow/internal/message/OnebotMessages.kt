@@ -475,7 +475,7 @@ internal object OnebotMessages {
                             val id = when {
                                 else -> data["id"].string.toInt()
                             }
-                            val msgData = (bot as BotWrapper).impl.getMsg(id).data
+                            val msgData = (bot as BotWrapper).impl.getMsg(id) { throwExceptions(null) }.data
                             val msgSource = MessageSourceBuilder()
                                 .id(id)
                                 .internalId(id)

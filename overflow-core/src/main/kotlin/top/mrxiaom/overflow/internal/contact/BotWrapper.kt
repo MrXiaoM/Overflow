@@ -128,7 +128,7 @@ internal class BotWrapper private constructor(
     }
     @JvmBlockingBridge
     override suspend fun getMsg(messageId: Int): MessageChain? {
-        val data = impl.getMsg(messageId).data ?: return null
+        val data = impl.getMsg(messageId) { throwExceptions(null) }.data ?: return null
         if (data.message.isEmpty()) return null
         return OnebotMessages.toMiraiMessage(data.isJsonMessage, data.message, this)
     }
