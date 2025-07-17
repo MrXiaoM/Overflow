@@ -13,6 +13,8 @@ class NotifyNoticeEvent : NoticeEvent() {
     var groupId = 0L
     @SerializedName("title")
     val title = ""
+    @SerializedName("name_new")
+    val nameNew = ""
     val realOperatorId: Long
         get() = operatorId.takeIf { it > 0 } ?: userId
 }

@@ -400,17 +400,27 @@ internal fun addGroupListeners() {
             e.cardOld, e.cardNew, member
         ))
     }
-    listen<GroupNameChangeNoticeEvent> { e ->
-        if (bot.checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")) return@listen
-        // 群名称变更通知
-        val group = bot.group(e.groupId)
+    suspend fun onNameChange(bot: BotWrapper, groupId: Long, new: String, operatorId: Long?) {
+        val group = bot.group(groupId)
         val origin = group.name
-        val new = e.name
         group.impl.groupName = new
-        val operator = if (e.operatorId <= 0) null else group.queryMember(e.operatorId)
+        val operator = if (operatorId == null) null else group.queryMember(operatorId)
         bot.eventDispatcher.broadcastAsync(GroupNameChangeEvent(
-                origin, new, group, operator
+            origin, new, group, operator
         ))
+    }
+    // NapCat
+    listen<NotifyNoticeEvent>("group_name") { e ->
+        if (checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")) return@listen
+        // 群名称变更通知
+        val operatorId = e.realOperatorId.takeIf { it > 0 }
+        onNameChange(bot, e.groupId, e.nameNew, operatorId)
+    }
+    listen<GroupNameChangeNoticeEvent> { e ->
+        if (checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")) return@listen
+        // 群名称变更通知
+        val operatorId = e.operatorId.takeIf { it > 0 } ?: e.userId.takeIf { it > 0 }
+        onNameChange(bot, e.groupId, e.name, operatorId)
     }
     listen<GroupMsgEmojiLikeNotice> { e ->
         if (checkId(e.groupId, "%onebot 返回了异常的数值 group_id=%value")
