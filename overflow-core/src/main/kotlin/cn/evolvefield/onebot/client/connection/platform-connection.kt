@@ -2,6 +2,8 @@ package cn.evolvefield.onebot.client.connection
 
 import cn.evolvefield.onebot.client.core.Bot
 import kotlinx.coroutines.withTimeout
+import net.mamoe.mirai.internal.network.components.EventDispatcher
+import top.mrxiaom.overflow.internal.contact.BotWrapper
 import kotlin.time.Duration
 
 internal interface OneBotProducer {
@@ -50,5 +52,12 @@ internal class ReversedOneBotProducer(
                 server.awaitNewBot()
             }
         }.getOrNull()
+    }
+}
+
+@Suppress("INVISIBLE_MEMBER")
+internal fun Bot.eventDispatcher(block: EventDispatcher.(BotWrapper) -> Unit) {
+    (net.mamoe.mirai.Bot._instances.remove(id) as? BotWrapper)?.run {
+        block(eventDispatcher, this)
     }
 }

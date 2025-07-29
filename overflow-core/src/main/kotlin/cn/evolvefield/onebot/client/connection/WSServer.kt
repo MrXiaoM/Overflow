@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
+import net.mamoe.mirai.event.events.BotOfflineEvent
 import org.java_websocket.WebSocket
 import org.java_websocket.WebSocketServerFactory
 import org.java_websocket.framing.CloseFrame
@@ -54,7 +55,7 @@ internal class WSServer(
 
     internal var botConsumer: suspend (Bot) -> Unit = {}
     override val eventsHolder: MutableMap<Long, MutableList<EventHolder>> = mutableMapOf()
-    private val bots: MutableList<Bot> = mutableListOf()
+    private val bots = hashMapOf<WebSocket, Bot>()
     // 通过使 ConnectionBox 互不相等，使得当 bot 重新上线时，botChannel 推送成功。
     private val botChannel = Channel<ConnectionBox>()
     private val muteX = Mutex()
@@ -119,11 +120,11 @@ internal class WSServer(
         logger.info("▌ 反向 WebSocket 客户端 ${conn.remoteSocketAddress} 已连接 ┈━═☆")
         scope.launch {
             val bot = muteX.withLock {
-                Bot(conn, this@WSServer, config, actionHandler).also { it.conn = conn }.apply {
+                Bot(conn, this@WSServer, config, actionHandler).apply {
                     connectDef.complete(this)
                 }
             }
-            bots.add(bot)
+            bots[conn] = bot
             botConsumer.invoke(bot)
             botChannel.send(ConnectionBox(bot))
         }
@@ -140,7 +141,11 @@ internal class WSServer(
         unlockMutex()
         scope.launch {
             muteX.withLock {
-                if (!bots.removeIf { it.conn == conn }) {
+                bots.remove(conn)?.also {
+                    it.eventDispatcher {
+                        broadcastAsync(BotOfflineEvent.Active(it, null))
+                    }
+                } ?: run {
                     logger.warn("bot移除失败，这并不应该被发生。")
                 }
             }

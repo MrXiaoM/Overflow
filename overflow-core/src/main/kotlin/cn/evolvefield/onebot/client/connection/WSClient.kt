@@ -5,6 +5,7 @@ import cn.evolvefield.onebot.client.core.Bot
 import cn.evolvefield.onebot.client.handler.ActionHandler
 import cn.evolvefield.onebot.client.handler.EventHolder
 import kotlinx.coroutines.*
+import net.mamoe.mirai.event.events.BotOfflineEvent
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.Logger
@@ -31,6 +32,7 @@ internal class WSClient(
     override val eventsHolder: MutableMap<Long, MutableList<EventHolder>> = mutableMapOf()
     private var retryCount = 0
     private var scheduleClose = false
+    private var loginBot: Bot? = null
 
     init {
         connectionLostTimeout = Math.max(0, config.heartbeatCheckSeconds)
@@ -46,6 +48,7 @@ internal class WSClient(
     suspend fun createBot(): Bot {
         val bot = Bot(this, this, config, actionHandler)
         botConsumer.invoke(bot)
+        loginBot = bot
         return bot
     }
 
@@ -80,12 +83,18 @@ internal class WSClient(
 
         // 自动重连
         if (!scheduleClose) retry()
+        else loginBot?.eventDispatcher {
+            broadcastAsync(BotOfflineEvent.Active(it, null))
+        }
     }
 
     private fun retry() {
         if (retryTimes < 1 || retryWaitMills < 0) {
             logger.warn("连接失败，未开启自动重连，放弃连接")
             connectDef.complete(false)
+            loginBot?.eventDispatcher {
+                broadcastAsync(BotOfflineEvent.Dropped(it, null))
+            }
             return
         }
         scope.launch {
