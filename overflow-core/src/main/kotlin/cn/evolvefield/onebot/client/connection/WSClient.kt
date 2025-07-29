@@ -34,15 +34,14 @@ internal class WSClient(
 
     init {
         connectionLostTimeout = Math.max(0, config.heartbeatCheckSeconds)
+        @OptIn(InternalCoroutinesApi::class)
+        config.parentJob?.run { Job(this) }?.invokeOnCompletion(
+            onCancelling = true,
+            invokeImmediately = true,
+        ) { if (isOpen) close() }
     }
 
-    @OptIn(InternalCoroutinesApi::class)
-    private val connectDef = CompletableDeferred<Boolean>(config.parentJob).apply {
-        invokeOnCompletion(
-            onCancelling = true,
-            invokeImmediately = true
-        ) { close() }
-    }
+    private val connectDef = CompletableDeferred<Boolean>(config.parentJob)
 
     suspend fun createBot(): Bot {
         val bot = Bot(this, this, config, actionHandler)
