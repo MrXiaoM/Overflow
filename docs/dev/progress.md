@@ -121,7 +121,9 @@
 + BotLeaveEvent.Disband 
 + BotLeaveEvent.Active （有限支持：当 Bot 在其它设备主动退群时不触发）
 + BotNickChangedEvent
-+ BotOfflineEvent
++ BotOfflineEvent.Force
++ BotOfflineEvent.MsfOffline
++ BotOfflineEvent.RequireReconnect  (这三个离线类型在 Onebot 暂时用不到)
 + BotReloginEvent
 + FriendAddEvent
 + FriendAvatarChangedEvent
