@@ -213,8 +213,9 @@ internal class GroupWrapper(
         if (botAsMember.isOwner()) {
             throw IllegalStateException("机器人是群主，无法退群")
         }
-        bot.impl.setGroupLeave(id, false)
+        bot.leftGroups.add(id)
         bot.groups.remove(id)
+        bot.impl.setGroupLeave(id, false)
         bot.eventDispatcher.broadcastAsync(BotLeaveEvent.Active(this))
         return true
     }

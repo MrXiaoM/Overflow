@@ -67,6 +67,18 @@ internal suspend fun BotWrapper.group(groupId: Long): GroupWrapper {
     }
 }
 
+internal suspend fun BotWrapper.groupOrNull(groupId: Long): GroupWrapper? {
+    return getGroup(groupId) as? GroupWrapper ?: kotlin.run {
+        val result = impl.getGroupInfo(groupId, false) {
+            throwExceptions(null)
+        }
+        val data = result.data ?: return@run null
+        val group = GroupWrapper(this, data, result.json.data ?: JsonObject())
+        group.updateGroupMemberList()
+        updateGroup(group)
+    }
+}
+
 
 internal fun PrivateSender.wrapAsFriend(bot: BotWrapper, json: JsonElement): FriendWrapper {
     return bot.updateFriend(FriendWrapper(bot, FriendInfoResp().also {

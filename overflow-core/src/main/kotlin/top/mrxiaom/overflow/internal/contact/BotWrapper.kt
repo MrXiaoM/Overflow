@@ -40,7 +40,7 @@ import java.io.File
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 
-@Suppress("MemberVisibilityCanBePrivate")
+@Suppress("MemberVisibilityCanBePrivate", "INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 internal class BotWrapper private constructor(
     private var implBot: Bot,
     defLoginInfo: LoginInfoResp,
@@ -62,6 +62,7 @@ internal class BotWrapper private constructor(
     private var groupsInternal: ContactList<GroupWrapper> = ContactList()
     private var otherClientsInternal: ContactList<OtherClientWrapper>? = null
     private var strangersInternal: ContactList<StrangerWrapper> = ContactList()
+    internal val leftGroups: MutableSet<Long> = mutableSetOf()
 
     suspend fun updateLoginInfo() {
         loginInfo = impl.getLoginInfo().data ?: throw IllegalStateException("刷新机器人信息失败")
@@ -126,6 +127,14 @@ internal class BotWrapper private constructor(
             implJson = stranger.implJson
         }
     }
+
+    internal suspend fun getGroupNotLeft(groupId: Long): GroupWrapper? {
+        if (leftGroups.contains(groupId)) {
+            return null
+        }
+        return groupOrNull(groupId)
+    }
+
     @JvmBlockingBridge
     override suspend fun getMsg(messageId: Int): MessageChain? {
         val data = impl.getMsg(messageId) { throwExceptions(null) }.data ?: return null
@@ -163,7 +172,6 @@ internal class BotWrapper private constructor(
                         if (it !is CancellationException) logger.error(it)
                     }
 
-                    @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
                     net.mamoe.mirai.Bot._instances.remove(id)
 
                     // help GC release instances
@@ -288,7 +296,6 @@ internal class BotWrapper private constructor(
                     updateContacts()
 
                     //updateOtherClients()
-                    @Suppress("INVISIBLE_MEMBER")
                     net.mamoe.mirai.Bot._instances[id] = this
                 }
             }
