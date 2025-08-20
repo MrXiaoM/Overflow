@@ -1032,6 +1032,7 @@ internal class Bot(
         val params = JsonObject().apply {
             addProperty("group_id", groupId)
             addProperty("name", name)
+            addProperty("folder_name", name)
             addProperty("parent_id", parentId)
         }
         val result = actionHandler.action(this, action, params)
