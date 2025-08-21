@@ -115,20 +115,20 @@ internal fun MsgId?.safeMessageIds(bot: RemoteBot): IntArray {
     return this?.messageId?.run { intArrayOf(this) } ?: throw IllegalStateException("消息发送失败，详见网络日志 (logs/onebot/*.log) 和 Onebot 实现 (${bot.appName} v${bot.appVersion}) 的日志")
 }
 
-internal fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderWrapper? = null): List<FileWrapper> {
+internal fun List<GroupFilesResp.Files>.toMiraiFiles(group: GroupWrapper, parent: FolderWrapper): List<FileWrapper> {
     return map { it.toMiraiFile(group, parent) }
 }
-internal fun GroupFilesResp.Files.toMiraiFile(group: GroupWrapper, parent: FolderWrapper? = null): FileWrapper {
+internal fun GroupFilesResp.Files.toMiraiFile(group: GroupWrapper, parent: FolderWrapper): FileWrapper {
     val md5 = md5?.hexToBytes() ?: ByteArray(16)
     val sha1 = sha1?.hexToBytes() ?: ByteArray(16)
     return FileWrapper(group, parent,
         fileId, fileName, md5, sha1, fileSize, deadTime, modifyTime, uploadTime, uploader, busid
     )
 }
-internal fun List<GroupFilesResp.Folders>.toMiraiFolders(group: GroupWrapper, parent: FolderWrapper? = null): List<FolderWrapper> {
+internal fun List<GroupFilesResp.Folders>.toMiraiFolders(group: GroupWrapper, parent: FolderWrapper): List<FolderWrapper> {
     return map { it.toMiraiFolder(group, parent) }
 }
-internal fun GroupFilesResp.Folders.toMiraiFolder(group: GroupWrapper, parent: FolderWrapper? = null): FolderWrapper {
+internal fun GroupFilesResp.Folders.toMiraiFolder(group: GroupWrapper, parent: FolderWrapper): FolderWrapper {
     return FolderWrapper(group, parent,
         folderId, folderName, createTime, createTime, creator, totalFileCount
     )
