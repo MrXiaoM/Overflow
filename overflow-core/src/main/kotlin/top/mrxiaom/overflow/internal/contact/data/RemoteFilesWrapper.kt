@@ -87,7 +87,7 @@ internal class FolderWrapper(
     }
 
     override suspend fun files(): Flow<AbsoluteFile> {
-        return files.asFlow()
+        return files.toList().asFlow()
     }
 
     override suspend fun refresh(): Boolean {
