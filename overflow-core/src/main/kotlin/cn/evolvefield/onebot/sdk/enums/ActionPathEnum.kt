@@ -263,4 +263,9 @@ enum class ActionPathEnum(
      * 创建群文件夹
      */
     CREATE_GROUP_FILE_FOLDER("create_group_file_folder"),
+
+    /**
+     * 移动群文件
+     */
+    MOVE_GROUP_FILE("move_group_file"),
 }

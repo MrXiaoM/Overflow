@@ -15,6 +15,7 @@ import cn.evolvefield.onebot.sdk.response.contact.LoginInfoResp
 import cn.evolvefield.onebot.sdk.response.contact.StrangerInfoResp
 import cn.evolvefield.onebot.sdk.response.ext.CreateGroupFileFolderResp
 import cn.evolvefield.onebot.sdk.response.ext.GetFileResp
+import cn.evolvefield.onebot.sdk.response.ext.MoveGroupFIleResp
 import cn.evolvefield.onebot.sdk.response.ext.SetGroupReactionResp
 import cn.evolvefield.onebot.sdk.response.ext.UploadGroupFileResp
 import cn.evolvefield.onebot.sdk.response.group.*
@@ -1034,6 +1035,34 @@ internal class Bot(
             addProperty("name", name)
             addProperty("folder_name", name)
             addProperty("parent_id", parentId)
+        }
+        val result = actionHandler.action(this, action, params)
+        return result.withToken()
+    }
+
+    /**
+     * 移动群文件
+     * @param groupId 群号
+     * @param fileId 文件ID
+     * @param currentParentDirectoryId 目前父文件夹ID 参考 Folder 对象
+     * @param targetParentDirectoryId 目标父文件夹ID 参考 Folder 对象
+     * @param context  Onebot 主动操作的上下文
+     */
+    @JvmBlockingBridge
+    @JvmOverloads
+    suspend fun moveGroupFIle(
+        groupId: Long,
+        fileId: String,
+        currentParentDirectoryId: String,
+        targetParentDirectoryId: String,
+        context: Context = {},
+    ): ActionData<MoveGroupFIleResp> {
+        val action = context.build(ActionPathEnum.MOVE_GROUP_FILE)
+        val params = JsonObject().apply {
+            addProperty("group_id", groupId)
+            addProperty("file_id", fileId)
+            addProperty("current_parent_directory", currentParentDirectoryId)
+            addProperty("target_parent_directory", targetParentDirectoryId)
         }
         val result = actionHandler.action(this, action, params)
         return result.withToken()
