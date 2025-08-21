@@ -294,7 +294,7 @@ internal class FileWrapper(
         val success = impl.moveGroupFIle(contact.id, id, absolutePath, folder.absolutePath).data?.ok ?: false
         when (contact.bot.appName.lowercase()) {
             "napcat" -> return success
-            else -> throw PermissionDeniedException("当前 Onebot 实现不支持获取文件夹创建回执")
+            else -> throw PermissionDeniedException("当前 Onebot 实现不支持移动文件")
         }
     }
 
