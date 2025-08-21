@@ -45,8 +45,8 @@ internal class RemoteFilesWrapper(
         }
 
         internal fun FolderWrapper.update(data: GroupFilesResp) {
-            data.folders?.toMiraiFolders(contact)?.also { folders.addAll(it) }
-            data.files?.toMiraiFiles(contact)?.also { files.addAll(it) }
+            data.folders?.toMiraiFolders(contact, this)?.also { folders.addAll(it) }
+            data.files?.toMiraiFiles(contact, this)?.also { files.addAll(it) }
         }
     }
 }
@@ -247,7 +247,7 @@ internal class FolderWrapper(
 
 internal class FileWrapper(
     override val contact: GroupWrapper,
-    override val parent: FolderWrapper?,
+    override var parent: FolderWrapper,
     override val id: String,
     override val name: String,
     override val md5: ByteArray,
@@ -267,7 +267,7 @@ internal class FileWrapper(
         get() {
             val parent = parent
             return when {
-                parent == null || parent.name == "/" -> "/$name"
+                parent.name == "/" -> "/$name"
                 else -> "${parent.absolutePath}/$name"
             }
         }
@@ -291,11 +291,20 @@ internal class FileWrapper(
     }
 
     override suspend fun moveTo(folder: AbsoluteFolder): Boolean {
-        val success = impl.moveGroupFIle(contact.id, id, absolutePath, folder.absolutePath).data?.ok ?: false
-        when (contact.bot.appName.lowercase()) {
-            "napcat" -> return success
-            else -> throw PermissionDeniedException("当前 Onebot 实现不支持移动文件")
+        if (folder.absolutePath == this.parent.absolutePath) return true
+        if (!contact.bot.appName.lowercase().contains("napcat")) {
+            throw PermissionDeniedException("当前 Onebot 实现不支持移动文件")
         }
+        if (folder !is FolderWrapper)
+            return false
+        val success =
+            impl.moveGroupFIle(contact.id, id, parent.id, folder.id).data?.ok ?: false
+        if (success) {
+            parent.files.remove(this)
+            parent = folder
+            folder.files.add(this)
+        }
+        return success
     }
 
     override suspend fun refresh(): Boolean {
@@ -303,7 +312,7 @@ internal class FileWrapper(
     }
 
     override suspend fun refreshed(): AbsoluteFile? {
-        val data = parent?.refreshFromOnebot() ?: return null
+        val data = parent.refreshFromOnebot() ?: return null
         return data.files?.firstOrNull { it.fileId == id }?.toMiraiFile(contact, parent)
     }
 
