@@ -110,15 +110,22 @@ internal class FolderWrapper(
     override suspend fun createFolder(name: String): AbsoluteFolder {
         if (name.isEmpty()) throw IllegalArgumentException("子目录名称不能为空")
         if (name.matches(Regex(":*?\"<>|"))) throw IllegalArgumentException("不能在非根目录下创建子目录")
-        val result = contact.bot.impl.createGroupFileFolder(contact.id, name, id)
-        val data = result.data
-        if (data != null && data.folderId.isNotEmpty()) {
-            val time = currentTimeSeconds()
-            val folder = FolderWrapper(contact, this, data.folderId, name, time, time, contact.bot.id, 0)
-            folders.add(folder)
-            return folder
+
+        // 与 mirai 行为保持一致
+        this.resolveFolder(name)?.let {
+            return it
         }
-        throw PermissionDeniedException("当前 Onebot 实现不支持获取文件夹创建回执")
+        val result = contact.bot.impl.createGroupFileFolder(contact.id, name, id)
+        val data = result.data ?: throw PermissionDeniedException("当前 Onebot 实现不支持获取文件夹创建回执")
+        val folderId = if (data.folderId.isNotEmpty()) {
+            data.folderId
+        } else if (data.groupItem?.folderInfo?.folderId?.isNotEmpty() ?: false) {
+            data.groupItem?.folderInfo?.folderId!!
+        } else throw PermissionDeniedException("当前 Onebot 实现不支持获取文件夹创建回执")
+        val time = currentTimeSeconds()
+        val folder = FolderWrapper(contact, this, folderId, name, time, time, contact.bot.id, 0)
+        folders.add(folder)
+        return folder
     }
 
     @JavaFriendlyAPI
@@ -284,7 +291,11 @@ internal class FileWrapper(
     }
 
     override suspend fun moveTo(folder: AbsoluteFolder): Boolean {
-        TODO("暂无移动文件实现")
+        val success = impl.moveGroupFIle(contact.id, id, absolutePath, folder.absolutePath).data?.ok ?: false
+        when (contact.bot.appName.lowercase()) {
+            "napcat" -> return success
+            else -> throw PermissionDeniedException("当前 Onebot 实现不支持移动文件")
+        }
     }
 
     override suspend fun refresh(): Boolean {
