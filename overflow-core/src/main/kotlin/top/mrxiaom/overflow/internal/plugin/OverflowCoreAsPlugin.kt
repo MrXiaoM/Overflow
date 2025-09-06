@@ -286,6 +286,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 appendLine()
                 append("Overflow 无法确保您的环境是否安全，因此我们").lightYellow().append("将不会为您的BOT安全负责。")
                 appendLine()
+                append("如果您作为用户并看到了这条信息，请").lightRed().append(" 立即停止程序，并询问整合包的提供者是否配置了防火墙等安全措施。 ")
             }
         }
 
