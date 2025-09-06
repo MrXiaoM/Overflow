@@ -115,3 +115,14 @@ WebSocket 各关闭码的详细意义另请参见 [CloseFrame.java](https://gith
 | `-Doverflow.not-exit=true`        | 设置无法连接到 Onebot 时不结束进程                                                                           |
 | `-Doverflow.timeout=超时时间`         | 设置主动发送 action 的请求超时时间(毫秒)，默认为10000毫秒(10秒)                                                       |
 | `-Doverflow.timeout-process=超时时间` | 设置处理事件的超时时间(毫秒)，默认为200000毫秒(20秒)。这个超时时间是在 Overflow 内部，将 Onebot 事件转换为 mirai 事件的时间，与事件广播后被插件处理无关。 |
+
+::: warning 警告
+`-Doverflow.skip-token-security-check=I_KNOW_WHAT_I_AM_DOING` 跳过 token 安全性检查。
+
+这个 JVM 参数**当且仅当**您在**已配置好防火墙、无鉴权安全风险的环境下**时使用。  
+如果你添加了这个 JVM 参数，即代表你已获悉可能带来的安全隐患，**你最好真的知道你在做什么**。  
+此时，如果你的 Onebot 服务暴露在公网中，将有可能被有心人士利用进行非法操作。
++ **请勿将这个 JVM 参数添加到“整合包”中。**
++ **请勿将这个 JVM 参数添加到“整合包”中。**
++ **请勿将这个 JVM 参数添加到“整合包”中。**
+:::
