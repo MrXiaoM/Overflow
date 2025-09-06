@@ -40,6 +40,7 @@ import top.mrxiaom.overflow.internal.Overflow
 import top.mrxiaom.overflow.internal.message.OnebotMessages.string
 import top.mrxiaom.overflow.internal.plugin.OverflowCoreAsPlugin.TheDescription.id
 import top.mrxiaom.overflow.internal.utils.LoggerInFolder
+import top.mrxiaom.overflow.internal.utils.securityLength
 import java.io.File
 import kotlin.reflect.jvm.jvmName
 import kotlin.system.exitProcess
@@ -161,6 +162,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
 
     }
 
+    @OptIn(ExperimentalStdlibApi::class)
     @Suppress("DEPRECATION_ERROR")
     private suspend fun StartupEvent.onPostStartup() {
         runCatching {
@@ -187,16 +189,118 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             appendLine()
             appendLine()
         }
-        if (Overflow.instance.config.token.length <= 8) {
+
+        //-Doverflow.skip-token-security-check=I_KNOW_WHAT_I_AM_DOING
+        val SKIP_TOKEN_CHECK = System.getProperty("overflow.skip-token-security-check") == "I_KNOW_WHAT_I_AM_DOING"
+
+        if (!SKIP_TOKEN_CHECK) {
+            if (Overflow.instance.config.token.isBlank()) {
+                ConsoleCommandSender.sendAnsiMessage {
+                    appendLine()
+                    reset().lightRed()
+                    append("注意：")
+                    reset().lightYellow()
+                    append("Overflow 拒绝连接")
+                    lightRed().append("《未经配置 token 鉴权》 ")
+                    lightYellow().append("的 OneBot 实现")
+                    appendLine()
+                    append("请设置你的 token，然后重新启动 Overflow。")
+                    appendLine()
+                }
+                shutdown()
+                return
+            }
+
+            when(Overflow.instance.config.token.securityLength()) {
+                in 0.0..<3.5 -> {
+                    ConsoleCommandSender.sendAnsiMessage {
+                        appendLine()
+                        reset().lightRed()
+                        append("注意：")
+                        reset().lightYellow()
+                        appendLine("您的token极易受到攻击。为了保护您的BOT安全，请修改您的token，然后重新启动 Overflow。")
+                        appendLine("以下是我们认为比较安全的token：")
+                        appendLine("极度安全：")
+                        appendLine("  9位及以上的数字+小写+大写+特殊字符组合")
+                        appendLine("  10位及以上的数字+小写+大写字符组合")
+                        appendLine("  15位及以上的数字+小写字符组合")
+                        appendLine("中等安全：")
+                        appendLine("  5到14位的数字+小写字符组合")
+                        appendLine("  5到9位的数字+小写+大写字符组合")
+                        appendLine("  8位及以上的纯小写字符")
+                        appendLine("  4到8位的数字+小写+大写+特殊字符组合")
+                        appendLine("极度不安全：")
+                        appendLine("  任何长度的纯数字密码")
+                        appendLine("  7位以下的纯小写字符密码")
+                        appendLine("  6位以下的数字+小写字符组合")
+                        appendLine("  4位以下的任何字符组合")
+                        append("请注意：对于 中等安全 以下的密码，我们会")
+                        lightRed().append(" 进行提示。")
+                        appendLine()
+                        lightYellow().append("而对于 极度不安全 和 不设置token 的用户，我们将会")
+                        lightRed().append(" 拒绝启动 Overflow。 ")
+                    }
+                    shutdown()
+                    return
+                }
+
+                in 3.5..<4.5 -> {
+                    ConsoleCommandSender.sendAnsiMessage {
+                        appendLine()
+                        reset().lightRed()
+                        append("注意：")
+                        reset().lightYellow()
+                        appendLine("你的token仍然不够安全，如果你的 Onebot 服务暴露在公网中，将有可能被有心人士利用进行非法操作。")
+                        appendLine("以下是我们认为比较安全的token：")
+                        appendLine("极度安全：")
+                        appendLine("  9位及以上的数字+小写+大写+特殊字符组合")
+                        appendLine("  10位及以上的数字+小写+大写字符组合")
+                        appendLine("  15位及以上的数字+小写字符组合")
+                        appendLine("中等安全：")
+                        appendLine("  5到14位的数字+小写字符组合")
+                        appendLine("  5到9位的数字+小写+大写字符组合")
+                        appendLine("  8位及以上的纯小写字符")
+                        appendLine("  4到8位的数字+小写+大写+特殊字符组合")
+                        appendLine("极度不安全：")
+                        appendLine("  任何长度的纯数字密码")
+                        appendLine("  7位以下的纯小写字符密码")
+                        appendLine("  6位以下的数字+小写字符组合")
+                        appendLine("  4位以下的任何字符组合")
+                        append("请注意：对于 中等安全 以下的密码，我们会")
+                        lightRed().append(" 进行提示。")
+                        appendLine()
+                        lightYellow().append("而对于 极度不安全 和 不设置token 的用户，我们将会")
+                        lightRed().append(" 拒绝启动 Overflow。 ")
+                    }
+                }
+
+                else -> Unit
+            }
+        } else {
             ConsoleCommandSender.sendAnsiMessage {
                 appendLine()
                 reset().lightRed()
-                append("  (!) ")
+                append("注意：")
                 reset().lightYellow()
-                append("请注意，你没有设置 token 或 token 长度过短，如果你的 Onebot 服务暴露在公网中，将有可能被有心人士利用进行非法操作。").reset()
+                appendLine("检测到对 Token校验机制 的绕过处理。")
+                append("该参数仅供").lightRed().append(" 开发人员 或 已经配置了防火墙等安全措施的 ").lightYellow().append("用户使用")
                 appendLine()
+                append("由于 Overflow 无法辨别程序的环境，因此我们").lightYellow().append("将不会为您的BOT安全负责。")
+                appendLine()
+                append("如果您作为用户并看到了这条信息，请").lightRed().append(" 立即停止程序，并询问整合包的提供者是否配置了防火墙等安全措施。 ")
             }
         }
+
+//        if (Overflow.instance.config.token.securityLength() < 80) {
+//            ConsoleCommandSender.sendAnsiMessage {
+//                appendLine()
+//                reset().lightRed()
+//                append("  (!) ")
+//                reset().lightYellow()
+//                append("请注意，你没有设置 token 或 token 长度过短，如果你的 Onebot 服务暴露在公网中，将有可能被有心人士利用进行非法操作。").reset()
+//                appendLine()
+//            }
+//        }
         if (autoConnect) startWithConfig()
     }
 
