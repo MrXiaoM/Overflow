@@ -187,6 +187,16 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
             appendLine()
             appendLine()
         }
+        if (Overflow.instance.config.token.length <= 8) {
+            ConsoleCommandSender.sendAnsiMessage {
+                appendLine()
+                reset().lightRed()
+                append("  (!) ")
+                reset().lightYellow()
+                append("请注意，你没有设置 token 或 token 长度过短，如果你的 Onebot 服务暴露在公网中，将有可能被有心人士利用进行非法操作。").reset()
+                appendLine()
+            }
+        }
         if (autoConnect) startWithConfig()
     }
 
