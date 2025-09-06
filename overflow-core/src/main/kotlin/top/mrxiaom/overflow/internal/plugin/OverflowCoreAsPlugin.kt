@@ -193,7 +193,7 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
         //-Doverflow.skip-token-security-check=I_KNOW_WHAT_I_AM_DOING
         val SKIP_TOKEN_CHECK = System.getProperty("overflow.skip-token-security-check") == "I_KNOW_WHAT_I_AM_DOING"
 
-        if (SKIP_TOKEN_CHECK) {
+        if (!SKIP_TOKEN_CHECK) {
             if (Overflow.instance.config.token.isBlank()) {
                 ConsoleCommandSender.sendAnsiMessage {
                     appendLine()
@@ -282,9 +282,10 @@ internal object OverflowCoreAsPlugin : Plugin, CommandOwner {
                 reset().lightRed()
                 append("注意：")
                 reset().lightYellow()
+                appendLine("检测到对 Token校验机制 的绕过处理。")
                 append("该参数仅供").lightRed().append(" 开发人员 或 已经配置了防火墙等安全措施的 ").lightYellow().append("用户使用")
                 appendLine()
-                append("Overflow 无法确保您的环境是否安全，因此我们").lightYellow().append("将不会为您的BOT安全负责。")
+                append("由于 Overflow 无法辨别程序的环境，因此我们").lightYellow().append("将不会为您的BOT安全负责。")
                 appendLine()
                 append("如果您作为用户并看到了这条信息，请").lightRed().append(" 立即停止程序，并询问整合包的提供者是否配置了防火墙等安全措施。 ")
             }
