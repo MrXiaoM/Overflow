@@ -5,6 +5,7 @@ import cn.evolvefield.onebot.sdk.util.ignorable
 import cn.evolvefield.onebot.sdk.util.ignorableArray
 import cn.evolvefield.onebot.sdk.util.ignorableObject
 import cn.evolvefield.onebot.sdk.util.nullableInt
+import cn.evolvefield.onebot.sdk.util.nullableString
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.CompletableDeferred
@@ -24,10 +25,6 @@ import java.util.*
  * Date: 2022/9/14 15:06
  * Version: 1.0
  */
-/**
- * @param channel        [WebSocket]
- * @param requestTimeout Request Timeout
- */
 internal class ActionSendRequest(
     private val bot: Bot,
     private val context: ActionContext,
@@ -38,15 +35,17 @@ internal class ActionSendRequest(
 ) {
     private val resp = CompletableDeferred<JsonObject>(parent)
     /**
-     * @param req Request json data
-     * @return Response json data
+     * 执行向 Onebot 服务端主动发送请求
+     * @param req 发送的 JSON 数据
+     * @return 收到的回应
      */
     @Throws(TimeoutCancellationException::class, ActionFailedException::class)
     suspend fun send(req: JsonObject): JsonObject {
+        // 发送请求，并等待结果回调
         val resp = mutex.withLock {
             kotlin.runCatching {
                 withTimeout(requestTimeout) {
-                    val echo = req.nullableInt("echo", null)
+                    val echo = req.nullableString("echo", null)
                     if (echo != null) {
                         logger.debug("[Send][$echo] --> {}", req.toString())
                     } else {
@@ -57,7 +56,9 @@ internal class ActionSendRequest(
                 }
             }.onFailure { resp.cancel() }.getOrThrow()
         }
+        // 根据请求上下文，进行调用失败检查判定
         if (resp.ignorable("status", if (context.ignoreStatus) "" else "failed") == "failed") {
+            // 如果发送的是消息，并且里面有 base64 资源，在报错信息增加文件类型信息
             val extra = runCatching {
                 val params = req.ignorableObject("params") { JsonObject() }
                 val messages = params.ignorableArray("message") { JsonArray() }
@@ -78,7 +79,7 @@ internal class ActionSendRequest(
             throw ActionFailedException(
                 action = context.action,
                 app = "${bot.appName} v${bot.appVersion}",
-                msg = "${resp.ignorable("message", "")}$extra",
+                msg = resp.ignorable("message", "") + extra,
                 json = resp
             )
         }

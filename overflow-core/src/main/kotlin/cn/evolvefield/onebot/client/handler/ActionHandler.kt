@@ -87,12 +87,23 @@ internal class ActionHandler(
     }
 
     /**
-     * 构建请求数据
-     * {"action":"send_private_msg","params":{"user_id":10001000,"message":"你好"},"echo":"123"}
+     * 构建主动请求 JSON
+     * ```json5
+     * // 示例
+     * {
+     *     "action": "send_private_msg",
+     *     "params": {
+     *         "user_id": 10001000,
+     *         "message": "你好"
+     *     },
+     *     "echo": 123
+     * }
+     * ```
      *
      * @param action 请求路径
      * @param params 请求参数
-     * @return 请求数据结构
+     * @param block 回调这次请求的 `echo` 值
+     * @return 请求数据结构，最终结果是未格式化的
      */
     private fun generateReqJson(
         action: String,
