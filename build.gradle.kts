@@ -18,7 +18,7 @@ plugins {
 Helper.proj = rootProject
 group = "top.mrxiaom.mirai"
 
-val overflowVersion = "1.0.7".ext("overflowVersion")
+val overflowVersion = "1.0.8".ext("overflowVersion")
 val miraiVersion = "2.16.0".ext("miraiVersion")
 
 var commitHash = "local"
