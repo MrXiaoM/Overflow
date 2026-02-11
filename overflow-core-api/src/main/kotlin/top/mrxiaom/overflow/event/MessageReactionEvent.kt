@@ -37,4 +37,6 @@ public class MessageReactionEvent(
      * `true` 为添加，`false` 为移除
      */
     public val operation: Boolean,
-): BotEvent, AbstractEvent()
+): BotEvent, AbstractEvent(){
+    public override fun toString()= "MessageReactionEvent(bot=$bot, group=$group, operator=$operator, messageId=$messageId, reaction='$reaction', count=$count, operation=$operation)"
+}
