@@ -11,6 +11,8 @@ class GroupMsgEmojiLikeNotice : NoticeEvent() {
     var messageId = 0
     @SerializedName("likes")
     var likes = LinkedList<Like>()
+    @SerializedName("is_add")
+    var isAdd: Boolean? = null
 
     class Like {
         @SerializedName("emoji_id")

@@ -430,7 +430,12 @@ internal fun addGroupListeners() {
         val group = bot.group(e.groupId)
         val member = group.queryMember(e.userId) ?: return@listen
         val operator = if (member.id == bot.id) null else member
-        // TODO: 接口中没有提及是添加还是删除，可能要开一张缓存表来记录
+        val isAdd = if (e.isAdd == null) {
+            logger.warning("请更新至新版 Onebot 或 LLOnebot")
+            true
+        } else {
+            e.isAdd!!
+        }
         for (like in e.likes) {
             bot.eventDispatcher.broadcastAsync(MessageReactionEvent(
                 bot = bot,
@@ -439,7 +444,7 @@ internal fun addGroupListeners() {
                 operator = operator,
                 reaction = like.emojiId,
                 count = like.count,
-                operation = true, // TODO
+                operation = isAdd
             ))
         }
     }
