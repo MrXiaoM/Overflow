@@ -431,7 +431,7 @@ internal fun addGroupListeners() {
         val member = group.queryMember(e.userId) ?: return@listen
         val operator = if (member.id == bot.id) null else member
         val isAdd = if (e.isAdd == null) {
-            logger.warning("请更新至新版 Onebot 或 LLOnebot")
+            logger.warning("请更新至新版 NapCat 或 LLOnebot")
             true
         } else {
             e.isAdd!!
