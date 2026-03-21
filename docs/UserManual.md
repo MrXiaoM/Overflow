@@ -59,7 +59,7 @@ Overflow 主要配置文件为 `overflow.json`。
 
 从下方选择任意一种连接方式，**仅能选择一种**。
 
-以下提到的 `Onebot 端`，均为 `Onebot 协议实现`，如 LLOnebot。
+以下提到的 `Onebot 端`，均为 `Onebot 协议实现`，如 LLOnebot、NapCat。
 
 ------
 
@@ -67,28 +67,60 @@ Overflow 主要配置文件为 `overflow.json`。
 
 让 Overflow 去连接 Onebot 协议实现。在网络协议层面，Onebot 做服务端，Overflow 做客户端。
 
-关键配置项：`ws_host` - 连接目标 WebSocket 地址。
+```json5
+{
+  // 正向 WebSocket 示例配置
+  "connections": [
+    {
+      "enable": true,
+      "type": "websocket",
+      "host": "ws://127.0.0.1:3001",
+      "token": ""
+    },
+  ]
+}
+```
+
+关键配置项：
++ `enable` - 是否启用该配置
++ `type` - 指定连接类型为正向 WebSocket
++ `host` - 连接目标 WebSocket 地址
 
 在 `Onebot 端` 获取如下信息：
 
 + 正向 WebSocket **端口** (也叫做主动 WebSocket 端口)
 + 在 `Overflow 侧` 可以与 Onebot **建立连接**的IP地址，可以是内网、公网或者内网穿透等等，模拟器可能需要配置端口转发。
 
-将以上信息以 `ws://IP:端口` 的格式填入 `ws_host`，如 `ws://127.0.0.1:3001`，再次启动即可。
+将以上信息以 `ws://IP:端口` 的格式填入 `host`，如 `ws://127.0.0.1:3001`，再次启动即可。
 
 ### 反向 WebSocket
 
 让 Onebot 协议实现去连接 Overflow。在网络协议层面，Onebot 做客户端，Overflow 做服务端。
 
-> 设置此项以后，正向 WebSocket 的配置将会**失效**。
+```json5
+{
+  // 反向 WebSocket 示例配置
+  "connections": [
+    {
+      "enable": true,
+      "type": "websocket-reverse",
+      "port": 3002,
+      "token": ""
+    },
+  ]
+}
+```
 
-关键配置项：`reversed_ws_port` - 反向 WebSocket 服务器端口。
+关键配置项：
++ `enable` - 是否启用该配置
++ `type` - 指定连接类型为正向 WebSocket
++ `port` - 反向 WebSocket 服务器端口
 
-首先修改 `reversed_ws_port` 为 `[1, 65535]` 区间的数 (端口号有效值)，启动 Overflow，确保端口没有冲突，若有冲突请自行更改。
+首先修改 `port` 为 `[1, 65535]` 区间的数 (端口号有效值)，启动 Overflow，确保端口没有冲突，若有冲突请自行更改。
 
 在 `Overflow 侧` 获取以下信息：
 
-+ 被动服务器**端口**，即 `reversed_ws_port` 的值。
++ 反向服务器**端口**，即 `port` 的值。
 + 在 `Onebot 端` 可以与 Overflow **建立连接**的IP地址。
 
 将以上信息以 `ws://IP:端口` 的格式写好备用，这个就叫做`反向 WebSocket 地址`了，如 `ws://127.0.0.1:3002`。
