@@ -4,6 +4,7 @@ package top.mrxiaom.overflow.internal.message
 import cn.evolvefield.onebot.sdk.entity.MsgId
 import cn.evolvefield.onebot.sdk.event.message.MessageEvent
 import cn.evolvefield.onebot.sdk.response.group.ForwardMsgResp
+import cn.evolvefield.onebot.sdk.response.group.GetMsgResp
 import cn.evolvefield.onebot.sdk.util.CQCode
 import cn.evolvefield.onebot.sdk.util.JsonHelper.gson
 import com.google.gson.JsonParser
@@ -281,9 +282,9 @@ internal object OnebotMessages {
      * @param message 消息内容，应为 json 数组消息，若 json 反序列化失败，将会尝试通过 CQ 码反序列化，若依然失败，返回为纯文本消息作为 fallback
      * @param source 消息源
      */
-    internal suspend fun deserializeFromOneBot(bot: RemoteBot, message: String, source: MessageSource? = null): MessageChain {
-        return deserializeMessageFromJson(bot, message, source)
-            ?: deserializeMessageFromCQCode(bot, message, source)
+    internal suspend fun deserializeFromOneBot(bot: RemoteBot, message: String, source: MessageSource? = null, resolveReplyMessage: Boolean = true): MessageChain {
+        return deserializeMessageFromJson(bot, message, source, resolveReplyMessage)
+            ?: deserializeMessageFromCQCode(bot, message, source, resolveReplyMessage)
             ?: source?.plus(message)
             ?: PlainText(message).toMessageChain()
     }
@@ -295,11 +296,11 @@ internal object OnebotMessages {
      * @param message 消息内容，应为 json 数组消息，若 json 反序列化失败，将会返回 null
      * @param source 消息源
      */
-    internal suspend fun deserializeMessageFromJson(bot: RemoteBot, message: String, source: MessageSource? = null): MessageChain? {
+    internal suspend fun deserializeMessageFromJson(bot: RemoteBot, message: String, source: MessageSource? = null, resolveReplyMessage: Boolean = true): MessageChain? {
         return runCatching {
             Json.parseToJsonElement(message).jsonArray
         }.map {
-            deserializeFromOneBotJson(bot, it, source)
+            deserializeFromOneBotJson(bot, it, source, resolveReplyMessage)
         }.getOrNull()
     }
     /**
@@ -309,12 +310,12 @@ internal object OnebotMessages {
      * @param message 消息内容，CQ 码，CQ 码反序列化失败 (通常不会失败)，将会返回 null
      * @param source 消息源
      */
-    internal suspend fun deserializeMessageFromCQCode(bot: RemoteBot, message: String, source: MessageSource? = null): MessageChain? {
+    internal suspend fun deserializeMessageFromCQCode(bot: RemoteBot, message: String, source: MessageSource? = null, resolveReplyMessage: Boolean = true): MessageChain? {
         return runCatching {
             val cqCodeToJson = CQCode.toJson(message).toString()
             Json.parseToJsonElement(cqCodeToJson).jsonArray
         }.map {
-            deserializeFromOneBotJson(bot, it, source)
+            deserializeFromOneBotJson(bot, it, source, resolveReplyMessage)
         }.getOrNull()
     }
 
@@ -323,7 +324,7 @@ internal object OnebotMessages {
      *
      * @see deserializeFromOneBot
      */
-    internal suspend fun deserializeFromOneBotJson(bot: RemoteBot, json: JsonArray, source: MessageSource? = null): MessageChain {
+    internal suspend fun deserializeFromOneBotJson(bot: RemoteBot, json: JsonArray, source: MessageSource? = null, resolveReplyMessage: Boolean = true): MessageChain {
         return buildMessageChain {
             if (source != null) add(source)
 
@@ -436,7 +437,7 @@ internal object OnebotMessages {
                                 //若报错则主动获取合并转发消息，否则将其中的数据构造为合并转发消息
                                 if (tryContent != null) {
                                     return@run tryContent.message.map {
-                                        val msg = deserializeFromOneBot(bot, it.message)
+                                        val msg = deserializeFromOneBot(bot, it.message, resolveReplyMessage=false)
                                         ForwardMessage.Node(
                                             it.sender!!.userId,
                                             it.time,
@@ -482,7 +483,12 @@ internal object OnebotMessages {
                             val id = when {
                                 else -> data["id"].string.toInt()
                             }
-                            val msgData = (bot as BotWrapper).impl.getMsg(id) { throwExceptions(null) }.data
+                            val msgData: GetMsgResp? =
+                                if (resolveReplyMessage) {
+                                    (bot as BotWrapper).impl.getMsg(id) { throwExceptions(null) }.data
+                                } else {
+                                    null
+                                }
                             val msgSource = MessageSourceBuilder()
                                 .id(id)
                                 .internalId(id)
@@ -498,7 +504,7 @@ internal object OnebotMessages {
                                 hasQuote = true
                             }
 
-                            add(QuoteReply(msgSource.build(bot.id, kind)))
+                            add(QuoteReply(msgSource.build((bot as Bot).id, kind)))
                         }
 
                         "file" -> { // OpenShamrock
