@@ -35,7 +35,7 @@ interface ExtendedMessageSerializerService : BaseService {
     companion object {
         private val loader = SpiServiceLoader(ExtendedMessageSerializerService::class)
 
-        internal val instances: List<ExtendedMessageSerializerService>
+        val instances: List<ExtendedMessageSerializerService>
             get() = loader.allServices.sortedBy { it.priority }
 
         suspend fun List<ExtendedMessageSerializerService>.deserialize(
