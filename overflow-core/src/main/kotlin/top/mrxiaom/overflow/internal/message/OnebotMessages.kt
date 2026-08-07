@@ -28,6 +28,7 @@ import top.mrxiaom.overflow.message.data.Markdown
 internal object OnebotMessages {
     internal fun registerSerializers() = MessageSerializers.apply {
         registerSerializer(At::class, At.serializer())
+        registerSerializer(AtAll::class, AtAll.serializer())
         registerSerializer(Dice::class, Dice.serializer())
         registerSerializer(Face::class, Face.serializer())
         registerSerializer(FlashImage::class, FlashImage.serializer())
